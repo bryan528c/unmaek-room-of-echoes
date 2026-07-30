@@ -26,4 +26,10 @@ describe('SaveSystem', () => {
     storage.value = JSON.stringify({ ...DEFAULT_SAVE, settings: { ...DEFAULT_SAVE.settings, shake: 8 } });
     expect(loadSave(storage)).toEqual(DEFAULT_SAVE);
   });
+
+  it('폴리시 이전 저장 데이터는 기록을 보존하고 새 진행 필드만 기본값으로 채운다', () => {
+    const storage = new MemoryStorage();
+    storage.value = JSON.stringify({ settings: DEFAULT_SAVE.settings, bestScore: 2180, bestRank: 'B', tutorialSeen: true });
+    expect(loadSave(storage)).toEqual({ ...DEFAULT_SAVE, bestScore: 2180, bestRank: 'B', tutorialSeen: true });
+  });
 });

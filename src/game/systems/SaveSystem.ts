@@ -9,9 +9,14 @@ export interface GameSettings {
 export interface GameSave {
   settings: GameSettings;
   bestScore: number;
-  bestRank: 'S' | 'A' | 'B' | 'C' | '-';
+  bestRank: GameRank;
   tutorialSeen: boolean;
+  bestStage: number;
+  bossReached: boolean;
+  cleared: boolean;
 }
+
+export type GameRank = 'S' | 'A' | 'B' | 'C+' | 'C' | 'C-' | '-';
 
 export interface StorageLike {
   getItem(key: string): string | null;
@@ -31,6 +36,9 @@ export const DEFAULT_SAVE: GameSave = {
   bestScore: 0,
   bestRank: '-',
   tutorialSeen: false,
+  bestStage: 0,
+  bossReached: false,
+  cleared: false,
 };
 
 const KEY = 'eonmaek-save-v1';
@@ -49,12 +57,16 @@ export function loadSave(storage: StorageLike): GameSave {
         !validNumber(settings.shake, 0, 1) || typeof settings.reducedMotion !== 'boolean' || typeof settings.showTutorial !== 'boolean') {
       return structuredClone(DEFAULT_SAVE);
     }
-    const ranks = ['S', 'A', 'B', 'C', '-'];
+    const ranks: readonly GameRank[] = ['S', 'A', 'B', 'C+', 'C', 'C-', '-'];
+    const bestRank = typeof parsed.bestRank === 'string' && ranks.includes(parsed.bestRank as GameRank) ? parsed.bestRank as GameRank : '-';
     return {
       settings: { ...settings },
       bestScore: typeof parsed.bestScore === 'number' && parsed.bestScore >= 0 ? parsed.bestScore : 0,
-      bestRank: ranks.includes(parsed.bestRank ?? '') ? (parsed.bestRank ?? '-') : '-',
+      bestRank,
       tutorialSeen: parsed.tutorialSeen === true,
+      bestStage: typeof parsed.bestStage === 'number' && parsed.bestStage >= 0 ? Math.min(7, Math.floor(parsed.bestStage)) : 0,
+      bossReached: parsed.bossReached === true,
+      cleared: parsed.cleared === true,
     } as GameSave;
   } catch {
     return structuredClone(DEFAULT_SAVE);

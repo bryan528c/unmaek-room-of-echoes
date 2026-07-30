@@ -9,6 +9,11 @@ export interface HeroAttack {
   y: number;
 }
 
+const HERO_SCALE = 0.63;
+const HERO_HALF_WIDTH = 62;
+const HERO_VISIBLE_HEIGHT = 141;
+const HERO_FLOOR_LIMIT = 494;
+
 export class Hero extends Phaser.Physics.Arcade.Sprite {
   public health: number = BALANCE.hero.maxHealth;
   public readonly maxHealth = BALANCE.hero.maxHealth;
@@ -33,10 +38,10 @@ export class Hero extends Phaser.Physics.Arcade.Sprite {
     super(scene, x, y, 'hero-idle');
     scene.add.existing(this);
     scene.physics.add.existing(this);
-    this.setDepth(20).setOrigin(0.5, 0.76).setScale(0.68);
+    this.setDepth(20).setOrigin(0.5, 1).setScale(HERO_SCALE);
     const body = this.body as Phaser.Physics.Arcade.Body;
-    body.setSize(Math.max(28, this.width * 0.28), Math.max(36, this.height * 0.38));
-    body.setOffset(this.width * 0.36, this.height * 0.53);
+    body.setSize(28, 28);
+    body.setOffset((this.width - 28) / 2, this.height - 30);
     body.setCollideWorldBounds(true);
   }
 
@@ -52,8 +57,9 @@ export class Hero extends Phaser.Physics.Arcade.Sprite {
     if (vector.lengthSq() > 0) vector.normalize().scale(BALANCE.hero.speed);
     this.setVelocity(vector.x, vector.y);
     if (!this.attacking) this.setTexture(vector.lengthSq() > 0 ? 'hero-move' : 'hero-idle');
-    if (vector.lengthSq() > 0) this.y += Math.sin(time / 65) * 0.13;
-    else this.setScale(0.68, 0.68 + Math.sin(time / 330) * 0.012);
+    this.setScale(HERO_SCALE, HERO_SCALE + (vector.lengthSq() > 0 ? Math.abs(Math.sin(time / 78)) * 0.006 : Math.sin(time / 330) * 0.008));
+    this.setRotation(vector.lengthSq() > 0 ? Math.sin(time / 105) * 0.012 : 0);
+    this.constrainToArena();
     if (this.attackBuffered && time - this.lastAttackAt >= BALANCE.hero.attackCooldown) {
       this.attackBuffered = false;
       this.performAttack(this.attackTarget.x, this.attackTarget.y, this.attackHandler);
@@ -82,9 +88,9 @@ export class Hero extends Phaser.Physics.Arcade.Sprite {
     this.facing = Phaser.Math.Angle.Between(this.x, this.y, targetX, targetY);
     this.setFlipX(Math.cos(this.facing) < 0).setTexture('hero-attack');
     const startRotation = this.rotation;
-    this.scene.tweens.add({ targets: this, rotation: startRotation + (this.flipX ? -0.09 : 0.09), scaleX: this.flipX ? -0.75 : 0.75, scaleY: 0.73, duration: 70, yoyo: true });
+    this.scene.tweens.add({ targets: this, rotation: startRotation + (this.flipX ? -0.075 : 0.075), scaleX: HERO_SCALE * 1.06, scaleY: HERO_SCALE * 1.03, duration: 70, yoyo: true });
     this.scene.time.delayedCall(70, () => handler?.({ combo: this.combo, angle: this.facing, x: this.x, y: this.y }));
-    this.scene.time.delayedCall(145, () => { if (this.active) { this.attacking = false; this.rotation = 0; this.setScale(0.68); } });
+    this.scene.time.delayedCall(145, () => { if (this.active) { this.attacking = false; this.rotation = 0; this.setScale(HERO_SCALE); } });
   }
 
   public dash(directionX: number, directionY: number, onTrail: (x: number, y: number) => void): boolean {
@@ -102,7 +108,7 @@ export class Hero extends Phaser.Physics.Arcade.Sprite {
       this.scene.time.delayedCall(index * 38, () => {
         if (!this.active) return;
         const echo = this.scene.add.image(this.x - vector.x * index * 18, this.y - vector.y * index * 18, this.texture.key)
-          .setOrigin(this.originX, this.originY).setScale(this.scaleX, this.scaleY).setFlipX(this.flipX).setTint(0x53cbb7).setAlpha(0.34).setDepth(18);
+          .setOrigin(0.5, 1).setScale(HERO_SCALE).setFlipX(this.flipX).setTint(0x39a6be).setAlpha(0.3).setDepth(18);
         this.scene.tweens.add({ targets: echo, alpha: 0, duration: 220, onComplete: () => echo.destroy() });
       });
     }
@@ -127,8 +133,8 @@ export class Hero extends Phaser.Physics.Arcade.Sprite {
   public castPose(): void {
     if (!this.active) return;
     this.setTexture('hero-cast').setTint(0x9effec);
-    this.scene.tweens.add({ targets: this, scaleX: this.flipX ? -0.73 : 0.73, scaleY: 0.74, duration: 90, yoyo: true });
-    this.scene.time.delayedCall(260, () => { if (this.active) { this.clearTint(); this.setTexture('hero-idle').setScale(0.68); } });
+    this.scene.tweens.add({ targets: this, scaleX: HERO_SCALE * 1.035, scaleY: HERO_SCALE * 1.045, duration: 90, yoyo: true });
+    this.scene.time.delayedCall(260, () => { if (this.active) { this.clearTint(); this.setTexture('hero-idle').setScale(HERO_SCALE); } });
   }
 
   public takeDamage(amount: number, sourceX: number, sourceY: number): number {
@@ -145,6 +151,11 @@ export class Hero extends Phaser.Physics.Arcade.Sprite {
 
   public heal(amount: number): void { this.health = clamp(this.health + amount, 0, this.maxHealth); }
   public restoreHealth(value: number): void { this.health = clamp(value, 1, this.maxHealth); }
+
+  public constrainToArena(): void {
+    this.x = clamp(this.x, HERO_HALF_WIDTH, 960 - HERO_HALF_WIDTH);
+    this.y = clamp(this.y, HERO_VISIBLE_HEIGHT + 8, HERO_FLOOR_LIMIT);
+  }
 
   public override destroy(fromScene?: boolean): void {
     this.delayedSlash?.remove(false);

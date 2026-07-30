@@ -16,4 +16,9 @@ describe('연결 피해', () => {
       { targetId: 'b', amount: 30, propagated: true },
     ]);
   });
+
+  it('같은 대상이 중복으로 들어와도 공유 피해는 한 번만 전달한다', () => {
+    const duplicated = [{ id: 'a', alive: true }, { id: 'b', alive: true }, { id: 'b', alive: true }];
+    expect(distributeLinkedDamage('a', 50, duplicated, 0.4).filter((packet) => packet.targetId === 'b')).toHaveLength(1);
+  });
 });

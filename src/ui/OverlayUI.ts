@@ -12,6 +12,13 @@ export interface HudState {
   stopCooldown: number;
   rewindCooldown: number;
   linkCooldown: number;
+  stopCost: number;
+  rewindCost: number;
+  linkCost: number;
+  canStop: boolean;
+  canRewind: boolean;
+  canLink: boolean;
+  rewindPreviewHealth?: number;
   empowered: boolean;
   bossHealth?: number;
   bossMaxHealth?: number;
@@ -27,6 +34,12 @@ export interface ResultStats {
   wordUses: Record<'멎는다' | '되돌린다' | '잇는다', number>;
   upgrades: string[];
   rank: string;
+  progressStage: number;
+  progressLabel: string;
+  previousBest: number;
+  scoreDelta: number;
+  newBest: boolean;
+  milestones: string[];
 }
 
 export class OverlayUI {
@@ -36,6 +49,7 @@ export class OverlayUI {
   private tutorial?: HTMLElement;
   private damageHealth = 100;
   private damageTimer?: number;
+  private keyHandler?: (event: KeyboardEvent) => void;
 
   public constructor(private readonly root: HTMLElement, private readonly save: GameSave, private readonly audio: AudioSystem) {
     this.root.innerHTML = '<div class="screen boot-card"><div class="ink-seal">言</div><p>잔향을 불러오는 중…</p></div>';
@@ -44,10 +58,16 @@ export class OverlayUI {
   public setPersistHandler(handler: () => void): void { this.persist = handler; }
 
   private clear(): void {
+    if (this.keyHandler) { window.removeEventListener('keydown', this.keyHandler); this.keyHandler = undefined; }
+    window.clearTimeout(this.damageTimer); this.damageTimer = undefined;
     this.root.innerHTML = '';
     this.screen = undefined;
     this.hud = undefined;
     this.tutorial = undefined;
+  }
+
+  private progressLabel(stage: number): string {
+    return ['기록 없음', '제1전투', '제2전투', '제3전투', '보스 제1형', '보스 제2형', '보스 제3형', '클리어'][Math.max(0, Math.min(7, stage))] ?? '기록 없음';
   }
 
   public showMenu(onStart: () => void): void {
@@ -66,19 +86,19 @@ export class OverlayUI {
           <button class="rune-button" data-action="controls">조작법</button>
           <button class="rune-button" data-action="settings">설정</button>
         </div>
-        <div class="best-record"><span>최고 기록</span><strong>${this.save.bestScore.toLocaleString()} · ${this.save.bestRank} 랭크</strong></div>
+        <div class="best-record"><span>최고 기록</span><strong>${this.save.bestScore.toLocaleString()} · ${this.save.bestRank} 랭크</strong><small>최고 진행 · ${this.progressLabel(this.save.bestStage)}</small></div>
       </div>
       <p class="footer-note">한 판 8–12분 · 헤드폰 권장</p>`;
     this.root.append(screen);
     this.screen = screen;
-    const start = (): void => { this.audio.unlock(); onStart(); };
+    const start = (): void => { if (this.keyHandler) window.removeEventListener('keydown', this.keyHandler); this.keyHandler = undefined; this.audio.unlock(); onStart(); };
     screen.querySelector('[data-action="start"]')?.addEventListener('click', start, { once: true });
     screen.querySelector('[data-action="controls"]')?.addEventListener('click', () => this.showControls(() => this.showMenu(onStart)));
     screen.querySelector('[data-action="settings"]')?.addEventListener('click', () => this.showSettings(() => this.showMenu(onStart)));
     const enter = (event: KeyboardEvent): void => {
       if (event.code === 'Enter' && this.screen === screen) { window.removeEventListener('keydown', enter); start(); }
     };
-    window.addEventListener('keydown', enter);
+    this.keyHandler = enter; window.addEventListener('keydown', enter);
   }
 
   private showControls(back: () => void): void {
@@ -88,7 +108,7 @@ export class OverlayUI {
     screen.innerHTML = `<div class="panel-content wide"><p class="eyebrow">살아남기 위한 문법</p><h2>조작법</h2>
       <div class="control-grid">
         <div><kbd>WASD</kbd><kbd>방향키</kbd><span>이동</span></div><div><kbd>마우스</kbd><span>조준</span></div>
-        <div><kbd>좌클릭</kbd><kbd>J</kbd><span>단검 3연격</span></div><div><kbd>우클릭</kbd><kbd>K</kbd><span>패링</span></div>
+        <div><kbd>좌클릭</kbd><kbd>J</kbd><span>단검 3연격</span></div><div><kbd>우클릭</kbd><kbd>K</kbd><kbd>Shift</kbd><span>패링</span></div>
         <div><kbd>Space</kbd><span>무적 대시</span></div><div><kbd>F</kbd><span>다음 언령 강화</span></div>
         <div class="word"><kbd>Q</kbd><span><b>멎는다</b> 적과 탄환 정지</span></div>
         <div class="word"><kbd>E</kbd><span><b>되돌린다</b> 2초 전 상태 복원</span></div>
@@ -133,13 +153,13 @@ export class OverlayUI {
     this.clear();
     const hud = document.createElement('section');
     hud.className = 'hud';
-    hud.innerHTML = `<div class="health-panel"><div class="hero-mini"><img src="./assets/hero-concept.png" alt="" /></div><div><div class="hud-label">생명 <span data-health-text>100 / 100</span></div><div class="health-track"><i data-health-ghost></i><b data-health></b></div></div></div>
+    hud.innerHTML = `<div class="health-panel"><div class="hero-mini"><img src="./assets/hero-concept.png" alt="" /></div><div><div class="hud-label">생명 <span data-health-text>100 / 100</span></div><div class="health-track"><i data-health-ghost></i><em data-health-rewind></em><b data-health></b></div></div></div>
       <div class="stage-panel"><span data-stage>제1전투</span><strong data-score>0</strong></div>
       <div class="boss-panel hidden" data-boss><div><span>기록 포식자</span><em data-boss-phase>제1형</em></div><div class="boss-track"><b data-boss-health></b></div></div>
       <div class="word-hud">
-        <div class="word-slot" data-word="q"><kbd>Q</kbd><b>멎는다</b><span data-cooldown>25</span></div>
-        <div class="word-slot" data-word="e"><kbd>E</kbd><b>되돌린다</b><span data-cooldown>30</span></div>
-        <div class="word-slot" data-word="r"><kbd>R</kbd><b>잇는다</b><span data-cooldown>35</span></div>
+        <div class="word-slot" data-word="q"><kbd>Q</kbd><b>멎는다</b><span data-cooldown>비용 25</span></div>
+        <div class="word-slot" data-word="e"><kbd>E</kbd><b>되돌린다</b><span data-cooldown>비용 30</span></div>
+        <div class="word-slot" data-word="r"><kbd>R</kbd><b>잇는다</b><span data-cooldown>비용 35</span></div>
         <div class="sentence"><div><span>문장력</span><b data-sentence-text>0 / 100</b></div><div class="sentence-track"><i data-sentence></i></div><button data-empower><kbd>F</kbd> 강화 용언</button></div>
       </div>
       <button class="hud-mute" data-mute aria-label="음소거">${this.audio.isMuted ? '×' : '♪'}</button>
@@ -156,21 +176,31 @@ export class OverlayUI {
     const healthPercent = Math.max(0, state.health / state.maxHealth) * 100;
     const healthBar = this.hud.querySelector<HTMLElement>('[data-health]');
     const ghost = this.hud.querySelector<HTMLElement>('[data-health-ghost]');
+    const rewindPreview = this.hud.querySelector<HTMLElement>('[data-health-rewind]');
     if (healthBar) healthBar.style.width = `${healthPercent}%`;
     const currentGhost = this.damageHealth;
     if (state.health < currentGhost) {
       window.clearTimeout(this.damageTimer);
       this.damageTimer = window.setTimeout(() => { this.damageHealth = state.health; if (ghost) ghost.style.width = `${healthPercent}%`; }, 500);
     } else { this.damageHealth = state.health; if (ghost) ghost.style.width = `${healthPercent}%`; }
+    if (rewindPreview) {
+      const previewPercent = Math.max(0, Math.min(100, (state.rewindPreviewHealth ?? state.health) / state.maxHealth * 100));
+      rewindPreview.style.width = `${previewPercent}%`;
+      rewindPreview.classList.toggle('visible', previewPercent > healthPercent + 0.5);
+    }
     const healthText = this.hud.querySelector('[data-health-text]'); if (healthText) healthText.textContent = `${Math.ceil(state.health)} / ${state.maxHealth}`;
     const sentence = this.hud.querySelector<HTMLElement>('[data-sentence]'); if (sentence) sentence.style.width = `${Math.min(100, state.sentence / state.sentenceMax * 100)}%`;
     const sentenceText = this.hud.querySelector('[data-sentence-text]'); if (sentenceText) sentenceText.textContent = `${Math.floor(state.sentence)} / ${state.sentenceMax}`;
     const stage = this.hud.querySelector('[data-stage]'); if (stage) stage.textContent = state.stage;
     const score = this.hud.querySelector('[data-score]'); if (score) score.textContent = state.score.toLocaleString();
     const cooldowns = [state.stopCooldown, state.rewindCooldown, state.linkCooldown];
+    const costs = [state.stopCost, state.rewindCost, state.linkCost];
+    const canUse = [state.canStop, state.canRewind, state.canLink];
     this.hud.querySelectorAll<HTMLElement>('.word-slot').forEach((slot, index) => {
-      const value = cooldowns[index] ?? 0; slot.classList.toggle('unavailable', value > 0);
-      const label = slot.querySelector('[data-cooldown]'); if (label) label.textContent = value > 0 ? `${value.toFixed(1)}s` : '준비';
+      const value = cooldowns[index] ?? 0; const usable = canUse[index] ?? false;
+      slot.classList.toggle('unavailable', !usable); slot.classList.toggle('cooling', value > 0); slot.classList.toggle('ready', usable); slot.classList.toggle('empowered', state.empowered && value <= 0);
+      const label = slot.querySelector('[data-cooldown]');
+      if (label) label.textContent = value > 0 ? `재사용 ${value.toFixed(1)}s` : state.empowered ? '강화 준비' : usable ? `비용 ${costs[index] ?? 0}` : `필요 ${costs[index] ?? 0}`;
     });
     const empower = this.hud.querySelector<HTMLElement>('[data-empower]');
     if (empower) { empower.classList.toggle('ready', state.sentence >= state.sentenceMax || state.empowered); empower.classList.toggle('armed', state.empowered); empower.innerHTML = state.empowered ? '<kbd>F</kbd> 다음 언령 강화됨' : '<kbd>F</kbd> 강화 용언'; }
@@ -209,19 +239,23 @@ export class OverlayUI {
     modal.querySelector('[data-title]')?.addEventListener('click', () => { close(); title(); }, { once: true });
   }
 
+  public hidePause(): void { this.root.querySelector('.pause-modal')?.remove(); }
+
   public showResult(stats: ResultStats, restart: () => void, title: () => void): void {
     this.clear();
     const screen = document.createElement('section'); screen.className = `screen result-screen ${stats.victory ? 'victory' : 'defeat'}`;
     const minutes = Math.floor(stats.time / 60); const seconds = Math.floor(stats.time % 60).toString().padStart(2, '0');
-    screen.innerHTML = `<div class="result-sigil">${stats.rank}</div><div class="result-content"><p class="eyebrow">${stats.victory ? '마지막 문장이 이어졌다' : '기록이 먹빛에 잠겼다'}</p><h2>${stats.victory ? '기록 회수 완료' : '계승 실패'}</h2><div class="score-big">${stats.score.toLocaleString()}</div>
+    const comparison = stats.previousBest > 0 ? `${stats.scoreDelta >= 0 ? '+' : ''}${stats.scoreDelta.toLocaleString()} 이전 최고 대비` : '첫 기록';
+    screen.innerHTML = `<div class="result-sigil">${stats.rank}</div><div class="result-content"><p class="eyebrow">${stats.victory ? '마지막 문장이 이어졌다' : '기록이 먹빛에 잠겼다'}</p><h2>${stats.victory ? '기록 회수 완료' : '계승 실패'}</h2><div class="score-big">${stats.score.toLocaleString()}${stats.newBest ? '<em>NEW BEST</em>' : ''}</div><div class="result-progress"><b>${stats.progressLabel}</b><span>${comparison}</span></div>
       <div class="result-stats"><span>플레이 시간<b>${minutes}:${seconds}</b></span><span>받은 피해<b>${Math.round(stats.damageTaken)}</b></span><span>패링 성공<b>${stats.parries}</b></span><span>멎는다<b>${stats.wordUses['멎는다']}</b></span><span>되돌린다<b>${stats.wordUses['되돌린다']}</b></span><span>잇는다<b>${stats.wordUses['잇는다']}</b></span></div>
+      ${stats.milestones.length ? `<div class="milestones">${stats.milestones.map((item) => `<span>${item}</span>`).join('')}</div>` : ''}
       <div class="upgrade-summary"><span>새겨진 강화</span><p>${stats.upgrades.length ? stats.upgrades.join(' · ') : '없음'}</p></div>
       <div class="panel-buttons"><button class="rune-button primary" data-restart>다시 시작 <kbd>Enter</kbd></button><button class="rune-button" data-title>타이틀로</button></div></div>`;
     this.root.append(screen); this.screen = screen;
     const doRestart = (): void => restart();
     screen.querySelector('[data-restart]')?.addEventListener('click', doRestart, { once: true });
     screen.querySelector('[data-title]')?.addEventListener('click', title, { once: true });
-    const enter = (event: KeyboardEvent): void => { if (event.code === 'Enter' && this.screen === screen) { window.removeEventListener('keydown', enter); doRestart(); } };
-    window.addEventListener('keydown', enter);
+    const enter = (event: KeyboardEvent): void => { if (event.code === 'Enter' && this.screen === screen) { window.removeEventListener('keydown', enter); this.keyHandler = undefined; doRestart(); } };
+    this.keyHandler = enter; window.addEventListener('keydown', enter);
   }
 }

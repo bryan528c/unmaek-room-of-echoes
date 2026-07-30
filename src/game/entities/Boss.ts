@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { BALANCE } from '../balance';
 import { Enemy, type EnemyCallbacks } from './Enemy';
+import { bossPhaseForHealth } from '../systems/CombatRules';
 
 export interface BossCallbacks extends EnemyCallbacks {
   phaseChanged: (phase: number) => void;
@@ -24,8 +25,7 @@ export class Boss extends Enemy {
 
   public override updateAI(time: number, hero: Phaser.Physics.Arcade.Sprite): void {
     if (!this.active || !this.spawned) return;
-    const healthRatio = this.health / this.maxHealth;
-    const desiredPhase = healthRatio <= 0.34 ? 3 : healthRatio <= 0.67 ? 2 : 1;
+    const desiredPhase = bossPhaseForHealth(this.health, this.maxHealth);
     if (desiredPhase > this.phase) this.transition(desiredPhase);
     if (time < this.phaseTransitionUntil) { this.setVelocity(0); return; }
     if (time < this.frozenUntil) { this.setVelocity(0); this.setTint(0x62b9aa); return; }
@@ -46,10 +46,11 @@ export class Boss extends Enemy {
 
   private transition(phase: number): void {
     this.phase = phase;
-    this.phaseTransitionUntil = this.scene.time.now + 1500;
+    this.phaseTransitionUntil = this.scene.time.now + BALANCE.boss.phaseTransition;
     this.actionLockedUntil = this.phaseTransitionUntil;
+    this.nextActionAt = this.phaseTransitionUntil + BALANCE.boss.phaseOpeningDelay;
     this.setVelocity(0).setTint(0xa0f4e5);
-    this.scene.tweens.add({ targets: this, scaleX: this.flipX ? -1.52 : 1.52, scaleY: 1.52, duration: 430, yoyo: true, repeat: 1 });
+    this.scene.tweens.add({ targets: this, scaleX: 1.48, scaleY: 1.48, duration: 330, yoyo: true });
     this.bossCallbacks.phaseChanged(phase);
     if (phase === 3) this.scene.time.delayedCall(900, () => { if (this.active) this.bossCallbacks.summon(3); });
   }

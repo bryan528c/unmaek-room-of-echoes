@@ -18,8 +18,10 @@ export function distributeLinkedDamage(
 ): DistributedDamage[] {
   const result: DistributedDamage[] = [{ targetId: sourceId, amount, propagated }];
   if (propagated) return result;
+  const distributed = new Set<string>([sourceId]);
   for (const target of targets) {
-    if (!target.alive || target.id === sourceId) continue;
+    if (!target.alive || distributed.has(target.id)) continue;
+    distributed.add(target.id);
     result.push({ targetId: target.id, amount: amount * shareRatio, propagated: true });
   }
   return result;

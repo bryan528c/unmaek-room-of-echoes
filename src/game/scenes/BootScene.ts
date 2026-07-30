@@ -24,53 +24,54 @@ export class BootScene extends Phaser.Scene {
 
   private makeChaser(): void {
     const g = this.make.graphics({ x: 0, y: 0 });
-    g.fillStyle(0x080b0c).fillTriangle(8, 64, 28, 16, 52, 64).fillCircle(29, 17, 13);
+    g.fillStyle(0x080b0c).fillTriangle(4, 66, 28, 16, 56, 66).fillTriangle(11, 55, 3, 65, 18, 61).fillCircle(29, 17, 13);
     g.fillStyle(0x352e2b).fillTriangle(16, 11, 23, 0, 27, 14).fillTriangle(34, 11, 42, 2, 38, 16);
     g.fillStyle(0xcf533d).fillRect(21, 17, 6, 3).fillRect(33, 17, 6, 3);
-    g.lineStyle(4, 0x9b876b).lineBetween(31, 38, 52, 27); g.lineStyle(2, 0x522e26).strokeCircle(29, 46, 14);
+    g.lineStyle(4, 0x9b876b).lineBetween(31, 38, 55, 24); g.lineStyle(2, 0xe0c193).lineBetween(47, 30, 59, 19); g.lineStyle(2, 0x522e26).strokeCircle(29, 46, 14);
     g.generateTexture('enemy-chaser', 60, 70); g.destroy();
   }
 
   private makeArcher(): void {
     const g = this.make.graphics({ x: 0, y: 0 });
-    g.fillStyle(0x121315).fillTriangle(10, 64, 29, 13, 48, 64).fillCircle(29, 16, 12);
+    g.fillStyle(0x121315).fillTriangle(10, 66, 29, 13, 48, 66).fillCircle(29, 16, 12);
     g.fillStyle(0x4c3e31).fillRect(17, 31, 24, 22); g.fillStyle(0xe18d52).fillRect(22, 16, 5, 3).fillRect(33, 16, 5, 3);
-    g.lineStyle(3, 0x9d7b4d).strokeEllipse(48, 37, 17, 44).lineBetween(48, 15, 48, 59).lineBetween(18, 36, 53, 36);
+    g.fillStyle(0x6c4d30).fillRect(7, 21, 7, 39).fillTriangle(5, 18, 16, 18, 10, 10);
+    g.lineStyle(3, 0x9d7b4d).strokeEllipse(49, 37, 19, 46).lineBetween(49, 14, 49, 60).lineBetween(18, 36, 56, 36);
     g.generateTexture('enemy-archer', 62, 70); g.destroy();
   }
 
   private makeInk(): void {
     const g = this.make.graphics({ x: 0, y: 0 });
-    g.fillStyle(0x121014).fillCircle(30, 24, 19).fillTriangle(9, 64, 14, 27, 52, 27).fillCircle(15, 55, 7).fillCircle(28, 62, 6).fillCircle(44, 54, 8);
+    g.fillStyle(0x121014).fillCircle(30, 24, 19).fillTriangle(9, 58, 14, 27, 52, 27).fillCircle(15, 55, 7).fillCircle(28, 62, 6).fillCircle(44, 54, 8);
     g.fillStyle(0x8856a3, 0.35).fillCircle(30, 27, 13); g.fillStyle(0xc85450).fillCircle(23, 22, 3).fillCircle(37, 22, 3);
-    g.lineStyle(2, 0x6b465d, 0.7).strokeCircle(30, 28, 21);
+    g.lineStyle(2, 0x6b465d, 0.7).strokeCircle(30, 28, 21).lineBetween(15, 52, 7, 69).lineBetween(28, 57, 27, 71).lineBetween(43, 51, 53, 67);
     g.generateTexture('enemy-ink', 62, 72); g.destroy();
   }
 
   private makeElite(): void {
     const g = this.make.graphics({ x: 0, y: 0 });
     g.fillStyle(0x161719).fillRoundedRect(13, 18, 51, 58, 12).fillCircle(38, 18, 19);
-    g.fillStyle(0x47413b).fillRect(7, 31, 62, 16).fillRect(21, 58, 34, 21);
+    g.fillStyle(0x47413b).fillRect(4, 29, 68, 20).fillRect(21, 58, 34, 21);
     g.lineStyle(3, 0x917053).lineBetween(15, 29, 61, 67).lineBetween(60, 24, 18, 69);
     g.fillStyle(0xef6b46).fillRect(26, 16, 7, 4).fillRect(44, 16, 7, 4);
-    g.lineStyle(4, 0x5eb9a9, 0.55).strokeCircle(38, 50, 19);
+    g.lineStyle(4, 0x5eb9a9, 0.55).strokeCircle(38, 50, 19); g.lineStyle(5, 0x786a59, 0.9).strokeEllipse(68, 51, 15, 42);
     g.generateTexture('enemy-elite', 78, 84); g.destroy();
   }
 
   private makeBoss(): void {
     const g = this.make.graphics({ x: 0, y: 0 });
-    g.fillStyle(0x090a0c).fillTriangle(6, 100, 45, 19, 90, 100).fillCircle(48, 25, 27);
+    g.fillStyle(0x090a0c).fillTriangle(1, 104, 45, 19, 95, 104).fillCircle(48, 25, 27);
     g.fillStyle(0x31282b).fillTriangle(18, 17, 27, 0, 35, 23).fillTriangle(61, 21, 76, 2, 74, 29);
-    g.lineStyle(5, 0x685451).strokeEllipse(48, 59, 56, 53);
+    g.lineStyle(7, 0x241c20).strokeEllipse(48, 59, 63, 60); g.lineStyle(4, 0x685451).strokeEllipse(48, 59, 56, 53);
     g.fillStyle(0xee674b).fillCircle(36, 25, 5).fillCircle(60, 25, 5).fillRect(34, 50, 28, 6);
-    g.fillStyle(0x5fc5b4, 0.7).fillTriangle(25, 77, 48, 91, 72, 75);
+    g.fillStyle(0x5fc5b4, 0.8).fillTriangle(25, 77, 48, 94, 72, 75).fillCircle(48, 61, 9); g.fillStyle(0x071012).fillCircle(48, 61, 4);
     g.generateTexture('enemy-boss', 96, 108); g.destroy();
   }
 
   private makeProjectiles(): void {
-    const ink = this.make.graphics({ x: 0, y: 0 }); ink.fillStyle(0x9e4d57).fillCircle(8, 8, 6).fillStyle(0xefd1b4).fillCircle(6, 6, 2).generateTexture('projectile-ink', 16, 16); ink.destroy();
-    const boss = this.make.graphics({ x: 0, y: 0 }); boss.fillStyle(0xd45a41).fillTriangle(0, 6, 18, 0, 18, 12).fillStyle(0xffb16a).fillCircle(13, 6, 3).generateTexture('projectile-boss', 20, 14); boss.destroy();
-    const rune = this.make.graphics({ x: 0, y: 0 }); rune.fillStyle(0xa7fff0).fillRect(6, 0, 4, 16).fillRect(0, 6, 16, 4).fillStyle(0x3db9a7).fillCircle(8, 8, 4).generateTexture('projectile-rune', 16, 16); rune.destroy();
+    const ink = this.make.graphics({ x: 0, y: 0 }); ink.fillStyle(0x351619, 0.7).fillTriangle(0, 7, 18, 2, 18, 12).fillStyle(0x5a2027).fillCircle(19, 7, 7).fillStyle(0xf2c79d).fillCircle(20, 7, 3).fillStyle(0xffebc8).fillCircle(21, 6, 1).generateTexture('projectile-ink', 27, 14); ink.destroy();
+    const boss = this.make.graphics({ x: 0, y: 0 }); boss.fillStyle(0x511b17).fillTriangle(0, 7, 20, 0, 20, 14).fillStyle(0x9f3728).fillCircle(20, 7, 7).fillStyle(0xffb16a).fillCircle(21, 7, 3).fillStyle(0xffedbd).fillCircle(22, 6, 1).generateTexture('projectile-boss', 28, 15); boss.destroy();
+    const rune = this.make.graphics({ x: 0, y: 0 }); rune.fillStyle(0x1d5c68, 0.7).fillTriangle(0, 8, 12, 3, 12, 13).fillStyle(0xa7fff0).fillRect(15, 0, 4, 16).fillRect(9, 6, 16, 4).fillStyle(0x3db9a7).fillCircle(17, 8, 4).generateTexture('projectile-rune', 26, 16); rune.destroy();
     const pixel = this.make.graphics({ x: 0, y: 0 }); pixel.fillStyle(0x73d7c4).fillRect(0, 0, 4, 4).generateTexture('rune-pixel', 4, 4); pixel.destroy();
   }
 }

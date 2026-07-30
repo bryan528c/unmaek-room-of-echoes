@@ -5,6 +5,7 @@ import { Enemy, type EnemyCallbacks } from '../entities/Enemy';
 import { Hero, type HeroAttack } from '../entities/Hero';
 import { Projectile } from '../entities/Projectile';
 import { getServices, type AppServices } from '../services';
+import { parrySentenceReward } from '../systems/CombatRules';
 import { distributeLinkedDamage } from '../systems/LinkDamage';
 import { RewindBuffer } from '../systems/RewindBuffer';
 import { UpgradeSystem } from '../systems/UpgradeSystem';
@@ -32,13 +33,17 @@ export class GameScene extends Phaser.Scene {
   private hero!: Hero;
   private heroShadow!: Phaser.GameObjects.Ellipse;
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
-  private keys!: Record<'w' | 'a' | 's' | 'd' | 'j' | 'k' | 'space' | 'q' | 'e' | 'r' | 'f' | 'p', Phaser.Input.Keyboard.Key>;
+  private keys!: Record<'w' | 'a' | 's' | 'd' | 'j' | 'k' | 'shift' | 'space' | 'q' | 'e' | 'r' | 'f' | 'p', Phaser.Input.Keyboard.Key>;
   private enemies = new Set<Enemy>();
   private projectiles = new Set<Projectile>();
   private inkZones: InkZone[] = [];
   private linkedTargets = new Set<Enemy>();
   private linkShareRatio: number = BALANCE.words.linkShare;
   private linkGraphics?: Phaser.GameObjects.Graphics;
+  private rewindGraphics?: Phaser.GameObjects.Graphics;
+  private heroRune?: Phaser.GameObjects.Arc;
+  private linkMarkers = new Map<Enemy, Phaser.GameObjects.Text>();
+  private linkGeneration = 0;
   private boss?: Boss;
   private upgrades = new UpgradeSystem();
   private rewind = new RewindBuffer(BALANCE.words.rewindDuration);
@@ -65,6 +70,7 @@ export class GameScene extends Phaser.Scene {
   private lastPursuitId = '';
   private pursuitCount = 0;
   private regressionCharged = false;
+  private parryCounterUntil = 0;
   private timeouts: number[] = [];
   private qaMode = false;
   private pointerHandler!: (pointer: Phaser.Input.Pointer) => void;
@@ -81,6 +87,8 @@ export class GameScene extends Phaser.Scene {
     this.heroShadow = this.add.ellipse(480, 304, 48, 17, 0x020506, 0.55).setDepth(11);
     this.hero = new Hero(this, 480, 300);
     this.linkGraphics = this.add.graphics().setDepth(13);
+    this.rewindGraphics = this.add.graphics().setDepth(10);
+    this.heroRune = this.add.circle(this.hero.x, this.hero.y - 7, 27, 0x5bd2bd, 0).setStrokeStyle(2, 0x8ff3df, 0).setDepth(12);
     this.setupInput();
     this.services.ui.showHud();
     this.startTime = this.time.now;
@@ -91,26 +99,26 @@ export class GameScene extends Phaser.Scene {
   }
 
   private resetRunState(): void {
-    this.enemies = new Set(); this.projectiles = new Set(); this.inkZones = []; this.linkedTargets = new Set(); this.linkShareRatio = BALANCE.words.linkShare;
+    this.enemies = new Set(); this.projectiles = new Set(); this.inkZones = []; this.linkedTargets = new Set(); this.linkMarkers = new Map(); this.linkShareRatio = BALANCE.words.linkShare; this.linkGeneration = 0;
     this.upgrades = new UpgradeSystem(); this.rewind = new RewindBuffer(BALANCE.words.rewindDuration); this.attacks = [];
     this.waveIndex = 0; this.pendingSpawns = 0; this.runState = 'combat'; this.paused = false; this.score = 0;
     this.sentence = 0; this.empowered = false; this.stopReadyAt = 0; this.rewindReadyAt = 0; this.linkReadyAt = 0;
     this.damageTaken = 0; this.parries = 0; this.wordUses = { '멎는다': 0, '되돌린다': 0, '잇는다': 0 };
-    this.tutorialIndex = 0; this.firstHitAvailable = true; this.lastPursuitId = ''; this.pursuitCount = 0; this.regressionCharged = false; this.timeouts = [];
+    this.tutorialIndex = 0; this.firstHitAvailable = true; this.lastPursuitId = ''; this.pursuitCount = 0; this.regressionCharged = false; this.parryCounterUntil = 0; this.timeouts = [];
   }
 
   private setupInput(): void {
     const keyboard = this.input.keyboard;
     if (!keyboard) throw new Error('Keyboard input is unavailable');
     this.cursors = keyboard.createCursorKeys();
-    this.keys = keyboard.addKeys({ w: 'W', a: 'A', s: 'S', d: 'D', j: 'J', k: 'K', space: 'SPACE', q: 'Q', e: 'E', r: 'R', f: 'F', p: 'P' }) as typeof this.keys;
+    this.keys = keyboard.addKeys({ w: 'W', a: 'A', s: 'S', d: 'D', j: 'J', k: 'K', shift: 'SHIFT', space: 'SPACE', q: 'Q', e: 'E', r: 'R', f: 'F', p: 'P' }) as typeof this.keys;
     this.pointerHandler = (pointer: Phaser.Input.Pointer): void => {
       if (this.paused || this.runState === 'upgrade' || this.runState === 'result') return;
       if (pointer.leftButtonDown()) this.attack(pointer.worldX, pointer.worldY);
       if (pointer.rightButtonDown()) this.parry();
     };
     this.input.on(Phaser.Input.Events.POINTER_DOWN, this.pointerHandler);
-    this.escapeHandler = (event: KeyboardEvent): void => { if (event.code === 'Escape' && this.scene.isActive()) this.togglePause(); };
+    this.escapeHandler = (event: KeyboardEvent): void => { if (event.code === 'Escape' && (this.scene.isActive() || this.scene.isPaused())) this.togglePause(); };
     window.addEventListener('keydown', this.escapeHandler);
   }
 
@@ -120,10 +128,12 @@ export class GameScene extends Phaser.Scene {
     const x = (this.keys.d.isDown || this.cursors.right.isDown ? 1 : 0) - (this.keys.a.isDown || this.cursors.left.isDown ? 1 : 0);
     const y = (this.keys.s.isDown || this.cursors.down.isDown ? 1 : 0) - (this.keys.w.isDown || this.cursors.up.isDown ? 1 : 0);
     this.hero.updateMovement(time, x, y, pointer.worldX, pointer.worldY);
+    this.hero.constrainToArena();
     this.heroShadow.setPosition(this.hero.x, this.hero.y + 9).setScale(this.hero.isDashing ? 1.5 : 1);
+    this.heroRune?.setPosition(this.hero.x, this.hero.y - 7).setAlpha(this.empowered ? 0.48 + Math.sin(time / 95) * 0.2 : 0).setScale(1 + Math.sin(time / 130) * 0.08);
     if (x !== 0 || y !== 0) this.markTutorial('move');
     if (Phaser.Input.Keyboard.JustDown(this.keys.j)) this.attack(pointer.worldX, pointer.worldY);
-    if (Phaser.Input.Keyboard.JustDown(this.keys.k)) this.parry();
+    if (Phaser.Input.Keyboard.JustDown(this.keys.k) || Phaser.Input.Keyboard.JustDown(this.keys.shift)) this.parry();
     if (Phaser.Input.Keyboard.JustDown(this.keys.space)) this.dash(x, y);
     if (Phaser.Input.Keyboard.JustDown(this.keys.f)) this.armEmpower();
     if (Phaser.Input.Keyboard.JustDown(this.keys.q)) this.castStop(pointer.worldX, pointer.worldY);
@@ -138,6 +148,7 @@ export class GameScene extends Phaser.Scene {
     }
     this.checkMeleeCollisions(time);
     this.updateInkZones(time);
+    this.updateRewindPreview(time);
     this.updateLinks(time);
     this.updateHud(time);
   }
@@ -165,6 +176,7 @@ export class GameScene extends Phaser.Scene {
       shoot: (x, y, angle, speed, damage, texture) => this.spawnProjectile(x, y, angle, speed, damage, texture),
       melee: (enemy, damage) => this.hitHero(damage, enemy.x, enemy.y),
       died: (enemy) => this.onEnemyDied(enemy),
+      cue: (cue) => this.services.audio.play(cue === 'warning' ? 'warning' : 'parryOpen'),
     };
   }
 
@@ -194,6 +206,7 @@ export class GameScene extends Phaser.Scene {
     this.tweens.add({ targets: slash, alpha: 0, scaleX: 1.18, scaleY: 1.18, duration: 130, onComplete: () => slash.destroy() });
     this.attacks.push({ time: this.time.now, x: attack.x, y: attack.y, angle: attack.angle, combo: attack.combo });
     let hits = 0;
+    const parryCounter = this.time.now <= this.parryCounterUntil;
     for (const enemy of [...this.enemies]) {
       const distance = Phaser.Math.Distance.Between(attack.x, attack.y, enemy.x, enemy.y);
       const targetAngle = Phaser.Math.Angle.Between(attack.x, attack.y, enemy.x, enemy.y);
@@ -206,6 +219,7 @@ export class GameScene extends Phaser.Scene {
       if (enemy.id === this.lastPursuitId) this.pursuitCount = Math.min(5, this.pursuitCount + 1); else { this.lastPursuitId = enemy.id; this.pursuitCount = 0; }
       damage *= 1 + pursuit * this.pursuitCount * 0.08;
       if (enemy.frozenUntil > this.time.now) damage += this.upgrades.getStack('broken-sentence') * 12;
+      if (parryCounter) damage *= BALANCE.hero.parryCounterBonus;
       this.damageEnemy(enemy, damage, attack.angle); hits += 1;
       if (attack.combo === 3) {
         const body = enemy.body as Phaser.Physics.Arcade.Body; body.velocity.add(new Phaser.Math.Vector2(Math.cos(attack.angle), Math.sin(attack.angle)).scale(120));
@@ -217,7 +231,11 @@ export class GameScene extends Phaser.Scene {
         const target = this.nearestEnemy(projectile.x, projectile.y); if (target) projectile.reflect(target.x, target.y);
       }
     }
-    if (hits > 0) { this.gainSentence(BALANCE.sentence.hitGain * hits); this.services.audio.play('hit'); this.cameraKick(0.0026, 60); }
+    if (hits > 0) {
+      if (parryCounter) { this.parryCounterUntil = 0; this.runeBurst(attack.x + Math.cos(attack.angle) * 28, attack.y + Math.sin(attack.angle) * 28, 6); }
+      this.gainSentence(BALANCE.sentence.hitGain * hits); this.services.audio.play('hit');
+      if (attack.combo === 3) this.cameraKick(0.0026, 60);
+    }
   }
 
   private dash(x: number, y: number): void {
@@ -243,18 +261,24 @@ export class GameScene extends Phaser.Scene {
   }
 
   private parrySuccess(enemy?: Enemy, projectile?: Projectile): void {
-    this.parries += 1; this.gainSentence(BALANCE.sentence.parryGain + this.upgrades.getStack('perfect-breath') * 5);
-    this.services.audio.play('parry'); this.cameraKick(0.008, 95); this.cameras.main.flash(85, 132, 255, 227, true);
-    if (enemy) { enemy.vulnerableUntil = this.time.now + 1500; enemy.attackActiveUntil = 0; enemy.setVelocity(0); this.damageEnemy(enemy, 12, this.hero.facing, true); }
+    const perfectBreath = this.upgrades.getStack('perfect-breath');
+    this.parries += 1; this.gainSentence(parrySentenceReward(BALANCE.sentence.parryGain, perfectBreath));
+    this.parryCounterUntil = this.time.now + BALANCE.hero.parryCounterWindow;
+    this.services.audio.play('parry'); this.cameraKick(0.008, 95);
+    const flash = this.add.circle(this.hero.x, this.hero.y - 8, 24, 0xb4ffef, 0.2).setStrokeStyle(5, 0x8ff3df, 0.95).setDepth(31);
+    this.tweens.add({ targets: flash, radius: 72, alpha: 0, duration: this.services.save.settings.reducedMotion ? 95 : 170, onComplete: () => flash.destroy() });
+    this.runeBurst(this.hero.x, this.hero.y - 10, 8);
+    if (enemy) { enemy.vulnerableUntil = this.time.now + BALANCE.hero.parryVulnerability; enemy.attackActiveUntil = 0; enemy.setVelocity(0); this.damageEnemy(enemy, 12, this.hero.facing, true); }
     if (projectile) { const target = this.nearestEnemy(projectile.x, projectile.y); if (target) projectile.reflect(target.x, target.y); else projectile.destroy(); }
     this.physics.world.timeScale = 0.28; this.tweens.timeScale = 0.35;
-    const handle = window.setTimeout(() => { if (this.sys.isActive()) { this.physics.world.timeScale = 1; this.tweens.timeScale = 1; } }, this.services.save.settings.reducedMotion ? 35 : 90);
+    const handle = window.setTimeout(() => { if (this.sys.isActive()) { this.physics.world.timeScale = 1; this.tweens.timeScale = 1; } }, this.services.save.settings.reducedMotion ? 35 : BALANCE.hero.parryHitstop);
     this.timeouts.push(handle);
   }
 
   private armEmpower(): void {
     if (this.empowered || this.sentence < this.sentenceMax) return;
     this.empowered = true; this.sentence = 0; this.services.audio.play('upgrade'); this.hero.setTint(0x86ead8);
+    this.runeBurst(this.hero.x, this.hero.y - 12, 12);
     this.time.delayedCall(220, () => { if (this.hero.active) this.hero.clearTint(); });
   }
 
@@ -291,17 +315,32 @@ export class GameScene extends Phaser.Scene {
     if (!this.canCast(BALANCE.sentence.rewindCost, this.rewindReadyAt)) return;
     const records = this.rewind.getRange(this.time.now, BALANCE.words.rewindDuration); if (records.length === 0) return;
     const enhanced = this.spendWord(BALANCE.sentence.rewindCost); this.rewindReadyAt = this.time.now + 7200; this.wordUses['되돌린다'] += 1; this.markTutorial('rewind');
+    const before = { x: this.hero.x, y: this.hero.y, health: this.hero.health };
+    const targetState = records[0];
     this.services.audio.play('rewind'); this.showWordTypography('되돌린다', this.hero.x, this.hero.y - 48); this.hero.rewinding = true; this.hero.invulnerableUntil = this.time.now + 900;
+    if (targetState) {
+      const marker = this.add.circle(targetState.x, targetState.y - 5, 12, 0x3d9fc2, 0.1).setStrokeStyle(2, 0x7edcf2, 0.9).setDepth(17);
+      this.tweens.add({ targets: marker, radius: 30, alpha: 0, duration: 520, onComplete: () => marker.destroy() });
+    }
     const reverse = [...records].reverse(); const echoTrail: Phaser.GameObjects.Image[] = [];
     this.tweens.addCounter({ from: 0, to: reverse.length - 1, duration: 470, ease: 'Sine.InOut', onUpdate: (tween) => {
       const state = reverse[Math.floor(tween.getValue() ?? 0)]; if (!state) return;
       this.hero.setPosition(state.x, state.y).setFlipX(Math.cos(state.facing) < 0).restoreHealth(state.health);
       if (echoTrail.length < 8 && Math.random() < 0.28) {
-        const echo = this.add.image(state.x, state.y, 'hero-move').setOrigin(this.hero.originX, this.hero.originY).setScale(this.hero.scaleX, this.hero.scaleY).setFlipX(this.hero.flipX).setTint(0x65d5c1).setAlpha(0.22).setDepth(18);
+        const echo = this.add.image(state.x, state.y, 'hero-move').setOrigin(0.5, 1).setScale(Math.abs(this.hero.scaleX), Math.abs(this.hero.scaleY)).setFlipX(this.hero.flipX).setTint(0x43add0).setAlpha(0.24).setDepth(18);
         echoTrail.push(echo); this.tweens.add({ targets: echo, alpha: 0, duration: 320, onComplete: () => echo.destroy() });
       }
     }, onComplete: () => {
       this.hero.rewinding = false; const oldest = reverse.at(-1); if (oldest) { this.hero.setVelocity(oldest.velocityX, oldest.velocityY); this.hero.restoreHealth(oldest.health); }
+      if (oldest) {
+        const recovered = Math.max(0, oldest.health - before.health);
+        const moved = Phaser.Math.Distance.Between(before.x, before.y, oldest.x, oldest.y);
+        if (recovered > 0.5) this.damageNumber(this.hero.x, this.hero.y - 62, recovered, 0x75e6f3, false, '+');
+        if (this.boss?.active && this.boss.phase === 2 && (recovered > 0.5 || moved > 72)) {
+          this.boss.vulnerableUntil = this.time.now + BALANCE.boss.rewindVulnerability;
+          this.showWordTypography('기록 균열', this.boss.x, this.boss.y - 68);
+        }
+      }
       if (enhanced || this.upgrades.getStack('memory-echo') > 0) this.replayAttackEcho(records[0]?.time ?? this.time.now - 2000, enhanced);
       if (this.upgrades.getStack('regression-blade') > 0) this.regressionCharged = true;
     }});
@@ -311,7 +350,7 @@ export class GameScene extends Phaser.Scene {
     const recent = this.attacks.filter((attack) => attack.time >= fromTime).slice(-6);
     const power = 0.48 + this.upgrades.getStack('memory-echo') * 0.22 + (enhanced ? 0.2 : 0);
     recent.forEach((record, index) => this.time.delayedCall(index * 115, () => {
-      const echo = this.add.image(record.x, record.y, 'hero-attack').setOrigin(this.hero.originX, this.hero.originY).setScale(0.68).setFlipX(Math.cos(record.angle) < 0).setTint(0x65d5c1).setAlpha(0.55).setDepth(19);
+      const echo = this.add.image(record.x, record.y, 'hero-attack').setOrigin(0.5, 1).setScale(0.63).setFlipX(Math.cos(record.angle) < 0).setTint(0x43add0).setAlpha(0.55).setDepth(19);
       this.tweens.add({ targets: echo, alpha: 0, x: record.x + Math.cos(record.angle) * 22, duration: 210, onComplete: () => echo.destroy() });
       for (const enemy of [...this.enemies]) if (distanceSq(record.x, record.y, enemy.x, enemy.y) < 78 ** 2 && angleDelta(Phaser.Math.Angle.Between(record.x, record.y, enemy.x, enemy.y), record.angle) < 1) this.damageEnemy(enemy, (BALANCE.hero.attackDamage[record.combo - 1] ?? 18) * power, record.angle);
     }));
@@ -319,16 +358,26 @@ export class GameScene extends Phaser.Scene {
 
   private castLink(x: number, y: number): void {
     if (!this.canCast(BALANCE.sentence.linkCost, this.linkReadyAt)) return;
-    const candidates = [...this.enemies].filter((enemy) => enemy.spawned && distanceSq(x, y, enemy.x, enemy.y) < 280 ** 2).sort((a, b) => distanceSq(x, y, a.x, a.y) - distanceSq(x, y, b.x, b.y));
+    let candidates = [...this.enemies].filter((enemy) => enemy.spawned && distanceSq(x, y, enemy.x, enemy.y) < 280 ** 2).sort((a, b) => distanceSq(x, y, a.x, a.y) - distanceSq(x, y, b.x, b.y));
+    if (this.boss?.active && this.boss.phase === 3 && distanceSq(x, y, this.boss.x, this.boss.y) < 330 ** 2) {
+      const phaseTargets = [...this.enemies].filter((enemy) => enemy.spawned && (enemy === this.boss || enemy.kind === 'minion'));
+      candidates = [...new Set([...phaseTargets, ...candidates])];
+    }
     const enhancedPreview = this.empowered; const selected = candidates.slice(0, enhancedPreview ? 5 : 3); if (selected.length < 2) return;
     const enhanced = this.spendWord(BALANCE.sentence.linkCost); this.linkReadyAt = this.time.now + 8700; this.wordUses['잇는다'] += 1; this.markTutorial('link');
     this.services.audio.play('link'); this.hero.castPose(); this.showWordTypography('잇는다', x, y);
-    this.linkedTargets.clear(); const expires = this.time.now + BALANCE.words.linkDuration + (enhanced ? 1300 : 0);
+    this.clearLinks(); const expires = this.time.now + BALANCE.words.linkDuration + (enhanced ? 1300 : 0);
+    const generation = ++this.linkGeneration;
     this.linkShareRatio = enhanced ? BALANCE.words.empoweredLinkShare : BALANCE.words.linkShare;
-    selected.forEach((enemy) => { enemy.linked = true; enemy.linkedUntil = expires; this.linkedTargets.add(enemy); });
+    selected.forEach((enemy) => {
+      enemy.linked = true; enemy.linkedUntil = expires; this.linkedTargets.add(enemy);
+      const marker = this.add.text(enemy.x, enemy.y - (enemy.kind === 'boss' ? 78 : 48), '連', { fontFamily: 'Malgun Gothic, serif', fontSize: enemy.kind === 'boss' ? '19px' : '15px', color: '#a1f3df', stroke: '#09201d', strokeThickness: 4 }).setOrigin(0.5).setDepth(28);
+      this.linkMarkers.set(enemy, marker);
+    });
     this.time.delayedCall(expires - this.time.now, () => {
+      if (generation !== this.linkGeneration) return;
       if (enhanced) for (const enemy of [...this.linkedTargets]) if (enemy.active) this.damageEnemy(enemy, 22, 0, false, true);
-      this.linkedTargets.clear();
+      this.clearLinks();
     });
   }
 
@@ -340,15 +389,20 @@ export class GameScene extends Phaser.Scene {
       const target = packet.targetId === enemy.id ? enemy : activeLinks.find((item) => item.id === packet.targetId);
       if (!target?.active) continue;
       const dealt = target.takeDamage(packet.amount, sourceAngle, parried && !packet.propagated);
-      if (dealt > 0) this.damageNumber(target.x, target.y - 40, dealt, packet.propagated ? 0x5ac9b7 : 0xf1d7a8);
+      if (dealt > 0) {
+        this.damageNumber(target.x, target.y - 40, dealt, packet.propagated ? 0x72e1cd : 0xf1d7a8, packet.propagated, packet.propagated ? '공유 ' : '');
+        if (packet.propagated) this.linkPulse(enemy, target);
+      }
     }
   }
 
   private onEnemyDied(enemy: Enemy): void {
-    this.enemies.delete(enemy); this.linkedTargets.delete(enemy);
+    this.enemies.delete(enemy); this.linkedTargets.delete(enemy); this.linkMarkers.get(enemy)?.destroy(); this.linkMarkers.delete(enemy);
     const scoreValue = enemy.kind === 'minion' ? 80 : BALANCE.enemies[enemy.kind].score; this.score += scoreValue;
     if (enemy.linked) {
       const stacks = this.upgrades.getStack('link-overload'); const radius = 76 + stacks * 24; const damage = 22 + stacks * 12;
+      const burst = this.add.circle(enemy.x, enemy.y, 18, 0x55c8b1, 0.16).setStrokeStyle(4, 0x9af3df, 0.88).setDepth(24);
+      this.tweens.add({ targets: burst, radius, alpha: 0, duration: 260, onComplete: () => burst.destroy() });
       this.runeBurst(enemy.x, enemy.y, 8 + stacks * 3);
       for (const target of [...this.enemies]) if (distanceSq(enemy.x, enemy.y, target.x, target.y) < radius ** 2) this.damageEnemy(target, damage, Phaser.Math.Angle.Between(enemy.x, enemy.y, target.x, target.y), false, true);
       if (this.upgrades.getStack('inscription-spread') > 0) {
@@ -375,6 +429,10 @@ export class GameScene extends Phaser.Scene {
 
   private startBoss(): void {
     this.runState = 'boss'; this.firstHitAvailable = true;
+    if (this.hero.health < BALANCE.boss.entryMinimumHealth) {
+      const restored = BALANCE.boss.entryMinimumHealth - this.hero.health;
+      this.hero.heal(restored); this.damageNumber(this.hero.x, this.hero.y - 58, restored, 0x8de5d3, false, '+');
+    }
     this.showWordTypography('기록 포식자', 480, 150, true);
     const callbacks: BossCallbacks = {
       ...this.enemyCallbacks(),
@@ -386,7 +444,9 @@ export class GameScene extends Phaser.Scene {
   }
 
   private bossPhaseChanged(phase: number): void {
-    this.services.audio.play('phase'); this.cameraKick(0.012, 260); this.cameras.main.zoomTo(1.12, 340); this.time.delayedCall(620, () => this.cameras.main.zoomTo(1, 520));
+    this.services.audio.play('phase'); this.cameraKick(0.012, 260);
+    if (!this.services.save.settings.reducedMotion) { this.cameras.main.zoomTo(1.08, 280); this.time.delayedCall(520, () => this.cameras.main.zoomTo(1, 420)); }
+    this.runeBurst(480, 155, 14);
     this.showWordTypography(phase === 2 ? '제2형 · 먹물의 기억' : '제3형 · 이어진 굶주림', 480, 170, true);
   }
 
@@ -418,7 +478,8 @@ export class GameScene extends Phaser.Scene {
       } else if (distance < 42 && !projectile.getData('nearMiss')) { projectile.setData('nearMiss', true); this.gainSentence(BALANCE.sentence.nearMissGain); }
     } else {
       for (const enemy of [...this.enemies]) if (distanceSq(projectile.x, projectile.y, enemy.x, enemy.y) < (enemy.kind === 'boss' ? 45 : 31) ** 2) {
-        this.damageEnemy(enemy, projectile.damage, projectile.rotation);
+        const reflectedStopBonus = enemy === this.boss && this.boss.phase === 1 && projectile.reflected ? BALANCE.boss.reflectedPhaseOneMultiplier : 1;
+        this.damageEnemy(enemy, projectile.damage * reflectedStopBonus, projectile.rotation);
         if (projectile.reflected && this.upgrades.getStack('fragment-recovery') > 0) this.hero.heal(this.upgrades.getStack('fragment-recovery') * 4);
         projectile.destroy(); break;
       }
@@ -441,7 +502,8 @@ export class GameScene extends Phaser.Scene {
     if (this.tutorialEnabled && this.tutorialIndex < TUTORIAL.length) damage *= 0.45;
     const cloak = this.upgrades.getStack('ink-cloak'); if (this.firstHitAvailable && cloak > 0) { damage *= Math.max(0.4, 1 - cloak * 0.35); this.firstHitAvailable = false; }
     const dealt = this.hero.takeDamage(damage, sourceX, sourceY); if (dealt <= 0) return;
-    this.damageTaken += dealt; this.services.audio.play('hurt'); this.cameraKick(0.006, 110); this.cameras.main.flash(70, 105, 18, 14, true);
+    this.damageTaken += dealt; this.services.audio.play('hurt'); this.cameraKick(0.006, 110); this.showDamageVignette(dealt);
+    if (this.hero.health > 0 && this.hero.health <= this.hero.maxHealth * 0.22) this.services.audio.play('critical');
     if (this.hero.health <= 0) this.finishRun(false);
   }
 
@@ -455,22 +517,84 @@ export class GameScene extends Phaser.Scene {
   private updateLinks(time: number): void {
     this.linkGraphics?.clear();
     const active = [...this.linkedTargets].filter((enemy) => enemy.active && enemy.linked && enemy.linkedUntil > time);
+    for (const enemy of active) if (!this.linkMarkers.has(enemy)) {
+      const marker = this.add.text(enemy.x, enemy.y - (enemy.kind === 'boss' ? 78 : 48), '連', { fontFamily: 'Malgun Gothic, serif', fontSize: enemy.kind === 'boss' ? '19px' : '15px', color: '#a1f3df', stroke: '#09201d', strokeThickness: 4 }).setOrigin(0.5).setDepth(28);
+      this.linkMarkers.set(enemy, marker);
+    }
+    for (const [enemy, marker] of this.linkMarkers) {
+      if (!active.includes(enemy)) { marker.destroy(); this.linkMarkers.delete(enemy); continue; }
+      marker.setPosition(enemy.x, enemy.y - (enemy.kind === 'boss' ? 78 : 48)).setAlpha(0.72 + Math.sin(time / 120 + enemy.x) * 0.22).setScale(1 + Math.sin(time / 150 + enemy.y) * 0.08);
+    }
     this.linkedTargets = new Set(active); if (active.length < 2) return;
-    this.linkGraphics?.lineStyle(3, 0x58c9b6, 0.64);
     for (let index = 0; index < active.length; index += 1) {
-      const a = active[index]; const b = active[(index + 1) % active.length]; if (a && b) this.linkGraphics?.lineBetween(a.x, a.y - 10, b.x, b.y - 10);
+      const a = active[index]; const b = active[(index + 1) % active.length];
+      if (!a || !b) continue;
+      const ax = a.x; const ay = a.y - 10; const bx = b.x; const by = b.y - 10;
+      const length = Math.max(1, Phaser.Math.Distance.Between(ax, ay, bx, by));
+      const nx = -(by - ay) / length * 2.4; const ny = (bx - ax) / length * 2.4;
+      this.linkGraphics?.lineStyle(2, 0x153d39, 0.9).lineBetween(ax + nx, ay + ny, bx + nx, by + ny);
+      this.linkGraphics?.lineStyle(1, 0x74dfca, 0.8).lineBetween(ax - nx, ay - ny, bx - nx, by - ny);
+      const travel = (time / 720 + index * 0.31) % 1;
+      const gx = Phaser.Math.Linear(ax, bx, travel); const gy = Phaser.Math.Linear(ay, by, travel);
+      this.linkGraphics?.fillStyle(0xc0ffef, 0.9).fillCircle(gx, gy, 3.5);
     }
   }
 
-  private gainSentence(amount: number): void { this.sentence = Math.min(this.sentenceMax, this.sentence + amount * (1 + this.upgrades.getStack('sealed-sentence') * 0.08)); }
+  private updateRewindPreview(time: number): void {
+    this.rewindGraphics?.clear();
+    if (this.runState === 'upgrade' || this.hero.rewinding) return;
+    const records = this.rewind.getRange(time, BALANCE.words.rewindDuration);
+    if (records.length < 2) return;
+    this.rewindGraphics?.lineStyle(2, 0x3aa8c8, 0.14).beginPath();
+    records.forEach((state, index) => {
+      if (index === 0) this.rewindGraphics?.moveTo(state.x, state.y - 5);
+      else if (index % 3 === 0 || index === records.length - 1) this.rewindGraphics?.lineTo(state.x, state.y - 5);
+    });
+    this.rewindGraphics?.strokePath();
+    const target = records[0];
+    if (target) {
+      const alpha = this.time.now >= this.rewindReadyAt ? 0.44 + Math.sin(time / 180) * 0.1 : 0.18;
+      this.rewindGraphics?.lineStyle(2, 0x77d8eb, alpha).strokeCircle(target.x, target.y - 5, 8);
+      this.rewindGraphics?.fillStyle(0x77d8eb, alpha * 0.65).fillCircle(target.x, target.y - 5, 2.5);
+    }
+  }
+
+  private clearLinks(): void {
+    this.linkGeneration += 1;
+    for (const enemy of this.linkedTargets) enemy.linked = false;
+    this.linkedTargets.clear();
+    for (const marker of this.linkMarkers.values()) marker.destroy();
+    this.linkMarkers.clear();
+    this.linkGraphics?.clear();
+  }
+
+  private linkPulse(from: Enemy, to: Enemy): void {
+    if (!from.active || !to.active) return;
+    const pulse = this.add.circle(from.x, from.y - 10, 5, 0xb5ffef, 0.9).setDepth(29);
+    this.tweens.add({ targets: pulse, x: to.x, y: to.y - 10, alpha: 0.1, duration: this.services.save.settings.reducedMotion ? 90 : 180, onComplete: () => pulse.destroy() });
+  }
+
+  private gainSentence(amount: number): void {
+    const wasFull = this.sentence >= this.sentenceMax;
+    this.sentence = Math.min(this.sentenceMax, this.sentence + amount * (1 + this.upgrades.getStack('sealed-sentence') * 0.08));
+    if (!wasFull && this.sentence >= this.sentenceMax) this.services.audio.play('sentenceFull');
+  }
 
   private nearestEnemy(x: number, y: number): Enemy | undefined {
     return [...this.enemies].filter((enemy) => enemy.active && enemy.spawned).sort((a, b) => distanceSq(x, y, a.x, a.y) - distanceSq(x, y, b.x, b.y))[0];
   }
 
-  private damageNumber(x: number, y: number, amount: number, color: number): void {
-    const text = this.add.text(x, y, `${Math.round(amount)}`, { fontFamily: 'Malgun Gothic, sans-serif', fontSize: amount >= 40 ? '18px' : '14px', color: `#${color.toString(16).padStart(6, '0')}`, stroke: '#071012', strokeThickness: 4 }).setOrigin(0.5).setDepth(30);
+  private damageNumber(x: number, y: number, amount: number, color: number, shared = false, prefix = ''): void {
+    const text = this.add.text(x, y, `${prefix}${Math.round(amount)}`, { fontFamily: 'Malgun Gothic, sans-serif', fontSize: amount >= 40 ? '18px' : shared ? '12px' : '14px', fontStyle: shared ? 'italic' : 'normal', color: `#${color.toString(16).padStart(6, '0')}`, stroke: shared ? '#123631' : '#071012', strokeThickness: 4 }).setOrigin(0.5).setDepth(30);
     this.tweens.add({ targets: text, y: y - 28, alpha: 0, duration: this.services.save.settings.reducedMotion ? 280 : 520, onComplete: () => text.destroy() });
+  }
+
+  private showDamageVignette(damage: number): void {
+    const reduced = this.services.save.settings.reducedMotion;
+    const alpha = Math.min(reduced ? 0.1 : 0.2, 0.06 + damage / 180);
+    const graphics = this.add.graphics().setDepth(70);
+    graphics.lineStyle(28, 0x7a201c, alpha).strokeRect(8, 8, 944, 524);
+    this.tweens.add({ targets: graphics, alpha: 0, duration: reduced ? 80 : 145, onComplete: () => graphics.destroy() });
   }
 
   private runeBurst(x: number, y: number, count: number): void {
@@ -503,17 +627,25 @@ export class GameScene extends Phaser.Scene {
 
   private updateHud(time: number): void {
     const boss = this.boss;
+    const rewindRecords = this.rewind.getRange(time, BALANCE.words.rewindDuration);
+    const rewindTarget = rewindRecords[0];
+    const stopCost = this.wordCost(BALANCE.sentence.stopCost); const rewindCost = this.wordCost(BALANCE.sentence.rewindCost); const linkCost = this.wordCost(BALANCE.sentence.linkCost);
     this.services.ui.updateHud({
       health: this.hero.health, maxHealth: this.hero.maxHealth, sentence: this.sentence, sentenceMax: this.sentenceMax,
       score: this.score, stage: this.runState === 'boss' ? '최종전투 · 기록 포식자' : WAVE_LABELS[this.waveIndex] ?? '잔향의 방',
       stopCooldown: Math.max(0, (this.stopReadyAt - time) / 1000), rewindCooldown: Math.max(0, (this.rewindReadyAt - time) / 1000), linkCooldown: Math.max(0, (this.linkReadyAt - time) / 1000), empowered: this.empowered,
+      stopCost, rewindCost, linkCost,
+      canStop: time >= this.stopReadyAt && (this.empowered || this.sentence >= stopCost),
+      canRewind: rewindRecords.length > 0 && time >= this.rewindReadyAt && (this.empowered || this.sentence >= rewindCost),
+      canLink: time >= this.linkReadyAt && (this.empowered || this.sentence >= linkCost),
+      rewindPreviewHealth: rewindTarget?.health,
       bossHealth: boss?.health, bossMaxHealth: boss?.maxHealth, bossPhase: boss?.phase,
     });
   }
 
   private togglePause(): void {
     if (this.runState === 'result' || this.runState === 'upgrade') return;
-    if (this.paused) { this.paused = false; this.scene.resume(); return; }
+    if (this.paused) { this.paused = false; this.services.ui.hidePause(); this.scene.resume(); return; }
     this.paused = true; this.scene.pause();
     this.services.ui.showPause(() => { this.paused = false; this.scene.resume(); }, () => { this.cleanup(); this.scene.stop(); this.scene.start('MenuScene'); });
   }
@@ -521,10 +653,18 @@ export class GameScene extends Phaser.Scene {
   private finishRun(victory: boolean): void {
     if (this.runState === 'result') return; this.runState = 'result'; this.physics.pause(); this.hero.controlsLocked = true;
     const elapsed = Math.max(1, (this.time.now - this.startTime) / 1000); if (victory) this.score += Math.max(0, 1200 - Math.floor(elapsed));
-    const rank = rankFor(this.score, this.damageTaken, elapsed);
-    if (this.score > this.services.save.bestScore) { this.services.save.bestScore = this.score; this.services.save.bestRank = rank; this.services.persist(); }
+    const progressStage = victory ? 7 : this.boss?.active ? 3 + this.boss.phase : Math.min(3, this.waveIndex + 1);
+    const rank = rankFor(this.score, this.damageTaken, elapsed, progressStage, victory);
+    const previousBest = this.services.save.bestScore; const previousStage = this.services.save.bestStage;
+    const newBest = this.score > previousBest; const milestones: string[] = [];
+    if (newBest) { this.services.save.bestScore = this.score; this.services.save.bestRank = rank; milestones.push('최고 점수 갱신'); }
+    if (progressStage > previousStage) { this.services.save.bestStage = progressStage; milestones.push('최고 진행 단계 갱신'); }
+    if (progressStage >= 4 && !this.services.save.bossReached) { this.services.save.bossReached = true; milestones.push('첫 보스 도달'); }
+    if (victory && !this.services.save.cleared) { this.services.save.cleared = true; milestones.push('첫 클리어'); }
+    this.services.persist();
     this.services.audio.play(victory ? 'victory' : 'defeat');
-    const stats: ResultStats = { victory, score: this.score, time: elapsed, damageTaken: this.damageTaken, parries: this.parries, wordUses: { ...this.wordUses }, upgrades: this.upgrades.summary(), rank };
+    const progressLabel = ['기록 없음', '제1전투', '제2전투', '제3전투', '보스 제1형', '보스 제2형', '보스 제3형', '클리어'][progressStage] ?? '잔향의 방';
+    const stats: ResultStats = { victory, score: this.score, time: elapsed, damageTaken: this.damageTaken, parries: this.parries, wordUses: { ...this.wordUses }, upgrades: this.upgrades.summary(), rank, progressStage, progressLabel, previousBest, scoreDelta: this.score - previousBest, newBest, milestones };
     this.time.delayedCall(500, () => this.services.ui.showResult(stats, () => this.scene.restart(), () => { this.scene.stop(); this.scene.start('MenuScene'); }));
   }
 
@@ -549,6 +689,6 @@ export class GameScene extends Phaser.Scene {
     const world = this.physics?.world;
     if (world) world.timeScale = 1;
     if (this.tweens) this.tweens.timeScale = 1;
-    this.linkGraphics?.destroy(); this.inkZones.forEach((zone) => zone.circle.destroy());
+    this.clearLinks(); this.linkGraphics?.destroy(); this.rewindGraphics?.destroy(); this.heroRune?.destroy(); this.inkZones.forEach((zone) => zone.circle.destroy());
   }
 }

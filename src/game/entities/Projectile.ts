@@ -14,7 +14,7 @@ export class Projectile extends Phaser.Physics.Arcade.Image {
     this.damage = damage;
     this.expiresAt = scene.time.now + 5500;
     this.setVelocity(Math.cos(angle) * speed, Math.sin(angle) * speed);
-    const body = this.body as Phaser.Physics.Arcade.Body; body.setCircle(6, 2, 2);
+    const body = this.body as Phaser.Physics.Arcade.Body; body.setCircle(5, Math.max(0, this.width - 12), Math.max(0, (this.height - 10) / 2));
   }
 
   public override update(time: number): void {
