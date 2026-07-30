@@ -1,6 +1,6 @@
 import type { GameSettings } from './SaveSystem';
 
-export type SoundName = 'slash' | 'hit' | 'dash' | 'warning' | 'parryOpen' | 'parry' | 'sentenceFull' | 'stop' | 'rewind' | 'link' | 'upgrade' | 'hurt' | 'critical' | 'phase' | 'victory' | 'defeat';
+export type SoundName = 'slash' | 'hit' | 'dash' | 'warning' | 'parryOpen' | 'parry' | 'sentenceFull' | 'stop' | 'rewind' | 'link' | 'chain' | 'upgrade' | 'hurt' | 'critical' | 'phase' | 'victory' | 'defeat';
 
 const NOTES: Record<SoundName, readonly [number, number, OscillatorType, number]> = {
   slash: [260, 110, 'sawtooth', 0.07], hit: [120, 68, 'square', 0.07], dash: [340, 90, 'triangle', 0.12],
@@ -8,6 +8,7 @@ const NOTES: Record<SoundName, readonly [number, number, OscillatorType, number]
   parry: [760, 1240, 'sine', 0.16], stop: [310, 82, 'square', 0.24], rewind: [720, 180, 'triangle', 0.34],
   sentenceFull: [520, 780, 'sine', 0.2], critical: [112, 72, 'triangle', 0.28],
   link: [220, 680, 'sine', 0.24], upgrade: [440, 880, 'triangle', 0.28], hurt: [96, 48, 'sawtooth', 0.18],
+  chain: [360, 960, 'triangle', 0.3],
   phase: [82, 246, 'sawtooth', 0.42], victory: [420, 1040, 'triangle', 0.7], defeat: [180, 52, 'sine', 0.8],
 };
 

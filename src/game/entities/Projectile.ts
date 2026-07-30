@@ -5,13 +5,15 @@ export class Projectile extends Phaser.Physics.Arcade.Image {
   public reflected = false;
   public frozenUntil = 0;
   public damage = 12;
+  public readonly originalDamage: number;
+  public readonly sourceId?: string;
   private expiresAt: number;
 
-  public constructor(scene: Phaser.Scene, x: number, y: number, angle: number, speed: number, damage: number, texture = 'projectile-ink') {
+  public constructor(scene: Phaser.Scene, x: number, y: number, angle: number, speed: number, damage: number, texture = 'projectile-ink', sourceId?: string) {
     super(scene, x, y, texture);
     scene.add.existing(this); scene.physics.add.existing(this);
     this.setDepth(14).setRotation(angle).setScale(0.9);
-    this.damage = damage;
+    this.damage = damage; this.originalDamage = damage; this.sourceId = sourceId;
     this.expiresAt = scene.time.now + 5500;
     this.setVelocity(Math.cos(angle) * speed, Math.sin(angle) * speed);
     const body = this.body as Phaser.Physics.Arcade.Body; body.setCircle(5, Math.max(0, this.width - 12), Math.max(0, (this.height - 10) / 2));
@@ -26,11 +28,11 @@ export class Projectile extends Phaser.Physics.Arcade.Image {
 
   public freeze(until: number): void { this.frozenUntil = Math.max(this.frozenUntil, until); }
 
-  public reflect(targetX: number, targetY: number): void {
+  public reflect(targetX: number, targetY: number, damage = 30, backflow = false): void {
     this.enemyOwned = false; this.reflected = true; this.frozenUntil = 0;
     const body = this.body as Phaser.Physics.Arcade.Body; body.moves = true;
     const angle = Phaser.Math.Angle.Between(this.x, this.y, targetX, targetY);
-    this.setVelocity(Math.cos(angle) * 390, Math.sin(angle) * 390).setRotation(angle).setTexture('projectile-rune').setTint(0xb0fff0).setAlpha(1);
-    this.damage = 30;
+    this.setVelocity(Math.cos(angle) * 390, Math.sin(angle) * 390).setRotation(angle).setTexture('projectile-rune').setTint(backflow ? 0x64c8ec : 0xb0fff0).setAlpha(1);
+    this.damage = damage; this.setData('chainBackflow', backflow);
   }
 }

@@ -65,9 +65,10 @@ export class Boss extends Enemy {
     const angle = this.facingAngle;
     this.actionLockedUntil = this.scene.time.now + 850;
     this.showAim(angle, 720, 0xd95842, 650);
+    const generation = this.attackIntentGeneration;
     this.scene.time.delayedCall(680, () => {
-      if (!this.active) return;
-      for (let index = -2; index <= 2; index += 1) this.callbacks.shoot(this.x, this.y - 18, angle + index * 0.12, 245, 15, 'projectile-boss');
+      if (!this.active || generation !== this.attackIntentGeneration || this.scene.time.now < this.phaseTransitionUntil) return;
+      for (let index = -2; index <= 2; index += 1) this.callbacks.shoot(this, this.x, this.y - 18, angle + index * 0.12, 245, 15, 'projectile-boss');
     });
     this.nextActionAt = this.scene.time.now + 1850;
   }
@@ -84,10 +85,13 @@ export class Boss extends Enemy {
       { x: hero.x, y: hero.y },
       { x: Phaser.Math.Clamp(hero.x + Phaser.Math.Between(-150, 150), 100, 860), y: Phaser.Math.Clamp(hero.y + Phaser.Math.Between(-100, 100), 110, 475) },
     ];
-    spots.forEach((spot, index) => this.scene.time.delayedCall(index * 220, () => this.bossCallbacks.inkZone(spot.x, spot.y, 62, 3500)));
+    const generation = this.attackIntentGeneration;
+    spots.forEach((spot, index) => this.scene.time.delayedCall(index * 220, () => {
+      if (this.active && generation === this.attackIntentGeneration && this.scene.time.now >= this.phaseTransitionUntil) this.bossCallbacks.inkZone(spot.x, spot.y, 62, 3500);
+    }));
     this.scene.time.delayedCall(650, () => {
-      if (!this.active) return;
-      for (let index = 0; index < 12; index += 1) this.callbacks.shoot(this.x, this.y, index * Math.PI * 2 / 12 + this.patternIndex * 0.14, 155, 14, 'projectile-ink');
+      if (!this.active || generation !== this.attackIntentGeneration || this.scene.time.now < this.phaseTransitionUntil) return;
+      for (let index = 0; index < 12; index += 1) this.callbacks.shoot(this, this.x, this.y, index * Math.PI * 2 / 12 + this.patternIndex * 0.14, 155, 14, 'projectile-ink');
     });
     this.nextActionAt = this.scene.time.now + 2050;
   }
@@ -103,9 +107,10 @@ export class Boss extends Enemy {
     const angle = this.facingAngle;
     this.actionLockedUntil = this.scene.time.now + 720;
     this.showAim(angle, 520, 0xe36f4b, 680);
+    const generation = this.attackIntentGeneration;
     this.scene.time.delayedCall(480, () => {
-      if (!this.active) return;
-      for (let index = -3; index <= 3; index += 1) this.callbacks.shoot(this.x, this.y - 14, angle + index * 0.17, 270 - Math.abs(index) * 12, 17, 'projectile-boss');
+      if (!this.active || generation !== this.attackIntentGeneration || this.scene.time.now < this.phaseTransitionUntil) return;
+      for (let index = -3; index <= 3; index += 1) this.callbacks.shoot(this, this.x, this.y - 14, angle + index * 0.17, 270 - Math.abs(index) * 12, 17, 'projectile-boss');
     });
     this.nextActionAt = this.scene.time.now + 1350;
   }

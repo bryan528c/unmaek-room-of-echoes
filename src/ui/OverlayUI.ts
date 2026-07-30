@@ -1,6 +1,8 @@
 import type { UpgradeDefinition, UpgradeId } from '../game/data/upgrades';
 import type { AudioSystem } from '../game/systems/AudioSystem';
 import type { GameSave } from '../game/systems/SaveSystem';
+import type { ControlMode } from '../game/systems/SaveSystem';
+import type { WordId } from '../game/systems/WordChainSystem';
 
 export interface HudState {
   health: number;
@@ -20,9 +22,15 @@ export interface HudState {
   canLink: boolean;
   rewindPreviewHealth?: number;
   empowered: boolean;
+  sentencePulse: boolean;
+  controlMode: ControlMode;
+  chainOpener?: WordId;
+  chainRemaining?: number;
+  chainNext?: readonly WordId[];
   bossHealth?: number;
   bossMaxHealth?: number;
   bossPhase?: number;
+  bossGuide?: string;
 }
 
 export interface ResultStats {
@@ -44,11 +52,11 @@ export interface ResultStats {
 
 export class OverlayUI {
   private persist = (): void => undefined;
-  private screen?: HTMLElement;
   private hud?: HTMLElement;
   private tutorial?: HTMLElement;
   private damageHealth = 100;
   private damageTimer?: number;
+  private chainTimer?: number;
   private keyHandler?: (event: KeyboardEvent) => void;
 
   public constructor(private readonly root: HTMLElement, private readonly save: GameSave, private readonly audio: AudioSystem) {
@@ -60,10 +68,34 @@ export class OverlayUI {
   private clear(): void {
     if (this.keyHandler) { window.removeEventListener('keydown', this.keyHandler); this.keyHandler = undefined; }
     window.clearTimeout(this.damageTimer); this.damageTimer = undefined;
+    window.clearTimeout(this.chainTimer); this.chainTimer = undefined;
     this.root.innerHTML = '';
-    this.screen = undefined;
     this.hud = undefined;
     this.tutorial = undefined;
+  }
+
+  private bindKeyboardNavigation(
+    container: HTMLElement,
+    selector = 'button:not([disabled])',
+    onEscape?: () => void,
+    directKeys: Readonly<Record<string, () => void>> = {},
+  ): void {
+    if (this.keyHandler) window.removeEventListener('keydown', this.keyHandler);
+    const items = (): HTMLElement[] => [...container.querySelectorAll<HTMLElement>(selector)].filter((item) => !item.hasAttribute('disabled'));
+    let index = Math.max(0, items().findIndex((item) => item.classList.contains('primary') || item.getAttribute('aria-pressed') === 'true'));
+    const focus = (): void => { const current = items(); index = Math.min(index, Math.max(0, current.length - 1)); current[index]?.focus({ preventScroll: true }); };
+    focus();
+    const handler = (event: KeyboardEvent): void => {
+      const direct = directKeys[event.code];
+      if (direct) { event.preventDefault(); direct(); return; }
+      const current = items(); if (current.length === 0) return;
+      const previous = event.code === 'ArrowUp' || event.code === 'ArrowLeft' || event.code === 'KeyW' || event.code === 'KeyA';
+      const next = event.code === 'ArrowDown' || event.code === 'ArrowRight' || event.code === 'KeyS' || event.code === 'KeyD';
+      if (previous || next) { event.preventDefault(); index = (index + (previous ? -1 : 1) + current.length) % current.length; focus(); return; }
+      if (event.code === 'Enter' || event.code === 'KeyJ') { event.preventDefault(); (current[index] as HTMLButtonElement | undefined)?.click(); return; }
+      if (event.code === 'Escape' && onEscape) { event.preventDefault(); onEscape(); }
+    };
+    this.keyHandler = handler; window.addEventListener('keydown', handler);
   }
 
   private progressLabel(stage: number): string {
@@ -90,15 +122,11 @@ export class OverlayUI {
       </div>
       <p class="footer-note">한 판 8–12분 · 헤드폰 권장</p>`;
     this.root.append(screen);
-    this.screen = screen;
     const start = (): void => { if (this.keyHandler) window.removeEventListener('keydown', this.keyHandler); this.keyHandler = undefined; this.audio.unlock(); onStart(); };
     screen.querySelector('[data-action="start"]')?.addEventListener('click', start, { once: true });
     screen.querySelector('[data-action="controls"]')?.addEventListener('click', () => this.showControls(() => this.showMenu(onStart)));
     screen.querySelector('[data-action="settings"]')?.addEventListener('click', () => this.showSettings(() => this.showMenu(onStart)));
-    const enter = (event: KeyboardEvent): void => {
-      if (event.code === 'Enter' && this.screen === screen) { window.removeEventListener('keydown', enter); start(); }
-    };
-    this.keyHandler = enter; window.addEventListener('keydown', enter);
+    this.bindKeyboardNavigation(screen, '.menu-actions button');
   }
 
   private showControls(back: () => void): void {
@@ -107,16 +135,18 @@ export class OverlayUI {
     screen.className = 'screen parchment-panel';
     screen.innerHTML = `<div class="panel-content wide"><p class="eyebrow">살아남기 위한 문법</p><h2>조작법</h2>
       <div class="control-grid">
-        <div><kbd>WASD</kbd><kbd>방향키</kbd><span>이동</span></div><div><kbd>마우스</kbd><span>조준</span></div>
-        <div><kbd>좌클릭</kbd><kbd>J</kbd><span>단검 3연격</span></div><div><kbd>우클릭</kbd><kbd>K</kbd><kbd>Shift</kbd><span>패링</span></div>
+        <div><kbd>WASD</kbd><kbd>방향키</kbd><span>이동 · 메뉴 선택</span></div><div><kbd>J</kbd><span>자동 조준 단검 3연격</span></div>
+        <div><kbd>K</kbd><kbd>Shift</kbd><span>패링</span></div><div><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><span>강화 즉시 선택</span></div>
         <div><kbd>Space</kbd><span>무적 대시</span></div><div><kbd>F</kbd><span>다음 언령 강화</span></div>
         <div class="word"><kbd>Q</kbd><span><b>멎는다</b> 적과 탄환 정지</span></div>
         <div class="word"><kbd>E</kbd><span><b>되돌린다</b> 2초 전 상태 복원</span></div>
         <div class="word"><kbd>R</kbd><span><b>잇는다</b> 피해 공유 연결</span></div>
-        <div><kbd>Esc</kbd><span>일시정지</span></div>
+        <div><kbd>Enter</kbd><kbd>J</kbd><span>메뉴 결정</span></div><div><kbd>Esc</kbd><span>일시정지 · 뒤로</span></div>
+        <div class="control-note"><b>키보드 전용이 기본입니다.</b><span>설정에서 기존 마우스 조준 방식으로 전환할 수 있습니다.</span></div>
       </div><button class="rune-button primary" data-action="back">돌아가기</button></div>`;
-    this.root.append(screen); this.screen = screen;
+    this.root.append(screen);
     screen.querySelector('[data-action="back"]')?.addEventListener('click', back, { once: true });
+    this.bindKeyboardNavigation(screen, 'button', back);
   }
 
   private showSettings(back: () => void): void {
@@ -125,13 +155,24 @@ export class OverlayUI {
     const screen = document.createElement('section');
     screen.className = 'screen parchment-panel';
     screen.innerHTML = `<div class="panel-content"><p class="eyebrow">기록실 환경</p><h2>설정</h2>
+      <div class="control-setting"><span>조작 방식</span><div class="control-mode-options">
+        <button data-control="keyboard" aria-pressed="${current.controlMode === 'keyboard'}"><b>키보드 전용</b><small>자동 조준 + 수동 공격</small></button>
+        <button data-control="mouse" aria-pressed="${current.controlMode === 'mouse'}"><b>기존 마우스 조준</b><small>클릭 공격 + 포인터 조준</small></button>
+      </div></div>
       <label class="setting-row"><span>전체 볼륨 <output>${Math.round(current.masterVolume * 100)}</output></span><input data-setting="masterVolume" type="range" min="0" max="1" step="0.05" value="${current.masterVolume}" /></label>
       <label class="setting-row"><span>효과음 볼륨 <output>${Math.round(current.effectsVolume * 100)}</output></span><input data-setting="effectsVolume" type="range" min="0" max="1" step="0.05" value="${current.effectsVolume}" /></label>
       <label class="setting-row"><span>화면 흔들림 <output>${Math.round(current.shake * 100)}</output></span><input data-setting="shake" type="range" min="0" max="1" step="0.05" value="${current.shake}" /></label>
       <label class="toggle-row"><input data-setting="reducedMotion" type="checkbox" ${current.reducedMotion ? 'checked' : ''} /><span>감소된 모션</span></label>
       <label class="toggle-row"><input data-setting="showTutorial" type="checkbox" ${current.showTutorial ? 'checked' : ''} /><span>튜토리얼 다시 보기</span></label>
       <div class="panel-buttons"><button class="rune-button" data-action="mute">${this.audio.isMuted ? '음소거 해제' : '즉시 음소거'}</button><button class="rune-button primary" data-action="back">저장하고 돌아가기</button></div></div>`;
-    this.root.append(screen); this.screen = screen;
+    this.root.append(screen);
+    screen.querySelectorAll<HTMLButtonElement>('[data-control]').forEach((button) => {
+      button.addEventListener('click', () => {
+        current.controlMode = button.dataset.control === 'mouse' ? 'mouse' : 'keyboard';
+        screen.querySelectorAll<HTMLButtonElement>('[data-control]').forEach((option) => option.setAttribute('aria-pressed', String(option === button)));
+        this.persist();
+      });
+    });
     screen.querySelectorAll<HTMLInputElement>('input[data-setting]').forEach((input) => {
       input.addEventListener('input', () => {
         const key = input.dataset.setting;
@@ -147,6 +188,7 @@ export class OverlayUI {
       const muted = this.audio.toggleMute(); (event.currentTarget as HTMLButtonElement).textContent = muted ? '음소거 해제' : '즉시 음소거';
     });
     screen.querySelector('[data-action="back"]')?.addEventListener('click', () => { this.persist(); back(); }, { once: true });
+    this.bindKeyboardNavigation(screen, 'button', () => { this.persist(); back(); });
   }
 
   public showHud(): void {
@@ -155,13 +197,15 @@ export class OverlayUI {
     hud.className = 'hud';
     hud.innerHTML = `<div class="health-panel"><div class="hero-mini"><img src="./assets/hero-concept.png" alt="" /></div><div><div class="hud-label">생명 <span data-health-text>100 / 100</span></div><div class="health-track"><i data-health-ghost></i><em data-health-rewind></em><b data-health></b></div></div></div>
       <div class="stage-panel"><span data-stage>제1전투</span><strong data-score>0</strong></div>
-      <div class="boss-panel hidden" data-boss><div><span>기록 포식자</span><em data-boss-phase>제1형</em></div><div class="boss-track"><b data-boss-health></b></div></div>
+      <div class="boss-panel hidden" data-boss><div><span>기록 포식자</span><em data-boss-phase>제1형</em></div><small data-boss-guide></small><div class="boss-track"><b data-boss-health></b></div></div>
       <div class="word-hud">
         <div class="word-slot" data-word="q"><kbd>Q</kbd><b>멎는다</b><span data-cooldown>비용 25</span></div>
         <div class="word-slot" data-word="e"><kbd>E</kbd><b>되돌린다</b><span data-cooldown>비용 30</span></div>
         <div class="word-slot" data-word="r"><kbd>R</kbd><b>잇는다</b><span data-cooldown>비용 35</span></div>
         <div class="sentence"><div><span>문장력</span><b data-sentence-text>0 / 100</b></div><div class="sentence-track"><i data-sentence></i></div><button data-empower><kbd>F</kbd> 강화 용언</button></div>
       </div>
+      <div class="chain-status hidden" data-chain-status></div>
+      <div class="chain-toast hidden" data-chain-toast></div>
       <button class="hud-mute" data-mute aria-label="음소거">${this.audio.isMuted ? '×' : '♪'}</button>
       <div class="tutorial-banner hidden" data-tutorial></div>`;
     this.root.append(hud); this.hud = hud;
@@ -191,6 +235,7 @@ export class OverlayUI {
     const healthText = this.hud.querySelector('[data-health-text]'); if (healthText) healthText.textContent = `${Math.ceil(state.health)} / ${state.maxHealth}`;
     const sentence = this.hud.querySelector<HTMLElement>('[data-sentence]'); if (sentence) sentence.style.width = `${Math.min(100, state.sentence / state.sentenceMax * 100)}%`;
     const sentenceText = this.hud.querySelector('[data-sentence-text]'); if (sentenceText) sentenceText.textContent = `${Math.floor(state.sentence)} / ${state.sentenceMax}`;
+    const sentencePanel = this.hud.querySelector<HTMLElement>('.sentence'); sentencePanel?.classList.toggle('max-pulse', state.sentencePulse);
     const stage = this.hud.querySelector('[data-stage]'); if (stage) stage.textContent = state.stage;
     const score = this.hud.querySelector('[data-score]'); if (score) score.textContent = state.score.toLocaleString();
     const cooldowns = [state.stopCooldown, state.rewindCooldown, state.linkCooldown];
@@ -202,6 +247,19 @@ export class OverlayUI {
       const label = slot.querySelector('[data-cooldown]');
       if (label) label.textContent = value > 0 ? `재사용 ${value.toFixed(1)}s` : state.empowered ? '강화 준비' : usable ? `비용 ${costs[index] ?? 0}` : `필요 ${costs[index] ?? 0}`;
     });
+    const chainStatus = this.hud.querySelector<HTMLElement>('[data-chain-status]');
+    const wordNames: Record<WordId, string> = { stop: '멎는다', rewind: '되돌린다', link: '잇는다' };
+    const wordKeys: Record<WordId, string> = { stop: 'Q', rewind: 'E', link: 'R' };
+    const chainNext = state.chainNext ?? [];
+    this.hud.querySelectorAll<HTMLElement>('.word-slot').forEach((slot) => {
+      const slotWord: Record<string, WordId> = { q: 'stop', e: 'rewind', r: 'link' };
+      const word = slotWord[slot.dataset.word ?? ''];
+      slot.classList.toggle('chain-next', word !== undefined && chainNext.includes(word));
+    });
+    if (chainStatus && state.chainOpener && (state.chainRemaining ?? 0) > 0) {
+      chainStatus.classList.remove('hidden');
+      chainStatus.innerHTML = `<span>${wordNames[state.chainOpener]} 이후</span><b>${chainNext.map((word) => `${wordKeys[word]} ${wordNames[word]}`).join(' / ')}</b><i>${(state.chainRemaining ?? 0).toFixed(1)}s</i>`;
+    } else chainStatus?.classList.add('hidden');
     const empower = this.hud.querySelector<HTMLElement>('[data-empower]');
     if (empower) { empower.classList.toggle('ready', state.sentence >= state.sentenceMax || state.empowered); empower.classList.toggle('armed', state.empowered); empower.innerHTML = state.empowered ? '<kbd>F</kbd> 다음 언령 강화됨' : '<kbd>F</kbd> 강화 용언'; }
     const boss = this.hud.querySelector<HTMLElement>('[data-boss]');
@@ -209,7 +267,21 @@ export class OverlayUI {
       boss.classList.remove('hidden');
       const bar = boss.querySelector<HTMLElement>('[data-boss-health]'); if (bar) bar.style.width = `${Math.max(0, state.bossHealth / state.bossMaxHealth) * 100}%`;
       const phase = boss.querySelector('[data-boss-phase]'); if (phase) phase.textContent = `제${state.bossPhase ?? 1}형`;
+      const guide = boss.querySelector('[data-boss-guide]'); if (guide) guide.textContent = state.bossGuide ?? '';
     } else boss?.classList.add('hidden');
+  }
+
+  public showChainTrigger(name: string, duration: number): void {
+    const toast = this.hud?.querySelector<HTMLElement>('[data-chain-toast]');
+    if (!toast) return;
+    window.clearTimeout(this.chainTimer);
+    toast.textContent = name;
+    toast.classList.remove('hidden');
+    toast.classList.remove('triggered');
+    void toast.offsetWidth;
+    toast.style.animationDuration = `${duration}ms`;
+    toast.classList.add('triggered');
+    this.chainTimer = window.setTimeout(() => toast.classList.add('hidden'), duration);
   }
 
   public showTutorial(text: string): void {
@@ -221,25 +293,48 @@ export class OverlayUI {
   public showUpgradeChoice(choices: readonly UpgradeDefinition[], rerolls: number, select: (id: UpgradeId) => void, reroll: () => void): void {
     const modal = document.createElement('section');
     modal.className = 'modal upgrade-modal';
-    modal.innerHTML = `<div class="modal-scrim"></div><div class="upgrade-box"><p class="eyebrow">새 문장이 새겨진다</p><h2>강화 선택</h2><div class="upgrade-grid">${choices.map((choice, index) => `<button class="upgrade-card rarity-${choice.rarity}" data-id="${choice.id}"><span>0${index + 1}</span><em>${choice.rarity} · ${choice.tag}</em><h3>${choice.name}</h3><p>${choice.description}</p><small>선택하려면 클릭</small></button>`).join('')}</div><button class="reroll" data-reroll ${rerolls <= 0 ? 'disabled' : ''}>↻ 다시 뽑기 · 남은 횟수 ${rerolls}</button></div>`;
+    modal.innerHTML = `<div class="modal-scrim"></div><div class="upgrade-box"><p class="eyebrow">새 문장이 새겨진다</p><h2>강화 선택</h2><div class="upgrade-grid">${choices.map((choice, index) => `<button class="upgrade-card rarity-${choice.rarity}" data-id="${choice.id}"><span>0${index + 1}</span><em>${choice.rarity} · ${choice.tag}</em><h3>${choice.name}</h3><p>${choice.description}</p><small>${index + 1} 또는 Enter / J</small></button>`).join('')}</div><button class="reroll" data-reroll ${rerolls <= 0 ? 'disabled' : ''}>↻ 다시 뽑기 · 남은 횟수 ${rerolls}</button></div>`;
     this.root.append(modal);
-    modal.querySelectorAll<HTMLButtonElement>('[data-id]').forEach((button) => button.addEventListener('click', () => {
+    const choose = (button: HTMLButtonElement): void => {
+      if (this.keyHandler) window.removeEventListener('keydown', this.keyHandler);
+      this.keyHandler = undefined;
       const id = button.dataset.id as UpgradeId; modal.remove(); this.audio.play('upgrade'); select(id);
+    };
+    const cards = [...modal.querySelectorAll<HTMLButtonElement>('[data-id]')];
+    cards.forEach((button) => button.addEventListener('click', () => {
+      choose(button);
     }, { once: true }));
-    modal.querySelector('[data-reroll]')?.addEventListener('click', () => { modal.remove(); reroll(); }, { once: true });
+    modal.querySelector('[data-reroll]')?.addEventListener('click', () => {
+      if (this.keyHandler) window.removeEventListener('keydown', this.keyHandler);
+      this.keyHandler = undefined; modal.remove(); reroll();
+    }, { once: true });
+    this.bindKeyboardNavigation(modal, 'button:not([disabled])', undefined, {
+      Digit1: () => { if (cards[0]) choose(cards[0]); },
+      Digit2: () => { if (cards[1]) choose(cards[1]); },
+      Digit3: () => { if (cards[2]) choose(cards[2]); },
+    });
   }
 
   public showPause(resume: () => void, title: () => void): void {
     const modal = document.createElement('section'); modal.className = 'modal pause-modal';
     modal.innerHTML = `<div class="modal-scrim"></div><div class="panel-content"><p class="eyebrow">기록이 잠시 멎었다</p><h2>일시정지</h2><button class="rune-button primary" data-resume>계속하기</button><button class="rune-button" data-settings>설정</button><button class="rune-button danger" data-title>타이틀로</button></div>`;
     this.root.append(modal);
-    const close = (): void => modal.remove();
+    const close = (): void => {
+      modal.remove();
+      if (this.keyHandler) window.removeEventListener('keydown', this.keyHandler);
+      this.keyHandler = undefined;
+    };
     modal.querySelector('[data-resume]')?.addEventListener('click', () => { close(); resume(); }, { once: true });
     modal.querySelector('[data-settings]')?.addEventListener('click', () => { close(); this.showSettings(() => { this.showHud(); resume(); }); }, { once: true });
     modal.querySelector('[data-title]')?.addEventListener('click', () => { close(); title(); }, { once: true });
+    this.bindKeyboardNavigation(modal);
   }
 
-  public hidePause(): void { this.root.querySelector('.pause-modal')?.remove(); }
+  public hidePause(): void {
+    this.root.querySelector('.pause-modal')?.remove();
+    if (this.keyHandler) window.removeEventListener('keydown', this.keyHandler);
+    this.keyHandler = undefined;
+  }
 
   public showResult(stats: ResultStats, restart: () => void, title: () => void): void {
     this.clear();
@@ -251,11 +346,10 @@ export class OverlayUI {
       ${stats.milestones.length ? `<div class="milestones">${stats.milestones.map((item) => `<span>${item}</span>`).join('')}</div>` : ''}
       <div class="upgrade-summary"><span>새겨진 강화</span><p>${stats.upgrades.length ? stats.upgrades.join(' · ') : '없음'}</p></div>
       <div class="panel-buttons"><button class="rune-button primary" data-restart>다시 시작 <kbd>Enter</kbd></button><button class="rune-button" data-title>타이틀로</button></div></div>`;
-    this.root.append(screen); this.screen = screen;
+    this.root.append(screen);
     const doRestart = (): void => restart();
     screen.querySelector('[data-restart]')?.addEventListener('click', doRestart, { once: true });
     screen.querySelector('[data-title]')?.addEventListener('click', title, { once: true });
-    const enter = (event: KeyboardEvent): void => { if (event.code === 'Enter' && this.screen === screen) { window.removeEventListener('keydown', enter); this.keyHandler = undefined; doRestart(); } };
-    this.keyHandler = enter; window.addEventListener('keydown', enter);
+    this.bindKeyboardNavigation(screen, '.panel-buttons button');
   }
 }

@@ -32,4 +32,17 @@ describe('SaveSystem', () => {
     storage.value = JSON.stringify({ settings: DEFAULT_SAVE.settings, bestScore: 2180, bestRank: 'B', tutorialSeen: true });
     expect(loadSave(storage)).toEqual({ ...DEFAULT_SAVE, bestScore: 2180, bestRank: 'B', tutorialSeen: true });
   });
+
+  it('기존 저장 데이터에는 키보드 전용 모드를 기본 적용한다', () => {
+    const storage = new MemoryStorage();
+    const { controlMode: _controlMode, ...legacySettings } = DEFAULT_SAVE.settings;
+    storage.value = JSON.stringify({ settings: legacySettings, bestScore: 320, bestRank: 'C', tutorialSeen: false });
+    expect(loadSave(storage).settings.controlMode).toBe('keyboard');
+  });
+
+  it('마우스 조준 비교 모드를 저장하고 다시 읽는다', () => {
+    const storage = new MemoryStorage(); const save = structuredClone(DEFAULT_SAVE);
+    save.settings.controlMode = 'mouse'; saveGame(storage, save);
+    expect(loadSave(storage).settings.controlMode).toBe('mouse');
+  });
 });

@@ -1,9 +1,12 @@
+export type ControlMode = 'keyboard' | 'mouse';
+
 export interface GameSettings {
   masterVolume: number;
   effectsVolume: number;
   shake: number;
   reducedMotion: boolean;
   showTutorial: boolean;
+  controlMode: ControlMode;
 }
 
 export interface GameSave {
@@ -29,6 +32,7 @@ export const DEFAULT_SETTINGS: GameSettings = {
   shake: 0.7,
   reducedMotion: false,
   showTutorial: true,
+  controlMode: 'keyboard',
 };
 
 export const DEFAULT_SAVE: GameSave = {
@@ -60,7 +64,7 @@ export function loadSave(storage: StorageLike): GameSave {
     const ranks: readonly GameRank[] = ['S', 'A', 'B', 'C+', 'C', 'C-', '-'];
     const bestRank = typeof parsed.bestRank === 'string' && ranks.includes(parsed.bestRank as GameRank) ? parsed.bestRank as GameRank : '-';
     return {
-      settings: { ...settings },
+      settings: { ...settings, controlMode: settings.controlMode === 'mouse' ? 'mouse' : 'keyboard' },
       bestScore: typeof parsed.bestScore === 'number' && parsed.bestScore >= 0 ? parsed.bestScore : 0,
       bestRank,
       tutorialSeen: parsed.tutorialSeen === true,

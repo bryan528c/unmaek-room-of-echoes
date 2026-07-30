@@ -3,7 +3,7 @@ import { BALANCE, type EnemyKind } from '../balance';
 import { angleDelta } from '../utils/math';
 
 export interface EnemyCallbacks {
-  shoot: (x: number, y: number, angle: number, speed: number, damage: number, texture?: string) => void;
+  shoot: (source: Enemy, x: number, y: number, angle: number, speed: number, damage: number, texture?: string) => void;
   melee: (enemy: Enemy, damage: number) => void;
   died: (enemy: Enemy) => void;
   cue: (cue: 'warning' | 'parryWindow') => void;
@@ -28,6 +28,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   protected telegraph?: Phaser.GameObjects.Graphics;
   protected statusGraphics?: Phaser.GameObjects.Graphics;
   protected readonly baseScale: number;
+  protected attackIntentGeneration = 0;
   private static sequence = 0;
 
   public constructor(scene: Phaser.Scene, x: number, y: number, kind: EnemyKind, callbacks: EnemyCallbacks) {
@@ -93,8 +94,9 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     if (time >= this.nextActionAt && distance < 500) {
       this.setVelocity(0); this.actionLockedUntil = time + 620;
       const angle = this.facingAngle; this.showAim(angle, 520, 0xd05b45);
-      this.scene.time.delayedCall(500, () => this.callbacks.cue('parryWindow'));
-      this.scene.time.delayedCall(540, () => { if (this.active && this.health > 0) this.callbacks.shoot(this.x, this.y - 12, angle, 250, BALANCE.enemies.archer.damage); });
+      const generation = this.attackIntentGeneration;
+      this.scene.time.delayedCall(500, () => { if (generation === this.attackIntentGeneration) this.callbacks.cue('parryWindow'); });
+      this.scene.time.delayedCall(540, () => { if (generation === this.attackIntentGeneration && this.active && this.health > 0) this.callbacks.shoot(this, this.x, this.y - 12, angle, 250, BALANCE.enemies.archer.damage); });
       this.nextActionAt = time + Phaser.Math.Between(1500, 2100); return;
     }
     if (distance < 190) this.moveToward(this.facingAngle + Math.PI, BALANCE.enemies.archer.speed);
@@ -105,10 +107,12 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   protected updateInk(time: number, distance: number): void {
     if (time >= this.nextActionAt && distance < 480) {
       this.setVelocity(0); this.actionLockedUntil = time + 780;
-      this.telegraph = this.scene.add.graphics().setDepth(8).lineStyle(2, 0xd26c52, 0.65).strokeCircle(this.x, this.y, 44);
-      this.scene.tweens.add({ targets: this.telegraph, scaleX: 1.6, scaleY: 1.6, alpha: 0, duration: 670, onComplete: () => { this.telegraph?.destroy(); this.telegraph = undefined; } });
+      const telegraph = this.scene.add.graphics().setDepth(8).lineStyle(2, 0xd26c52, 0.65).strokeCircle(this.x, this.y, 44);
+      this.telegraph = telegraph;
+      this.scene.tweens.add({ targets: telegraph, scaleX: 1.6, scaleY: 1.6, alpha: 0, duration: 670, onComplete: () => { telegraph.destroy(); if (this.telegraph === telegraph) this.telegraph = undefined; } });
       const count = 7;
-      this.scene.time.delayedCall(650, () => { if (!this.active || this.health <= 0) return; for (let index = 0; index < count; index += 1) this.callbacks.shoot(this.x, this.y, this.facingAngle - 0.75 + index * 1.5 / (count - 1), 170, BALANCE.enemies.ink.damage, 'projectile-ink'); });
+      const generation = this.attackIntentGeneration;
+      this.scene.time.delayedCall(650, () => { if (generation !== this.attackIntentGeneration || !this.active || this.health <= 0) return; for (let index = 0; index < count; index += 1) this.callbacks.shoot(this, this.x, this.y, this.facingAngle - 0.75 + index * 1.5 / (count - 1), 170, BALANCE.enemies.ink.damage, 'projectile-ink'); });
       this.nextActionAt = time + Phaser.Math.Between(2100, 2600); return;
     }
     if (distance > 260) this.moveToward(this.facingAngle, BALANCE.enemies.ink.speed); else this.setVelocity(0);
@@ -127,8 +131,9 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     const angle = Phaser.Math.Angle.Between(this.x, this.y, hero.x, hero.y);
     this.showAim(angle, warningMs, 0xd56343, 185);
     this.scene.tweens.add({ targets: this, scaleX: this.baseScale * 1.08, scaleY: this.baseScale * 0.82, rotation: Math.cos(angle) < 0 ? -0.06 : 0.06, duration: warningMs * 0.72, yoyo: true });
+    const generation = this.attackIntentGeneration;
     this.scene.time.delayedCall(warningMs, () => {
-      if (!this.active || this.health <= 0) return;
+      if (generation !== this.attackIntentGeneration || !this.active || this.health <= 0) return;
       this.callbacks.cue('parryWindow'); this.setScale(this.baseScale).setRotation(0);
       this.attackActiveUntil = this.scene.time.now + 300;
       this.setVelocity(Math.cos(angle) * speed, Math.sin(angle) * speed);
@@ -139,16 +144,24 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
   protected showAim(angle: number, duration: number, color: number, length = 540): void {
     this.telegraph?.destroy();
-    this.telegraph = this.scene.add.graphics().setDepth(8);
+    const telegraph = this.scene.add.graphics().setDepth(8);
+    this.telegraph = telegraph;
     this.callbacks.cue('warning');
-    this.telegraph.lineStyle(7, 0x5b1715, 0.22).lineBetween(this.x, this.y, this.x + Math.cos(angle) * length, this.y + Math.sin(angle) * length);
-    this.telegraph.lineStyle(2, color, 0.88).lineBetween(this.x, this.y, this.x + Math.cos(angle) * length, this.y + Math.sin(angle) * length);
-    this.telegraph.fillStyle(0xe7844e, 0.68).fillTriangle(this.x + Math.cos(angle) * 28, this.y + Math.sin(angle) * 28, this.x + Math.cos(angle + 0.18) * 46, this.y + Math.sin(angle + 0.18) * 46, this.x + Math.cos(angle - 0.18) * 46, this.y + Math.sin(angle - 0.18) * 46);
-    this.scene.tweens.add({ targets: this.telegraph, alpha: 0.15, duration, onComplete: () => { this.telegraph?.destroy(); this.telegraph = undefined; } });
+    telegraph.lineStyle(7, 0x5b1715, 0.22).lineBetween(this.x, this.y, this.x + Math.cos(angle) * length, this.y + Math.sin(angle) * length);
+    telegraph.lineStyle(2, color, 0.88).lineBetween(this.x, this.y, this.x + Math.cos(angle) * length, this.y + Math.sin(angle) * length);
+    telegraph.fillStyle(0xe7844e, 0.68).fillTriangle(this.x + Math.cos(angle) * 28, this.y + Math.sin(angle) * 28, this.x + Math.cos(angle + 0.18) * 46, this.y + Math.sin(angle + 0.18) * 46, this.x + Math.cos(angle - 0.18) * 46, this.y + Math.sin(angle - 0.18) * 46);
+    this.scene.tweens.add({ targets: telegraph, alpha: 0.15, duration, onComplete: () => { telegraph.destroy(); if (this.telegraph === telegraph) this.telegraph = undefined; } });
   }
 
   public freeze(until: number, bossSlow = false): void {
     this.frozenUntil = Math.max(this.frozenUntil, bossSlow ? this.scene.time.now + (until - this.scene.time.now) * 0.45 : until);
+  }
+
+  public cancelAttackIntent(until: number): void {
+    this.attackIntentGeneration += 1;
+    this.telegraph?.destroy(); this.telegraph = undefined; this.attackActiveUntil = 0;
+    this.actionLockedUntil = Math.max(this.actionLockedUntil, until); this.nextActionAt = Math.max(this.nextActionAt, until);
+    this.setVelocity(0).setRotation(0).setScale(this.baseScale);
   }
 
   public takeDamage(amount: number, sourceAngle: number, parried = false): number {
