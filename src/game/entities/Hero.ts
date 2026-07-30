@@ -3,6 +3,7 @@ import { BALANCE } from '../balance';
 import { clamp } from '../utils/math';
 
 export interface HeroAttack {
+  attackId: number;
   combo: number;
   angle: number;
   x: number;
@@ -37,12 +38,13 @@ export class Hero extends Phaser.Physics.Arcade.Sprite {
   private delayedSlash?: Phaser.Time.TimerEvent;
   private attackHitTimer?: Phaser.Time.TimerEvent;
   private attackRecoveryTimer?: Phaser.Time.TimerEvent;
+  private attackSequence = 0;
 
   public constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y, 'hero-idle');
     scene.add.existing(this);
     scene.physics.add.existing(this);
-    this.setDepth(20).setOrigin(0.5, 1).setScale(HERO_SCALE);
+    this.setDepth(400).setOrigin(0.5, 1).setScale(HERO_SCALE);
     const body = this.body as Phaser.Physics.Arcade.Body;
     body.setSize(28, 28);
     body.setOffset((this.width - 28) / 2, this.height - 30);
@@ -50,6 +52,7 @@ export class Hero extends Phaser.Physics.Arcade.Sprite {
   }
 
   public updateMovement(time: number, x: number, y: number, aimX: number, aimY: number): void {
+    this.setDepth(100 + Math.floor(this.y));
     if (!this.attacking && !this.dashing) {
       this.facing = Phaser.Math.Angle.Between(this.x, this.y, aimX, aimY);
       this.setFlipX(Math.cos(this.facing) < 0);
@@ -101,7 +104,8 @@ export class Hero extends Phaser.Physics.Arcade.Sprite {
     const startRotation = this.rotation;
     this.scene.tweens.add({ targets: this, rotation: startRotation + (this.flipX ? -0.075 : 0.075), scaleX: HERO_SCALE * 1.06, scaleY: HERO_SCALE * 1.03, duration: 70, yoyo: true });
     this.attackHitTimer?.remove(false); this.attackRecoveryTimer?.remove(false);
-    this.attackHitTimer = this.scene.time.delayedCall(BALANCE.hero.attackHitDelay, () => handler?.({ combo: this.combo, angle: this.facing, x: this.x, y: this.y }));
+    const attackId = ++this.attackSequence;
+    this.attackHitTimer = this.scene.time.delayedCall(BALANCE.hero.attackHitDelay, () => handler?.({ attackId, combo: this.combo, angle: this.facing, x: this.x, y: this.y }));
     this.attackRecoveryTimer = this.scene.time.delayedCall(BALANCE.hero.attackRecovery, () => { if (this.active) { this.attacking = false; this.rotation = 0; this.setScale(HERO_SCALE); } });
   }
 
@@ -121,7 +125,7 @@ export class Hero extends Phaser.Physics.Arcade.Sprite {
       this.scene.time.delayedCall(index * 38, () => {
         if (!this.active) return;
         const echo = this.scene.add.image(this.x - vector.x * index * 18, this.y - vector.y * index * 18, this.texture.key)
-          .setOrigin(0.5, 1).setScale(HERO_SCALE).setFlipX(this.flipX).setTint(0x39a6be).setAlpha(0.3).setDepth(18);
+          .setOrigin(0.5, 1).setScale(HERO_SCALE).setFlipX(this.flipX).setTint(0x39a6be).setAlpha(0.3).setDepth(this.depth - 2);
         this.scene.tweens.add({ targets: echo, alpha: 0, duration: 220, onComplete: () => echo.destroy() });
       });
     }
@@ -144,6 +148,9 @@ export class Hero extends Phaser.Physics.Arcade.Sprite {
   public get isParrying(): boolean { return this.scene.time.now <= this.parryUntil; }
   public get isDashing(): boolean { return this.dashing; }
   public get isAttacking(): boolean { return this.attacking; }
+  public get comboStep(): number { return this.combo; }
+  public get movementCircle(): Readonly<{ x: number; y: number; radius: number }> { return { x: this.x, y: this.y, radius: BALANCE.collision.heroMovementRadius }; }
+  public get hurtCircle(): Readonly<{ x: number; y: number; radius: number }> { return { x: this.x, y: this.y + BALANCE.collision.heroHurtOffsetY, radius: BALANCE.collision.heroHurtRadius }; }
 
   public canCancelAttack(time = this.scene.time.now): boolean { return !this.attacking || time >= this.attackCancelableAt; }
 
@@ -154,6 +161,8 @@ export class Hero extends Phaser.Physics.Arcade.Sprite {
     this.attackRecoveryTimer?.remove(false); this.attackRecoveryTimer = undefined;
     this.attacking = false; this.rotation = 0; this.setScale(HERO_SCALE);
   }
+
+  public clearBufferedInput(): void { this.attackBuffered = false; this.attackBufferedUntil = 0; this.attackHandler = undefined; }
 
   public castPose(): void {
     if (!this.active) return;

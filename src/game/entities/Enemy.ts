@@ -15,6 +15,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   public readonly maxHealth: number;
   public frozenUntil = 0;
   public vulnerableUntil = 0;
+  public slowedUntil = 0;
   public attackActiveUntil = 0;
   public linkedUntil = 0;
   public linked = false;
@@ -29,6 +30,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   protected statusGraphics?: Phaser.GameObjects.Graphics;
   protected readonly baseScale: number;
   protected attackIntentGeneration = 0;
+  public activeTelegraph?: { angle: number; length: number; halfWidth: number; until: number };
   private static sequence = 0;
 
   public constructor(scene: Phaser.Scene, x: number, y: number, kind: EnemyKind, callbacks: EnemyCallbacks) {
@@ -41,8 +43,8 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.nextActionAt = scene.time.now + Phaser.Math.Between(700, 1300);
     scene.add.existing(this); scene.physics.add.existing(this);
     this.baseScale = kind === 'elite' ? 1.18 : kind === 'boss' ? 1.32 : 0.92;
-    this.setDepth(16).setOrigin(0.5, 0.7).setAlpha(0).setScale(this.baseScale);
-    this.statusGraphics = scene.add.graphics().setDepth(15);
+    this.setDepth(400).setOrigin(0.5, 0.7).setAlpha(0).setScale(this.baseScale);
+    this.statusGraphics = scene.add.graphics().setDepth(715);
     const body = this.body as Phaser.Physics.Arcade.Body;
     body.setSize(kind === 'elite' ? 42 : 30, kind === 'elite' ? 48 : 35).setOffset((this.width - (kind === 'elite' ? 42 : 30)) / 2, this.height * 0.42);
     body.setCollideWorldBounds(true).setEnable(false);
@@ -62,6 +64,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
   public updateAI(time: number, hero: Phaser.Physics.Arcade.Sprite): void {
     if (!this.active || !this.spawned) return;
+    this.setDepth(100 + Math.floor(this.y));
     if (this.linked && time >= this.linkedUntil) this.linked = false;
     this.updateStatusGraphics(time);
     if (time < this.frozenUntil) { this.setVelocity(0); this.setTint(0x54bbaa); return; }
@@ -80,7 +83,10 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     }
   }
 
-  protected moveToward(angle: number, speed: number): void { this.setVelocity(Math.cos(angle) * speed, Math.sin(angle) * speed); }
+  protected moveToward(angle: number, speed: number): void {
+    const adjusted = this.scene.time.now < this.slowedUntil ? speed * .55 : speed;
+    this.setVelocity(Math.cos(angle) * adjusted, Math.sin(angle) * adjusted);
+  }
 
   protected updateChaser(time: number, hero: Phaser.Physics.Arcade.Sprite, distance: number): void {
     const stats = this.kind === 'minion' ? { speed: 112, damage: 10 } : BALANCE.enemies.chaser;
@@ -129,7 +135,8 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   protected telegraphDash(hero: Phaser.Physics.Arcade.Sprite, damage: number, warningMs: number, speed: number): void {
     this.setVelocity(0); this.actionLockedUntil = this.scene.time.now + warningMs + 310;
     const angle = Phaser.Math.Angle.Between(this.x, this.y, hero.x, hero.y);
-    this.showAim(angle, warningMs, 0xd56343, 185);
+    const hitRadius = this.kind === 'boss' ? 55 : this.kind === 'elite' ? 48 : 38;
+    this.showAim(angle, warningMs, 0xd56343, 185, hitRadius);
     this.scene.tweens.add({ targets: this, scaleX: this.baseScale * 1.08, scaleY: this.baseScale * 0.82, rotation: Math.cos(angle) < 0 ? -0.06 : 0.06, duration: warningMs * 0.72, yoyo: true });
     const generation = this.attackIntentGeneration;
     this.scene.time.delayedCall(warningMs, () => {
@@ -142,24 +149,29 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.setData('meleeDamage', damage);
   }
 
-  protected showAim(angle: number, duration: number, color: number, length = 540): void {
+  protected showAim(angle: number, duration: number, color: number, length = 540, halfWidth = 0): void {
     this.telegraph?.destroy();
-    const telegraph = this.scene.add.graphics().setDepth(8);
+    const telegraph = this.scene.add.graphics().setDepth(80);
     this.telegraph = telegraph;
+    this.activeTelegraph = { angle, length, halfWidth, until: this.scene.time.now + duration };
     this.callbacks.cue('warning');
+    if (halfWidth > 0) telegraph.lineStyle(halfWidth * 2, 0x8c2f25, 0.1).lineBetween(this.x, this.y, this.x + Math.cos(angle) * length, this.y + Math.sin(angle) * length);
     telegraph.lineStyle(7, 0x5b1715, 0.22).lineBetween(this.x, this.y, this.x + Math.cos(angle) * length, this.y + Math.sin(angle) * length);
     telegraph.lineStyle(2, color, 0.88).lineBetween(this.x, this.y, this.x + Math.cos(angle) * length, this.y + Math.sin(angle) * length);
     telegraph.fillStyle(0xe7844e, 0.68).fillTriangle(this.x + Math.cos(angle) * 28, this.y + Math.sin(angle) * 28, this.x + Math.cos(angle + 0.18) * 46, this.y + Math.sin(angle + 0.18) * 46, this.x + Math.cos(angle - 0.18) * 46, this.y + Math.sin(angle - 0.18) * 46);
-    this.scene.tweens.add({ targets: telegraph, alpha: 0.15, duration, onComplete: () => { telegraph.destroy(); if (this.telegraph === telegraph) this.telegraph = undefined; } });
+    this.scene.tweens.add({ targets: telegraph, alpha: 0.15, duration, onComplete: () => { telegraph.destroy(); if (this.telegraph === telegraph) { this.telegraph = undefined; this.activeTelegraph = undefined; } } });
   }
 
   public freeze(until: number, bossSlow = false): void {
     this.frozenUntil = Math.max(this.frozenUntil, bossSlow ? this.scene.time.now + (until - this.scene.time.now) * 0.45 : until);
   }
 
+  public slow(until: number): void { this.slowedUntil = Math.max(this.slowedUntil, until); }
+
   public cancelAttackIntent(until: number): void {
     this.attackIntentGeneration += 1;
     this.telegraph?.destroy(); this.telegraph = undefined; this.attackActiveUntil = 0;
+    this.activeTelegraph = undefined;
     this.actionLockedUntil = Math.max(this.actionLockedUntil, until); this.nextActionAt = Math.max(this.nextActionAt, until);
     this.setVelocity(0).setRotation(0).setScale(this.baseScale);
   }
@@ -180,6 +192,9 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     return actual;
   }
 
+  public get movementCircle(): Readonly<{ x: number; y: number; radius: number }> { return { x: this.x, y: this.y, radius: BALANCE.collision.movementRadius[this.kind] }; }
+  public get hurtCircle(): Readonly<{ x: number; y: number; radius: number }> { return { x: this.x, y: this.y - 10, radius: BALANCE.collision.hurtRadius[this.kind] }; }
+
   protected die(): void {
     if (!this.active) return;
     this.callbacks.died(this);
@@ -187,7 +202,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.scene.tweens.add({ targets: this, alpha: 0, scaleX: this.scaleX * 1.35, scaleY: this.scaleY * 0.45, tint: 0x4fc0ad, duration: 190, onComplete: () => this.destroy() });
   }
 
-  private updateStatusGraphics(time: number): void {
+  protected updateStatusGraphics(time: number): void {
     const graphics = this.statusGraphics; if (!graphics) return; graphics.clear();
     if (this.kind !== 'elite' && this.kind !== 'boss') return;
     const vulnerable = time < this.vulnerableUntil;
@@ -198,5 +213,5 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     if (vulnerable) graphics.strokeCircle(this.x, this.y - 14, radius + 5 + Math.sin(time / 90) * 2);
   }
 
-  public override destroy(fromScene?: boolean): void { this.telegraph?.destroy(); this.statusGraphics?.destroy(); super.destroy(fromScene); }
+  public override destroy(fromScene?: boolean): void { this.telegraph?.destroy(); this.activeTelegraph = undefined; this.statusGraphics?.destroy(); super.destroy(fromScene); }
 }

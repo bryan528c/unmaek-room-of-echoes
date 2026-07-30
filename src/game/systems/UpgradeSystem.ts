@@ -22,10 +22,19 @@ export class UpgradeSystem {
   public choices(count = 3, random: () => number = Math.random): UpgradeDefinition[] {
     const pool = UPGRADES.filter((upgrade) => this.canAdd(upgrade.id));
     const result: UpgradeDefinition[] = [];
-    while (result.length < count && pool.length > 0) {
-      const index = Math.min(pool.length - 1, Math.floor(random() * pool.length));
-      const [picked] = pool.splice(index, 1);
-      if (picked) result.push(picked);
+    const ownedTags = new Set([...this.stacks.keys()].flatMap((id) => UPGRADES.find((upgrade) => upgrade.id === id)?.tags ?? []));
+    const pick = (candidates: UpgradeDefinition[]): void => {
+      const available = candidates.filter((item) => pool.includes(item) && (!item.survival || !result.some((choice) => choice.survival)));
+      if (available.length === 0 || result.length >= count) return;
+      const chosen = available[Math.min(available.length - 1, Math.floor(random() * available.length))];
+      if (!chosen) return; result.push(chosen); pool.splice(pool.indexOf(chosen), 1);
+    };
+    if (ownedTags.size > 0) pick(pool.filter((upgrade) => upgrade.tags.some((tag) => ownedTags.has(tag))));
+    pick(pool.filter((upgrade) => upgrade.tags.every((tag) => !ownedTags.has(tag))));
+    while (result.length < count && pool.length > 0) pick(pool);
+    if (result.length > 1 && result.every((upgrade) => upgrade.tags[0] === result[0]?.tags[0])) {
+      const replacement = pool.find((upgrade) => upgrade.tags[0] !== result[0]?.tags[0] && (!upgrade.survival || !result.some((choice) => choice.survival)));
+      if (replacement) result[result.length - 1] = replacement;
     }
     return result;
   }
@@ -37,6 +46,10 @@ export class UpgradeSystem {
   }
 
   public get rerollsLeft(): number { return this.rerolls; }
+
+  public entries(): Array<{ id: UpgradeId; stacks: number }> {
+    return [...this.stacks.entries()].map(([id, stacks]) => ({ id, stacks }));
+  }
 
   public summary(): string[] {
     return [...this.stacks.entries()].map(([id, count]) => {

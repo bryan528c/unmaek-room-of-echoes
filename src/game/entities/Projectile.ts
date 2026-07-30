@@ -12,7 +12,7 @@ export class Projectile extends Phaser.Physics.Arcade.Image {
   public constructor(scene: Phaser.Scene, x: number, y: number, angle: number, speed: number, damage: number, texture = 'projectile-ink', sourceId?: string) {
     super(scene, x, y, texture);
     scene.add.existing(this); scene.physics.add.existing(this);
-    this.setDepth(14).setRotation(angle).setScale(0.9);
+    this.setDepth(720).setRotation(angle).setScale(0.9);
     this.damage = damage; this.originalDamage = damage; this.sourceId = sourceId;
     this.expiresAt = scene.time.now + 5500;
     this.setVelocity(Math.cos(angle) * speed, Math.sin(angle) * speed);
@@ -27,6 +27,8 @@ export class Projectile extends Phaser.Physics.Arcade.Image {
   }
 
   public freeze(until: number): void { this.frozenUntil = Math.max(this.frozenUntil, until); }
+
+  public get collisionCircle(): Readonly<{ x: number; y: number; radius: number }> { return { x: this.x, y: this.y, radius: 5 }; }
 
   public reflect(targetX: number, targetY: number, damage = 30, backflow = false): void {
     this.enemyOwned = false; this.reflected = true; this.frozenUntil = 0;

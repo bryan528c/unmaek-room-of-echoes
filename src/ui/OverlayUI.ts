@@ -1,8 +1,9 @@
-import type { UpgradeDefinition, UpgradeId } from '../game/data/upgrades';
+import { upgradeDescription, type UpgradeDefinition, type UpgradeId } from '../game/data/upgrades';
 import type { AudioSystem } from '../game/systems/AudioSystem';
 import type { GameSave } from '../game/systems/SaveSystem';
 import type { ControlMode } from '../game/systems/SaveSystem';
 import type { WordId } from '../game/systems/WordChainSystem';
+import type { CombatStatsSnapshot } from '../game/systems/CombatStats';
 
 export interface HudState {
   health: number;
@@ -48,6 +49,9 @@ export interface ResultStats {
   scoreDelta: number;
   newBest: boolean;
   milestones: string[];
+  empowerUses: number;
+  chainSuccesses: number;
+  details: CombatStatsSnapshot;
 }
 
 export class OverlayUI {
@@ -57,10 +61,12 @@ export class OverlayUI {
   private damageHealth = 100;
   private damageTimer?: number;
   private chainTimer?: number;
+  private noticeTimer?: number;
   private keyHandler?: (event: KeyboardEvent) => void;
 
   public constructor(private readonly root: HTMLElement, private readonly save: GameSave, private readonly audio: AudioSystem) {
     this.root.innerHTML = '<div class="screen boot-card"><div class="ink-seal">言</div><p>잔향을 불러오는 중…</p></div>';
+    this.root.addEventListener('pointermove', () => document.body.classList.remove('keyboard-nav'));
   }
 
   public setPersistHandler(handler: () => void): void { this.persist = handler; }
@@ -69,6 +75,7 @@ export class OverlayUI {
     if (this.keyHandler) { window.removeEventListener('keydown', this.keyHandler); this.keyHandler = undefined; }
     window.clearTimeout(this.damageTimer); this.damageTimer = undefined;
     window.clearTimeout(this.chainTimer); this.chainTimer = undefined;
+    window.clearTimeout(this.noticeTimer); this.noticeTimer = undefined;
     this.root.innerHTML = '';
     this.hud = undefined;
     this.tutorial = undefined;
@@ -86,14 +93,22 @@ export class OverlayUI {
     const focus = (): void => { const current = items(); index = Math.min(index, Math.max(0, current.length - 1)); current[index]?.focus({ preventScroll: true }); };
     focus();
     const handler = (event: KeyboardEvent): void => {
+      document.body.classList.add('keyboard-nav');
+      if (event.code === 'Tab') event.preventDefault();
       const direct = directKeys[event.code];
       if (direct) { event.preventDefault(); direct(); return; }
       const current = items(); if (current.length === 0) return;
+      if (event.repeat && (event.code === 'Enter' || event.code === 'KeyJ')) { event.preventDefault(); return; }
+      const focused = current[index];
+      if (focused instanceof HTMLInputElement && focused.type === 'range' && (event.code === 'ArrowLeft' || event.code === 'ArrowRight' || event.code === 'KeyA' || event.code === 'KeyD')) {
+        event.preventDefault(); const step = Number(focused.step || .05); const direction = event.code === 'ArrowLeft' || event.code === 'KeyA' ? -1 : 1;
+        focused.value = String(Math.max(Number(focused.min), Math.min(Number(focused.max), Number(focused.value) + step * direction))); focused.dispatchEvent(new Event('input', { bubbles: true })); return;
+      }
       const previous = event.code === 'ArrowUp' || event.code === 'ArrowLeft' || event.code === 'KeyW' || event.code === 'KeyA';
       const next = event.code === 'ArrowDown' || event.code === 'ArrowRight' || event.code === 'KeyS' || event.code === 'KeyD';
       if (previous || next) { event.preventDefault(); index = (index + (previous ? -1 : 1) + current.length) % current.length; focus(); return; }
-      if (event.code === 'Enter' || event.code === 'KeyJ') { event.preventDefault(); (current[index] as HTMLButtonElement | undefined)?.click(); return; }
-      if (event.code === 'Escape' && onEscape) { event.preventDefault(); onEscape(); }
+      if (event.code === 'Enter' || event.code === 'KeyJ') { event.preventDefault(); (current[index] as HTMLButtonElement | HTMLInputElement | undefined)?.click(); return; }
+      if ((event.code === 'Escape' || event.code === 'KeyK') && onEscape) { event.preventDefault(); onEscape(); }
     };
     this.keyHandler = handler; window.addEventListener('keydown', handler);
   }
@@ -136,12 +151,13 @@ export class OverlayUI {
     screen.innerHTML = `<div class="panel-content wide"><p class="eyebrow">살아남기 위한 문법</p><h2>조작법</h2>
       <div class="control-grid">
         <div><kbd>WASD</kbd><kbd>방향키</kbd><span>이동 · 메뉴 선택</span></div><div><kbd>J</kbd><span>자동 조준 단검 3연격</span></div>
+        <div><kbd>Tab</kbd><kbd>L</kbd><span>자동 조준 대상 순환</span></div><div><kbd>Esc</kbd><kbd>K</kbd><span>메뉴 뒤로 · 일시정지</span></div>
         <div><kbd>K</kbd><kbd>Shift</kbd><span>패링</span></div><div><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><span>강화 즉시 선택</span></div>
         <div><kbd>Space</kbd><span>무적 대시</span></div><div><kbd>F</kbd><span>다음 언령 강화</span></div>
         <div class="word"><kbd>Q</kbd><span><b>멎는다</b> 적과 탄환 정지</span></div>
         <div class="word"><kbd>E</kbd><span><b>되돌린다</b> 2초 전 상태 복원</span></div>
         <div class="word"><kbd>R</kbd><span><b>잇는다</b> 피해 공유 연결</span></div>
-        <div><kbd>Enter</kbd><kbd>J</kbd><span>메뉴 결정</span></div><div><kbd>Esc</kbd><span>일시정지 · 뒤로</span></div>
+        <div><kbd>Enter</kbd><kbd>J</kbd><span>메뉴 결정</span></div><div><kbd>Esc</kbd><span>강화 대기 취소 · 일시정지</span></div>
         <div class="control-note"><b>키보드 전용이 기본입니다.</b><span>설정에서 기존 마우스 조준 방식으로 전환할 수 있습니다.</span></div>
       </div><button class="rune-button primary" data-action="back">돌아가기</button></div>`;
     this.root.append(screen);
@@ -188,7 +204,7 @@ export class OverlayUI {
       const muted = this.audio.toggleMute(); (event.currentTarget as HTMLButtonElement).textContent = muted ? '음소거 해제' : '즉시 음소거';
     });
     screen.querySelector('[data-action="back"]')?.addEventListener('click', () => { this.persist(); back(); }, { once: true });
-    this.bindKeyboardNavigation(screen, 'button', () => { this.persist(); back(); });
+    this.bindKeyboardNavigation(screen, 'button, input', () => { this.persist(); back(); });
   }
 
   public showHud(): void {
@@ -206,6 +222,7 @@ export class OverlayUI {
       </div>
       <div class="chain-status hidden" data-chain-status></div>
       <div class="chain-toast hidden" data-chain-toast></div>
+      <div class="hud-notice hidden" data-hud-notice></div>
       <button class="hud-mute" data-mute aria-label="음소거">${this.audio.isMuted ? '×' : '♪'}</button>
       <div class="tutorial-banner hidden" data-tutorial></div>`;
     this.root.append(hud); this.hud = hud;
@@ -258,6 +275,7 @@ export class OverlayUI {
     });
     if (chainStatus && state.chainOpener && (state.chainRemaining ?? 0) > 0) {
       chainStatus.classList.remove('hidden');
+      chainStatus.style.setProperty('--chain-progress', `${Math.max(0, Math.min(1, (state.chainRemaining ?? 0) / 2.5)) * 360}deg`);
       chainStatus.innerHTML = `<span>${wordNames[state.chainOpener]} 이후</span><b>${chainNext.map((word) => `${wordKeys[word]} ${wordNames[word]}`).join(' / ')}</b><i>${(state.chainRemaining ?? 0).toFixed(1)}s</i>`;
     } else chainStatus?.classList.add('hidden');
     const empower = this.hud.querySelector<HTMLElement>('[data-empower]');
@@ -284,16 +302,22 @@ export class OverlayUI {
     this.chainTimer = window.setTimeout(() => toast.classList.add('hidden'), duration);
   }
 
+  public showNotice(message: string, duration = 700): void {
+    const notice = this.hud?.querySelector<HTMLElement>('[data-hud-notice]'); if (!notice) return;
+    window.clearTimeout(this.noticeTimer); notice.textContent = message; notice.classList.remove('hidden');
+    this.noticeTimer = window.setTimeout(() => notice.classList.add('hidden'), duration);
+  }
+
   public showTutorial(text: string): void {
     if (!this.tutorial) return;
     this.tutorial.innerHTML = text; this.tutorial.classList.remove('hidden');
   }
   public hideTutorial(): void { this.tutorial?.classList.add('hidden'); }
 
-  public showUpgradeChoice(choices: readonly UpgradeDefinition[], rerolls: number, select: (id: UpgradeId) => void, reroll: () => void): void {
+  public showUpgradeChoice(choices: readonly UpgradeDefinition[], rerolls: number, select: (id: UpgradeId) => void, reroll: () => void, stackFor: (id: UpgradeId) => number = () => 0): void {
     const modal = document.createElement('section');
     modal.className = 'modal upgrade-modal';
-    modal.innerHTML = `<div class="modal-scrim"></div><div class="upgrade-box"><p class="eyebrow">새 문장이 새겨진다</p><h2>강화 선택</h2><div class="upgrade-grid">${choices.map((choice, index) => `<button class="upgrade-card rarity-${choice.rarity}" data-id="${choice.id}"><span>0${index + 1}</span><em>${choice.rarity} · ${choice.tag}</em><h3>${choice.name}</h3><p>${choice.description}</p><small>${index + 1} 또는 Enter / J</small></button>`).join('')}</div><button class="reroll" data-reroll ${rerolls <= 0 ? 'disabled' : ''}>↻ 다시 뽑기 · 남은 횟수 ${rerolls}</button></div>`;
+    modal.innerHTML = `<div class="modal-scrim"></div><div class="upgrade-box"><p class="eyebrow">새 문장이 새겨진다</p><h2>강화 선택</h2><div class="upgrade-grid">${choices.map((choice, index) => { const current = stackFor(choice.id); return `<button class="upgrade-card rarity-${choice.rarity}" data-id="${choice.id}"><span>0${index + 1}</span><em>${choice.rarity} · ${choice.tag}</em><h3>${choice.name}</h3><p>${upgradeDescription(choice, current + 1)}</p><small>${choice.relatedKey} · ${current}/${choice.maxStacks} → ${current + 1}/${choice.maxStacks}</small></button>`; }).join('')}</div><button class="reroll" data-reroll ${rerolls <= 0 ? 'disabled' : ''}>↻ 다시 뽑기 · 남은 횟수 ${rerolls}</button></div>`;
     this.root.append(modal);
     const choose = (button: HTMLButtonElement): void => {
       if (this.keyHandler) window.removeEventListener('keydown', this.keyHandler);
@@ -330,6 +354,16 @@ export class OverlayUI {
     this.bindKeyboardNavigation(modal);
   }
 
+  public showDebugScenarios(items: readonly string[], select: (index: number) => void, close: () => void): void {
+    const modal = document.createElement('section'); modal.className = 'modal debug-modal';
+    modal.innerHTML = `<div class="modal-scrim"></div><div class="panel-content debug-list"><p class="eyebrow">개발 환경 전용 · F4</p><h2>전투 테스트 시나리오</h2>${items.map((item, index) => `<button class="rune-button ${index === 0 ? 'primary' : ''}" data-index="${index}">${String(index + 1).padStart(2, '0')} · ${item}</button>`).join('')}<button class="rune-button" data-close>닫기</button></div>`;
+    this.root.append(modal);
+    const finish = (): void => { modal.remove(); if (this.keyHandler) window.removeEventListener('keydown', this.keyHandler); this.keyHandler = undefined; };
+    modal.querySelectorAll<HTMLButtonElement>('[data-index]').forEach((button) => button.addEventListener('click', () => { const index = Number(button.dataset.index); finish(); select(index); }, { once: true }));
+    modal.querySelector('[data-close]')?.addEventListener('click', () => { finish(); close(); }, { once: true });
+    this.bindKeyboardNavigation(modal, 'button', () => { finish(); close(); });
+  }
+
   public hidePause(): void {
     this.root.querySelector('.pause-modal')?.remove();
     if (this.keyHandler) window.removeEventListener('keydown', this.keyHandler);
@@ -342,9 +376,10 @@ export class OverlayUI {
     const minutes = Math.floor(stats.time / 60); const seconds = Math.floor(stats.time % 60).toString().padStart(2, '0');
     const comparison = stats.previousBest > 0 ? `${stats.scoreDelta >= 0 ? '+' : ''}${stats.scoreDelta.toLocaleString()} 이전 최고 대비` : '첫 기록';
     screen.innerHTML = `<div class="result-sigil">${stats.rank}</div><div class="result-content"><p class="eyebrow">${stats.victory ? '마지막 문장이 이어졌다' : '기록이 먹빛에 잠겼다'}</p><h2>${stats.victory ? '기록 회수 완료' : '계승 실패'}</h2><div class="score-big">${stats.score.toLocaleString()}${stats.newBest ? '<em>NEW BEST</em>' : ''}</div><div class="result-progress"><b>${stats.progressLabel}</b><span>${comparison}</span></div>
-      <div class="result-stats"><span>플레이 시간<b>${minutes}:${seconds}</b></span><span>받은 피해<b>${Math.round(stats.damageTaken)}</b></span><span>패링 성공<b>${stats.parries}</b></span><span>멎는다<b>${stats.wordUses['멎는다']}</b></span><span>되돌린다<b>${stats.wordUses['되돌린다']}</b></span><span>잇는다<b>${stats.wordUses['잇는다']}</b></span></div>
+      <div class="result-stats"><span>플레이 시간<b>${minutes}:${seconds}</b></span><span>받은 피해<b>${Math.round(stats.damageTaken)}</b></span><span>패링 성공<b>${stats.parries}</b></span><span>언령 사용<b>${Object.values(stats.wordUses).reduce((sum, value) => sum + value, 0)}</b></span><span>연쇄 성공<b>${stats.chainSuccesses}</b></span><span>강화 용언<b>${stats.empowerUses}</b></span></div>
       ${stats.milestones.length ? `<div class="milestones">${stats.milestones.map((item) => `<span>${item}</span>`).join('')}</div>` : ''}
       <div class="upgrade-summary"><span>새겨진 강화</span><p>${stats.upgrades.length ? stats.upgrades.join(' · ') : '없음'}</p></div>
+      <details class="result-details"><summary>상세 전투 통계</summary><p>공격 ${stats.details.attackHits}/${stats.details.attackAttempts} · 3연격 ${stats.details.comboFinishes} · 완벽 패링 ${stats.details.perfectParries}<br>연쇄 정지 ${stats.details.chainCounts['chain-stop']} · 역류 ${stats.details.chainCounts.backflow} · 피해 회귀 ${stats.details.chainCounts['damage-regression']}<br>자동 대상 변경 ${stats.details.autoTargetChanges} · 수동 대상 변경 ${stats.details.manualTargetChanges}</p></details>
       <div class="panel-buttons"><button class="rune-button primary" data-restart>다시 시작 <kbd>Enter</kbd></button><button class="rune-button" data-title>타이틀로</button></div></div>`;
     this.root.append(screen);
     const doRestart = (): void => restart();

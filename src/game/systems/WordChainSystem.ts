@@ -17,6 +17,7 @@ export interface ChainSnapshot {
 export interface ChainUseResult {
   chain?: WordChainId;
   snapshot?: ChainSnapshot;
+  costDiscount: number;
 }
 
 const NEXT_WORDS: Readonly<Record<'stop' | 'link', readonly WordId[]>> = {
@@ -25,22 +26,33 @@ const NEXT_WORDS: Readonly<Record<'stop' | 'link', readonly WordId[]>> = {
 };
 
 export class WordChainSystem {
-  private active?: { opener: 'stop' | 'link'; expiresAt: number };
+  private active?: { opener: 'stop' | 'link'; expiresAt: number; extended: boolean };
 
-  public constructor(private readonly windowMs: number) {}
+  public constructor(private readonly windowMs: number, private readonly discount = 0.25) {}
 
   public use(word: WordId, now: number, context: ChainContext): ChainUseResult {
     this.expire(now);
-    if (!context.successful) return { snapshot: this.snapshot(now) };
+    if (!context.successful) return { snapshot: this.snapshot(now), costDiscount: 0 };
 
     const opener = this.active?.opener;
     this.active = undefined;
     const chain = opener ? this.resolve(opener, word, context) : undefined;
-    if (chain) return { chain };
+    if (chain) return { chain, costDiscount: this.discount };
 
-    if (word === 'link' && context.hasLinkedTargets) this.active = { opener: 'link', expiresAt: now + this.windowMs };
-    if (word === 'stop') this.active = { opener: 'stop', expiresAt: now + this.windowMs };
-    return { snapshot: this.snapshot(now) };
+    if (word === 'link' && context.hasLinkedTargets) this.active = { opener: 'link', expiresAt: now + this.windowMs, extended: false };
+    if (word === 'stop') this.active = { opener: 'stop', expiresAt: now + this.windowMs, extended: false };
+    return { snapshot: this.snapshot(now), costDiscount: 0 };
+  }
+
+  public preview(word: WordId, now: number, context: Omit<ChainContext, 'successful'>): WordChainId | undefined {
+    this.expire(now);
+    return this.active ? this.resolve(this.active.opener, word, { ...context, successful: true }) : undefined;
+  }
+
+  public extendOnce(now: number, milliseconds: number): boolean {
+    this.expire(now);
+    if (!this.active || this.active.extended || milliseconds <= 0) return false;
+    this.active.expiresAt += milliseconds; this.active.extended = true; return true;
   }
 
   public snapshot(now: number): ChainSnapshot | undefined {
