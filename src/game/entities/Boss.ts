@@ -18,25 +18,26 @@ export class Boss extends Enemy {
   public constructor(scene: Phaser.Scene, x: number, y: number, callbacks: BossCallbacks) {
     super(scene, x, y, 'boss', callbacks);
     this.bossCallbacks = callbacks;
-    this.setScale(1.32).setDepth(400);
+    this.setScale(1.22);
     const body = this.body as Phaser.Physics.Arcade.Body;
-    body.setSize(54, 58).setOffset((this.width - 54) / 2, this.height * 0.37);
+    const diameter = BALANCE.collision.movementRadius.boss * 2;
+    body.setCircle(BALANCE.collision.movementRadius.boss).setOffset((this.width - diameter) / 2, this.height - diameter - 2);
   }
 
   public override updateAI(time: number, hero: Phaser.Physics.Arcade.Sprite): void {
     if (!this.active || !this.spawned) return;
-    this.setDepth(100 + Math.floor(this.y)); this.updateStatusGraphics(time);
     const desiredPhase = bossPhaseForHealth(this.health, this.maxHealth);
     if (desiredPhase > this.phase) this.transition(desiredPhase);
     if (time < this.phaseTransitionUntil) { this.setVelocity(0); return; }
     if (time < this.frozenUntil) { this.setVelocity(0); this.setTint(0x62b9aa); return; }
-    this.clearTint(); if (time < this.vulnerableUntil) this.setTint(0x91e2d3);
+    const slowed = time < this.slowUntil;
+    if (slowed) this.setTint(0x62b9aa); else this.clearTint();
     const distance = Phaser.Math.Distance.Between(this.x, this.y, hero.x, hero.y);
     this.facingAngle = Phaser.Math.Angle.Between(this.x, this.y, hero.x, hero.y);
     this.setFlipX(Math.cos(this.facingAngle) < 0);
     if (time < this.actionLockedUntil) return;
     if (time < this.nextActionAt) {
-      if (distance > 145) this.moveToward(this.facingAngle, BALANCE.enemies.boss.speed * (this.phase === 3 ? 1.16 : 1));
+      if (distance > 145) this.moveToward(this.facingAngle, BALANCE.enemies.boss.speed * (this.phase === 3 ? 1.16 : 1) * (slowed ? 0.36 : 1));
       else this.setVelocity(0);
       return;
     }
@@ -54,11 +55,6 @@ export class Boss extends Enemy {
     this.scene.tweens.add({ targets: this, scaleX: 1.48, scaleY: 1.48, duration: 330, yoyo: true });
     this.bossCallbacks.phaseChanged(phase);
     if (phase === 3) this.scene.time.delayedCall(900, () => { if (this.active) this.bossCallbacks.summon(3); });
-  }
-
-  public debugSetPhase(phase: 1 | 2 | 3): void {
-    if (!import.meta.env.DEV || phase <= this.phase) return;
-    this.transition(phase);
   }
 
   private phaseOne(hero: Phaser.Physics.Arcade.Sprite): void {
@@ -119,5 +115,10 @@ export class Boss extends Enemy {
       for (let index = -3; index <= 3; index += 1) this.callbacks.shoot(this, this.x, this.y - 14, angle + index * 0.17, 270 - Math.abs(index) * 12, 17, 'projectile-boss');
     });
     this.nextActionAt = this.scene.time.now + 1350;
+  }
+
+  public debugSetPhase(phase: 1 | 2 | 3): void {
+    if (phase <= this.phase) return;
+    this.transition(phase);
   }
 }

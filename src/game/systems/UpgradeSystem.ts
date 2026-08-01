@@ -1,4 +1,28 @@
-import { UPGRADES, type UpgradeDefinition, type UpgradeId } from '../data/upgrades';
+import { UPGRADES, upgradeById, upgradeDescription, type UpgradeDefinition, type UpgradeId } from '../data/upgrades';
+
+export interface SealedSentenceStats {
+  stacks: number;
+  cooldownReduction: number;
+  wordHitSentenceBonus: number;
+}
+
+export interface UpgradeChoicePreview {
+  currentStacks: number;
+  nextStacks: number;
+  currentDescription: string;
+  nextDescription: string;
+  stackMode: UpgradeDefinition['stackMode'];
+}
+
+export function sealedSentenceStats(stacks: number): SealedSentenceStats {
+  const definition = upgradeById('sealed-sentence');
+  const capped = Math.max(0, Math.min(definition?.maxStacks ?? 3, Math.floor(stacks)));
+  return {
+    stacks: capped,
+    cooldownReduction: (definition?.effect.cooldownReduction ?? 0.06) * capped,
+    wordHitSentenceBonus: (definition?.effect.gainBonus ?? 0.15) * capped,
+  };
+}
 
 export class UpgradeSystem {
   private readonly stacks = new Map<UpgradeId, number>();
@@ -36,6 +60,34 @@ export class UpgradeSystem {
       const replacement = pool.find((upgrade) => upgrade.tags[0] !== result[0]?.tags[0] && (!upgrade.survival || !result.some((choice) => choice.survival)));
       if (replacement) result[result.length - 1] = replacement;
     }
+    return result;
+  }
+
+  public preview(id: UpgradeId): UpgradeChoicePreview | undefined {
+    const definition = upgradeById(id); if (!definition) return undefined;
+    const currentStacks = this.getStack(id);
+    const nextStacks = Math.min(definition.maxStacks, currentStacks + 1);
+    return {
+      currentStacks,
+      nextStacks,
+      currentDescription: currentStacks > 0 ? upgradeDescription(definition, currentStacks) : '미보유',
+      nextDescription: upgradeDescription(definition, nextStacks),
+      stackMode: definition.stackMode,
+    };
+  }
+
+  /** First reward always demonstrates one word change, one active combat change and one safety choice. */
+  public firstChoices(random: () => number = Math.random): UpgradeDefinition[] {
+    const result: UpgradeDefinition[] = [];
+    const pick = (ids: readonly UpgradeId[]): void => {
+      const pool = ids.map((id) => UPGRADES.find((upgrade) => upgrade.id === id)).filter((upgrade): upgrade is UpgradeDefinition => upgrade !== undefined && this.canAdd(upgrade.id) && !result.includes(upgrade));
+      if (pool.length === 0) return;
+      result.push(pool[Math.min(pool.length - 1, Math.floor(random() * pool.length))]!);
+    };
+    pick(['dual-moon-echo', 'wide-orbit', 'cut-sentence', 'backflow-blade', 'returning-scar', 'isolation-chain']);
+    pick(['broken-sentence', 'regression-sword-shadow', 'link-overload', 'stop-resonance', 'perfect-breath']);
+    pick(['ink-cloak', 'fragment-recovery', 'sealed-sentence']);
+    if (result.length < 3) for (const upgrade of this.choices(3, random)) if (!result.includes(upgrade) && result.length < 3) result.push(upgrade);
     return result;
   }
 

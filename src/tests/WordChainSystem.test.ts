@@ -2,12 +2,12 @@ import { describe, expect, it } from 'vitest';
 import { WordChainSystem } from '../game/systems/WordChainSystem';
 
 describe('언령 연쇄', () => {
-  it('2.5초 안에서만 정해진 연쇄가 발동한다', () => {
-    const chains = new WordChainSystem(2500);
+  it('3.2초 안에서만 정해진 연쇄가 발동한다', () => {
+    const chains = new WordChainSystem(3200);
     chains.use('link', 0, { successful: true, hasLinkedTargets: true });
-    expect(chains.use('stop', 2400, { successful: true, hasLinkedTargets: true }).chain).toBe('chain-stop');
-    chains.use('link', 3000, { successful: true, hasLinkedTargets: true });
-    expect(chains.use('stop', 5600, { successful: true, hasLinkedTargets: true }).chain).toBeUndefined();
+    expect(chains.use('stop', 3100, { successful: true, hasLinkedTargets: true }).chain).toBe('chain-stop');
+    chains.use('link', 4000, { successful: true, hasLinkedTargets: true });
+    expect(chains.use('stop', 7300, { successful: true, hasLinkedTargets: true }).chain).toBeUndefined();
   });
 
   it('실패한 첫 언령은 연쇄 상태를 만들지 않는다', () => {
@@ -22,15 +22,31 @@ describe('언령 연쇄', () => {
     expect(chains.use('rewind', 1100, { successful: true, hasLinkedTargets: true, hasRecordedDamage: true }).chain).toBeUndefined();
   });
 
-  it('정지 탄환이 없으면 역류가 발동하지 않는다', () => {
+  it('정지 탄환이 없어도 정지된 적이 있으면 최소 역류가 발동한다', () => {
     const chains = new WordChainSystem(2500);
     chains.use('stop', 0, { successful: true });
-    expect(chains.use('rewind', 500, { successful: true, hasFrozenProjectiles: false }).chain).toBeUndefined();
+    const result = chains.use('rewind', 500, { successful: true, hasFrozenProjectiles: false, hasStoppedTargets: true });
+    expect(result.chain).toBe('backflow'); expect(result.attemptedChain).toBe('backflow'); expect(result.usedFallback).toBe(true);
+  });
+
+  it('피해 기록이 부족해도 연결 대상이 있으면 최소 피해 회귀가 발동한다', () => {
+    const chains = new WordChainSystem(3800, 0);
+    chains.use('link', 0, { successful: true, hasLinkedTargets: true });
+    const result = chains.use('rewind', 1200, { successful: true, hasLinkedTargets: true, hasRecordedDamage: false });
+    expect(result.chain).toBe('damage-regression'); expect(result.usedFallback).toBe(true);
   });
 
   it('reset은 장면 재시작처럼 연쇄 상태를 비운다', () => {
     const chains = new WordChainSystem(2500);
     chains.use('link', 0, { successful: true, hasLinkedTargets: true }); chains.reset();
     expect(chains.snapshot(100)).toBeUndefined();
+  });
+
+  it('유효한 연쇄의 두 번째 언령만 25% 비용 할인을 예고하고 지급한다', () => {
+    const chains = new WordChainSystem(3200, 0.25);
+    chains.use('stop', 0, { successful: true });
+    expect(chains.preview('rewind', 500, { hasFrozenProjectiles: true })).toBe('backflow');
+    expect(chains.use('rewind', 500, { successful: true, hasFrozenProjectiles: true }).costDiscount).toBe(0.25);
+    expect(chains.use('rewind', 600, { successful: true, hasFrozenProjectiles: true }).costDiscount).toBe(0);
   });
 });

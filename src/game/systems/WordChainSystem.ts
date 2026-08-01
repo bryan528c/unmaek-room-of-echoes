@@ -5,6 +5,7 @@ export interface ChainContext {
   successful: boolean;
   hasLinkedTargets?: boolean;
   hasFrozenProjectiles?: boolean;
+  hasStoppedTargets?: boolean;
   hasRecordedDamage?: boolean;
 }
 
@@ -16,6 +17,8 @@ export interface ChainSnapshot {
 
 export interface ChainUseResult {
   chain?: WordChainId;
+  attemptedChain?: WordChainId;
+  usedFallback: boolean;
   snapshot?: ChainSnapshot;
   costDiscount: number;
 }
@@ -28,20 +31,25 @@ const NEXT_WORDS: Readonly<Record<'stop' | 'link', readonly WordId[]>> = {
 export class WordChainSystem {
   private active?: { opener: 'stop' | 'link'; expiresAt: number; extended: boolean };
 
-  public constructor(private readonly windowMs: number, private readonly discount = 0.25) {}
+  public constructor(private readonly windowMs: number, private readonly discount = 0) {}
 
   public use(word: WordId, now: number, context: ChainContext): ChainUseResult {
     this.expire(now);
-    if (!context.successful) return { snapshot: this.snapshot(now), costDiscount: 0 };
+    if (!context.successful) return { snapshot: this.snapshot(now), costDiscount: 0, usedFallback: false };
 
     const opener = this.active?.opener;
     this.active = undefined;
+    const attemptedChain = opener ? this.combination(opener, word) : undefined;
     const chain = opener ? this.resolve(opener, word, context) : undefined;
-    if (chain) return { chain, costDiscount: this.discount };
+    if (chain) {
+      const usedFallback = (chain === 'backflow' && !context.hasFrozenProjectiles)
+        || (chain === 'damage-regression' && !context.hasRecordedDamage);
+      return { chain, attemptedChain, usedFallback, costDiscount: this.discount };
+    }
 
     if (word === 'link' && context.hasLinkedTargets) this.active = { opener: 'link', expiresAt: now + this.windowMs, extended: false };
     if (word === 'stop') this.active = { opener: 'stop', expiresAt: now + this.windowMs, extended: false };
-    return { snapshot: this.snapshot(now), costDiscount: 0 };
+    return { attemptedChain, snapshot: this.snapshot(now), costDiscount: 0, usedFallback: false };
   }
 
   public preview(word: WordId, now: number, context: Omit<ChainContext, 'successful'>): WordChainId | undefined {
@@ -63,10 +71,21 @@ export class WordChainSystem {
 
   public reset(): void { this.active = undefined; }
 
+  public expected(opener: WordId, next: WordId): WordChainId | undefined {
+    return opener === 'rewind' ? undefined : this.combination(opener, next);
+  }
+
   private resolve(opener: 'stop' | 'link', word: WordId, context: ChainContext): WordChainId | undefined {
     if (opener === 'link' && word === 'stop' && context.hasLinkedTargets) return 'chain-stop';
-    if (opener === 'stop' && word === 'rewind' && context.hasFrozenProjectiles) return 'backflow';
-    if (opener === 'link' && word === 'rewind' && context.hasLinkedTargets && context.hasRecordedDamage) return 'damage-regression';
+    if (opener === 'stop' && word === 'rewind' && (context.hasFrozenProjectiles || context.hasStoppedTargets)) return 'backflow';
+    if (opener === 'link' && word === 'rewind' && context.hasLinkedTargets) return 'damage-regression';
+    return undefined;
+  }
+
+  private combination(opener: 'stop' | 'link', word: WordId): WordChainId | undefined {
+    if (opener === 'link' && word === 'stop') return 'chain-stop';
+    if (opener === 'stop' && word === 'rewind') return 'backflow';
+    if (opener === 'link' && word === 'rewind') return 'damage-regression';
     return undefined;
   }
 

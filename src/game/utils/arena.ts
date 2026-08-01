@@ -5,8 +5,8 @@ export function createArchiveArena(scene: Phaser.Scene, dim = false): Phaser.Gam
   const container = scene.add.container(0, 0).setDepth(0);
   const graphics = scene.add.graphics();
   graphics.fillStyle(dim ? 0x081012 : 0x101a1c).fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-  graphics.fillStyle(0x172224).fillRoundedRect(28, 30, 904, 488, 18);
-  graphics.lineStyle(5, 0x302d29, 0.9).strokeRoundedRect(28, 30, 904, 488, 18);
+  graphics.fillStyle(0x172224).fillRoundedRect(12, 18, 936, 510, 18);
+  graphics.lineStyle(4, 0x302d29, 0.9).strokeRoundedRect(12, 18, 936, 510, 18);
   graphics.lineStyle(1, 0x334044, 0.38);
   for (let y = 52; y < 516; y += 54) {
     const offset = Math.floor(y / 54) % 2 === 0 ? 0 : 48;
@@ -15,7 +15,7 @@ export function createArchiveArena(scene: Phaser.Scene, dim = false): Phaser.Gam
       if ((x + y) % 3 === 0) graphics.lineBetween(x + 12, y + 16, x + 56, y + 35);
     }
   }
-  graphics.fillStyle(0x090e10, 0.82).fillRect(0, 0, 960, 34).fillRect(0, 518, 960, 22).fillRect(0, 0, 28, 540).fillRect(932, 0, 28, 540);
+  graphics.fillStyle(0x090e10, 0.72).fillRect(0, 0, 960, 20).fillRect(0, 528, 960, 12).fillRect(0, 0, 12, 540).fillRect(948, 0, 12, 540);
   graphics.fillStyle(0x28241f, 0.9);
   for (let x = 65; x < 900; x += 138) {
     graphics.fillRect(x, 3, 88, 31).fillRect(x, 508, 88, 22);
