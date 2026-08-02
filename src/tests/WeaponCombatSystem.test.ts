@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { backflowBladeDamage, cutDamageMultiplier, cutHitsTarget, cutSentenceBonus, echoBladeProfile, echoBladeTargets, isolationChainProfile, quantizeEightDirection, returningScarProfile, WeaponCooldowns } from '../game/systems/WeaponCombatSystem';
+import { backflowBladeDamage, cutDamageMultiplier, cutHitsTarget, cutSentenceBonus, echoBladeProfile, echoBladeTargets, isolationChainProfile, quantizeEightDirection, returningScarProfile, selectEchoReplayTarget, WeaponCooldowns } from '../game/systems/WeaponCombatSystem';
 
 const candidate = (id: string, x: number, y: number, overrides = {}) => ({
   id, hurtbox: { x, y, radiusX: 10, radiusY: 16 }, alive: true, visible: true, attackable: true, insideCombatBounds: true, ...overrides,
@@ -64,5 +64,22 @@ describe('J 절단', () => {
     expect(cooldowns.canCut(100)).toBe(true); cooldowns.commitCut(100, 1050);
     expect(cooldowns.canCut(1149)).toBe(false); expect(cooldowns.canCut(1150)).toBe(true);
     cooldowns.reset(0); expect(cooldowns.snapshot()).toEqual({ echoReadyAt: 0, cutReadyAt: 0 });
+  });
+});
+
+describe('회귀 잔상 타기팅', () => {
+  it('prioritizes a valid linked target without changing the recorded arc', () => {
+    const target = selectEchoReplayTarget({ x: 0, y: 0 }, 0, 96, [
+      { ...candidate('near', 48, 4), linked: false },
+      { ...candidate('linked', 66, 8), linked: true },
+    ]);
+    expect(target?.id).toBe('linked');
+  });
+
+  it('falls back to the nearest valid target and never selects behind the echo', () => {
+    const front = { ...candidate('front', 62, 0), linked: false };
+    const behind = { ...candidate('behind', -30, 0), linked: true };
+    expect(selectEchoReplayTarget({ x: 0, y: 0 }, 0, 96, [behind, front])?.id).toBe('front');
+    expect(selectEchoReplayTarget({ x: 0, y: 0 }, 0, 96, [behind])).toBeUndefined();
   });
 });

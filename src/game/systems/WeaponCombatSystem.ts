@@ -35,6 +35,31 @@ export interface CutTargetState {
   exposed: boolean;
 }
 
+export interface EchoReplayCandidate {
+  id: string;
+  hurtbox: Ellipse;
+  alive: boolean;
+  linked: boolean;
+}
+
+const smallestAngleDelta = (first: number, second: number): number => {
+  let delta = (first - second) % (Math.PI * 2);
+  if (delta > Math.PI) delta -= Math.PI * 2;
+  if (delta < -Math.PI) delta += Math.PI * 2;
+  return Math.abs(delta);
+};
+
+/** Selects for a recorded echo without altering the recorded direction. */
+export function selectEchoReplayTarget(origin: Point, angle: number, range: number, candidates: readonly EchoReplayCandidate[]): EchoReplayCandidate | undefined {
+  return candidates
+    .filter((candidate) => candidate.alive
+      && distanceToEllipse(origin, candidate.hurtbox) <= range
+      && smallestAngleDelta(Math.atan2(candidate.hurtbox.y - origin.y, candidate.hurtbox.x - origin.x), angle) <= 1.18)
+    .sort((first, second) => Number(second.linked) - Number(first.linked)
+      || distanceToEllipse(origin, first.hurtbox) - distanceToEllipse(origin, second.hurtbox)
+      || first.id.localeCompare(second.id))[0];
+}
+
 export function echoBladeProfile(
   base: Readonly<Omit<EchoBladeProfile, 'orbitCount'>>,
   dualMoonStacks: number,
@@ -110,6 +135,7 @@ export class WeaponCooldowns {
   public canCut(now: number): boolean { return now >= this.cutReadyAt; }
   public commitEcho(now: number, intervalMs: number): void { this.echoReadyAt = now + Math.max(0, intervalMs); }
   public commitCut(now: number, cooldownMs: number): void { this.cutReadyAt = now + Math.max(0, cooldownMs); }
+  public readyCut(now: number): void { this.cutReadyAt = Math.min(this.cutReadyAt, now); }
   public cutRemaining(now: number): number { return Math.max(0, this.cutReadyAt - now); }
   public snapshot(): Readonly<{ echoReadyAt: number; cutReadyAt: number }> { return { echoReadyAt: this.echoReadyAt, cutReadyAt: this.cutReadyAt }; }
 }

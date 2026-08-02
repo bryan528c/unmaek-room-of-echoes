@@ -5,7 +5,7 @@ import { Boss, type BossCallbacks } from '../entities/Boss';
 import { Enemy, type EnemyCallbacks } from '../entities/Enemy';
 import { Hero, type HeroAttack } from '../entities/Hero';
 import { Projectile } from '../entities/Projectile';
-import { upgradeById, upgradeDescription } from '../data/upgrades';
+import { resonanceById, upgradeById, upgradeDescription, type ResonanceId, type UpgradeId } from '../data/upgrades';
 import { getServices, type AppServices } from '../services';
 import { parrySentenceReward } from '../systems/CombatRules';
 import { clampGroundPointToBounds, clampPointToBounds, groundFootprintInsideBounds } from '../systems/CombatBounds';
@@ -21,15 +21,17 @@ import { InputRouter, type InputContext } from '../systems/InputRouter';
 import { distributeLinkedDamage } from '../systems/LinkDamage';
 import { ParryResolver } from '../systems/ParrySystem';
 import { RewindBuffer } from '../systems/RewindBuffer';
+import { RunProgressController } from '../systems/RunProgressController';
 import { RunSessionController, type RunId } from '../systems/RunSessionController';
 import { runStabilityStressSimulation } from '../systems/StabilityStressSimulation';
 import { TimeControlService } from '../systems/TimeControlService';
 import { SoftTargetLock, TargetingSystem, type TargetCandidate, type TargetSelection } from '../systems/TargetingSystem';
 import { sealedSentenceStats, UpgradeSystem } from '../systems/UpgradeSystem';
+import { counterInscriptionProfile, echoHarvestGain, linkContagionProfile, overchargedWordProfile, perfectCounterProfile, ResonanceRuntime, rewindBreathHealing, ruptureStepProfile, stopResonanceProfile } from '../systems/UpgradeRuntime';
 import { WordChainSystem, type WordChainId, type WordId } from '../systems/WordChainSystem';
 import { WaveDirector, type WaveEnemySnapshot } from '../systems/WaveDirector';
 import { adjustLinkedIncomingDamage, linkShareRatio } from '../systems/WordCombatRules';
-import { backflowBladeDamage, cutDamageMultiplier, cutHitsTarget, cutSentenceBonus, echoBladeProfile, echoBladeTargets, isolationChainProfile, quantizeEightDirection, returningScarProfile, WeaponCooldowns } from '../systems/WeaponCombatSystem';
+import { backflowBladeDamage, cutDamageMultiplier, cutHitsTarget, cutSentenceBonus, echoBladeProfile, echoBladeTargets, isolationChainProfile, quantizeEightDirection, returningScarProfile, selectEchoReplayTarget, WeaponCooldowns } from '../systems/WeaponCombatSystem';
 import { angleDelta, distanceSq, rankFor } from '../utils/math';
 import { createArchiveArena } from '../utils/arena';
 import type { ResultStats } from '../../ui/OverlayUI';
@@ -83,11 +85,13 @@ export class GameScene extends Phaser.Scene {
   private waveDirector = new WaveDirector(BALANCE.pacing.roundClearStability, BALANCE.pacing.staleEnemyRecovery);
   private runOutcome = new RunOutcomeController();
   private readonly runSession = new RunSessionController();
+  private readonly runProgress = new RunProgressController();
   private runId: RunId = 0;
   private inputRouter = new InputRouter();
   private parryResolver = new ParryResolver();
   private finisherCharges = new FinisherChargeSystem(BALANCE.hero.finisher.maximumCharges);
   private weaponCooldowns = new WeaponCooldowns();
+  private resonanceRuntime = new ResonanceRuntime();
   private timeControl!: TimeControlService;
   private readonly timeOwner = 'GameScene';
   private attacks: RecordedAttack[] = [];
@@ -139,6 +143,20 @@ export class GameScene extends Phaser.Scene {
   private parryAimUntil = 0;
   private parryStartedAt = 0;
   private sentencePulseUntil = 0;
+  private perfectCounterUntil = 0;
+  private cutPerfectCounterActive = false;
+  private lastDashAt = Number.NEGATIVE_INFINITY;
+  private echoHarvestWindowStartedAt = 0;
+  private echoHarvestWindowGain = 0;
+  private wordOverchargeMultiplier = 1;
+  private wordOverchargeDurationBonus = 0;
+  private wordEmpoweredByF = false;
+  private lastUpgradeToastAt = new Map<UpgradeId, number>();
+  private lastActivatedUpgrade?: UpgradeId;
+  private lastActivatedUpgradeUntil = 0;
+  private lastActivatedResonance?: ResonanceId;
+  private lastActivatedResonanceUntil = 0;
+  private readonly transientCombatObjects = new Set<Phaser.GameObjects.GameObject>();
   private bossTransitionUntil = 0;
   private bufferedAction?: { action: CombatAction; expiresAt: number; x: number; y: number };
   private timeouts: number[] = [];
@@ -220,6 +238,7 @@ export class GameScene extends Phaser.Scene {
     if (import.meta.env.DEV) (window as DebugWindow).__EONMAEK_DEBUG__ = () => ({
       state: this.flow.state,
       run: this.runSession.snapshot(),
+      progress: this.runProgress.snapshot(),
       time: this.timeControl.snapshot(),
       input: this.inputRouter.snapshot(),
       hero: { x: this.hero.x, y: this.hero.y, comboActive: this.hero.isComboActive, comboStep: this.hero.comboStep, direction: this.hero.attackDirection, health: this.hero.health, finisherCharges: this.finisherCharges.charges },
@@ -246,26 +265,29 @@ export class GameScene extends Phaser.Scene {
 
   private startNewRun(): void {
     this.runId = this.runSession.beginRun();
+    this.runProgress.beginRun(this.runId);
     // Phaser reuses the Scene instance for restart/start. Object fields are not
     // cleared automatically even though display-list children are destroyed.
     this.boss = undefined;
     this.enemies = new Set(); this.projectiles = new Set(); this.inkZones = []; this.linkedTargets = new Set(); this.linkMarkers = new Map(); this.linkShareRatio = BALANCE.words.linkShare; this.linkGeneration = 0;
-    this.upgrades = new UpgradeSystem(); this.rewind = new RewindBuffer(BALANCE.words.rewindDuration); this.targeting = new TargetingSystem(BALANCE.targeting); this.wordChain = new WordChainSystem(BALANCE.chain.window); this.damageHistory = new DamageHistory(BALANCE.chain.damageHistoryRetention); this.combatStats = new CombatStats(); this.attackRegistry = new AttackHitRegistry(); this.attackInput = new RisingEdgeInput(); this.comboLock = new SoftTargetLock(); this.flow = new GameFlowController('COMBAT', import.meta.env.DEV ? (message) => console.warn(`[GameFlow] ${message}`) : undefined, performance.now()); this.inputRouter = new InputRouter(); this.parryResolver = new ParryResolver(); this.finisherCharges = new FinisherChargeSystem(BALANCE.hero.finisher.maximumCharges); this.weaponCooldowns = new WeaponCooldowns(); this.weaponCooldowns.reset(0); this.waveDirector = new WaveDirector(BALANCE.pacing.roundClearStability, BALANCE.pacing.staleEnemyRecovery); this.runOutcome = new RunOutcomeController(); this.attacks = [];
+    this.upgrades = this.runProgress.upgrades; this.rewind = new RewindBuffer(BALANCE.words.rewindDuration); this.targeting = new TargetingSystem(BALANCE.targeting); this.wordChain = new WordChainSystem(BALANCE.chain.window); this.damageHistory = new DamageHistory(BALANCE.chain.damageHistoryRetention); this.combatStats = this.runProgress.combatStats; this.attackRegistry = new AttackHitRegistry(); this.attackInput = new RisingEdgeInput(); this.comboLock = new SoftTargetLock(); this.flow = new GameFlowController('COMBAT', import.meta.env.DEV ? (message) => console.warn(`[GameFlow] ${message}`) : undefined, performance.now()); this.inputRouter = new InputRouter(); this.parryResolver = new ParryResolver(); this.finisherCharges = new FinisherChargeSystem(BALANCE.hero.finisher.maximumCharges); this.weaponCooldowns = new WeaponCooldowns(); this.weaponCooldowns.reset(0); this.resonanceRuntime = new ResonanceRuntime(); this.waveDirector = new WaveDirector(BALANCE.pacing.roundClearStability, BALANCE.pacing.staleEnemyRecovery); this.runOutcome = new RunOutcomeController(); this.attacks = [];
     this.waveIndex = 0; this.waveSpawnGeneration = 0; this.enemySpawnTimes = new Map(); this.enemyFirstDamageAt = new Map(); this.currentComboDamage = 0; this.nextDefensiveSlashAt = 0; this.defensiveSlashEnabled = false; this.nextHeldComboAt = 0; this.enemyAttackReservedUntil = 0; this.firstWaveSpawnOrdinal = 0; this.defensiveSlashSequence = 100000; this.echoBladeSequence = 200000; this.lastDirectTargetId = undefined; this.echoFinisherUntil = 0; this.echoAmplifierUntil = 0; this.bossMechanicRewardUntil = 0; this.encounterStartedAt = 0; this.bossPhaseStartedAt = 0; this.currentWaveBatches = []; this.nextBatchIndex = 0; this.activeBatchPendingSpawns = 0; this.miniWaveReadyAt = 0; this.parryAnchorUntil = 0; this.lastWaveDiagnosticAt = 0; this.score = 0;
     this.sentence = 0; this.empowered = false; this.stopReadyAt = 0; this.rewindReadyAt = 0; this.linkReadyAt = 0;
     this.damageTaken = 0; this.parries = 0; this.wordUses = { '멎는다': 0, '되돌린다': 0, '잇는다': 0 };
-    this.tutorialIndex = 0; this.tutorialHideAt = 0; this.firstHitAvailable = true; this.lastPursuitId = ''; this.pursuitCount = 0; this.regressionCharged = false; this.parryCounterUntil = 0; this.parryAimUntil = 0; this.parryStartedAt = 0; this.sentencePulseUntil = 0; this.bossTransitionUntil = 0; this.bufferedAction = undefined; this.currentTarget = undefined; this.comboTarget = undefined; this.heldAttackTarget = undefined; this.targetMarkerUntil = 0; this.targetDistance = 0; this.timeouts = []; this.rewindPreviewGhosts = [];
+    this.tutorialIndex = 0; this.tutorialHideAt = 0; this.firstHitAvailable = true; this.lastPursuitId = ''; this.pursuitCount = 0; this.regressionCharged = false; this.parryCounterUntil = 0; this.parryAimUntil = 0; this.parryStartedAt = 0; this.sentencePulseUntil = 0; this.perfectCounterUntil = 0; this.cutPerfectCounterActive = false; this.lastDashAt = Number.NEGATIVE_INFINITY; this.echoHarvestWindowStartedAt = 0; this.echoHarvestWindowGain = 0; this.wordOverchargeMultiplier = 1; this.wordOverchargeDurationBonus = 0; this.wordEmpoweredByF = false; this.lastUpgradeToastAt = new Map(); this.lastActivatedUpgrade = undefined; this.lastActivatedUpgradeUntil = 0; this.lastActivatedResonance = undefined; this.lastActivatedResonanceUntil = 0; this.transientCombatObjects.clear(); this.bossTransitionUntil = 0; this.bufferedAction = undefined; this.currentTarget = undefined; this.comboTarget = undefined; this.heldAttackTarget = undefined; this.targetMarkerUntil = 0; this.targetDistance = 0; this.timeouts = []; this.rewindPreviewGhosts = [];
     this.activeDaggerDebug = undefined; this.debugHitboxes = false; this.debugStatsVisible = false; this.debugScenarioIndex = 0; this.debugInvulnerable = false; this.watchdogHandle = undefined; this.lastHeartbeatAt = performance.now(); this.lastWatchdogReportAt = 0; this.watchdogMessage = 'normal'; this.watchdogStalled = false; this.lastAttackAt = 0; this.lastHitAt = 0; this.lastDebugPublishAt = 0; this.frameDelta = 1000 / 60;
   }
 
   private runDelayedCall(delay: number, callback: () => void): Phaser.Time.TimerEvent {
     const runId = this.runId;
-    return this.time.delayedCall(delay, () => { this.runSession.invoke(runId, callback); });
+    const scope = this.runProgress.captureScope();
+    return this.time.delayedCall(delay, () => { this.runSession.invoke(runId, () => { this.runProgress.invoke(scope, callback); }); });
   }
 
   private runTimeout(delay: number, callback: () => void): number {
     const runId = this.runId;
-    const handle = window.setTimeout(() => { this.runSession.invoke(runId, callback); }, delay);
+    const scope = this.runProgress.captureScope();
+    const handle = window.setTimeout(() => { this.runSession.invoke(runId, () => { this.runProgress.invoke(scope, callback); }); }, delay);
     this.timeouts.push(handle);
     return handle;
   }
@@ -441,6 +463,7 @@ export class GameScene extends Phaser.Scene {
       stats: this.combatStats.snapshot(),
       enemies: [...this.enemies].filter((enemy) => enemy.active).map((enemy) => ({ id: enemy.id, kind: enemy.kind, health: enemy.health, x: enemy.x, y: enemy.y, removing: enemy.removing, stopped: enemy.isStopped, linked: enemy.linked, echo: enemy.isEchoMarked })),
       upgrades: this.upgrades.entries().map(({ id, stacks }) => ({ id, stacks, preview: this.upgrades.preview(id) })),
+      upgradeRuntime: this.upgrades.runtimeSnapshot(),
       time: this.timeControl.snapshot(),
     });
   }
@@ -555,6 +578,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private spawnWave(index: number): void {
+    this.runProgress.setWave(this.runId, this.runProgress.act.generation, index);
     this.firstHitAvailable = true;
     this.stopReadyAt = this.time.now; this.rewindReadyAt = this.time.now; this.linkReadyAt = this.time.now;
     if (index === 0) this.firstWaveSpawnOrdinal = 0;
@@ -651,8 +675,8 @@ export class GameScene extends Phaser.Scene {
     if (selected.length === 0) return;
     this.weaponCooldowns.commitEcho(time, profile.interval);
     this.combatStats.echoBladeActivation();
-    if (this.upgrades.getStack('dual-moon-echo') > 0) this.combatStats.upgradeContribution('dual-moon-echo', { generated: 1 });
-    if (this.upgrades.getStack('wide-orbit') > 0) this.combatStats.upgradeContribution('wide-orbit', { generated: 1 });
+    if (this.upgrades.getStack('dual-moon-echo') > 0) this.recordUpgradeContribution('dual-moon-echo', { activationCount: 1, generated: 1 });
+    if (this.upgrades.getStack('wide-orbit') > 0) this.recordUpgradeContribution('wide-orbit', { activationCount: 1, generated: 1 });
     const attackId = this.echoBladeSequence += 1;
     const phase = time / 380;
     const slash = this.add.graphics().setDepth(DEPTH.melee);
@@ -670,6 +694,8 @@ export class GameScene extends Phaser.Scene {
       const dealt = this.damageEnemy(enemy, profile.damage, angle, false, false, 'attack', 'attack');
       if (dealt <= 0) continue;
       totalDamage += dealt; this.combatStats.echoBladeHit(dealt); this.damageNumber(enemy.x, enemy.y - 38, dealt, 0x8bd8ca, true, '잔향 ');
+      if (enemy.isStopped || enemy.linked) this.applyEchoHarvest(time);
+      if (this.resonanceRuntime.registerMoonRingHit(this.upgrades.hasResonance('moon-ring'))) this.triggerMoonRingResonance();
     }
     if (totalDamage > 0) {
       this.attacks.push({ time, x: this.hero.x, y: this.hero.y, angle: phase, kind: 'echo-blade', damage: totalDamage });
@@ -681,9 +707,30 @@ export class GameScene extends Phaser.Scene {
         if (Phaser.Math.Distance.Between(this.hero.hurtbox.x, this.hero.hurtbox.y, projectile.x, projectile.y) > profile.range + projectile.collisionCircle.radius) continue;
         const target = this.nearestEnemy(projectile.x, projectile.y); if (!target) continue;
         projectile.damage = backflowBladeDamage(projectile.damage, this.upgrades.getStack('backflow-blade')); projectile.setData('echoBladeBackflow', true); projectile.reflect(target.x, target.y);
-        this.combatStats.echoBladeProjectile(); this.combatStats.upgradeContribution('backflow-blade', { generated: 1 }); this.showCombatLabel(projectile.x, projectile.y - 16, '역류 칼날', 0x7ee8db);
+        this.combatStats.echoBladeProjectile(); this.recordUpgradeContribution('backflow-blade', { activationCount: 1, generated: 1, reflectedProjectiles: 1 }, true); this.showCombatLabel(projectile.x, projectile.y - 16, '역류 칼날', 0x7ee8db);
       }
     }
+  }
+
+  private applyEchoHarvest(time: number): void {
+    const stacks = this.upgrades.getStack('echo-harvest'); if (stacks <= 0) return;
+    if (time - this.echoHarvestWindowStartedAt >= 1000) { this.echoHarvestWindowStartedAt = time; this.echoHarvestWindowGain = 0; }
+    const gained = echoHarvestGain(stacks, this.echoHarvestWindowGain); if (gained <= 0) return;
+    this.echoHarvestWindowGain += gained; this.gainSentence(gained);
+    this.recordUpgradeContribution('echo-harvest', { activationCount: 1, sentence: gained }, true);
+  }
+
+  private triggerMoonRingResonance(): void {
+    const radius = this.currentEchoBladeProfile().range + 18;
+    const ring = this.add.circle(this.hero.hurtbox.x, this.hero.hurtbox.y, 18, 0x6fd8c5, 0.05).setStrokeStyle(3, 0xa5f1df, 0.72).setDepth(DEPTH.word);
+    this.tweens.add({ targets: ring, radius, alpha: 0, duration: 230, onComplete: () => ring.destroy() });
+    let damage = 0; let targets = 0;
+    for (const enemy of [...this.enemies].filter((item) => item.active && !item.removing && distanceToEllipse(this.hero.hurtbox, item.hurtbox) <= radius).slice(0, 3)) {
+      const dealt = this.damageEnemy(enemy, 7, Phaser.Math.Angle.Between(this.hero.x, this.hero.y, enemy.x, enemy.y), false, true, undefined, 'attack');
+      if (dealt > 0) { damage += dealt; targets += 1; }
+    }
+    this.recordResonanceContribution('moon-ring', { activationCount: 1, damage, affectedTargets: targets, hits: targets, exclusiveDamage: true });
+    this.services.ui.showChainTrigger('공명 · 월환 공명', 650);
   }
 
   private useCut(angle: number): boolean {
@@ -691,6 +738,8 @@ export class GameScene extends Phaser.Scene {
     this.comboTarget = undefined; this.currentTarget = undefined; this.heldAttackTarget = undefined; this.targetMarkerUntil = 0;
     const started = this.startAttackCombo(Math.cos(angle), Math.sin(angle), 1, 0, 'cut');
     if (!started) return false;
+    this.cutPerfectCounterActive = this.time.now <= this.perfectCounterUntil;
+    if (this.cutPerfectCounterActive) this.perfectCounterUntil = 0;
     this.weaponCooldowns.commitCut(this.time.now, BALANCE.hero.cut.cooldown);
     this.combatStats.cutUse(); this.services.audio.play('cut');
     return true;
@@ -698,7 +747,9 @@ export class GameScene extends Phaser.Scene {
 
   private resolveCut(attack: HeroAttack): void {
     this.combatStats.attackAttempt(); this.lastAttackAt = performance.now();
-    const profile = BALANCE.hero.cut;
+    const perfectCounter = perfectCounterProfile(this.upgrades.getStack('perfect-counter'));
+    const counterActive = this.cutPerfectCounterActive;
+    const profile = { ...BALANCE.hero.cut, range: BALANCE.hero.cut.range * (counterActive ? perfectCounter.rangeMultiplier : 1) };
     const slash = this.add.graphics().setDepth(DEPTH.melee);
     slash.lineStyle(12, 0x143d37, 0.68).beginPath().arc(attack.originX, attack.originY, profile.range, attack.angle - profile.halfAngle, attack.angle + profile.halfAngle).strokePath();
     slash.lineStyle(6, 0xb5f6e8, 0.96).beginPath().arc(attack.originX, attack.originY, profile.range, attack.angle - profile.halfAngle, attack.angle + profile.halfAngle).strokePath();
@@ -710,16 +761,19 @@ export class GameScene extends Phaser.Scene {
       .slice(0, profile.maximumTargets);
     let totalDamage = 0;
     let hitCount = 0;
+    let counterCutActivated = false;
     for (const enemy of candidates) {
       if (!this.attackRegistry.claim(attack.attackId, enemy.id)) continue;
       const states = { stopped: enemy.isStopped, linked: enemy.linked, echo: enemy.isEchoMarked, exposed: enemy.vulnerableUntil > this.time.now };
       let damage = profile.damage * cutDamageMultiplier(states, profile);
+      if (counterActive && (states.stopped || states.linked)) damage += perfectCounter.ruptureBonus;
+      if (counterActive && this.upgrades.hasResonance('counter-cut') && !states.stopped && !states.linked) damage += 10;
       const fang = this.upgrades.getStack('dragon-fang'); if (fang > 0 && Math.random() < Math.min(0.55, fang * 0.22)) damage *= 1.75;
       if (this.regressionCharged) { damage *= 1 + this.upgrades.getStack('regression-blade') * 0.55; this.regressionCharged = false; }
       const pursuit = this.upgrades.getStack('pursuit-mark');
       if (enemy.id === this.lastPursuitId) this.pursuitCount = Math.min(5, this.pursuitCount + 1); else { this.lastPursuitId = enemy.id; this.pursuitCount = 0; }
       damage *= 1 + pursuit * this.pursuitCount * 0.08;
-      const dealt = this.damageEnemy(enemy, damage, attack.angle, false, false, 'attack', 'attack');
+      const dealt = this.damageEnemy(enemy, damage, attack.angle, false, false, 'attack', 'attack', 'cut');
       if (dealt <= 0) continue;
       totalDamage += dealt; hitCount += 1; this.combatStats.cutHit(dealt, states); this.damageNumber(enemy.x, enemy.y - 52, dealt, states.stopped || states.linked ? 0x9cf1df : 0xf1d7a8, false, states.stopped ? '절단 파열 ' : states.linked ? '연결 절단 ' : '절단 ');
       const body = enemy.body as Phaser.Physics.Arcade.Body; body.velocity.add(new Phaser.Math.Vector2(Math.cos(attack.angle), Math.sin(attack.angle)).scale(profile.knockback));
@@ -727,21 +781,33 @@ export class GameScene extends Phaser.Scene {
       if (states.linked) this.resolveCutLinked(enemy, attack.angle);
       if (states.echo) this.resolveCutEcho(enemy, attack.angle, dealt);
       if (states.exposed) this.showCombatLabel(enemy.x, enemy.y - 68, '반격 절단', 0xb9f5e9);
+      if (counterActive) this.recordUpgradeContribution('perfect-counter', { activationCount: 0, damage: Math.min(dealt, perfectCounter.ruptureBonus), hits: 1 }, true);
+      if (counterActive && this.upgrades.hasResonance('counter-cut')) {
+        this.recordResonanceContribution('counter-cut', {
+          activationCount: counterCutActivated ? 0 : 1,
+          damage: Math.min(dealt, states.stopped || states.linked ? perfectCounter.ruptureBonus : 10),
+          affectedTargets: 1,
+          hits: 1,
+        });
+        counterCutActivated = true;
+      }
       const cutSentence = this.upgrades.getStack('cut-sentence');
       if ((states.stopped || states.linked) && cutSentence > 0 && enemy.active) {
         const bonus = this.damageEnemy(enemy, cutSentenceBonus(states.stopped, states.linked, cutSentence), attack.angle, false, true, undefined, 'attack');
-        if (bonus > 0) { totalDamage += bonus; this.combatStats.upgradeContribution('cut-sentence', { damage: bonus }); this.showCombatLabel(enemy.x, enemy.y - 76, '절단 문장', 0x8ff1df); }
+        if (bonus > 0) { totalDamage += bonus; this.recordUpgradeContribution('cut-sentence', { activationCount: 1, damage: bonus, affectedTargets: 1, hits: 1 }, true); this.showCombatLabel(enemy.x, enemy.y - 76, '절단 문장', 0x8ff1df); }
       }
       const brokenSentence = this.upgrades.getStack('broken-sentence');
       if (states.stopped && brokenSentence > 0 && enemy.active) {
         const bonus = this.damageEnemy(enemy, 12 * brokenSentence, attack.angle, false, true, undefined, 'stop');
-        if (bonus > 0) { totalDamage += bonus; this.combatStats.upgradeContribution('broken-sentence', { damage: bonus }); }
+        if (bonus > 0) { totalDamage += bonus; this.recordUpgradeContribution('broken-sentence', { damage: bonus }); }
       }
       const rhythm = this.upgrades.getStack('dragon-rhythm');
       if ((states.stopped || states.linked || states.echo || states.exposed) && rhythm > 0) {
-        this.gainSentence(4 * rhythm); this.reduceShortestWordCooldown(500 * rhythm); this.combatStats.upgradeContribution('dragon-rhythm', { sentence: 4 * rhythm, cooldownMs: 500 * rhythm });
+        this.gainSentence(4 * rhythm); this.reduceShortestWordCooldown(500 * rhythm); this.recordUpgradeContribution('dragon-rhythm', { activationCount: 1, sentence: 4 * rhythm, cooldownMs: 500 * rhythm });
       }
     }
+    const dashWaveDamage = this.resolveRuptureStep(attack);
+    totalDamage += dashWaveDamage;
     for (const projectile of [...this.projectiles]) {
       if (!projectile.active || !projectile.enemyOwned || projectile.frozenUntil <= this.time.now) continue;
       const circle = projectile.collisionCircle;
@@ -754,7 +820,27 @@ export class GameScene extends Phaser.Scene {
       this.combatStats.attackHit(hitCount); this.combatStats.agencyMilestone('manualHit', this.elapsedSeconds()); this.combatStats.agencyDamage('basicJ', totalDamage);
       this.gainSentence(profile.sentenceGain); this.services.audio.play('cutHit'); this.timeControl.requestHitstop(this.timeOwner, this.services.save.settings.reducedMotion ? 24 : profile.hitstop); this.cameraKick(0.0018, 55);
     }
+    this.cutPerfectCounterActive = false;
     this.markTutorial('attack');
+  }
+
+  private resolveRuptureStep(attack: HeroAttack): number {
+    const stacks = this.upgrades.getStack('rupture-step');
+    const profile = ruptureStepProfile(stacks, this.time.now - this.lastDashAt);
+    if (!profile.active) return 0;
+    this.lastDashAt = Number.NEGATIVE_INFINITY;
+    const endX = attack.originX + Math.cos(attack.angle) * profile.range;
+    const endY = attack.originY + Math.sin(attack.angle) * profile.range;
+    const wave = this.add.rectangle(attack.originX, attack.originY, profile.range, 13, 0x77d8c4, 0.42).setOrigin(0, .5).setRotation(attack.angle).setDepth(DEPTH.melee);
+    this.tweens.add({ targets: wave, x: endX, y: endY, alpha: 0, duration: 190, onComplete: () => wave.destroy() });
+    let damage = 0; let affectedTargets = 0;
+    for (const enemy of [...this.enemies].filter((item) => item.active && !item.removing)) {
+      if (!sectorHitsEllipse({ x: attack.originX, y: attack.originY, angle: attack.angle, range: profile.range, halfAngle: .38 }, enemy.hurtbox)) continue;
+      const dealt = this.damageEnemy(enemy, profile.damage, attack.angle, false, true, undefined, 'attack');
+      if (dealt > 0) { damage += dealt; affectedTargets += 1; }
+    }
+    if (damage > 0) this.recordUpgradeContribution('rupture-step', { activationCount: 1, damage, affectedTargets, hits: affectedTargets }, true);
+    return damage;
   }
 
   private resolveCutStopped(primary: Enemy, angle: number): void {
@@ -773,7 +859,7 @@ export class GameScene extends Phaser.Scene {
     for (const target of targets) {
       this.linkPulse(primary, target, 0xa8f5e5);
       const dealt = this.damageEnemy(target, BALANCE.hero.cut.linkedReactionDamage * (1 + counterStacks * 0.18), angle, false, true, undefined, 'link');
-      if (counterStacks > 0 && dealt > 0) this.combatStats.upgradeContribution('linked-counter', { damage: dealt });
+      if (counterStacks > 0 && dealt > 0) this.recordUpgradeContribution('linked-counter', { damage: dealt });
     }
   }
 
@@ -852,7 +938,7 @@ export class GameScene extends Phaser.Scene {
     if (profile.reactsThroughLinks) this.resolveLinkedFinisher(enemy, attack.angle);
     if (profile.replaysEcho) this.resolveEchoFinisher(enemy, attack.angle, dealt);
     const rhythm = this.upgrades.getStack('dragon-rhythm');
-    if (rhythm > 0) { this.gainSentence(4 * rhythm); this.reduceShortestWordCooldown(500 * rhythm); this.combatStats.upgradeContribution('dragon-rhythm', { sentence: 4 * rhythm, cooldownMs: 500 * rhythm }); }
+    if (rhythm > 0) { this.gainSentence(4 * rhythm); this.reduceShortestWordCooldown(500 * rhythm); this.recordUpgradeContribution('dragon-rhythm', { sentence: 4 * rhythm, cooldownMs: 500 * rhythm }); }
     this.services.audio.play('hit'); this.cameraKick(0.004, 85);
     this.timeControl.requestHitstop(this.timeOwner, this.services.save.settings.reducedMotion ? 30 : BALANCE.hero.finisher.hitstop);
   }
@@ -1026,7 +1112,7 @@ export class GameScene extends Phaser.Scene {
         if (status === 'stopped') this.resolveStoppedFinisher(chargedPrimary, attack.angle);
         if (status === 'linked') this.resolveLinkedFinisher(chargedPrimary, attack.angle);
         if (status === 'echo') this.resolveEchoFinisher(chargedPrimary, attack.angle, chargedPrimaryDamage);
-        const rhythm = this.upgrades.getStack('dragon-rhythm'); if (rhythm > 0) { this.gainSentence(4 * rhythm); this.reduceShortestWordCooldown(500 * rhythm); this.combatStats.upgradeContribution('dragon-rhythm', { sentence: 4 * rhythm, cooldownMs: 500 * rhythm }); }
+        const rhythm = this.upgrades.getStack('dragon-rhythm'); if (rhythm > 0) { this.gainSentence(4 * rhythm); this.reduceShortestWordCooldown(500 * rhythm); this.recordUpgradeContribution('dragon-rhythm', { sentence: 4 * rhythm, cooldownMs: 500 * rhythm }); }
         this.timeControl.requestHitstop(this.timeOwner, this.services.save.settings.reducedMotion ? 30 : BALANCE.hero.finisher.hitstop);
       }
       if (attack.combo === 3) this.cameraKick(0.0026, 60);
@@ -1041,6 +1127,7 @@ export class GameScene extends Phaser.Scene {
 
   private dash(x: number, y: number): boolean {
     if (!this.hero.dash(x, y, (trailX, trailY) => this.resolveDashTrail(trailX, trailY))) return false;
+    this.lastDashAt = this.time.now;
     this.combatStats.dash(); this.markTutorial('dash'); this.services.audio.play('dash');
     return true;
   }
@@ -1051,7 +1138,7 @@ export class GameScene extends Phaser.Scene {
     this.runDelayedCall(190, () => {
       let damage = 0;
       for (const enemy of [...this.enemies]) if (distanceSq(x, y, enemy.x, enemy.y) < 86 * 86) damage += this.damageEnemy(enemy, 18 * (0.45 + (stacks - 1) * 0.18), this.hero.facing, false, false, undefined, 'attack');
-      if (damage > 0) { this.combatStats.upgradeContribution('afterimage-slash', { damage }); this.showCombatLabel(x, y - 30, '잔상 베기', 0x7ddcca); }
+      if (damage > 0) { this.recordUpgradeContribution('afterimage-slash', { activationCount: 1, damage }); this.showCombatLabel(x, y - 30, '잔상 베기', 0x7ddcca); }
       this.tweens.add({ targets: rune, alpha: 0, duration: 130, onComplete: () => rune.destroy() });
     });
   }
@@ -1078,11 +1165,19 @@ export class GameScene extends Phaser.Scene {
     this.services.audio.play(perfect ? 'perfectParry' : 'parry');
     if (perfect) {
       if (this.upgrades.getStack('unbroken-context') > 0) this.wordChain.extendOnce(this.time.now, BALANCE.chain.perfectParryExtension);
+      const counter = perfectCounterProfile(this.upgrades.getStack('perfect-counter'));
+      if (counter.cutReady) {
+        this.weaponCooldowns.readyCut(this.time.now); this.perfectCounterUntil = this.time.now + counter.duration;
+        this.recordUpgradeContribution('perfect-counter', { activationCount: 1, generated: 1 }, true);
+        this.showCombatLabel(this.hero.x, this.hero.y - 58, this.upgrades.hasResonance('counter-cut') ? '반격 절문 준비' : '다음 절단 강화', 0xb6f5df);
+      }
     }
     const flash = this.add.circle(this.hero.x, this.hero.y - 8, 24, 0xb4ffef, 0.2).setStrokeStyle(5, 0x8ff3df, 0.95).setDepth(DEPTH.word);
     this.tweens.add({ targets: flash, radius: 72, alpha: 0, duration: this.services.save.settings.reducedMotion ? 95 : 170, onComplete: () => flash.destroy() });
     this.runeBurst(this.hero.x, this.hero.y - 10, 8);
     if (enemy) {
+      const inscription = counterInscriptionProfile(this.upgrades.getStack('counter-inscription'));
+      if (inscription.duration > 0) { enemy.setData('counterInscriptionUntil', this.time.now + inscription.duration); this.recordUpgradeContribution('counter-inscription', { activationCount: 1, generated: 1, affectedTargets: 1 }, true); }
       if (perfect) enemy.setData('counterMarkedUntil', this.time.now + 4000);
       enemy.vulnerableUntil = this.time.now + BALANCE.hero.parryVulnerability;
       enemy.cancelAttackIntent(this.time.now + BALANCE.hero.parryAttackerStagger);
@@ -1092,7 +1187,12 @@ export class GameScene extends Phaser.Scene {
       this.damageEnemy(enemy, 12, away, true, false, undefined, 'parry');
       this.parryAnchorUntil = Math.max(this.parryAnchorUntil, this.time.now + BALANCE.hero.parryPositionLock);
     }
-    if (projectile) { const target = this.nearestEnemy(projectile.x, projectile.y); if (target) projectile.reflect(target.x, target.y); else projectile.destroy(); }
+    if (projectile) {
+      const target = [...this.enemies].find((candidate) => candidate.id === projectile.sourceId && candidate.active) ?? this.nearestEnemy(projectile.x, projectile.y);
+      const inscription = counterInscriptionProfile(this.upgrades.getStack('counter-inscription'));
+      if (target && inscription.duration > 0) { target.setData('counterInscriptionUntil', this.time.now + inscription.duration); this.recordUpgradeContribution('counter-inscription', { activationCount: 1, generated: 1, affectedTargets: 1 }, true); }
+      if (target) projectile.reflect(target.x, target.y); else projectile.destroy();
+    }
     // parrySuccess never relocates the hero. Re-applying an unchanged position
     // here used to interfere with Arcade Physics' pending postUpdate delta.
     this.hero.constrainToArena();
@@ -1109,10 +1209,20 @@ export class GameScene extends Phaser.Scene {
   }
 
   private canCast(readyAt: number): boolean { return this.flow.allowsCombatInput && this.time.now >= readyAt && this.wordInputAt !== this.game.loop.frame; }
-  private wordCooldown(base: number): number { return base * (1 - sealedSentenceStats(this.upgrades.getStack('sealed-sentence')).cooldownReduction); }
+  private wordCooldown(base: number): number {
+    const sealed = sealedSentenceStats(this.upgrades.getStack('sealed-sentence'));
+    const cooldown = base * (1 - sealed.cooldownReduction);
+    const reduction = Math.max(0, base - cooldown);
+    if (reduction > 0) this.recordUpgradeContribution('sealed-sentence', { activationCount: 1, cooldownMs: reduction });
+    return cooldown;
+  }
   private beginWordCast(): boolean {
     const amplifierEnhanced = this.upgrades.getStack('echo-amplifier') > 0 && this.time.now <= this.echoAmplifierUntil;
-    const enhanced = this.empowered || amplifierEnhanced;
+    const empoweredByF = this.empowered;
+    this.wordEmpoweredByF = empoweredByF;
+    const enhanced = empoweredByF || amplifierEnhanced;
+    const overcharge = overchargedWordProfile(this.upgrades.getStack('sentence-overcharge'), empoweredByF);
+    this.wordOverchargeMultiplier = overcharge.multiplier; this.wordOverchargeDurationBonus = overcharge.durationBonus;
     if (amplifierEnhanced) this.echoAmplifierUntil = 0;
     this.empowered = false; this.wordInputAt = this.game.loop.frame; return enhanced;
   }
@@ -1128,26 +1238,33 @@ export class GameScene extends Phaser.Scene {
   private castStop(x: number, y: number): boolean {
     const activeLinked = [...this.linkedTargets].filter((enemy) => enemy.active && enemy.linked);
     if (!this.canCast(this.stopReadyAt)) return false;
-    const enhanced = this.beginWordCast(); this.stopReadyAt = this.time.now + this.wordCooldown(BALANCE.words.stopCooldown); this.wordUses['멎는다'] += 1; this.markTutorial('stop');
+    const enhanced = this.beginWordCast(); const overchargeMultiplier = this.wordOverchargeMultiplier; const overchargeDurationBonus = this.wordOverchargeDurationBonus; this.stopReadyAt = this.time.now + this.wordCooldown(BALANCE.words.stopCooldown); this.wordUses['멎는다'] += 1; if (this.wordEmpoweredByF) this.combatStats.empoweredWord('stop'); this.markTutorial('stop');
     const chain = this.registerWordUse('stop', { successful: true, hasLinkedTargets: activeLinked.length > 0 });
     this.hero.castPose(); this.services.audio.play('stop'); this.showWordTypography('멎는다', x, y);
     const circle = this.add.circle(x, y, BALANCE.words.stopRadius, 0x55c4b1, 0.08).setStrokeStyle(3, 0x76d8c7, 0.74).setDepth(DEPTH.telegraph).setScale(0.2);
     this.tweens.add({ targets: circle, scale: 1, duration: 180 });
     this.runDelayedCall(180, () => {
-      const until = this.time.now + BALANCE.words.stopDuration;
+      const until = this.time.now + BALANCE.words.stopDuration + overchargeDurationBonus;
       let damaged = 0;
+      const stoppedEnemyIds: string[] = [];
       for (const enemy of [...this.enemies]) if (enemy.active && (enhanced || this.skillAreaHitsEnemy(x, y, BALANCE.words.stopRadius, enemy))) {
         enemy.freeze(until + (enhanced ? 500 : 0), enemy.kind === 'boss');
-        damaged += this.damageEnemy(enemy, BALANCE.words.stopDamage * (enhanced ? 1.35 : 1), Phaser.Math.Angle.Between(x, y, enemy.x, enemy.y), false, false, 'word', 'stop');
+        stoppedEnemyIds.push(enemy.id);
+        damaged += this.damageEnemy(enemy, BALANCE.words.stopDamage * (enhanced ? 1.35 : 1) * overchargeMultiplier, Phaser.Math.Angle.Between(x, y, enemy.x, enemy.y), false, false, 'word', 'stop', 'word');
       }
-      if (damaged > 0) { this.combatStats.agencyDamage('stop', damaged); this.gainWordHitSentence(BALANCE.sentence.wordHitGain); }
+      if (damaged > 0) {
+        this.combatStats.agencyDamage('stop', damaged); this.gainWordHitSentence(BALANCE.sentence.wordHitGain);
+        if (overchargeMultiplier > 1) this.recordUpgradeContribution('sentence-overcharge', { activationCount: 1, damage: damaged * (1 - 1 / overchargeMultiplier), affectedTargets: stoppedEnemyIds.length }, true);
+      }
       let projectileIndex = 0;
       for (const projectile of this.projectiles) {
         if (enhanced || this.skillAreaHitsProjectile(x, y, BALANCE.words.stopRadius, projectile)) {
           projectile.freeze(until + (enhanced ? 500 : 0));
+          projectile.setData('stopWordToken', until);
           if (enhanced && projectileIndex++ % 3 === 0) this.runDelayedCall(280, () => this.explodeStoppedProjectile(projectile));
         }
       }
+      if (this.upgrades.getStack('stop-resonance') > 0 || this.upgrades.hasResonance('time-undertow')) this.runDelayedCall(until - this.time.now + 10, () => this.applyStopEndEffects(stoppedEnemyIds, until));
       if (chain === 'chain-stop') this.applyChainStop(activeLinked);
       this.tweens.add({ targets: circle, alpha: 0, duration: 220, onComplete: () => circle.destroy() });
     });
@@ -1167,7 +1284,7 @@ export class GameScene extends Phaser.Scene {
     const hasRecordedDamage = this.damageHistory.hasRecentDamage(activeLinked.map((enemy) => enemy.id), this.time.now, BALANCE.chain.damageHistoryDuration);
     const chainContext = { hasFrozenProjectiles: frozenProjectiles.length > 0, hasStoppedTargets: stoppedTargets.length > 0, hasLinkedTargets: activeLinked.length > 0, hasRecordedDamage };
     if (!this.canCast(this.rewindReadyAt)) return false;
-    const enhanced = this.beginWordCast(); this.rewindReadyAt = this.time.now + this.wordCooldown(BALANCE.words.rewindCooldown); this.wordUses['되돌린다'] += 1; this.markTutorial('rewind');
+    const enhanced = this.beginWordCast(); this.rewindReadyAt = this.time.now + this.wordCooldown(BALANCE.words.rewindCooldown); this.wordUses['되돌린다'] += 1; if (this.wordEmpoweredByF) this.combatStats.empoweredWord('rewind'); this.markTutorial('rewind');
     const chain = this.registerWordUse('rewind', { successful: true, ...chainContext });
     if (chain === 'backflow') this.applyBackflow(frozenProjectiles, stoppedTargets);
     if (chain === 'damage-regression') this.applyDamageRegression(activeLinked);
@@ -1196,7 +1313,12 @@ export class GameScene extends Phaser.Scene {
     }, onComplete: () => {
       this.hero.rewinding = false; const oldest = reverse.at(-1); if (oldest) { this.hero.setVelocity(oldest.velocityX, oldest.velocityY); this.hero.restoreHealth(oldest.health); }
       if (oldest) {
-        const recovered = Math.max(0, oldest.health - before.health);
+        let recovered = Math.max(0, oldest.health - before.health);
+        const breath = rewindBreathHealing(recovered, this.upgrades.getStack('rewind-breath'));
+        if (breath > 0) {
+          const beforeBonus = this.hero.health; this.hero.heal(breath); const actualBonus = Math.max(0, this.hero.health - beforeBonus);
+          recovered += actualBonus; this.recordUpgradeContribution('rewind-breath', { activationCount: 1, healing: actualBonus }, true);
+        }
         const moved = Phaser.Math.Distance.Between(before.x, before.y, oldest.x, oldest.y);
         if (recovered > 0.5) { this.damageNumber(this.hero.x, this.hero.y - 62, recovered, 0x75e6f3, false, '체력 +'); this.combatStats.rewindRecovered(recovered); }
         if (moved > 12) this.showCombatLabel(this.hero.x, this.hero.y - 45, '위치 복구', 0x79cfe3);
@@ -1222,8 +1344,11 @@ export class GameScene extends Phaser.Scene {
     slash.beginPath().arc(x, y - 10, radius, angle - 0.88, angle + 0.88).strokePath();
     this.tweens.add({ targets: slash, alpha: 0, scaleX: 1.12, scaleY: 1.12, duration: 280, onComplete: () => slash.destroy() });
     let damage = 0;
-    for (const enemy of [...this.enemies]) if (enemy.active && distanceToEllipse({ x, y }, enemy.hurtbox) <= radius) damage += this.damageEnemy(enemy, BALANCE.words.rewindDamage * (enhanced ? 1.35 : 1), Phaser.Math.Angle.Between(x, y, enemy.x, enemy.y), false, false, 'word', 'rewind');
-    if (damage > 0) { this.combatStats.agencyDamage('rewind', damage); this.combatStats.rewindEchoDamage(damage); this.gainWordHitSentence(BALANCE.sentence.wordHitGain); }
+    for (const enemy of [...this.enemies]) if (enemy.active && distanceToEllipse({ x, y }, enemy.hurtbox) <= radius) damage += this.damageEnemy(enemy, BALANCE.words.rewindDamage * (enhanced ? 1.35 : 1) * this.wordOverchargeMultiplier, Phaser.Math.Angle.Between(x, y, enemy.x, enemy.y), false, false, 'word', 'rewind', 'word');
+    if (damage > 0) {
+      this.combatStats.agencyDamage('rewind', damage); this.combatStats.rewindEchoDamage(damage); this.gainWordHitSentence(BALANCE.sentence.wordHitGain);
+      if (this.wordOverchargeMultiplier > 1) this.recordUpgradeContribution('sentence-overcharge', { activationCount: 1, damage: damage * (1 - 1 / this.wordOverchargeMultiplier) }, true);
+    }
     return damage;
   }
 
@@ -1236,18 +1361,56 @@ export class GameScene extends Phaser.Scene {
     const recent = this.attacks.filter((attack) => attack.time >= fromTime && (attack.kind === 'cut' || attack.kind === 'echo-blade' || this.legacyCombatMode)).slice(-replayCount);
     const basePower = returningStacks > 0 ? returning.damageRatio : shadowStacks > 0 ? 0.45 + (shadowStacks - 1) * 0.18 : BALANCE.hero.finisher.echoReplayRatio;
     const power = basePower + this.upgrades.getStack('memory-echo') * 0.22 + (enhanced ? 0.16 : 0);
-    if (shadowStacks > 0 && recent.length > 0) { this.showCombatLabel(this.hero.x, this.hero.y - 58, '회귀 검영', 0x79cfe8); this.combatStats.upgradeContribution('regression-sword-shadow', { generated: recent.length }); }
-    if (returningStacks > 0 && recent.length > 0) { this.showCombatLabel(this.hero.x, this.hero.y - 72, '회귀의 칼자국', 0x79cfe8); this.combatStats.upgradeContribution('returning-scar', { generated: recent.length }); }
+    if (shadowStacks > 0 && recent.length > 0) { this.showCombatLabel(this.hero.x, this.hero.y - 58, '회귀 검영', 0x79cfe8); this.recordUpgradeContribution('regression-sword-shadow', { activationCount: 1, generated: recent.length }); }
+    if (returningStacks > 0) this.recordUpgradeContribution('returning-scar', {
+      activationCount: recent.length > 0 ? 1 : 0,
+      generated: recent.length,
+      failedConditions: recent.length > 0 ? 0 : 1,
+    }, recent.length > 0);
+    if (returningStacks > 0 && recent.length > 0) this.showCombatLabel(this.hero.x, this.hero.y - 72, '회귀의 칼자국', 0x79cfe8);
+    let regressionActivated = false;
+    const resonanceReady = this.upgrades.hasResonance('regression-chain');
+    const linkedInReplaySpace = resonanceReady && recent.some((record) => [...this.linkedTargets].some((enemy) => enemy.active && enemy.linked && !enemy.removing
+      && distanceToEllipse({ x: record.x, y: record.y }, enemy.hurtbox) <= 96
+      && angleDelta(Phaser.Math.Angle.Between(record.x, record.y, enemy.x, enemy.y), record.angle) <= 1.18));
+    if (resonanceReady && !linkedInReplaySpace) this.recordResonanceContribution('regression-chain', { activationCount: 0, failedConditions: 1 });
     recent.forEach((record, index) => this.runDelayedCall(index * 135, () => {
       const echo = this.add.image(record.x, record.y, 'hero-attack').setOrigin(0.5, 1).setScale(0.4).setFlipX(Math.cos(record.angle) < 0).setTint(0x43add0).setAlpha(0.55).setDepth(DEPTH.rewind);
       this.tweens.add({ targets: echo, alpha: 0, x: record.x + Math.cos(record.angle) * 22, duration: 210, onComplete: () => echo.destroy() });
-      const range = record.kind === 'finisher' ? BALANCE.hero.finisher.range : 68;
-      const target = [...this.enemies].filter((enemy) => enemy.active && !enemy.removing && distanceSq(record.x, record.y, enemy.x, enemy.y) < range ** 2 && angleDelta(Phaser.Math.Angle.Between(record.x, record.y, enemy.x, enemy.y), record.angle) < 1).sort((a, b) => distanceSq(record.x, record.y, a.x, a.y) - distanceSq(record.x, record.y, b.x, b.y))[0];
+      const range = record.kind === 'finisher' ? BALANCE.hero.finisher.range : 96;
+      const slash = this.add.graphics().setDepth(DEPTH.word);
+      slash.lineStyle(7, 0x72cfe8, .42).beginPath().arc(record.x, record.y - 8, range * .78, record.angle - .82, record.angle + .82).strokePath();
+      slash.lineStyle(2, 0xb8f4ef, .68).beginPath().arc(record.x, record.y - 8, range * .62, record.angle - .68, record.angle + .68).strokePath();
+      this.tweens.add({ targets: slash, alpha: 0, x: Math.cos(record.angle) * 8, y: Math.sin(record.angle) * 8, duration: 240, onComplete: () => slash.destroy() });
+      const selected = selectEchoReplayTarget({ x: record.x, y: record.y }, record.angle, range, [...this.enemies].map((enemy) => ({ id: enemy.id, hurtbox: enemy.hurtbox, alive: enemy.active && !enemy.removing, linked: enemy.linked })));
+      const target = selected ? [...this.enemies].find((enemy) => enemy.id === selected.id) : undefined;
       if (target) {
-        const dealt = this.damageEnemy(target, Math.max(1, record.damage) * power, record.angle, false, true, undefined, 'rewind');
-        if (shadowStacks > 0 && dealt > 0) this.combatStats.upgradeContribution('regression-sword-shadow', { damage: dealt });
-        if (returningStacks > 0 && dealt > 0) this.combatStats.upgradeContribution('returning-scar', { damage: dealt });
-      }
+        const activeLinks = [...this.linkedTargets].filter((enemy) => enemy.active && enemy.linked);
+        const regressionResonance = resonanceReady && target.linked;
+        const resonanceMultiplier = regressionResonance && activeLinks.length === 1 ? 1.35 : 1;
+        const baseDamage = Math.max(1, record.damage) * power;
+        const dealt = this.damageEnemy(target, baseDamage * resonanceMultiplier, record.angle, false, regressionResonance, undefined, 'rewind');
+        const embeddedResonanceDamage = regressionResonance && activeLinks.length === 1
+          ? Math.max(0, dealt - Math.min(dealt, baseDamage))
+          : 0;
+        if (shadowStacks > 0 && dealt > 0) this.recordUpgradeContribution('regression-sword-shadow', { activationCount: 0, damage: dealt, hits: 1 });
+        if (returningStacks > 0 && dealt > 0) this.recordUpgradeContribution('returning-scar', {
+          activationCount: 0,
+          damage: Math.max(0, dealt - embeddedResonanceDamage),
+          hits: 1,
+          exclusiveDamage: true,
+        });
+        if (regressionResonance && dealt > 0) {
+          let resonanceDamage = embeddedResonanceDamage; let affectedTargets = 1;
+          if (activeLinks.length > 1) for (const linked of activeLinks) {
+            if (linked === target || !linked.active || linked.removing) continue;
+            const shared = this.damageEnemy(linked, baseDamage * .22, record.angle, false, true, undefined, 'rewind');
+            if (shared > 0) { resonanceDamage += shared; affectedTargets += 1; this.linkPulse(target, linked, 0x64bfe1); }
+          }
+          this.recordResonanceContribution('regression-chain', { activationCount: regressionActivated ? 0 : 1, damage: resonanceDamage, affectedTargets, hits: affectedTargets, exclusiveDamage: true });
+          regressionActivated = true;
+        }
+      } else if (returningStacks > 0) this.recordUpgradeContribution('returning-scar', { activationCount: 0, misses: 1 });
     }));
   }
 
@@ -1266,18 +1429,22 @@ export class GameScene extends Phaser.Scene {
     const selected = candidates.slice(0, enhancedPreview ? BALANCE.words.empoweredLinkTargets : BALANCE.words.baseLinkTargets);
     if (selected.length < 1) { this.combatStats.invalidWord('link'); return true; }
     if (!this.canCast(this.linkReadyAt)) return false;
-    const enhanced = this.beginWordCast(); this.linkReadyAt = this.time.now + this.wordCooldown(BALANCE.words.linkCooldown); this.wordUses['잇는다'] += 1; this.markTutorial('link');
+    const enhanced = this.beginWordCast(); this.linkReadyAt = this.time.now + this.wordCooldown(BALANCE.words.linkCooldown); this.wordUses['잇는다'] += 1; if (this.wordEmpoweredByF) this.combatStats.empoweredWord('link'); this.markTutorial('link');
     this.services.audio.play('link'); this.hero.castPose(); this.showWordTypography('잇는다', x, y);
     this.showLinkPreview(selected);
     this.clearLinks();
     let directDamage = 0;
-    selected.forEach((enemy) => { directDamage += this.damageEnemy(enemy, BALANCE.words.linkDamage * (selected.length === 1 ? BALANCE.words.singleLinkDamageMultiplier : 1) * (enhanced ? 1.35 : 1), Phaser.Math.Angle.Between(this.hero.x, this.hero.y, enemy.x, enemy.y), false, false, 'word', 'link'); });
-    if (directDamage > 0) { this.combatStats.agencyDamage('link', directDamage); this.gainWordHitSentence(BALANCE.sentence.wordHitGain); }
-    const expires = this.time.now + BALANCE.words.linkDuration + (enhanced ? 1300 : 0);
+    selected.forEach((enemy) => { directDamage += this.damageEnemy(enemy, BALANCE.words.linkDamage * (selected.length === 1 ? BALANCE.words.singleLinkDamageMultiplier : 1) * (enhanced ? 1.35 : 1) * this.wordOverchargeMultiplier, Phaser.Math.Angle.Between(this.hero.x, this.hero.y, enemy.x, enemy.y), false, false, 'word', 'link', 'word'); });
+    if (directDamage > 0) {
+      this.combatStats.agencyDamage('link', directDamage); this.gainWordHitSentence(BALANCE.sentence.wordHitGain);
+      if (this.wordOverchargeMultiplier > 1) this.recordUpgradeContribution('sentence-overcharge', { activationCount: 1, damage: directDamage * (1 - 1 / this.wordOverchargeMultiplier), affectedTargets: selected.length }, true);
+    }
+    const expires = this.time.now + BALANCE.words.linkDuration + (enhanced ? 1300 : 0) + this.wordOverchargeDurationBonus;
     const generation = ++this.linkGeneration;
     this.linkShareRatio = linkShareRatio(enhanced);
+    if (selected.length === 1 && this.upgrades.getStack('isolation-chain') > 0) this.recordUpgradeContribution('isolation-chain', { activationCount: 1, affectedTargets: 1 }, true);
     selected.forEach((enemy) => {
-      enemy.linked = true; enemy.linkedUntil = expires; this.linkedTargets.add(enemy);
+      enemy.linked = true; enemy.linkedUntil = expires; enemy.setData('linkContagionGeneration', 0); this.linkedTargets.add(enemy);
       const marker = this.add.text(enemy.x, enemy.y - (enemy.kind === 'boss' ? 78 : 48), selected.length === 1 ? '孤' : '連', { fontFamily: 'Malgun Gothic, serif', fontSize: enemy.kind === 'boss' ? '19px' : '15px', color: '#a1f3df', stroke: '#09201d', strokeThickness: 4 }).setOrigin(0.5).setDepth(DEPTH.word);
       this.linkMarkers.set(enemy, marker);
       const preview = this.add.circle(enemy.x, enemy.y - 8, enemy.kind === 'boss' ? 34 : 23, 0x58c9b6, 0.04).setStrokeStyle(2, 0xa3f5e4, 0.72).setDepth(DEPTH.word).setScale(0.72);
@@ -1291,6 +1458,50 @@ export class GameScene extends Phaser.Scene {
       this.clearLinks();
     });
     return true;
+  }
+
+  private applyStopEndEffects(stoppedEnemyIds: readonly string[], token: number): void {
+    const profile = stopResonanceProfile(this.upgrades.getStack('stop-resonance'));
+    let damage = 0; let affected = 0; let pulses = 0;
+    if (profile.damage > 0) for (const sourceId of stoppedEnemyIds) {
+      const source = [...this.enemies].find((enemy) => enemy.id === sourceId && enemy.active && !enemy.removing); if (!source) continue;
+      pulses += 1;
+      const outer = this.add.circle(source.x, source.y - 8, 12, 0x6dcab8, .03).setStrokeStyle(3, 0x9cebdc, .72).setDepth(DEPTH.word);
+      const inner = this.add.circle(source.x, source.y - 8, 8, 0x0, 0).setStrokeStyle(1, 0x9cebdc, .92).setDepth(DEPTH.word);
+      const glyph = this.add.text(source.x, source.y - 10, '止', { fontFamily: 'serif', fontSize: '15px', color: '#b7f5e8', stroke: '#0a2823', strokeThickness: 3 }).setOrigin(.5).setDepth(DEPTH.word);
+      this.tweens.add({ targets: outer, radius: profile.radius, alpha: 0, duration: 250, onComplete: () => outer.destroy() });
+      this.tweens.add({ targets: inner, radius: profile.radius * .72, alpha: 0, duration: 190, delay: 35, onComplete: () => inner.destroy() });
+      this.tweens.add({ targets: glyph, y: glyph.y - 12, alpha: 0, duration: 280, onComplete: () => glyph.destroy() });
+      for (const target of [...this.enemies]) {
+        if (!target.active || target.removing || target === source || distanceSq(source.x, source.y, target.x, target.y) > profile.radius ** 2) continue;
+        const dealt = this.damageEnemy(target, profile.damage, Phaser.Math.Angle.Between(source.x, source.y, target.x, target.y), false, true, undefined, 'stop');
+        if (dealt > 0) { damage += dealt; affected += 1; target.freeze(this.time.now + profile.slowDuration, target.kind === 'boss'); }
+      }
+    }
+    if (profile.damage > 0) this.recordUpgradeContribution('stop-resonance', {
+      activationCount: pulses > 0 ? 1 : 0,
+      damage,
+      generated: pulses,
+      affectedTargets: affected,
+      failedConditions: pulses > 0 ? 0 : 1,
+      hits: affected,
+      exclusiveDamage: true,
+    }, damage > 0);
+
+    if (!this.upgrades.hasResonance('time-undertow')) return;
+    let reflected = 0;
+    for (const projectile of [...this.projectiles]) {
+      if (reflected >= 3 || !projectile.active || !projectile.enemyOwned || projectile.reflected || projectile.getData('timeUndertowReflected') === true || Number(projectile.getData('stopWordToken')) !== token) continue;
+      const target = [...this.enemies].find((enemy) => enemy.id === projectile.sourceId && enemy.active) ?? this.nearestEnemy(projectile.x, projectile.y); if (!target) continue;
+      projectile.setData('timeUndertow', true); projectile.setData('timeUndertowReflected', true); projectile.reflect(target.x, target.y, projectile.originalDamage * .55, true); reflected += 1;
+      this.showCombatLabel(projectile.x, projectile.y - 14, '시간 역조', 0x77d8e8);
+    }
+    this.recordResonanceContribution('time-undertow', {
+      activationCount: reflected > 0 ? 1 : 0,
+      reflectedProjectiles: reflected,
+      affectedTargets: reflected,
+      failedConditions: reflected > 0 ? 0 : 1,
+    });
   }
 
   private showLinkPreview(selected: readonly Enemy[]): void {
@@ -1321,7 +1532,7 @@ export class GameScene extends Phaser.Scene {
       if (chainBreath > 0) {
         this.gainSentence(12 * chainBreath);
         this.reduceAllWordCooldowns(400 * chainBreath);
-        this.combatStats.upgradeContribution('chain-breath', { sentence: 12 * chainBreath, cooldownMs: 400 * chainBreath });
+        this.recordUpgradeContribution('chain-breath', { activationCount: 1, sentence: 12 * chainBreath, cooldownMs: 400 * chainBreath }, true);
         this.showCombatLabel(this.hero.x, this.hero.y - 52, '연문의 숨', 0x91e7d5);
       }
       const amplifier = this.upgrades.getStack('echo-amplifier');
@@ -1361,16 +1572,6 @@ export class GameScene extends Phaser.Scene {
     const anchor = active[0]; if (!anchor) return;
     for (const enemy of active.slice(1)) this.linkPulse(anchor, enemy, 0x9ef5e5);
     this.runeBurst(anchor.x, anchor.y - 10, 8);
-    const resonance = this.upgrades.getStack('stop-resonance');
-    let resonanceDamage = 0;
-    if (resonance > 0) for (const source of active) {
-      for (const target of [...this.enemies]) {
-        if (!target.active || active.includes(target) || distanceSq(source.x, source.y, target.x, target.y) > 72 ** 2) continue;
-        resonanceDamage += this.damageEnemy(target, 9 * resonance, Phaser.Math.Angle.Between(source.x, source.y, target.x, target.y), false, true, undefined, 'word');
-        target.freeze(this.time.now + 650, target.kind === 'boss');
-      }
-    }
-    if (resonanceDamage > 0) { this.combatStats.upgradeContribution('stop-resonance', { damage: resonanceDamage }); this.showCombatLabel(anchor.x, anchor.y - 54, '정지 공명', 0x91e7d5); }
   }
 
   private applyBackflow(projectiles: readonly Projectile[], stoppedTargets: readonly Enemy[]): void {
@@ -1406,13 +1607,20 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
-  private damageEnemy(enemy: Enemy, amount: number, sourceAngle: number, parried = false, propagated = false, historyKind?: RecordedDamageKind, deathSource?: EnemyDeathSource): number {
+  private damageEnemy(enemy: Enemy, amount: number, sourceAngle: number, parried = false, propagated = false, historyKind?: RecordedDamageKind, deathSource?: EnemyDeathSource, upgradeTrigger: 'cut' | 'word' | 'none' = 'none'): number {
     if (!enemy.active || enemy.health <= 0) return 0;
+    let resolvedAmount = amount;
+    const inscription = counterInscriptionProfile(this.upgrades.getStack('counter-inscription'));
+    if (!propagated && upgradeTrigger !== 'none' && inscription.damage > 0 && this.time.now <= Number(enemy.getData('counterInscriptionUntil') ?? 0)) {
+      enemy.setData('counterInscriptionUntil', 0); resolvedAmount += inscription.damage;
+      this.recordUpgradeContribution('counter-inscription', { activationCount: 0, damage: inscription.damage, hits: 1 }, true);
+      this.showCombatLabel(enemy.x, enemy.y - 64, `반격 비문 +${inscription.damage}`, 0xa9f0da);
+    }
     let totalDealt = 0;
     const activeLinks = [...this.linkedTargets].filter((target) => target.active && target.linked);
     const isolationStacks = this.upgrades.getStack('isolation-chain');
     const isolation = isolationChainProfile(isolationStacks);
-    const adjustment = adjustLinkedIncomingDamage(amount, enemy.linked, activeLinks.length, propagated, isolation.isolatedMultiplier);
+    const adjustment = adjustLinkedIncomingDamage(resolvedAmount, enemy.linked, activeLinks.length, propagated, isolation.isolatedMultiplier);
     const isolated = adjustment.isolatedBonus > 0;
     const adjustedAmount = adjustment.adjustedAmount;
     const packets = distributeLinkedDamage(enemy.id, adjustedAmount, activeLinks.map((target) => ({ id: target.id, alive: target.active && target.health > 0 })), this.linkShareRatio, propagated);
@@ -1431,7 +1639,7 @@ export class GameScene extends Phaser.Scene {
           const bonus = dealt * adjustment.isolatedBonus / Math.max(0.001, adjustment.adjustedAmount);
           this.combatStats.linkIsolatedBonus(bonus);
           if (bonus >= 1) this.damageNumber(target.x + 15, target.y - 52, bonus, 0x91ead7, true, '고립 +');
-          if (isolationStacks > 0) this.combatStats.upgradeContribution('isolation-chain', { damage: Math.min(bonus, amount * isolationStacks * 0.1) });
+          if (isolationStacks > 0) this.recordUpgradeContribution('isolation-chain', { activationCount: 0, damage: Math.min(bonus, resolvedAmount * isolationStacks * 0.1), hits: 1 });
         }
       }
     }
@@ -1457,20 +1665,56 @@ export class GameScene extends Phaser.Scene {
     if (enemy.linked) {
       const stacks = this.upgrades.getStack('link-overload'); const isolationStacks = wasIsolated ? this.upgrades.getStack('isolation-chain') : 0;
       const isolation = isolationChainProfile(isolationStacks);
-      const radius = 76 + stacks * 24; const damage = 22 + stacks * 12 + isolation.explosionBonus;
+      const radius = 76 + stacks * 24; const baseDamage = 22 + stacks * 12;
       const burst = this.add.circle(enemy.x, enemy.y, 18, 0x55c8b1, 0.16).setStrokeStyle(4, 0x9af3df, 0.88).setDepth(DEPTH.word);
       this.tweens.add({ targets: burst, radius, alpha: 0, duration: 260, onComplete: () => burst.destroy() });
       this.runeBurst(enemy.x, enemy.y, 8 + stacks * 3);
-      let explosionDamage = 0;
-      for (const target of [...this.enemies]) if (distanceSq(enemy.x, enemy.y, target.x, target.y) < radius ** 2) explosionDamage += this.damageEnemy(target, damage, Phaser.Math.Angle.Between(enemy.x, enemy.y, target.x, target.y), false, true, undefined, 'link');
+      let explosionDamage = 0; let baseExplosionDamage = 0; let isolationDamage = 0; let isolationTargets = 0;
+      for (const target of [...this.enemies]) {
+        if (distanceSq(enemy.x, enemy.y, target.x, target.y) >= radius ** 2) continue;
+        const angle = Phaser.Math.Angle.Between(enemy.x, enemy.y, target.x, target.y);
+        const baseDealt = this.damageEnemy(target, baseDamage, angle, false, true, undefined, 'link');
+        explosionDamage += baseDealt;
+        baseExplosionDamage += baseDealt;
+        if (isolation.explosionBonus <= 0 || !target.active || target.removing) continue;
+        const bonus = this.damageEnemy(target, isolation.explosionBonus, angle, false, true, undefined, 'link');
+        explosionDamage += bonus;
+        isolationDamage += bonus;
+        if (bonus > 0) isolationTargets += 1;
+      }
       if (explosionDamage > 0) { this.combatStats.linkExplosionDamage(explosionDamage); this.showCombatLabel(enemy.x, enemy.y - 40, `연결 폭발 ${Math.round(explosionDamage)}`, 0x8ee6d5); }
-      if (isolationStacks > 0 && explosionDamage > 0) this.combatStats.upgradeContribution('isolation-chain', { damage: explosionDamage });
+      if (baseExplosionDamage > 0) this.combatStats.agencyDamage('link', baseExplosionDamage);
+      if (isolationStacks > 0) this.recordUpgradeContribution('isolation-chain', {
+        activationCount: 1,
+        damage: isolationDamage,
+        generated: 1,
+        affectedTargets: isolationTargets,
+        hits: isolationTargets,
+        failedConditions: isolationTargets > 0 ? 0 : 1,
+        exclusiveDamage: true,
+      }, true);
       if (this.upgrades.getStack('inscription-spread') > 0) {
         const nearest = this.nearestEnemy(enemy.x, enemy.y); if (nearest) { nearest.linked = true; nearest.linkedUntil = this.time.now + 2000; this.linkedTargets.add(nearest); }
       }
+      this.spreadLinkContagion(enemy);
     }
     if (completedPhaseThreeLink) this.rewardBossMechanic('이어진 핵 노출');
     if (enemy === this.boss) { this.runSession.clearBoss(this.runId, true); this.boss = undefined; this.beginBossDefeated(enemy); }
+  }
+
+  private spreadLinkContagion(source: Enemy): void {
+    const profile = linkContagionProfile(this.upgrades.getStack('link-contagion'));
+    const generation = Number(source.getData('linkContagionGeneration') ?? 0);
+    if (profile.targets <= 0 || generation >= profile.maximumGeneration) return;
+    const targets = [...this.enemies].filter((enemy) => enemy.active && !enemy.removing && !enemy.linked)
+      .sort((first, second) => distanceSq(source.x, source.y, first.x, first.y) - distanceSq(source.x, source.y, second.x, second.y))
+      .filter((enemy) => distanceSq(source.x, source.y, enemy.x, enemy.y) <= 190 ** 2).slice(0, profile.targets);
+    for (const target of targets) {
+      target.linked = true; target.linkedUntil = this.time.now + profile.duration; target.setData('linkContagionGeneration', generation + 1); this.linkedTargets.add(target);
+      const marker = this.add.text(target.x, target.y - (target.kind === 'boss' ? 78 : 48), '傳', { fontFamily: 'Malgun Gothic, serif', fontSize: '15px', color: '#8ee9d3', stroke: '#09201d', strokeThickness: 4 }).setOrigin(.5).setDepth(DEPTH.word);
+      this.linkMarkers.set(target, marker); this.linkPulse(source, target, 0x72d7bd);
+    }
+    if (targets.length > 0) { this.recordUpgradeContribution('link-contagion', { activationCount: 1, generated: targets.length, affectedTargets: targets.length }, true); this.showCombatLabel(source.x, source.y - 54, `연결 전염 ${targets.length}`, 0x80e3c8); }
   }
 
   private updateWaveLifecycle(): void {
@@ -1515,6 +1759,7 @@ export class GameScene extends Phaser.Scene {
   private completeWave(): void {
     if (this.flow.baseState !== 'COMBAT' || this.boss?.active) return;
     if (!this.transitionFlow('ROUND_CLEAR')) return;
+    this.clearTransientCombatObjects();
     const encounter = (['wave-1', 'wave-2', 'wave-3'] as const)[this.waveIndex];
     if (encounter) this.combatStats.setEncounterTime(encounter, Math.max(0, (this.time.now - this.encounterStartedAt) / 1000));
     const healthBefore = this.hero.health;
@@ -1533,15 +1778,29 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
-  private showUpgradeChoices(): void {
-    const choices = this.waveIndex === 0 ? this.upgrades.firstChoices() : this.upgrades.choices(3);
+  private showUpgradeChoices(forcedChoices?: ReturnType<UpgradeSystem['choices']>): void {
+    const snapshot = this.combatStats.snapshot();
+    const selectionContext = {
+      parryUses: snapshot.parryAttempts,
+      wordUses: Object.values(snapshot.wordUses).reduce((sum, count) => sum + count, 0),
+      echoDamage: snapshot.echoBlade.damage,
+      cutUses: snapshot.cut.uses,
+      healthRatio: this.hero.health / Math.max(1, this.hero.maxHealth),
+    };
+    const choices = forcedChoices ?? (this.waveIndex === 0 ? this.upgrades.firstChoices() : this.upgrades.choices(3, Math.random, selectionContext));
     this.services.ui.showUpgradeChoice(choices, this.upgrades.rerollsLeft, (id) => {
       if (!this.flow.allowsRewardInput) return;
+      const resonancesBefore = new Set(this.upgrades.activeResonances());
       if (!this.upgrades.add(id)) { this.transitionFlow('REWARD_REVEAL'); this.showUpgradeChoices(); return; }
+      this.upgrades.recordSelection(id);
       const chosen = choices.find((choice) => choice.id === id); if (chosen) {
         const stacks = this.upgrades.getStack(id);
         this.services.ui.showChainTrigger(`${chosen.name} ×${stacks} · ${upgradeDescription(chosen, stacks)}`, 1100);
       }
+      const completed = this.upgrades.activeResonances().filter((resonance) => !resonancesBefore.has(resonance));
+      if (completed.length > 0) this.runTimeout(480, () => {
+        const resonance = resonanceById(completed[0] ?? ''); if (resonance) this.services.ui.showChainTrigger(`공명 완성 · ${resonance.name}`, 1200);
+      });
       this.waveIndex += 1;
       if (this.waveIndex < 3) {
         this.transitionFlow('COMBAT'); this.timeControl.release('REWARD_SCREEN', this.timeOwner); this.spawnWave(this.waveIndex);
@@ -1550,7 +1809,8 @@ export class GameScene extends Phaser.Scene {
       }
     }, () => {
       if (!this.flow.allowsRewardInput || this.upgrades.rerollsLeft <= 0) return;
-      this.upgrades.reroll(); this.transitionFlow('REWARD_REVEAL'); this.showUpgradeChoices();
+      const rerolled = this.upgrades.reroll(Math.random, selectionContext); if (!rerolled) return;
+      this.transitionFlow('REWARD_REVEAL'); this.showUpgradeChoices(rerolled);
     }, {
       revealDelayMs: BALANCE.pacing.rewardRevealDelay,
       acceptsKey: (event) => this.inputRouter.accepts('REWARD', event.code, event.repeat),
@@ -1651,11 +1911,20 @@ export class GameScene extends Phaser.Scene {
     } else {
       for (const enemy of [...this.enemies]) if (enemy.active && !enemy.removing && sweptCircleHitsEllipse(projectile.previousPosition, projectile, projectile.collisionCircle.radius, enemy.hurtbox)) {
         const reflectedStopBonus = enemy === this.boss && this.boss.phase === 1 && projectile.reflected ? BALANCE.boss.reflectedPhaseOneMultiplier : 1;
-        this.damageEnemy(enemy, projectile.damage * reflectedStopBonus, projectile.rotation, false, false, undefined, 'projectile-reflect');
-        if (projectile.getData('chainBackflow')) this.combatStats.addChainDamage('backflow', projectile.damage * reflectedStopBonus);
+        const projectileDamage = this.damageEnemy(enemy, projectile.damage * reflectedStopBonus, projectile.rotation, false, false, undefined, 'projectile-reflect');
+        const echoBladeBackflow = Boolean(projectile.getData('echoBladeBackflow'));
+        const timeUndertow = Boolean(projectile.getData('timeUndertow'));
+        const chainBackflow = Boolean(projectile.getData('chainBackflow'));
+        if (echoBladeBackflow && projectileDamage > 0) this.recordUpgradeContribution('backflow-blade', { activationCount: 0, damage: projectileDamage, affectedTargets: 1, hits: 1, exclusiveDamage: true });
+        if (timeUndertow && projectileDamage > 0) this.recordResonanceContribution('time-undertow', { activationCount: 0, damage: projectileDamage, affectedTargets: 1, hits: 1, exclusiveDamage: true });
+        if (chainBackflow) this.combatStats.addChainDamage('backflow', projectileDamage);
+        if (projectile.reflected && !echoBladeBackflow && !timeUndertow && !chainBackflow) this.combatStats.parryDamage(projectileDamage);
         if (enemy === this.boss && this.boss.phase === 1 && projectile.reflected) this.rewardBossMechanic('역류 핵 노출');
         if (projectile.getData('chainBackflow') && this.upgrades.getStack('backflow-shards') > 0) this.applyBackflowShards(enemy, projectile.damage, projectile.rotation);
-        if (projectile.reflected && this.upgrades.getStack('fragment-recovery') > 0) this.hero.heal(this.upgrades.getStack('fragment-recovery') * 4);
+        if (projectile.reflected && this.upgrades.getStack('fragment-recovery') > 0) {
+          const before = this.hero.health; this.hero.heal(this.upgrades.getStack('fragment-recovery') * 4); const healing = this.hero.health - before;
+          if (healing > 0) this.recordUpgradeContribution('fragment-recovery', { activationCount: 1, healing }, true);
+        }
         projectile.destroy(); break;
       }
     }
@@ -1687,7 +1956,7 @@ export class GameScene extends Phaser.Scene {
       this.tweens.add({ targets: glyph, x: target.x, y: target.y - 18, alpha: 0, duration: 150, onComplete: () => glyph.destroy() });
       const dealt = this.damageEnemy(target, sourceDamage * 0.4, angle, false, true, undefined, 'projectile-reflect');
       this.combatStats.addChainDamage('backflow', dealt);
-      if (dealt > 0) this.combatStats.upgradeContribution('backflow-shards', { damage: dealt, generated: 1 });
+      if (dealt > 0) this.recordUpgradeContribution('backflow-shards', { damage: dealt, generated: 1 });
     });
   }
 
@@ -1696,7 +1965,13 @@ export class GameScene extends Phaser.Scene {
     if (this.qaMode || this.debugInvulnerable || this.time.now < this.bossTransitionUntil) return;
     let damage = baseDamage;
     if (this.tutorialEnabled && this.tutorialIndex < TUTORIAL.length) damage *= 0.45;
-    const cloak = this.upgrades.getStack('ink-cloak'); if (this.firstHitAvailable && cloak > 0) { damage *= Math.max(0.4, 1 - cloak * 0.35); this.firstHitAvailable = false; }
+    const cloak = this.upgrades.getStack('ink-cloak');
+    if (this.firstHitAvailable && cloak > 0) {
+      const beforeCloak = damage; damage *= Math.max(0.4, 1 - cloak * 0.35); this.firstHitAvailable = false;
+      this.recordUpgradeContribution('ink-cloak', { activationCount: 1, preventedDamage: beforeCloak - damage }, true);
+      const shield = this.add.ellipse(this.hero.hurtbox.x, this.hero.hurtbox.y, 56, 72, 0x253b39, .18).setStrokeStyle(3, 0x819d96, .78).setDepth(DEPTH.melee);
+      this.tweens.add({ targets: shield, scaleX: 1.25, scaleY: 1.25, alpha: 0, duration: 260, onComplete: () => shield.destroy() });
+    }
     const dealt = this.hero.takeDamage(damage, sourceX, sourceY); if (dealt <= 0) return;
     this.lastHitAt = performance.now();
     this.damageTaken += dealt; this.combatStats.damageTaken(source, dealt); this.services.audio.play('hurt'); this.cameraKick(0.006, 110); this.showDamageVignette(dealt);
@@ -1791,7 +2066,9 @@ export class GameScene extends Phaser.Scene {
 
   private gainWordHitSentence(amount: number): void {
     const bonus = sealedSentenceStats(this.upgrades.getStack('sealed-sentence')).wordHitSentenceBonus;
-    this.gainSentence(amount * (1 + bonus));
+    const bonusGain = amount * bonus;
+    this.gainSentence(amount + bonusGain);
+    if (bonusGain > 0) this.recordUpgradeContribution('sealed-sentence', { activationCount: 0, sentence: bonusGain });
   }
 
   private elapsedSeconds(): number { return Math.max(0, (this.time.now - this.startTime) / 1000); }
@@ -1809,7 +2086,8 @@ export class GameScene extends Phaser.Scene {
 
   private damageNumber(x: number, y: number, amount: number, color: number, shared = false, prefix = ''): void {
     const text = this.add.text(x, y, `${prefix}${Math.round(amount)}`, { fontFamily: 'Malgun Gothic, sans-serif', fontSize: amount >= 40 ? '18px' : shared ? '12px' : '14px', fontStyle: shared ? 'italic' : 'normal', color: `#${color.toString(16).padStart(6, '0')}`, stroke: shared ? '#123631' : '#071012', strokeThickness: 4 }).setOrigin(0.5).setDepth(DEPTH.combatText);
-    this.tweens.add({ targets: text, y: y - 28, alpha: 0, duration: this.services.save.settings.reducedMotion ? 280 : 520, onComplete: () => text.destroy() });
+    this.transientCombatObjects.add(text);
+    this.tweens.add({ targets: text, y: y - 28, alpha: 0, duration: this.services.save.settings.reducedMotion ? 280 : 520, onComplete: () => { this.transientCombatObjects.delete(text); text.destroy(); } });
   }
 
   private showDamageVignette(damage: number): void {
@@ -1830,7 +2108,8 @@ export class GameScene extends Phaser.Scene {
 
   private showWordTypography(word: string, x: number, y: number, boss = false): void {
     const text = this.add.text(x, y, word, { fontFamily: 'Malgun Gothic, serif', fontSize: boss ? '34px' : '25px', color: boss ? '#e6c79d' : '#a9f5e6', stroke: '#071012', strokeThickness: 7 }).setOrigin(0.5).setDepth(DEPTH.combatText).setAlpha(0).setScale(0.75);
-    this.tweens.add({ targets: text, alpha: 1, scale: 1, y: y - 14, duration: 190, hold: boss ? 720 : 350, yoyo: true, onComplete: () => text.destroy() });
+    this.transientCombatObjects.add(text);
+    this.tweens.add({ targets: text, alpha: 1, scale: 1, y: y - 14, duration: 190, hold: boss ? 720 : 350, yoyo: true, onComplete: () => { this.transientCombatObjects.delete(text); text.destroy(); } });
   }
 
   private cameraKick(intensity: number, duration: number): void {
@@ -1840,7 +2119,72 @@ export class GameScene extends Phaser.Scene {
 
   private showCombatLabel(x: number, y: number, label: string, color = 0x9fe9dc): void {
     const text = this.add.text(x, y, label, { fontFamily: 'Malgun Gothic, sans-serif', fontSize: '12px', fontStyle: 'bold', color: `#${color.toString(16).padStart(6, '0')}`, stroke: '#061012', strokeThickness: 4 }).setOrigin(0.5).setDepth(DEPTH.combatText);
-    this.tweens.add({ targets: text, y: y - 18, alpha: 0, duration: this.services.save.settings.reducedMotion ? 260 : 460, onComplete: () => text.destroy() });
+    this.transientCombatObjects.add(text);
+    this.tweens.add({ targets: text, y: y - 18, alpha: 0, duration: this.services.save.settings.reducedMotion ? 260 : 460, onComplete: () => { this.transientCombatObjects.delete(text); text.destroy(); } });
+  }
+
+  private clearTransientCombatObjects(): void {
+    for (const object of this.transientCombatObjects) {
+      this.tweens.killTweensOf(object);
+      if (object.active) object.destroy();
+    }
+    this.transientCombatObjects.clear();
+  }
+
+  private recordUpgradeContribution(id: UpgradeId, values: Partial<{
+    activationCount: number; damage: number; healing: number; sentence: number; cooldownMs: number; generated: number;
+    reflectedProjectiles: number; affectedTargets: number; preventedDamage: number; failedConditions: number; hits: number; misses: number; exclusiveDamage: boolean;
+  }> = {}, showName = false): void {
+    const contribution = {
+      activationCount: values.activationCount ?? 0,
+      damageContribution: values.damage,
+      healingContribution: values.healing,
+      resourceContribution: values.sentence,
+      cooldownReductionContribution: values.cooldownMs,
+      reflectedProjectileCount: values.reflectedProjectiles,
+      affectedTargetCount: values.affectedTargets,
+      preventedDamage: values.preventedDamage,
+      failedConditionCount: values.failedConditions,
+      generatedCount: values.generated,
+      hitCount: values.hits,
+      missCount: values.misses,
+    };
+    this.upgrades.record(id, contribution);
+    this.combatStats.upgradeContribution(id, contribution);
+    if (values.exclusiveDamage && (values.damage ?? 0) > 0) this.combatStats.attributedUpgradeDamage(values.damage ?? 0);
+    this.lastActivatedUpgrade = id; this.lastActivatedUpgradeUntil = this.time.now + 1500;
+    if (!showName) return;
+    const last = this.lastUpgradeToastAt.get(id) ?? Number.NEGATIVE_INFINITY;
+    if (this.time.now - last < 900) return;
+    this.lastUpgradeToastAt.set(id, this.time.now);
+    const definition = upgradeById(id); if (definition) this.showCombatLabel(this.hero.x, this.hero.y - 70, `${definition.icon.glyph} ${definition.name}`, Number.parseInt(definition.icon.color.slice(1), 16));
+  }
+
+  private recordResonanceContribution(id: ResonanceId, values: Partial<{
+    activationCount: number; damage: number; healing: number; sentence: number; cooldownMs: number; reflectedProjectiles: number;
+    affectedTargets: number; preventedDamage: number; failedConditions: number; generated: number; hits: number; misses: number; exclusiveDamage: boolean;
+  }> = {}): void {
+    const contribution = {
+      activationCount: values.activationCount ?? 0,
+      damageContribution: values.damage,
+      healingContribution: values.healing,
+      resourceContribution: values.sentence,
+      cooldownReductionContribution: values.cooldownMs,
+      reflectedProjectileCount: values.reflectedProjectiles,
+      affectedTargetCount: values.affectedTargets,
+      preventedDamage: values.preventedDamage,
+      failedConditionCount: values.failedConditions,
+      generatedCount: values.generated,
+      hitCount: values.hits,
+      missCount: values.misses,
+    };
+    this.upgrades.recordResonance(id, contribution);
+    this.combatStats.resonanceContribution(id, contribution);
+    if (values.exclusiveDamage && (values.damage ?? 0) > 0) this.combatStats.attributedUpgradeDamage(values.damage ?? 0);
+    if ((values.activationCount ?? 0) <= 0) return;
+    this.lastActivatedResonance = id; this.lastActivatedResonanceUntil = this.time.now + 1800;
+    const resonance = resonanceById(id);
+    if (resonance) this.services.ui.showChainTrigger(`공명 · ${resonance.name}`, 720);
   }
 
   private startWatchdog(): void {
@@ -1940,6 +2284,8 @@ export class GameScene extends Phaser.Scene {
     }
     if (this.debugStatsText && this.debugStatsVisible) {
       const stats = this.combatStats.snapshot();
+      const audio = this.services.audio.diagnostics();
+      const progress = this.runProgress.snapshot();
       const diagnostic = this.diagnosticSnapshot() as {
         flow: string; sceneActive: boolean; scenePaused: boolean; phaserTimeScale: number; physicsPaused: boolean;
         physicsTimeScale: number; tweenTimeScale: number; animationTimeScale: number; activePauseTokens: readonly string[];
@@ -1958,6 +2304,8 @@ export class GameScene extends Phaser.Scene {
         `적 ${diagnostic.enemies} · 탄환 ${diagnostic.projectiles} · 파티클 ${diagnostic.particles} · 타이머 ${diagnostic.timers}`,
         `Wave ${diagnostic.wave.waveState} · spawn ${diagnostic.wave.spawnSequenceComplete ? 'DONE' : 'WAIT'} · pending ${diagnostic.wave.pendingSpawnCount}`,
         `Run ${diagnostic.run.runId} · Boss ${diagnostic.run.boss.active ? `${diagnostic.run.boss.id} P${diagnostic.run.boss.phase}` : 'none'} · stale callbacks ${diagnostic.run.staleCallbacksBlocked}`,
+        `Act ${progress.act.actNumber} · Wave ${progress.act.waveIndex + 1} · generation ${progress.act.generation} · stale act callbacks ${progress.staleScopeCallbacksBlocked}`,
+        `Audio ${audio.contextState} · M/SFX/UI/C ${audio.master.toFixed(2)}/${audio.effects.toFixed(2)}/${audio.ui.toFixed(2)}/${audio.combat.toFixed(2)} · voices ${audio.activeVoices}`,
         `Living ${diagnostic.wave.livingEnemyIds.length} [${diagnostic.wave.livingEnemyIds.join(', ')}]`,
         `Round ${diagnostic.wave.lastRoundEvaluation} · 전환 ${diagnostic.wave.transitionCount}`,
         `마지막 사망 ${diagnostic.wave.lastDeathEvent?.source ?? '-'} · 결과 ${diagnostic.outcome.outcome ?? '-'} x${diagnostic.outcome.resultTransitions}`,
@@ -1977,6 +2325,8 @@ export class GameScene extends Phaser.Scene {
         `피해 J ${stats.agency.damage.basicJ.toFixed(0)}+${stats.agency.damage.enhancedJ.toFixed(0)} · Q/E/R ${stats.agency.damage.stop.toFixed(0)}/${stats.agency.damage.rewind.toFixed(0)}/${stats.agency.damage.link.toFixed(0)} · 자동 ${stats.agency.damage.automatic.toFixed(0)}`,
         `자동 타깃 없음 · 절단 방향 ${this.hero.attackDirection.x.toFixed(2)},${this.hero.attackDirection.y.toFixed(2)} · 쿨다운 ${(this.weaponCooldowns.cutRemaining(time) / 1000).toFixed(2)}s`,
         `봉인된 문장 ${this.upgrades.getStack('sealed-sentence')}/3 · CD -${(sealedSentenceStats(this.upgrades.getStack('sealed-sentence')).cooldownReduction * 100).toFixed(0)}% · 언령 문장 +${(sealedSentenceStats(this.upgrades.getStack('sealed-sentence')).wordHitSentenceBonus * 100).toFixed(0)}%`,
+        `공명 ${this.upgrades.activeResonances().map((id) => resonanceById(id)?.name ?? id).join(', ') || '없음'}`,
+        `카드 ${this.upgrades.entries().map(({ id, stacks }) => `${upgradeById(id)?.name ?? id}×${stacks}:${this.upgrades.runtimeSnapshot().contributions[id]?.activationCount ?? 0}`).join(' · ') || '없음'}`,
       ]).setVisible(true);
     }
   }
@@ -1984,17 +2334,24 @@ export class GameScene extends Phaser.Scene {
   private showDebugScenarioMenu(): void {
     if (!import.meta.env.DEV || this.debugScenarioText?.visible || this.flow.baseState !== 'COMBAT') return;
     this.timeControl.acquire('SCENE_TRANSITION', 'debug-menu'); this.clearCombatInput(); this.inputRouter.setContext('DEVELOPMENT');
-    this.debugScenarioText = this.add.text(480, 270, '', { fontFamily: 'Malgun Gothic, Consolas, monospace', fontSize: '15px', color: '#dcebe7', backgroundColor: '#041012f2', padding: { x: 28, y: 22 }, lineSpacing: 7, align: 'left' }).setOrigin(0.5).setDepth(DEPTH.debug);
+    this.debugScenarioText = this.add.text(480, 270, '', { fontFamily: 'Malgun Gothic, Consolas, monospace', fontSize: '13px', color: '#dcebe7', backgroundColor: '#041012f2', padding: { x: 22, y: 14 }, lineSpacing: 4, align: 'left' }).setOrigin(0.5).setDepth(DEPTH.debug);
     this.renderDebugScenarioMenu();
   }
 
   private renderDebugScenarioMenu(): void {
     const items = this.debugScenarioItems();
-    this.debugScenarioText?.setText(['F4 STABILITY / COMBAT FOUNDATION', '', ...items.map((item, index) => `${index === this.debugScenarioIndex ? '▶' : ' '} ${item}`), '', 'W/S 또는 ↑/↓ · Enter 실행 · Esc/K 닫기']);
+    this.debugScenarioText?.setText(['F4 STABILITY / UPGRADE LAB', '', ...items.map((item, index) => `${index === this.debugScenarioIndex ? '▶' : ' '} ${item}`), '', 'W/S 또는 ↑/↓ · Enter 실행 · Esc/K 닫기']);
   }
 
   private debugScenarioItems(): readonly string[] {
-    return ['A · 8방향 공격', 'B · 가까운 적 우선', 'C · 콤보 대상 고정', 'D · J 누르고 있기', 'E · 상단 경계 적', 'F · 보스 겹침', 'G · Telegraph', 'H · 8방향 패링 탄환', 'I · 위/아래 근접 패링', 'J · 패링 불가 장판', 'K · 10분/20회 안정성 시뮬레이션', 'L · stale enemy 소프트락 복구', 'M · J 결문 베기 표적'];
+    return [
+      'A · 8방향 공격', 'B · 가까운 적 우선', 'C · 콤보 대상 고정', 'D · J 누르고 있기',
+      'E · 상단 경계 적', 'F · 보스 겹침', 'G · Telegraph', 'H · 8방향 패링 탄환',
+      'I · 위/아래 근접 패링', 'J · 패링 불가 장판', 'K · 10분/20회 안정성 시뮬레이션',
+      'L · stale enemy 소프트락 복구', 'M · J 절단 표적',
+      'N · 잔향 빌드 + 월환 공명', 'O · 절단·패링 빌드 + 반격 절문',
+      'P · 언령 빌드 + 회귀 사슬', 'Q · 시간 역조 공명', 'R · 오디오 버스 진단', 'S · 카드 기여 통계 초기화',
+    ];
   }
 
   private closeDebugScenarioMenu(): void {
@@ -2030,7 +2387,61 @@ export class GameScene extends Phaser.Scene {
       const stale = this.spawnEnemy('chaser', this.hero.x + 120, this.hero.y, true);
       this.waveDirector.registerSpawn(stale.id, performance.now()); stale.destroy();
       console.warn('[STABILITY-01R intentional stale enemy]', { id: stale.id, director: this.waveDirector.snapshot() });
-    } else { this.spawnEnemy('chaser', this.hero.x + 72, this.hero.y); this.gainFinisherCharge('qa', this.finisherCharges.maxCharges); }
+    } else if (index === 12) {
+      this.spawnEnemy('chaser', this.hero.x + 72, this.hero.y); this.gainFinisherCharge('qa', this.finisherCharges.maxCharges);
+    } else if (index === 13) {
+      this.debugResetUpgradeBuild();
+      this.debugGrantUpgrades([['dual-moon-echo', 1], ['wide-orbit', 2], ['backflow-blade', 1]]);
+      this.spawnEnemy('chaser', this.hero.x + 70, this.hero.y); this.spawnEnemy('archer', this.hero.x - 82, this.hero.y + 18); this.spawnEnemy('ink', this.hero.x, this.hero.y - 78);
+      this.showWordTypography('잔향 빌드 · 월환 공명', 480, 154, true);
+    } else if (index === 14) {
+      this.debugResetUpgradeBuild();
+      this.debugGrantUpgrades([['cut-sentence', 2], ['perfect-counter', 1], ['counter-inscription', 2]]);
+      const target = this.spawnEnemy('elite', this.hero.x + 78, this.hero.y); target.freeze(this.time.now + 60000, false);
+      this.runDelayedCall(750, () => { if (!target.active) return; const projectile = new Projectile(this, this.hero.x + 122, this.hero.y, Math.PI, 95, 8, 'projectile-ink', target.id); this.projectiles.add(projectile); });
+      this.showWordTypography('절단·패링 · 반격 절문', 480, 154, true);
+    } else if (index === 15) {
+      this.debugResetUpgradeBuild();
+      this.debugGrantUpgrades([['returning-scar', 2], ['isolation-chain', 2], ['chain-breath', 2], ['rewind-breath', 1]]);
+      const isolated = this.spawnEnemy('elite', this.hero.x + 84, this.hero.y); isolated.linked = true; isolated.linkedUntil = this.time.now + 60000; isolated.setData('linkContagionGeneration', 0); this.linkedTargets.add(isolated);
+      this.spawnEnemy('chaser', this.hero.x - 92, this.hero.y + 24);
+      this.showWordTypography('언령 빌드 · 회귀 사슬', 480, 154, true);
+    } else if (index === 16) {
+      this.debugResetUpgradeBuild();
+      this.debugGrantUpgrades([['backflow-blade', 1], ['stop-resonance', 2]]);
+      // Short laboratory stop keeps projectiles inside their 5.5s lifetime and
+      // lets the resonance, rather than expiry, own the transition.
+      const token = this.time.now + 1800;
+      const stopped = this.spawnEnemy('archer', this.hero.x + 160, this.hero.y); stopped.freeze(token, false);
+      for (let direction = 0; direction < 4; direction += 1) {
+        const angle = direction * Math.PI / 2; const projectile = new Projectile(this, this.hero.x + Math.cos(angle) * 130, this.hero.y + Math.sin(angle) * 130, angle + Math.PI, 0, 8, 'projectile-ink', stopped.id);
+        projectile.setData('stopWordToken', token); projectile.freeze(token); this.projectiles.add(projectile);
+      }
+      this.runDelayedCall(1810, () => this.applyStopEndEffects([stopped.id], token));
+      this.showWordTypography('시간 역조 공명', 480, 154, true);
+    } else if (index === 17) {
+      this.services.audio.playDiagnostic('ui');
+      this.runTimeout(180, () => this.services.audio.playDiagnostic('combat'));
+      this.runTimeout(380, () => this.services.audio.playDiagnostic('damageRegression'));
+      const audio = this.services.audio.diagnostics();
+      this.showWordTypography(`오디오 M${Math.round(audio.master * 100)} SFX${Math.round(audio.effects * 100)} C${Math.round(audio.combat * 100)}`, 480, 154, true);
+    } else {
+      this.upgrades.resetRuntimeMetrics(); this.combatStats.resetUpgradeContributions(); this.resonanceRuntime.reset();
+      this.showWordTypography('카드 기여 통계 초기화', 480, 154, true);
+    }
+  }
+
+  private debugGrantUpgrades(entries: ReadonlyArray<readonly [UpgradeId, number]>): void {
+    for (const [id, targetStacks] of entries) while (this.upgrades.getStack(id) < targetStacks && this.upgrades.add(id)) { /* stack to target */ }
+  }
+
+  private debugResetUpgradeBuild(): void {
+    this.upgrades = new UpgradeSystem();
+    this.resonanceRuntime.reset();
+    this.combatStats.resetUpgradeContributions();
+    this.lastUpgradeToastAt.clear();
+    this.lastActivatedUpgrade = undefined;
+    this.lastActivatedUpgradeUntil = 0;
   }
 
   private debugClearEnemies(): void {
@@ -2130,8 +2541,9 @@ export class GameScene extends Phaser.Scene {
       echoBladeInterval: this.currentEchoBladeProfile().interval / 1000,
       echoBladeOrbitCount: this.currentEchoBladeProfile().orbitCount,
       upgrades: this.upgrades.entries().map(({ id, stacks }) => {
-        const definition = upgradeById(id); return { name: definition?.name ?? id, stacks, effect: definition ? upgradeDescription(definition, stacks) : '' };
+        const definition = upgradeById(id); return { id, name: definition?.name ?? id, stacks, effect: definition ? upgradeDescription(definition, stacks) : '', icon: definition?.icon.glyph ?? '言', color: definition?.icon.color ?? '#89d8c8', active: this.lastActivatedUpgrade === id && time <= this.lastActivatedUpgradeUntil };
       }),
+      resonances: this.upgrades.activeResonances().map((id) => { const resonance = resonanceById(id); return { name: resonance?.name ?? id, icon: resonance?.icon.glyph ?? '鳴', effect: resonance?.description ?? '', active: this.lastActivatedResonance === id && time <= this.lastActivatedResonanceUntil }; }),
       bossHealth: boss?.health, bossMaxHealth: boss?.maxHealth, bossPhase: boss?.phase,
       bossGuide: boss ? ['','멎는다 · 탄환을 멈춰 되받아쳐라','되돌린다 · 지연 공격을 역행하라','잇는다 · 소환체와 포식자를 이어라'][boss.phase] : undefined,
     });
@@ -2146,14 +2558,19 @@ export class GameScene extends Phaser.Scene {
     this.flow.setUserPaused(true, performance.now()); this.timeControl.acquire('USER_PAUSE', this.timeOwner); this.clearCombatInput(); this.syncInputContext();
     this.services.ui.showPause(() => {
       this.flow.setUserPaused(false, performance.now()); this.timeControl.release('USER_PAUSE', this.timeOwner); this.clearCombatInput(); this.syncInputContext();
-    }, () => { this.scene.stop(); this.scene.start('MenuScene'); }, this.upgrades.entries().map(({ id, stacks }) => {
-      const definition = upgradeById(id); return definition ? `${definition.name} ×${stacks} — ${upgradeDescription(definition, stacks)}` : id;
-    }));
+    }, () => { this.scene.stop(); this.scene.start('MenuScene'); }, [
+      ...this.upgrades.entries().map(({ id, stacks }) => {
+        const definition = upgradeById(id); const contribution = this.upgrades.runtimeSnapshot().contributions[id];
+        return definition ? `${definition.icon.glyph} ${definition.name} ×${stacks} — ${upgradeDescription(definition, stacks)} · 발동 ${contribution?.activationCount ?? 0} · 기여 피해 ${Math.round(contribution?.damageContribution ?? 0)} · 회복 ${Math.round(contribution?.healingContribution ?? 0)}` : id;
+      }),
+      ...this.upgrades.activeResonances().map((id) => { const resonance = resonanceById(id); return `공명 ${resonance?.icon.glyph ?? '鳴'} ${resonance?.name ?? id} — ${resonance?.description ?? ''}`; }),
+    ]);
   }
 
   private beginBossDefeated(defeatedBoss: Enemy): void {
     if (!this.runOutcome.claim('VICTORY')) return;
     if (!this.transitionFlow('BOSS_DEFEATED')) return;
+    this.clearTransientCombatObjects();
     this.combatStats.setBossPhaseTime(3, Math.max(0, (this.time.now - this.bossPhaseStartedAt) / 1000));
     this.combatStats.setEncounterTime('boss', Math.max(0, (this.time.now - this.encounterStartedAt) / 1000));
     this.timeControl.acquire('BOSS_DEFEATED', this.timeOwner);
@@ -2180,6 +2597,7 @@ export class GameScene extends Phaser.Scene {
     if (this.flow.baseState === 'RESULT') return;
     if (!this.transitionFlow('RESULT')) return;
     if (!this.runOutcome.consumeResultTransition(outcome)) return;
+    this.clearTransientCombatObjects();
     this.runSession.clearBoss(this.runId, victory);
     this.combatStats.resultTransition();
     this.timeControl.acquire('RESULT', this.timeOwner); this.hero.controlsLocked = true;
@@ -2198,7 +2616,7 @@ export class GameScene extends Phaser.Scene {
     const progressLabel = ['기록 없음', '제1전투', '제2전투', '제3전투', '보스 제1형', '보스 제2형', '보스 제3형', '클리어'][progressStage] ?? '잔향의 방';
     this.combatStats.setUpgrades(this.upgrades.entries());
     const details = this.combatStats.snapshot(); const chainSuccesses = Object.values(details.chainCounts).reduce((sum, value) => sum + value, 0);
-    const stats: ResultStats = { victory, score: this.score, time: elapsed, damageTaken: this.damageTaken, parries: this.parries, wordUses: { ...this.wordUses }, upgrades: this.upgrades.summary(), rank, progressStage, progressLabel, previousBest, scoreDelta: this.score - previousBest, newBest, milestones, empowerUses: details.empowerUses, chainSuccesses, details };
+    const stats: ResultStats = { victory, score: this.score, time: elapsed, damageTaken: this.damageTaken, parries: this.parries, wordUses: { ...this.wordUses }, upgrades: this.upgrades.summary(), rank, progressStage, progressLabel, previousBest, scoreDelta: this.score - previousBest, newBest, milestones, empowerUses: details.empowerUses, chainSuccesses, details, upgradeRuntime: this.upgrades.runtimeSnapshot() };
     this.runTimeout(500, () => {
       if (!this.sys.isActive() || this.flow.baseState !== 'RESULT') return;
       this.services.ui.showResult(stats, () => {
@@ -2231,6 +2649,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private cleanup(): void {
+    this.clearTransientCombatObjects();
     this.events.off(Phaser.Scenes.Events.POST_UPDATE, this.handlePostPhysicsUpdate, this);
     this.input.off(Phaser.Input.Events.POINTER_DOWN, this.pointerHandler);
     this.keys.j.off(Phaser.Input.Keyboard.Events.DOWN, this.attackKeyDownHandler);

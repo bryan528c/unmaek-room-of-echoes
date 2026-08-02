@@ -1,11 +1,47 @@
-import { upgradeById, upgradeDescription, type UpgradeDefinition, type UpgradeId } from '../game/data/upgrades';
+import { RESONANCES, resonanceById, upgradeById, upgradeDescription, type UpgradeDefinition, type UpgradeId } from '../game/data/upgrades';
 import type { AudioSystem } from '../game/systems/AudioSystem';
 import type { GameSave } from '../game/systems/SaveSystem';
 import type { ControlMode } from '../game/systems/SaveSystem';
 import type { WordId } from '../game/systems/WordChainSystem';
 import type { CombatStatsSnapshot } from '../game/systems/CombatStats';
-import type { UpgradeChoicePreview } from '../game/systems/UpgradeSystem';
+import type { UpgradeChoicePreview, UpgradeRuntimeSnapshot } from '../game/systems/UpgradeSystem';
 import { isRewardSelectionKey } from '../game/systems/RewardInputPolicy';
+
+const CATEGORY_LABELS: Readonly<Record<string, string>> = {
+  'echo-blade': '잔향 칼날', 'cut-parry': '절단·패링', word: '언령', survival: '생존', generic: '범용',
+};
+const TAG_LABELS: Readonly<Record<string, string>> = {
+  weapon: '무기', 'echo-blade': '잔향', orbit: '궤도', projectile: '탄환', cut: '절단', parry: '패링', mark: '표식',
+  word: '언령', chain: '연계', resource: '자원', stop: '멎는다', pulse: '공명파', rewind: '되돌림', link: '연결',
+  isolation: '고립', spread: '전염', survival: '생존', empower: '강화', dash: '대시', recovery: '회복', generic: '범용',
+  wave: '파동', counter: '반격', healing: '회복', 'first-hit': '첫 피격', cooldown: '재사용', blade: '칼날', target: '표적',
+};
+const CHAIN_DETAILS: Readonly<Record<string, { name: string; effect: string }>> = {
+  'link-stop': { name: '연쇄 정지', effect: '연결 대상 정지 · 추가 파동 피해' },
+  'stop-rewind': { name: '역류', effect: '탄환 역행 · 없으면 정지 대상 최소 피해' },
+  'link-rewind': { name: '피해 회귀', effect: '최근 직접 피해 재적용 · 최소 회귀 보장' },
+};
+
+type ContributionLike = Readonly<Record<string, unknown>>;
+const metric = (source: unknown, ...keys: readonly string[]): number => {
+  if (!source || typeof source !== 'object') return 0;
+  const record = source as ContributionLike;
+  for (const key of keys) if (typeof record[key] === 'number' && Number.isFinite(record[key])) return Math.max(0, record[key] as number);
+  return 0;
+};
+const contributionSummary = (source: unknown): string => {
+  const activation = metric(source, 'activationCount', 'activations', 'triggers');
+  const damage = metric(source, 'damageContribution', 'damage');
+  const healing = metric(source, 'healingContribution', 'healing');
+  const resource = metric(source, 'resourceContribution', 'resource', 'sentence');
+  const cooldown = metric(source, 'cooldownReductionContribution', 'cooldownMs');
+  const reflected = metric(source, 'reflectedProjectileCount', 'reflectedProjectiles');
+  const affected = metric(source, 'affectedTargetCount', 'affectedTargets');
+  const prevented = metric(source, 'preventedDamage');
+  const failed = metric(source, 'failedConditionCount', 'failedConditions');
+  const generated = metric(source, 'generated', 'extraAttackCount');
+  return [`발동 ${activation}회`, damage > 0 ? `피해 ${Math.round(damage)}` : '', healing > 0 ? `회복 ${Math.round(healing)}` : '', prevented > 0 ? `방어 ${Math.round(prevented)}` : '', resource > 0 ? `문장력 ${Math.round(resource)}` : '', cooldown > 0 ? `쿨다운 ${(cooldown / 1000).toFixed(1)}초` : '', reflected > 0 ? `반사 ${reflected}` : '', affected > 0 ? `대상 ${affected}` : '', generated > 0 ? `생성 ${generated}` : '', failed > 0 ? `조건 실패 ${failed}` : ''].filter(Boolean).join(' · ');
+};
 
 export interface HudState {
   health: number;
@@ -32,7 +68,8 @@ export interface HudState {
   echoBladeRange: number;
   echoBladeInterval: number;
   echoBladeOrbitCount: number;
-  upgrades: readonly { name: string; stacks: number; effect: string }[];
+  upgrades: readonly { id: UpgradeId; name: string; stacks: number; effect: string; icon: string; color: string; active: boolean }[];
+  resonances: readonly { name: string; icon: string; effect: string; active?: boolean }[];
   bossHealth?: number;
   bossMaxHealth?: number;
   bossPhase?: number;
@@ -57,6 +94,7 @@ export interface ResultStats {
   empowerUses?: number;
   chainSuccesses?: number;
   details?: CombatStatsSnapshot;
+  upgradeRuntime?: UpgradeRuntimeSnapshot;
 }
 
 export interface RewardChoiceOptions {
@@ -171,6 +209,7 @@ export class OverlayUI {
   private showSettings(back: () => void): void {
     this.clear();
     const current = this.save.settings;
+    const diagnostics = this.audio.diagnostics();
     const screen = document.createElement('section');
     screen.className = 'screen parchment-panel';
     screen.innerHTML = `<div class="panel-content"><p class="eyebrow">기록실 환경</p><h2>설정</h2>
@@ -184,6 +223,7 @@ export class OverlayUI {
       <label class="toggle-row"><input data-setting="reducedMotion" type="checkbox" ${current.reducedMotion ? 'checked' : ''} /><span>감소된 모션</span></label>
       <label class="toggle-row"><input data-setting="showTutorial" type="checkbox" ${current.showTutorial ? 'checked' : ''} /><span>튜토리얼 다시 보기</span></label>
       <label class="toggle-row"><input data-setting="holdCutRepeat" type="checkbox" ${current.holdCutRepeat ? 'checked' : ''} /><span>접근성: J 유지 시 절단 반복</span></label>
+      ${import.meta.env.DEV ? `<div class="audio-diagnostics"><b>오디오 진단</b><output data-audio-diagnostics>${diagnostics.contextState} · M ${Math.round(diagnostics.master * 100)} · SFX ${Math.round(diagnostics.effects * 100)} · UI ${Math.round(diagnostics.ui * 100)} · 전투 ${Math.round(diagnostics.combat * 100)} · 음악 ${Math.round(diagnostics.music * 100)} · 음성 ${diagnostics.activeVoices}</output><div><button data-audio-bus="ui">UI</button><button data-audio-bus="combat">전투</button><button data-audio-bus="music">음악</button><button data-audio-sound="damageRegression">공명</button></div></div>` : ''}
       <div class="panel-buttons"><button class="rune-button" data-action="audio-test">전투 음량 시험</button><button class="rune-button" data-action="mute">${this.audio.isMuted ? '음소거 해제' : '즉시 음소거'}</button><button class="rune-button primary" data-action="back">저장하고 돌아가기</button></div></div>`;
     this.root.append(screen);
     screen.querySelectorAll<HTMLButtonElement>('[data-control]').forEach((button) => {
@@ -207,7 +247,14 @@ export class OverlayUI {
     screen.querySelector('[data-action="mute"]')?.addEventListener('click', (event) => {
       const muted = this.audio.toggleMute(); (event.currentTarget as HTMLButtonElement).textContent = muted ? '음소거 해제' : '즉시 음소거';
     });
-    screen.querySelector('[data-action="audio-test"]')?.addEventListener('click', () => { this.audio.unlock(); this.audio.play('parry'); window.setTimeout(() => this.audio.play('finisher'), 180); });
+    const refreshAudioDiagnostics = (): void => {
+      const output = screen.querySelector<HTMLOutputElement>('[data-audio-diagnostics]'); if (!output) return;
+      const state = this.audio.diagnostics();
+      output.textContent = `${state.contextState} · M ${Math.round(state.master * 100)} · SFX ${Math.round(state.effects * 100)} · UI ${Math.round(state.ui * 100)} · 전투 ${Math.round(state.combat * 100)} · 음악 ${Math.round(state.music * 100)} · 음성 ${state.activeVoices}`;
+    };
+    screen.querySelectorAll<HTMLButtonElement>('[data-audio-bus]').forEach((button) => button.addEventListener('click', () => { this.audio.playDiagnostic(button.dataset.audioBus as 'ui' | 'combat' | 'music'); refreshAudioDiagnostics(); }));
+    screen.querySelectorAll<HTMLButtonElement>('[data-audio-sound]').forEach((button) => button.addEventListener('click', () => { this.audio.playDiagnostic('damageRegression'); refreshAudioDiagnostics(); }));
+    screen.querySelector('[data-action="audio-test"]')?.addEventListener('click', () => { this.audio.unlock(); this.audio.play('parry'); window.setTimeout(() => { this.audio.play('finisher'); refreshAudioDiagnostics(); }, 180); });
     screen.querySelector('[data-action="back"]')?.addEventListener('click', () => { this.persist(); back(); }, { once: true });
     this.bindKeyboardNavigation(screen, 'button', () => { this.persist(); back(); });
   }
@@ -290,8 +337,8 @@ export class OverlayUI {
     if (chainStatus && state.chainOpener && (state.chainRemaining ?? 0) > 0) {
       chainStatus.classList.remove('hidden');
       chainStatus.style.setProperty('--chain-progress', `${Math.max(0, Math.min(1, state.chainProgress ?? 0)) * 360}deg`);
-      const chainNames: Record<string, string> = { 'link-stop': '연쇄 정지', 'stop-rewind': '역류', 'link-rewind': '피해 회귀' };
-      chainStatus.innerHTML = `<span>${wordNames[state.chainOpener]} 이후</span><b>${chainNext.map((word) => `${wordKeys[word]} ${wordNames[word]} · ${chainNames[`${state.chainOpener}-${word}`] ?? ''}`).join(' / ')}</b><i>${(state.chainRemaining ?? 0).toFixed(1)}s</i>`;
+      const nextDescriptions = chainNext.map((word) => ({ word, detail: CHAIN_DETAILS[`${state.chainOpener}-${word}`] }));
+      chainStatus.innerHTML = `<span>${wordNames[state.chainOpener]} 이후</span><b>${nextDescriptions.map(({ word, detail }) => `${wordKeys[word]} ${wordNames[word]} · ${detail?.name ?? ''}`).join(' / ')}</b><i>${(state.chainRemaining ?? 0).toFixed(1)}s</i><small>${nextDescriptions.map(({ detail }) => detail?.effect ?? '').filter(Boolean).join(' / ')}</small>`;
     } else chainStatus?.classList.add('hidden');
     const empower = this.hud.querySelector<HTMLElement>('[data-empower]');
     if (empower) { empower.classList.toggle('ready', state.sentence >= state.sentenceMax || state.empowered); empower.classList.toggle('armed', state.empowered); empower.innerHTML = state.empowered ? '<kbd>F</kbd> 다음 언령 강화됨' : '<kbd>F</kbd> 강화 용언'; }
@@ -305,7 +352,7 @@ export class OverlayUI {
     const owned = this.hud.querySelector<HTMLElement>('[data-owned-upgrades]');
     if (owned) {
       owned.classList.toggle('hidden', state.upgrades.length === 0);
-      owned.innerHTML = state.upgrades.map((upgrade) => `<span title="${upgrade.effect}">${upgrade.name}<b>×${upgrade.stacks}</b></span>`).join('');
+      owned.innerHTML = `${state.upgrades.map((upgrade) => `<span class="${upgrade.active ? 'proc' : ''}" title="${upgrade.effect}" style="--upgrade-color:${upgrade.color}"><i>${upgrade.icon}</i>${upgrade.name}<b>×${upgrade.stacks}</b></span>`).join('')}${state.resonances.map((resonance) => `<span class="resonance ${resonance.active ? 'proc' : ''}" title="${resonance.effect}"><i>${resonance.icon}</i>${resonance.name}</span>`).join('')}`;
     }
   }
 
@@ -335,7 +382,11 @@ export class OverlayUI {
     modal.className = 'modal upgrade-modal revealing';
     modal.innerHTML = `<div class="modal-scrim"></div><div class="upgrade-box"><p class="eyebrow">새 문장이 새겨진다</p><h2>강화 선택</h2><div class="upgrade-grid">${choices.map((choice, index) => {
       const preview = options?.previewChoice?.(choice.id); const stackMode = choice.stackMode === 'additive' ? '가산 중첩' : '고유 효과';
-      return `<button class="upgrade-card rarity-${choice.rarity}" data-id="${choice.id}"><span>0${index + 1}</span><em>${choice.rarity} · ${choice.tag}</em><h3>${choice.name} ${preview ? `${preview.currentStacks}/${choice.maxStacks}` : ''}</h3><p>${preview ? `<b>현재</b> ${preview.currentDescription}<br><b>선택 후</b> ${preview.nextDescription}` : choice.description}</p><small>${stackMode} · ${choice.relatedKey} · ${index + 1} 또는 방향키 + Enter</small></button>`;
+      const resonance = preview?.completesResonance.length
+        ? `<strong class="resonance-preview"><b>공명 완성</b><span>${preview.completesResonance.join(' / ')}</span></strong>`
+        : preview?.synergyPreview.length ? `<mark class="resonance-preview"><b>공명 가능</b><span>${preview.synergyPreview.join(' / ')}</span></mark>` : '';
+      const tags = (preview?.tags ?? choice.tags).slice(0, 4).map((tag) => `<i>${TAG_LABELS[tag] ?? tag}</i>`).join('');
+      return `<button class="upgrade-card rarity-${choice.rarity}" data-id="${choice.id}" style="--upgrade-color:${choice.icon.color}"><span>0${index + 1}</span><i class="upgrade-glyph">${choice.icon.glyph}</i><em>${choice.rarity} · ${CATEGORY_LABELS[choice.category] ?? choice.category}</em><div class="upgrade-tags">${tags}</div><h3>${choice.name}${preview ? `<b>${preview.currentStacks}/${choice.maxStacks}</b>` : ''}</h3><div class="effect-comparison">${preview ? `<p class="current-effect"><b>현재</b><span>${preview.currentDescription}</span></p><p class="next-effect"><b>선택 후</b><span>${preview.nextDescription}</span></p>` : `<p class="next-effect"><span>${choice.description}</span></p>`}</div>${resonance}<small>${stackMode} · ${choice.relatedKey} · ${index + 1} 또는 방향키 + Enter</small></button>`;
     }).join('')}</div><button class="reroll" data-reroll ${rerolls <= 0 ? 'disabled' : ''}><kbd>R</kbd> 다시 뽑기 · 남은 횟수 ${rerolls}</button><p class="reward-lock" data-reward-lock>기록을 펼치는 중…</p></div>`;
     this.root.append(modal);
     let ready = options === undefined;
@@ -409,16 +460,50 @@ export class OverlayUI {
     const screen = document.createElement('section'); screen.className = `screen result-screen ${stats.victory ? 'victory' : 'defeat'}`;
     const minutes = Math.floor(stats.time / 60); const seconds = Math.floor(stats.time % 60).toString().padStart(2, '0');
     const comparison = stats.previousBest > 0 ? `${stats.scoreDelta >= 0 ? '+' : ''}${stats.scoreDelta.toLocaleString()} 이전 최고 대비` : '첫 기록';
-    const upgradeDetails = stats.details?.upgrades.map(({ id, stacks }) => {
-      const definition = upgradeById(id); const contribution = stats.details?.upgradeContributions[id];
-      const contributionText = contribution ? ` · 발동 ${contribution.triggers}회 · 추가 피해 ${Math.round(contribution.damage)} · 문장력 ${Math.round(contribution.sentence)} · 쿨다운 ${(contribution.cooldownMs / 1000).toFixed(1)}초` : ' · 발동 0회';
-      return definition ? `${definition.name} ×${stacks}: ${upgradeDescription(definition, stacks)}${contributionText}` : `${id} ×${stacks}`;
-    }).join('<br>') ?? '';
+    const details = stats.details;
+    const runtime = stats.upgradeRuntime;
+    const owned = runtime?.owned ?? details?.upgrades ?? [];
+    const ownedIds = new Set(owned.map(({ id }) => id));
+    const activeResonanceIds = runtime?.resonances ?? RESONANCES.filter((resonance) => resonance.requiredUpgradeIds.every((id) => ownedIds.has(id))).map((resonance) => resonance.id);
+    const upgradeContribution = (id: UpgradeId): unknown => runtime?.contributions[id] ?? details?.upgradeContributions[id];
+    const resonanceContribution = (id: string): unknown => (runtime?.resonanceContributions as Partial<Record<string, unknown>> | undefined)?.[id]
+      ?? (details?.resonanceContributions as Partial<Record<string, unknown>> | undefined)?.[id];
+    const upgradeDetails = owned.map(({ id, stacks }) => {
+      const definition = upgradeById(id);
+      return `<span><b>${definition?.icon.glyph ?? '言'} ${definition?.name ?? id} ×${stacks}</b><small>${definition ? upgradeDescription(definition, stacks) : ''}</small><em>${contributionSummary(upgradeContribution(id))}</em></span>`;
+    }).join('');
+    const resonanceDetails = activeResonanceIds.map((id) => {
+      const definition = resonanceById(id);
+      return `<span class="resonance-row"><b>${definition?.icon.glyph ?? '鳴'} ${definition?.name ?? id}</b><small>${definition?.description ?? ''}</small><em>${contributionSummary(resonanceContribution(id))}</em></span>`;
+    }).join('');
+    const ranked = [
+      ...owned.map(({ id }) => ({ id, name: upgradeById(id)?.name ?? id, type: 'card' as const, item: upgradeContribution(id) })),
+      ...activeResonanceIds.map((id) => ({ id, name: resonanceById(id)?.name ?? id, type: 'resonance' as const, item: resonanceContribution(id) })),
+    ].map((entry) => ({ ...entry, score: metric(entry.item, 'damageContribution', 'damage') + metric(entry.item, 'healingContribution', 'healing') + metric(entry.item, 'preventedDamage') + metric(entry.item, 'resourceContribution', 'resource', 'sentence') * 2 + metric(entry.item, 'cooldownReductionContribution', 'cooldownMs') / 100 }))
+      .sort((a, b) => b.score - a.score).slice(0, 3);
+    const extended = details as (CombatStatsSnapshot & { damageAttribution?: ContributionLike; empoweredWordUses?: Partial<Record<WordId, number>> }) | undefined;
+    const explicitAttribution = extended?.damageAttribution;
+    const cardResonanceDamage = [...owned.map(({ id }) => upgradeContribution(id)), ...activeResonanceIds.map((id) => resonanceContribution(id))].reduce<number>((sum, item) => sum + metric(item, 'damageContribution', 'damage'), 0);
+    const attribution = {
+      echo: explicitAttribution ? metric(explicitAttribution, 'echoBlade', 'automatic') : details?.agency.damage.automatic ?? 0,
+      cut: explicitAttribution ? metric(explicitAttribution, 'cutParry', 'cut', 'manual') : (details?.agency.damage.basicJ ?? 0) + (details?.agency.damage.enhancedJ ?? 0),
+      word: explicitAttribution ? metric(explicitAttribution, 'word', 'words') : (details?.agency.damage.stop ?? 0) + (details?.agency.damage.rewind ?? 0) + (details?.agency.damage.link ?? 0) + (details?.agency.damage.chain ?? 0),
+      upgrade: explicitAttribution ? metric(explicitAttribution, 'upgradeResonance', 'cardResonance', 'upgrades') : cardResonanceDamage,
+    };
+    const totalAttribution = attribution.echo + attribution.cut + attribution.word + attribution.upgrade;
+    const ratio = (value: number): string => totalAttribution > 0 ? `${Math.round(value / totalAttribution * 100)}%` : '0%';
+    const chainCounts = details?.chainCounts;
+    const chainSummary = `연쇄 정지 ${chainCounts?.['chain-stop'] ?? 0} · 역류 ${chainCounts?.backflow ?? 0} · 피해 회귀 ${chainCounts?.['damage-regression'] ?? 0}`;
+    const empowerByWord = extended?.empoweredWordUses;
+    const empowerSummary = `Q ${empowerByWord?.stop ?? 0} · E ${empowerByWord?.rewind ?? 0} · R ${empowerByWord?.link ?? 0}`;
+    const topThree = ranked.length ? ranked.map((entry, index) => `<span><i>${index + 1}</i><b>${entry.type === 'resonance' ? '공명 · ' : ''}${entry.name}</b><small>${contributionSummary(entry.item)}</small></span>`).join('') : '<span><b>기여 기록 없음</b></span>';
     screen.innerHTML = `<div class="result-sigil">${stats.rank}</div><div class="result-content"><p class="eyebrow">${stats.victory ? '마지막 문장이 이어졌다' : '기록이 먹빛에 잠겼다'}</p><h2>${stats.victory ? '기록 회수 완료' : '계승 실패'}</h2><div class="score-big">${stats.score.toLocaleString()}${stats.newBest ? '<em>NEW BEST</em>' : ''}</div><div class="result-progress"><b>${stats.progressLabel}</b><span>${comparison}</span></div>
       <div class="result-stats"><span>플레이 시간<b>${minutes}:${seconds}</b></span><span>받은 피해<b>${Math.round(stats.damageTaken)}</b></span><span>패링 성공<b>${stats.parries}</b></span><span>전체 언령<b>${Object.values(stats.wordUses).reduce((sum, value) => sum + value, 0)}</b></span><span>언령 연쇄<b>${stats.chainSuccesses ?? 0}</b></span><span>강화 용언 F<b>${stats.empowerUses ?? 0}</b></span></div>
       ${stats.milestones.length ? `<div class="milestones">${stats.milestones.map((item) => `<span>${item}</span>`).join('')}</div>` : ''}
+      <div class="result-build-summary"><div><span>활성 공명</span><b>${activeResonanceIds.length ? activeResonanceIds.map((id) => resonanceById(id)?.name ?? id).join(' · ') : '없음'}</b></div><div><span>피해 비율</span><b>잔향 ${ratio(attribution.echo)} · 절단·패링 ${ratio(attribution.cut)} · 언령 ${ratio(attribution.word)} · 카드·공명 ${ratio(attribution.upgrade)}</b></div><div><span>언령 연계</span><b>${chainSummary}</b></div><div><span>F 강화 언령</span><b>${empowerSummary}</b></div></div>
+      <div class="result-top"><span>전투 기여 상위 3</span>${topThree}</div>
       <div class="upgrade-summary"><span>새겨진 강화</span><p>${stats.upgrades.length ? stats.upgrades.join(' · ') : '없음'}</p></div>
-      ${stats.details ? `<details class="result-details"><summary>개발 상세 통계</summary><p>잔향 칼날 ${stats.details.echoBlade.hits}/${stats.details.echoBlade.activations} · ${Math.round(stats.details.echoBlade.damage)} 피해 · 역류 탄환 ${stats.details.echoBlade.projectilesReflected}</p><p>J 절단 ${stats.details.cut.hits}/${stats.details.cut.uses} · ${Math.round(stats.details.cut.damage)} 피해 · 상태 절단 ${stats.details.cut.stopped + stats.details.cut.linked + stats.details.cut.echo + stats.details.cut.exposed} · 탄환 절단 ${stats.details.cut.projectilesCut}</p><p>완벽 패링 ${stats.details.perfectParries} · 유효하지 않은 언령 ${Object.values(stats.details.invalidWordUses).reduce((sum, value) => sum + value, 0)}</p><p>E 회복 ${Math.round(stats.details.rewindContribution.healthRecovered)} · 잔상 피해 ${Math.round(stats.details.rewindContribution.echoDamage)} · R 공유/고립/폭발 ${Math.round(stats.details.linkContribution.sharedDamage)}/${Math.round(stats.details.linkContribution.isolatedBonusDamage)}/${Math.round(stats.details.linkContribution.explosionDamage)}</p><p>경계 이탈 ${stats.details.enemiesOutsideBounds} · 예고 밖 피격 ${stats.details.telegraphOutsideHits}</p>${upgradeDetails ? `<p>${upgradeDetails}</p>` : ''}</details>` : ''}
+      ${details ? `<details class="result-details"><summary>강화·전투 상세</summary><p>잔향 칼날 ${details.echoBlade.hits}/${details.echoBlade.activations} · ${Math.round(details.echoBlade.damage)} 피해 · 역류 탄환 ${details.echoBlade.projectilesReflected}</p><p>J 절단 ${details.cut.hits}/${details.cut.uses} · ${Math.round(details.cut.damage)} 피해 · 상태 절단 ${details.cut.stopped + details.cut.linked + details.cut.echo + details.cut.exposed} · 탄환 절단 ${details.cut.projectilesCut}</p><p>완벽 패링 ${details.perfectParries} · E 회복/잔상 ${Math.round(details.rewindContribution.healthRecovered)}/${Math.round(details.rewindContribution.echoDamage)} · R 공유/고립/폭발 ${Math.round(details.linkContribution.sharedDamage)}/${Math.round(details.linkContribution.isolatedBonusDamage)}/${Math.round(details.linkContribution.explosionDamage)}</p><div class="result-contributions">${resonanceDetails}${upgradeDetails || '<span><b>보유 강화 없음</b></span>'}</div></details>` : ''}
       <div class="panel-buttons"><button class="rune-button primary" data-restart>다시 시작 <kbd>Enter</kbd></button><button class="rune-button" data-title>타이틀로</button></div></div>`;
     this.root.append(screen);
     const doRestart = (): void => restart();

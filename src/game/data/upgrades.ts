@@ -1,4 +1,10 @@
 export type UpgradeRarity = '일반' | '희귀' | '전설';
+export type UpgradeCategory = 'echo-blade' | 'cut-parry' | 'word' | 'survival' | 'generic';
+export type UpgradeStackMode = 'additive' | 'unique';
+export type UpgradeTriggerType =
+  | 'echo-hit' | 'cut-hit' | 'dash-cut' | 'parry' | 'perfect-parry'
+  | 'stop-end' | 'rewind' | 'link-death' | 'word-chain' | 'word-hit'
+  | 'empowered-word' | 'first-hit' | 'reflected-projectile';
 
 export type UpgradeId =
   | 'afterimage-slash' | 'dragon-fang' | 'broken-sentence' | 'regression-blade'
@@ -7,7 +13,16 @@ export type UpgradeId =
   | 'chain-breath' | 'stop-resonance' | 'backflow-shards' | 'regression-sword-shadow'
   | 'linked-counter' | 'unbroken-context' | 'dragon-rhythm' | 'echo-amplifier'
   | 'dual-moon-echo' | 'wide-orbit' | 'cut-sentence' | 'backflow-blade'
-  | 'returning-scar' | 'isolation-chain';
+  | 'returning-scar' | 'isolation-chain'
+  | 'perfect-counter' | 'counter-inscription' | 'link-contagion' | 'rewind-breath'
+  | 'echo-harvest' | 'sentence-overcharge' | 'rupture-step';
+
+export type ResonanceId = 'moon-ring' | 'time-undertow' | 'counter-cut' | 'regression-chain';
+
+export interface UpgradeIcon {
+  glyph: string;
+  color: string;
+}
 
 export interface UpgradeEffect {
   readonly [key: string]: number;
@@ -17,82 +32,149 @@ export interface UpgradeDefinition {
   id: UpgradeId;
   name: string;
   description: string;
+  category: UpgradeCategory;
   tag: string;
   tags: readonly string[];
   rarity: UpgradeRarity;
   maxStacks: number;
-  stackMode: 'additive' | 'unique';
-  relatedKey: string;
+  stackMode: UpgradeStackMode;
+  baseValues: UpgradeEffect;
+  /** Compatibility alias. Runtime values and descriptions both originate from baseValues. */
   effect: UpgradeEffect;
+  triggerTypes: readonly UpgradeTriggerType[];
+  incompatibleIds: readonly UpgradeId[];
+  synergyIds: readonly ResonanceId[];
+  icon: UpgradeIcon;
+  relatedKey: string;
+  behaviorChange: boolean;
+  active: boolean;
   survival?: boolean;
+  auditNote?: string;
 }
 
-type UpgradeInput = Omit<UpgradeDefinition, 'description' | 'tag' | 'stackMode'>;
+export interface ResonanceDefinition {
+  id: ResonanceId;
+  name: string;
+  requiredUpgradeIds: readonly [UpgradeId, UpgradeId];
+  description: string;
+  icon: UpgradeIcon;
+}
 
-function text(input: UpgradeInput, stacks = 1): string {
-  const n = (key: string): number => input.effect[key] ?? 0; const stack = Math.max(1, stacks);
+interface UpgradeInput extends Omit<UpgradeDefinition, 'description' | 'tag' | 'stackMode' | 'effect' | 'incompatibleIds' | 'synergyIds' | 'active'> {
+  incompatibleIds?: readonly UpgradeId[];
+  synergyIds?: readonly ResonanceId[];
+  active?: boolean;
+  stackMode?: UpgradeStackMode;
+}
+
+const value = (upgrade: Pick<UpgradeDefinition, 'baseValues'> | Pick<UpgradeInput, 'baseValues'>, key: string): number => upgrade.baseValues[key] ?? 0;
+
+function text(input: Pick<UpgradeDefinition, 'id' | 'baseValues' | 'maxStacks'>, stacks = 1): string {
+  const n = (key: string): number => value(input, key);
+  const stack = Math.max(1, Math.min(input.maxStacks, Math.floor(stacks)));
   switch (input.id) {
-    case 'afterimage-slash': return `대시 경로에 기본 피해의 ${Math.round((n('damageRatio') + n('perStack') * (stack - 1)) * 100)}% 지연 참격을 남긴다.`;
-    case 'dragon-fang': return `절단 치명타 확률 +${Math.round(Math.min(.55, n('chance') * stack) * 100)}% (피해 ${n('multiplier').toFixed(2)}배).`;
-    case 'broken-sentence': return `STOPPED 대상을 절단하면 파열 피해 +${n('damage') * stack}.`;
-    case 'regression-blade': return `되돌린다 뒤 첫 절단 피해 +${Math.round(n('bonus') * stack * 100)}%.`;
-    case 'memory-echo': return `되돌린다 잔상 공격 배율 +${Math.round(n('power') * stack * 100)}%.`;
-    case 'link-overload': return `연결 사망 폭발 피해 ${n('baseDamage') + n('damagePerStack') * stack}, 반경 ${n('baseRadius') + n('radiusPerStack') * stack}.`;
-    case 'inscription-spread': return `연결 사망 폭발이 가까운 적 하나를 ${n('duration') / 1000}초간 연결한다.`;
-    case 'perfect-breath': return `패링 판정 +${n('window') * stack}ms, 성공 문장력 +${n('sentence') * stack}.`;
-    case 'ink-cloak': return `전투 첫 피격 피해 -${Math.round(n('reduction') * stack * 100)}% (최소 ${Math.round(n('minimumMultiplier') * 100)}% 피해).`;
-    case 'sealed-sentence': return `언령 재사용 대기시간 -${Math.round(n('cooldownReduction') * stack * 100)}%, 언령 적중 문장력 +${Math.round(n('gainBonus') * stack * 100)}%.`;
-    case 'pursuit-mark': return `같은 적에게 연속 절단 적중 시 피해 +${Math.round(n('perHit') * stack * 100)}% (최대 ${n('maxHits')}회).`;
-    case 'fragment-recovery': return `반사 탄환 적중 시 체력 ${n('heal') * stack} 회복.`;
-    case 'chain-breath': return `연쇄 성공 시 문장력 ${n('sentence') * stack} 회복, 모든 언령 쿨다운 ${(n('cooldown') * stack / 1000).toFixed(1)}초 감소.`;
-    case 'stop-resonance': return `연쇄 정지 대상이 피해 ${n('damage') * stack}와 ${n('slowDuration') / 1000}초 감속 파동을 1회 방출.`;
-    case 'backflow-shards': return `역류 탄환 적중 시 피해 ${Math.round(n('ratio') * 100)}% 파편 ${n('count')}개로 분열.`;
-    case 'regression-sword-shadow': return `되돌린다 종료 후 최근 절단을 최대 3회, ${Math.round((n('baseRatio') + n('perStack') * (stack - 1)) * 100)}% 피해로 재현.`;
-    case 'linked-counter': return `완벽 패링 표식 대상을 절단하면 ${Math.round(n('share') * stack * 100)}%를 연결 대상에게 전달.`;
-    case 'unbroken-context': return `연쇄 대기 중 완벽 패링 시 연쇄 시간을 ${n('extension') / 1000}초 한 번 연장.`;
-    case 'dragon-rhythm': return `상태가 있는 적을 절단하면 문장력 ${n('sentence') * stack}, 가장 짧은 언령 쿨다운 ${(n('cooldown') * stack / 1000).toFixed(1)}초 감소.`;
-    case 'echo-amplifier': return `연쇄 성공 후 ${(n('window') * stack) / 1000}초 내 다음 언령을 강화한다.`;
-    case 'dual-moon-echo': return `잔향 칼날이 반대편에도 나타난다. 두 궤도의 합산 피해 +${Math.round((n('combinedMultiplier') - 1) * 100)}%.`;
-    case 'wide-orbit': return `잔향 칼날 범위 +${Math.round(n('range') * stack * 100)}%, 발동 간격 +${Math.round(n('interval') * stack * 100)}%.`;
-    case 'cut-sentence': return `STOPPED 또는 LINKED 대상을 절단하면 파열 피해 ${n('damage') * stack}.`;
-    case 'backflow-blade': return `잔향 칼날이 닿은 정지 탄환을 적에게 한 번 되돌린다.`;
+    case 'dual-moon-echo': return `잔향 칼날이 반대편에도 나타난다. 두 궤도의 합산 피해는 단일 칼날 대비 ${Math.round(n('combinedMultiplier') * 100)}%.`;
+    case 'wide-orbit': return `잔향 칼날 반경 +${Math.round(n('range') * stack * 100)}%, 발동 간격 +${Math.round(n('interval') * stack * 100)}%.`;
+    case 'cut-sentence': return `STOPPED 또는 LINKED 대상을 절단하면 상태별 파열 피해 ${n('damage') * stack}.`;
+    case 'backflow-blade': return `잔향 칼날이 정지 탄환을 적에게 한 번 되돌린다. 역류 피해 ${Math.round(n('reflectedRatio') * 100)}%.`;
     case 'returning-scar': return `되돌린다 잔상이 추가 절단 ${stack}회, 각 ${Math.round(n('ratio') * 100)}% 피해로 재현.`;
-    case 'isolation-chain': return `고립 연결 피해 증가 +${Math.round(n('bonus') * stack * 100)}%, 폭발 피해 +${n('explosion') * stack}.`;
+    case 'isolation-chain': return `고립 연결의 절단·언령 피해 +${Math.round(n('bonus') * stack * 100)}%, 사망 폭발 +${n('explosion') * stack}.`;
+    case 'chain-breath': return `언령 연계 성공 시 문장력 ${n('sentence') * stack}, Q/E/R 남은 쿨다운 ${(n('cooldown') * stack / 1000).toFixed(1)}초 감소.`;
+    case 'stop-resonance': return `멎는다 종료 시 STOPPED 대상이 피해 ${n('damage') * stack}와 ${(n('slowDuration') / 1000).toFixed(2)}초 감속 파동을 1회 방출.`;
+    case 'perfect-counter': return `완벽 패링 시 J 절단 즉시 준비. 다음 절단 범위 +${Math.round(n('rangeBonus') * 100)}%, 파열 피해 +${n('ruptureBonus')}.`;
+    case 'counter-inscription': return `패링한 공격자에게 ${(n('duration') / 1000).toFixed(1)}초 반격 비문. J·언령 적중 시 추가 파열 ${n('damage') * stack}.`;
+    case 'link-contagion': return `LINKED 적 사망 시 가까운 적 최대 ${n('targets')}명에게 ${(n('duration') / 1000).toFixed(1)}초 1세대 연결 전염.`;
+    case 'rewind-breath': return `되돌린다가 실제 회복한 체력의 ${Math.round(n('ratio') * stack * 100)}% 추가 회복.`;
+    case 'echo-harvest': return `잔향 칼날이 STOPPED·LINKED 적중 시 문장력 ${n('sentence') * stack}. 초당 최대 ${n('capPerSecond') * stack}.`;
+    case 'ink-cloak': return `각 일반 전투 첫 피격 피해 -${Math.round(n('reduction') * stack * 100)}% (최소 ${Math.round(n('minimumMultiplier') * 100)}% 피해).`;
+    case 'sentence-overcharge': return `F 강화 언령이 유효하게 적용되면 핵심 피해·지속 효과를 ${Math.round(n('bonus') * 100)}% 추가 강화.`;
+    case 'rupture-step': return `대시 후 ${(n('window') / 1000).toFixed(1)}초 내 J 절단이 전방 파동 피해 ${n('damage') * stack}를 추가한다.`;
+    case 'sealed-sentence': return `언령 재사용 대기시간 -${Math.round(n('cooldownReduction') * stack * 100)}%, 언령 적중 문장력 +${Math.round(n('gainBonus') * stack * 100)}%.`;
+    case 'fragment-recovery': return `반사 탄환 적중 시 체력 ${n('heal') * stack} 회복.`;
+    case 'afterimage-slash': return `비활성: 파열의 발걸음으로 통합됨.`;
+    case 'dragon-fang': return `비활성: 반복 절단 치명타는 상태 절단 역할과 충돌함.`;
+    case 'broken-sentence': return `비활성: 절단 문장으로 통합됨.`;
+    case 'regression-blade': return `비활성: 회귀의 칼자국으로 통합됨.`;
+    case 'memory-echo': return `비활성: 회귀의 칼자국으로 통합됨.`;
+    case 'link-overload': return `비활성: 고립의 사슬과 연결 전염으로 통합됨.`;
+    case 'inscription-spread': return `비활성: 연결 전염으로 대체됨.`;
+    case 'perfect-breath': return `비활성: 완벽한 반격으로 대체됨.`;
+    case 'pursuit-mark': return `비활성: 제거된 자동 대상 고정을 전제로 함.`;
+    case 'backflow-shards': return `비활성: 시간 역조 공명으로 통합됨.`;
+    case 'regression-sword-shadow': return `비활성: 회귀의 칼자국으로 통합됨.`;
+    case 'linked-counter': return `비활성: 반격 비문으로 대체됨.`;
+    case 'unbroken-context': return `비활성: 연문의 숨과 역할이 중복됨.`;
+    case 'dragon-rhythm': return `비활성: 잔향 수확과 역할이 중복됨.`;
+    case 'echo-amplifier': return `비활성: 문장 과충전으로 대체됨.`;
   }
 }
 
 function define(input: UpgradeInput): UpgradeDefinition {
-  return { ...input, tag: input.tags.join(' / '), stackMode: input.maxStacks === 1 ? 'unique' : 'additive', description: text(input) };
+  const definition: UpgradeDefinition = {
+    ...input,
+    tag: input.tags.join(' / '),
+    stackMode: input.stackMode ?? (input.maxStacks === 1 ? 'unique' : 'additive'),
+    effect: input.baseValues,
+    incompatibleIds: input.incompatibleIds ?? [],
+    synergyIds: input.synergyIds ?? [],
+    active: input.active ?? true,
+    description: '',
+  };
+  definition.description = text(definition);
+  return definition;
 }
 
-export const UPGRADES: readonly UpgradeDefinition[] = [
-  define({ id: 'afterimage-slash', name: '잔상 베기', tags: ['blade', 'dash'], rarity: '희귀', maxStacks: 2, relatedKey: 'Space', effect: { damageRatio: .45, perStack: .18 } }),
-  define({ id: 'dragon-fang', name: '용의 이빨', tags: ['blade'], rarity: '희귀', maxStacks: 3, relatedKey: 'J', effect: { chance: .22, multiplier: 1.75 } }),
-  define({ id: 'broken-sentence', name: '부서진 문장', tags: ['stop', 'blade'], rarity: '일반', maxStacks: 3, relatedKey: 'Q · J', effect: { damage: 12 } }),
-  define({ id: 'regression-blade', name: '역행의 칼날', tags: ['rewind', 'blade'], rarity: '희귀', maxStacks: 2, relatedKey: 'E · J', effect: { bonus: .55 } }),
-  define({ id: 'memory-echo', name: '기억의 잔상', tags: ['rewind'], rarity: '전설', maxStacks: 2, relatedKey: 'E', effect: { power: .22 } }),
-  define({ id: 'link-overload', name: '연결 과부하', tags: ['link'], rarity: '희귀', maxStacks: 3, relatedKey: 'R', effect: { baseRadius: 76, radiusPerStack: 24, baseDamage: 22, damagePerStack: 12 } }),
-  define({ id: 'inscription-spread', name: '비문 전염', tags: ['link'], rarity: '전설', maxStacks: 1, relatedKey: 'R', effect: { duration: 2000 } }),
-  define({ id: 'perfect-breath', name: '완벽한 호흡', tags: ['parry'], rarity: '일반', maxStacks: 2, relatedKey: 'K · Shift', effect: { window: 22, sentence: 5 } }),
-  define({ id: 'ink-cloak', name: '먹빛 망토', tags: ['survival'], rarity: '일반', maxStacks: 2, relatedKey: '피격', survival: true, effect: { reduction: .35, minimumMultiplier: .4 } }),
-  define({ id: 'sealed-sentence', name: '봉인된 문장', tags: ['resource', 'word'], rarity: '희귀', maxStacks: 3, relatedKey: 'Q · E · R', effect: { cooldownReduction: .06, gainBonus: .15 } }),
-  define({ id: 'pursuit-mark', name: '추격의 각인', tags: ['blade', 'target'], rarity: '일반', maxStacks: 3, relatedKey: 'J', effect: { perHit: .08, maxHits: 5 } }),
-  define({ id: 'fragment-recovery', name: '파편 회수', tags: ['projectile', 'survival'], rarity: '희귀', maxStacks: 2, relatedKey: 'K · Q', survival: true, effect: { heal: 4 } }),
-  define({ id: 'chain-breath', name: '연문의 숨', tags: ['chain', 'resource'], rarity: '희귀', maxStacks: 2, relatedKey: 'Q · E · R', effect: { sentence: 12, cooldown: 400 } }),
-  define({ id: 'stop-resonance', name: '정지 공명', tags: ['stop', 'link', 'chain'], rarity: '희귀', maxStacks: 2, relatedKey: 'R → Q', effect: { damage: 9, slowDuration: 650 } }),
-  define({ id: 'backflow-shards', name: '역류 파편', tags: ['stop', 'rewind', 'projectile'], rarity: '전설', maxStacks: 1, relatedKey: 'Q → E', effect: { count: 2, ratio: .4 } }),
-  define({ id: 'regression-sword-shadow', name: '회귀 검영', tags: ['rewind', 'blade'], rarity: '희귀', maxStacks: 2, relatedKey: 'E · J', effect: { baseRatio: .45, perStack: .18 } }),
-  define({ id: 'linked-counter', name: '이어진 반격', tags: ['parry', 'link'], rarity: '희귀', maxStacks: 2, relatedKey: 'K → R → J', effect: { duration: 4000, share: .18 } }),
-  define({ id: 'unbroken-context', name: '끊기지 않는 문맥', tags: ['parry', 'chain'], rarity: '전설', maxStacks: 1, relatedKey: 'K · Shift', effect: { extension: 600 } }),
-  define({ id: 'dragon-rhythm', name: '용의 박자', tags: ['blade', 'resource'], rarity: '일반', maxStacks: 2, relatedKey: 'J', effect: { sentence: 4, cooldown: 500 } }),
-  define({ id: 'echo-amplifier', name: '잔향 증폭', tags: ['chain', 'word'], rarity: '전설', maxStacks: 2, relatedKey: 'Q · E · R', effect: { window: 5000, bonus: .18 } }),
-  define({ id: 'dual-moon-echo', name: '쌍월의 잔향', tags: ['weapon', 'echo-blade'], rarity: '희귀', maxStacks: 1, relatedKey: '잔향 칼날', effect: { combinedMultiplier: 1.36 } }),
-  define({ id: 'wide-orbit', name: '넓은 궤도', tags: ['weapon', 'echo-blade'], rarity: '일반', maxStacks: 2, relatedKey: '잔향 칼날', effect: { range: .22, interval: .12 } }),
-  define({ id: 'cut-sentence', name: '절단 문장', tags: ['weapon', 'cut', 'word'], rarity: '희귀', maxStacks: 2, relatedKey: 'J · Q · R', effect: { damage: 9 } }),
-  define({ id: 'backflow-blade', name: '역류 칼날', tags: ['weapon', 'projectile', 'stop'], rarity: '전설', maxStacks: 1, relatedKey: '잔향 칼날 · Q', effect: { reflectedRatio: .65 } }),
-  define({ id: 'returning-scar', name: '회귀의 칼자국', tags: ['weapon', 'rewind'], rarity: '희귀', maxStacks: 2, relatedKey: 'E', effect: { ratio: .42 } }),
-  define({ id: 'isolation-chain', name: '고립의 사슬', tags: ['weapon', 'link'], rarity: '희귀', maxStacks: 2, relatedKey: 'R', effect: { bonus: .1, explosion: 12 } }),
+const active = (input: Omit<UpgradeInput, 'active'>): UpgradeDefinition => define({ ...input, active: true });
+const inactive = (input: Omit<UpgradeInput, 'active' | 'behaviorChange' | 'icon' | 'triggerTypes'> & { auditNote: string }): UpgradeDefinition => define({
+  ...input, active: false, behaviorChange: false, triggerTypes: [], icon: { glyph: '×', color: '#6e7774' },
+});
+
+export const RESONANCES: readonly ResonanceDefinition[] = [
+  { id: 'moon-ring', name: '월환 공명', requiredUpgradeIds: ['dual-moon-echo', 'wide-orbit'], description: '두 칼날이 반대 궤도로 회전하며 4회 적중마다 제한된 원형 파동을 낸다.', icon: { glyph: '雙', color: '#89ead8' } },
+  { id: 'time-undertow', name: '시간 역조', requiredUpgradeIds: ['backflow-blade', 'stop-resonance'], description: '멎는다 종료 시 정지 탄환 일부가 원래 발사자에게 한 번 역류한다.', icon: { glyph: '逆', color: '#73d6e8' } },
+  { id: 'counter-cut', name: '반격 절문', requiredUpgradeIds: ['perfect-counter', 'cut-sentence'], description: '완벽 패링 직후 절단은 상태가 없어도 작은 비문 파열을 일으킨다.', icon: { glyph: '斷', color: '#b4f3db' } },
+  { id: 'regression-chain', name: '회귀 사슬', requiredUpgradeIds: ['returning-scar', 'isolation-chain'], description: '되돌린다 잔상 절단이 고립 연결에 강해지고 다중 연결에는 일부 공유된다.', icon: { glyph: '廻', color: '#68cde2' } },
 ] as const;
 
+export const UPGRADES: readonly UpgradeDefinition[] = [
+  active({ id: 'dual-moon-echo', name: '쌍월의 잔향', category: 'echo-blade', tags: ['weapon', 'echo-blade', 'orbit'], rarity: '희귀', maxStacks: 1, relatedKey: '잔향 칼날', baseValues: { combinedMultiplier: 1.36, bladeMultiplier: .68 }, triggerTypes: ['echo-hit'], synergyIds: ['moon-ring'], icon: { glyph: '雙', color: '#86e5d2' }, behaviorChange: true }),
+  active({ id: 'wide-orbit', name: '넓은 궤도', category: 'echo-blade', tags: ['weapon', 'echo-blade', 'orbit'], rarity: '일반', maxStacks: 2, relatedKey: '잔향 칼날', baseValues: { range: .22, interval: .12 }, triggerTypes: ['echo-hit'], synergyIds: ['moon-ring'], icon: { glyph: '環', color: '#78d8c8' }, behaviorChange: true }),
+  active({ id: 'cut-sentence', name: '절단 문장', category: 'cut-parry', tags: ['weapon', 'cut', 'stop', 'link'], rarity: '희귀', maxStacks: 2, relatedKey: 'J · Q · R', baseValues: { damage: 9 }, triggerTypes: ['cut-hit'], synergyIds: ['counter-cut'], icon: { glyph: '斷', color: '#a3f1de' }, behaviorChange: true }),
+  active({ id: 'backflow-blade', name: '역류 칼날', category: 'echo-blade', tags: ['weapon', 'echo-blade', 'projectile', 'stop'], rarity: '전설', maxStacks: 1, relatedKey: '잔향 칼날 · Q', baseValues: { reflectedRatio: .65 }, triggerTypes: ['echo-hit'], synergyIds: ['time-undertow'], icon: { glyph: '逆', color: '#72d6e5' }, behaviorChange: true }),
+  active({ id: 'returning-scar', name: '회귀의 칼자국', category: 'word', tags: ['weapon', 'rewind', 'cut'], rarity: '희귀', maxStacks: 2, relatedKey: 'E', baseValues: { ratio: .42 }, triggerTypes: ['rewind'], synergyIds: ['regression-chain'], icon: { glyph: '廻', color: '#69cce4' }, behaviorChange: true }),
+  active({ id: 'isolation-chain', name: '고립의 사슬', category: 'word', tags: ['weapon', 'link', 'isolation'], rarity: '희귀', maxStacks: 2, relatedKey: 'R', baseValues: { bonus: .1, explosion: 12 }, triggerTypes: ['cut-hit', 'word-hit', 'link-death'], synergyIds: ['regression-chain'], icon: { glyph: '孤', color: '#90e5cc' }, behaviorChange: true }),
+  active({ id: 'chain-breath', name: '연문의 숨', category: 'word', tags: ['word', 'chain', 'resource'], rarity: '희귀', maxStacks: 2, relatedKey: 'Q · E · R', baseValues: { sentence: 12, cooldown: 400 }, triggerTypes: ['word-chain'], icon: { glyph: '聯', color: '#8ce7d5' }, behaviorChange: true }),
+  active({ id: 'stop-resonance', name: '정지 공명', category: 'word', tags: ['word', 'stop', 'pulse'], rarity: '희귀', maxStacks: 2, relatedKey: 'Q', baseValues: { damage: 9, slowDuration: 650, radius: 76 }, triggerTypes: ['stop-end'], synergyIds: ['time-undertow'], icon: { glyph: '止', color: '#83dccd' }, behaviorChange: true }),
+  active({ id: 'perfect-counter', name: '완벽한 반격', category: 'cut-parry', tags: ['parry', 'cut', 'counter'], rarity: '희귀', maxStacks: 1, relatedKey: 'K · Shift → J', baseValues: { rangeBonus: .28, ruptureBonus: 16, duration: 2600 }, triggerTypes: ['perfect-parry', 'cut-hit'], synergyIds: ['counter-cut'], icon: { glyph: '返', color: '#b1f2d9' }, behaviorChange: true }),
+  active({ id: 'counter-inscription', name: '반격 비문', category: 'cut-parry', tags: ['parry', 'mark', 'cut', 'word'], rarity: '희귀', maxStacks: 2, relatedKey: 'K · Shift → J/Q/E/R', baseValues: { duration: 4000, damage: 11 }, triggerTypes: ['parry', 'cut-hit', 'word-hit'], icon: { glyph: '標', color: '#9debd4' }, behaviorChange: true }),
+  active({ id: 'link-contagion', name: '연결 전염', category: 'word', tags: ['word', 'link', 'spread'], rarity: '전설', maxStacks: 1, relatedKey: 'R', baseValues: { targets: 2, duration: 2400, generations: 1 }, triggerTypes: ['link-death'], icon: { glyph: '傳', color: '#78d9bd' }, behaviorChange: true }),
+  active({ id: 'rewind-breath', name: '되감긴 숨', category: 'survival', tags: ['rewind', 'survival', 'healing'], rarity: '일반', maxStacks: 2, relatedKey: 'E', survival: true, baseValues: { ratio: .28 }, triggerTypes: ['rewind'], icon: { glyph: '息', color: '#80d7e8' }, behaviorChange: true }),
+  active({ id: 'echo-harvest', name: '잔향 수확', category: 'echo-blade', tags: ['echo-blade', 'resource', 'stop', 'link'], rarity: '일반', maxStacks: 2, relatedKey: '잔향 칼날', baseValues: { sentence: 1.5, capPerSecond: 6 }, triggerTypes: ['echo-hit'], icon: { glyph: '收', color: '#86e0ce' }, behaviorChange: true }),
+  active({ id: 'ink-cloak', name: '먹빛 망토', category: 'survival', tags: ['survival', 'first-hit'], rarity: '일반', maxStacks: 2, relatedKey: '피격', survival: true, baseValues: { reduction: .35, minimumMultiplier: .4 }, triggerTypes: ['first-hit'], icon: { glyph: '墨', color: '#819994' }, behaviorChange: true }),
+  active({ id: 'sentence-overcharge', name: '문장 과충전', category: 'word', tags: ['empower', 'word'], rarity: '전설', maxStacks: 1, relatedKey: 'F → Q/E/R', baseValues: { bonus: .35, durationBonus: 500 }, triggerTypes: ['empowered-word'], icon: { glyph: '極', color: '#b8f0d4' }, behaviorChange: true }),
+  active({ id: 'rupture-step', name: '파열의 발걸음', category: 'cut-parry', tags: ['dash', 'cut', 'wave'], rarity: '희귀', maxStacks: 2, relatedKey: 'Space → J', baseValues: { window: 1800, damage: 10, range: 142 }, triggerTypes: ['dash-cut'], icon: { glyph: '步', color: '#9ae5d1' }, behaviorChange: true }),
+  active({ id: 'sealed-sentence', name: '봉인된 문장', category: 'generic', tags: ['resource', 'word', 'cooldown'], rarity: '일반', maxStacks: 3, relatedKey: 'Q · E · R', baseValues: { cooldownReduction: .06, gainBonus: .15 }, triggerTypes: ['word-hit'], icon: { glyph: '封', color: '#9ac8bd' }, behaviorChange: false }),
+  active({ id: 'fragment-recovery', name: '파편 회수', category: 'survival', tags: ['projectile', 'survival', 'healing'], rarity: '희귀', maxStacks: 2, relatedKey: 'K · Q', survival: true, baseValues: { heal: 4 }, triggerTypes: ['reflected-projectile'], icon: { glyph: '片', color: '#82cfc0' }, behaviorChange: true }),
+
+  inactive({ id: 'afterimage-slash', name: '잔상 베기', category: 'cut-parry', tags: ['blade', 'dash'], rarity: '희귀', maxStacks: 2, relatedKey: 'Space', baseValues: { damageRatio: .45, perStack: .18 }, auditNote: '파열의 발걸음으로 통합' }),
+  inactive({ id: 'dragon-fang', name: '용의 이빨', category: 'cut-parry', tags: ['blade'], rarity: '희귀', maxStacks: 3, relatedKey: 'J', baseValues: { chance: .22, multiplier: 1.75 }, auditNote: '상태 절단의 역할을 흐리는 무조건 치명타' }),
+  inactive({ id: 'broken-sentence', name: '부서진 문장', category: 'cut-parry', tags: ['stop', 'blade'], rarity: '일반', maxStacks: 3, relatedKey: 'Q · J', baseValues: { damage: 12 }, auditNote: '절단 문장과 중복' }),
+  inactive({ id: 'regression-blade', name: '역행의 칼날', category: 'word', tags: ['rewind', 'blade'], rarity: '희귀', maxStacks: 2, relatedKey: 'E · J', baseValues: { bonus: .55 }, auditNote: '회귀의 칼자국과 중복' }),
+  inactive({ id: 'memory-echo', name: '기억의 잔상', category: 'word', tags: ['rewind'], rarity: '전설', maxStacks: 2, relatedKey: 'E', baseValues: { power: .22 }, auditNote: '회귀의 칼자국에 통합' }),
+  inactive({ id: 'link-overload', name: '연결 과부하', category: 'word', tags: ['link'], rarity: '희귀', maxStacks: 3, relatedKey: 'R', baseValues: { baseRadius: 76, radiusPerStack: 24, baseDamage: 22, damagePerStack: 12 }, auditNote: '고립의 사슬로 통합' }),
+  inactive({ id: 'inscription-spread', name: '비문 전염', category: 'word', tags: ['link'], rarity: '전설', maxStacks: 1, relatedKey: 'R', baseValues: { duration: 2000 }, auditNote: '연결 전염으로 대체' }),
+  inactive({ id: 'perfect-breath', name: '완벽한 호흡', category: 'cut-parry', tags: ['parry'], rarity: '일반', maxStacks: 2, relatedKey: 'K · Shift', baseValues: { window: 22, sentence: 5 }, auditNote: '완벽한 반격으로 대체' }),
+  inactive({ id: 'pursuit-mark', name: '추격의 각인', category: 'cut-parry', tags: ['blade', 'target'], rarity: '일반', maxStacks: 3, relatedKey: 'J', baseValues: { perHit: .08, maxHits: 5 }, auditNote: '자동 대상 고정 폐기' }),
+  inactive({ id: 'backflow-shards', name: '역류 파편', category: 'word', tags: ['stop', 'rewind', 'projectile'], rarity: '전설', maxStacks: 1, relatedKey: 'Q → E', baseValues: { count: 2, ratio: .4 }, auditNote: '시간 역조 공명으로 통합' }),
+  inactive({ id: 'regression-sword-shadow', name: '회귀 검영', category: 'word', tags: ['rewind', 'blade'], rarity: '희귀', maxStacks: 2, relatedKey: 'E · J', baseValues: { baseRatio: .45, perStack: .18 }, auditNote: '회귀의 칼자국으로 통합' }),
+  inactive({ id: 'linked-counter', name: '이어진 반격', category: 'cut-parry', tags: ['parry', 'link'], rarity: '희귀', maxStacks: 2, relatedKey: 'K → R → J', baseValues: { duration: 4000, share: .18 }, auditNote: '반격 비문으로 대체' }),
+  inactive({ id: 'unbroken-context', name: '끊기지 않는 문맥', category: 'word', tags: ['parry', 'chain'], rarity: '전설', maxStacks: 1, relatedKey: 'K · Shift', baseValues: { extension: 600 }, auditNote: '연문의 숨과 역할 중복' }),
+  inactive({ id: 'dragon-rhythm', name: '용의 박자', category: 'generic', tags: ['blade', 'resource'], rarity: '일반', maxStacks: 2, relatedKey: 'J', baseValues: { sentence: 4, cooldown: 500 }, auditNote: '잔향 수확과 역할 중복' }),
+  inactive({ id: 'echo-amplifier', name: '잔향 증폭', category: 'word', tags: ['chain', 'word'], rarity: '전설', maxStacks: 2, relatedKey: 'Q · E · R', baseValues: { window: 5000, bonus: .18 }, auditNote: '문장 과충전으로 대체' }),
+] as const;
+
+export const ACTIVE_UPGRADES: readonly UpgradeDefinition[] = UPGRADES.filter((upgrade) => upgrade.active);
+
 export function upgradeById(id: string): UpgradeDefinition | undefined { return UPGRADES.find((upgrade) => upgrade.id === id); }
+export function resonanceById(id: string): ResonanceDefinition | undefined { return RESONANCES.find((resonance) => resonance.id === id); }
 export function upgradeDescription(upgrade: UpgradeDefinition, stacks = 1): string { return text(upgrade, stacks); }

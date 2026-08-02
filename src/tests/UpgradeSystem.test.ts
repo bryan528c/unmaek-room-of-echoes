@@ -5,11 +5,10 @@ import { sealedSentenceStats, UpgradeSystem } from '../game/systems/UpgradeSyste
 describe('UpgradeSystem', () => {
   it('정의된 강화는 최대 중첩까지 중복 선택할 수 있다', () => {
     const system = new UpgradeSystem();
-    expect(system.add('dragon-fang')).toBe(true);
-    expect(system.add('dragon-fang')).toBe(true);
-    expect(system.add('dragon-fang')).toBe(true);
-    expect(system.add('dragon-fang')).toBe(false);
-    expect(system.getStack('dragon-fang')).toBe(3);
+    expect(system.add('wide-orbit')).toBe(true);
+    expect(system.add('wide-orbit')).toBe(true);
+    expect(system.add('wide-orbit')).toBe(false);
+    expect(system.getStack('wide-orbit')).toBe(2);
   });
 
   it('존재하지 않는 강화는 거부한다', () => {
@@ -19,9 +18,9 @@ describe('UpgradeSystem', () => {
 
   it('선택지에는 최대 중첩에 도달한 강화가 나오지 않는다', () => {
     const system = new UpgradeSystem();
-    system.add('inscription-spread');
+    system.add('backflow-blade');
     const choices = system.choices(12, () => 0);
-    expect(choices.some((choice) => choice.id === 'inscription-spread')).toBe(false);
+    expect(choices.some((choice) => choice.id === 'backflow-blade')).toBe(false);
     expect(new Set(choices.map((choice) => choice.id)).size).toBe(choices.length);
   });
 
@@ -78,5 +77,63 @@ describe('UpgradeSystem', () => {
     const run = new UpgradeSystem(); run.add('sealed-sentence'); run.add('sealed-sentence');
     expect(run.entries()).toContainEqual({ id: 'sealed-sentence', stacks: 2 });
     expect(new UpgradeSystem().getStack('sealed-sentence')).toBe(0);
+  });
+
+  it('records an explicit activation count separately from per-target contribution totals', () => {
+    const run = new UpgradeSystem(); run.add('returning-scar');
+    run.record('returning-scar', {
+      activationCount: 1,
+      damageContribution: 16,
+      generatedCount: 2,
+      hitCount: 1,
+      missCount: 1,
+    });
+    run.record('returning-scar', {
+      activationCount: 0,
+      damageContribution: 8,
+      affectedTargetCount: 1,
+      failedConditionCount: 1,
+    });
+    expect(run.runtimeSnapshot().contributions['returning-scar']).toEqual({
+      activationCount: 1,
+      damageContribution: 24,
+      healingContribution: 0,
+      resourceContribution: 0,
+      cooldownReductionContribution: 0,
+      reflectedProjectileCount: 0,
+      affectedTargetCount: 1,
+      preventedDamage: 0,
+      failedConditionCount: 1,
+      generatedCount: 2,
+      hitCount: 1,
+      missCount: 1,
+    });
+  });
+
+  it('does not immediately re-offer cards the player left unselected', () => {
+    const run = new UpgradeSystem();
+    const first = run.firstChoices(() => 0.15);
+    const selected = first[0]!;
+    expect(run.add(selected.id)).toBe(true);
+    expect(run.recordSelection(selected.id)).toBe(true);
+    const next = run.choices(3, () => 0.2, { healthRatio: 0.8 });
+    const unselected = new Set(first.slice(1).map((choice) => choice.id));
+    expect(next.some((choice) => unselected.has(choice.id))).toBe(false);
+    expect(run.selectionHistory().selected).toEqual([selected.id]);
+  });
+
+  it('keeps survival cards in a low-health flex slot without forcing them at high health', () => {
+    let lowHealthSurvival = 0;
+    let highHealthSurvival = 0;
+    for (let seed = 1; seed <= 80; seed += 1) {
+      let lowState = seed;
+      let highState = seed;
+      const lowRandom = (): number => { lowState = (lowState * 1664525 + 1013904223) >>> 0; return lowState / 0x1_0000_0000; };
+      const highRandom = (): number => { highState = (highState * 1664525 + 1013904223) >>> 0; return highState / 0x1_0000_0000; };
+      if (new UpgradeSystem().choices(3, lowRandom, { healthRatio: 0.35 }).some((choice) => choice.survival)) lowHealthSurvival += 1;
+      if (new UpgradeSystem().choices(3, highRandom, { healthRatio: 0.9 }).some((choice) => choice.survival)) highHealthSurvival += 1;
+    }
+    expect(lowHealthSurvival).toBe(80);
+    expect(highHealthSurvival).toBeLessThan(lowHealthSurvival);
   });
 });

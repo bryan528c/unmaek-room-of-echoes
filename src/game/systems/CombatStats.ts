@@ -1,4 +1,4 @@
-import type { UpgradeId } from '../data/upgrades';
+import type { ResonanceId, UpgradeId } from '../data/upgrades';
 import type { EnemyKind } from '../balance';
 import type { WordChainId, WordId } from './WordChainSystem';
 import type { FinisherChargeSource, FinisherStatus } from './CombatCoreSystem';
@@ -6,6 +6,77 @@ import type { FinisherChargeSource, FinisherStatus } from './CombatCoreSystem';
 export type DamageSource = 'melee' | 'projectile' | 'ink' | 'boss' | 'other';
 export type AgencyDamageSource = 'basicJ' | 'enhancedJ' | 'stop' | 'rewind' | 'link' | 'chain' | 'automatic';
 export type AgencyMilestone = 'manualHit' | 'stop' | 'rewind' | 'link' | 'chain' | 'enhancedThird' | 'empowerReady';
+
+/**
+ * Canonical per-upgrade/per-resonance contribution record.
+ *
+ * `activationCount` is deliberately not inferred from a contribution update.
+ * A single activation can generate projectiles now and report damage later, so
+ * the caller must explicitly include an activation delta at the actual trigger.
+ */
+export interface CombatContributionRecord {
+  activationCount: number;
+  damageContribution: number;
+  healingContribution: number;
+  resourceContribution: number;
+  cooldownReductionContribution: number;
+  reflectedProjectileCount: number;
+  affectedTargetCount: number;
+  preventedDamage: number;
+  failedConditionCount: number;
+  generatedCount: number;
+  hitCount: number;
+  missCount: number;
+
+  /** @deprecated Read compatibility for the pre-UPGRADE-04R result UI. */
+  triggers: number;
+  /** @deprecated Read compatibility for the pre-UPGRADE-04R result UI. */
+  damage: number;
+  /** @deprecated Read compatibility for the pre-UPGRADE-04R result UI. */
+  healing: number;
+  /** @deprecated Read compatibility for the pre-UPGRADE-04R result UI. */
+  sentence: number;
+  /** @deprecated Read compatibility for the pre-UPGRADE-04R result UI. */
+  cooldownMs: number;
+  /** @deprecated Read compatibility for the pre-UPGRADE-04R result UI. */
+  reflectedProjectiles: number;
+  /** @deprecated Read compatibility for the pre-UPGRADE-04R result UI. */
+  affectedTargets: number;
+  /** @deprecated Read compatibility for the pre-UPGRADE-04R result UI. */
+  generated: number;
+}
+
+export interface CombatContributionDelta {
+  activationCount?: number;
+  damageContribution?: number;
+  healingContribution?: number;
+  resourceContribution?: number;
+  cooldownReductionContribution?: number;
+  reflectedProjectileCount?: number;
+  affectedTargetCount?: number;
+  preventedDamage?: number;
+  failedConditionCount?: number;
+  generatedCount?: number;
+  hitCount?: number;
+  missCount?: number;
+
+  /** @deprecated Write compatibility while existing call sites migrate. */
+  triggers?: number;
+  /** @deprecated Write compatibility while existing call sites migrate. */
+  damage?: number;
+  /** @deprecated Write compatibility while existing call sites migrate. */
+  healing?: number;
+  /** @deprecated Write compatibility while existing call sites migrate. */
+  sentence?: number;
+  /** @deprecated Write compatibility while existing call sites migrate. */
+  cooldownMs?: number;
+  /** @deprecated Write compatibility while existing call sites migrate. */
+  reflectedProjectiles?: number;
+  /** @deprecated Write compatibility while existing call sites migrate. */
+  affectedTargets?: number;
+  /** @deprecated Write compatibility while existing call sites migrate. */
+  generated?: number;
+}
 
 export interface CombatStatsSnapshot {
   jInputs: number;
@@ -27,6 +98,7 @@ export interface CombatStatsSnapshot {
   dashes: number;
   wordUses: Record<WordId, number>;
   empowerUses: number;
+  empoweredWordUses: Record<WordId, number>;
   chainCounts: Record<WordChainId, number>;
   chainAttempts: Record<WordChainId, number>;
   chainFallbacks: Record<WordChainId, number>;
@@ -61,7 +133,8 @@ export interface CombatStatsSnapshot {
   attackHitsByStep: Record<1 | 2 | 3, number>;
   linkContribution: { sharedDamage: number; isolatedBonusDamage: number; explosionDamage: number };
   rewindContribution: { healthRecovered: number; echoDamage: number };
-  upgradeContributions: Record<string, { triggers: number; damage: number; sentence: number; cooldownMs: number; generated: number }>;
+  upgradeContributions: Partial<Record<UpgradeId, CombatContributionRecord>>;
+  resonanceContributions: Partial<Record<ResonanceId, CombatContributionRecord>>;
   invalidWordUses: Record<WordId, number>;
   encounterTimes: Partial<Record<'wave-1' | 'wave-2' | 'wave-3' | 'boss', number>>;
   agency: {
@@ -71,9 +144,61 @@ export interface CombatStatsSnapshot {
     damage: Record<AgencyDamageSource, number>;
     firstRound?: { duration: number; healthBeforeRecovery: number; healthAfterRecovery: number };
   };
+  damageAttribution: { echoBlade: number; cutParry: number; word: number; upgradeResonance: number };
 }
 
 const blankChains = (): Record<WordChainId, number> => ({ 'chain-stop': 0, backflow: 0, 'damage-regression': 0 });
+
+const contributionValue = (value: number | undefined): number => Number.isFinite(value) ? Math.max(0, value ?? 0) : 0;
+
+const blankContribution = (): CombatContributionRecord => ({
+  activationCount: 0,
+  damageContribution: 0,
+  healingContribution: 0,
+  resourceContribution: 0,
+  cooldownReductionContribution: 0,
+  reflectedProjectileCount: 0,
+  affectedTargetCount: 0,
+  preventedDamage: 0,
+  failedConditionCount: 0,
+  generatedCount: 0,
+  hitCount: 0,
+  missCount: 0,
+  triggers: 0,
+  damage: 0,
+  healing: 0,
+  sentence: 0,
+  cooldownMs: 0,
+  reflectedProjectiles: 0,
+  affectedTargets: 0,
+  generated: 0,
+});
+
+function addContribution(record: CombatContributionRecord, delta: CombatContributionDelta): void {
+  record.activationCount += contributionValue(delta.activationCount ?? delta.triggers);
+  record.damageContribution += contributionValue(delta.damageContribution ?? delta.damage);
+  record.healingContribution += contributionValue(delta.healingContribution ?? delta.healing);
+  record.resourceContribution += contributionValue(delta.resourceContribution ?? delta.sentence);
+  record.cooldownReductionContribution += contributionValue(delta.cooldownReductionContribution ?? delta.cooldownMs);
+  record.reflectedProjectileCount += contributionValue(delta.reflectedProjectileCount ?? delta.reflectedProjectiles);
+  record.affectedTargetCount += contributionValue(delta.affectedTargetCount ?? delta.affectedTargets);
+  record.preventedDamage += contributionValue(delta.preventedDamage);
+  record.failedConditionCount += contributionValue(delta.failedConditionCount);
+  record.generatedCount += contributionValue(delta.generatedCount ?? delta.generated);
+  record.hitCount += contributionValue(delta.hitCount);
+  record.missCount += contributionValue(delta.missCount);
+
+  // Keep legacy readers correct during the UI migration without maintaining a
+  // second independently accumulated set of counters.
+  record.triggers = record.activationCount;
+  record.damage = record.damageContribution;
+  record.healing = record.healingContribution;
+  record.sentence = record.resourceContribution;
+  record.cooldownMs = record.cooldownReductionContribution;
+  record.reflectedProjectiles = record.reflectedProjectileCount;
+  record.affectedTargets = record.affectedTargetCount;
+  record.generated = record.generatedCount;
+}
 
 export class CombatStats {
   private data: CombatStatsSnapshot = this.empty();
@@ -96,9 +221,15 @@ export class CombatStats {
   public dash(): void { this.data.dashes += 1; }
   public word(word: WordId): void { this.data.wordUses[word] += 1; }
   public empower(): void { this.data.empowerUses += 1; }
+  public empoweredWord(word: WordId, count = 1): void { this.data.empoweredWordUses[word] += contributionValue(count); }
   public chain(chain: WordChainId): void { this.data.chainCounts[chain] += 1; }
   public chainAttempt(chain: WordChainId, fallback: boolean): void { this.data.chainAttempts[chain] += 1; if (fallback) this.data.chainFallbacks[chain] += 1; }
-  public addChainDamage(chain: WordChainId, amount: number): void { const value = Math.max(0, amount); this.data.chainDamage[chain] += value; this.data.agency.damage.chain += value; }
+  public addChainDamage(chain: WordChainId, amount: number): void {
+    const value = contributionValue(amount);
+    this.data.chainDamage[chain] += value;
+    this.data.agency.damage.chain += value;
+    this.data.damageAttribution.word += value;
+  }
   public targetChanged(manual: boolean): void { if (manual) this.data.manualTargetChanges += 1; else this.data.autoTargetChanges += 1; }
   public damageTaken(source: DamageSource, amount: number): void { this.data.damageTakenByType[source] += Math.max(0, amount); }
   public setBossPhaseTime(phase: 1 | 2 | 3, seconds: number): void { this.data.bossPhaseTimes[phase] = Math.max(0, seconds); }
@@ -144,10 +275,19 @@ export class CombatStats {
   public linkExplosionDamage(amount: number): void { this.data.linkContribution.explosionDamage += Math.max(0, amount); }
   public rewindRecovered(amount: number): void { this.data.rewindContribution.healthRecovered += Math.max(0, amount); }
   public rewindEchoDamage(amount: number): void { this.data.rewindContribution.echoDamage += Math.max(0, amount); }
-  public upgradeContribution(id: UpgradeId, values: Partial<{ damage: number; sentence: number; cooldownMs: number; generated: number }> = {}): void {
-    const item = this.data.upgradeContributions[id] ??= { triggers: 0, damage: 0, sentence: 0, cooldownMs: 0, generated: 0 };
-    item.triggers += 1; item.damage += Math.max(0, values.damage ?? 0); item.sentence += Math.max(0, values.sentence ?? 0);
-    item.cooldownMs += Math.max(0, values.cooldownMs ?? 0); item.generated += Math.max(0, values.generated ?? 0);
+  public upgradeContribution(id: UpgradeId, values: CombatContributionDelta = {}): void {
+    const item = this.data.upgradeContributions[id] ??= blankContribution();
+    addContribution(item, values);
+  }
+  public resonanceContribution(id: ResonanceId, values: CombatContributionDelta = {}): void {
+    const item = this.data.resonanceContributions[id] ??= blankContribution();
+    addContribution(item, values);
+  }
+
+  /** Clears only upgrade/resonance contribution counters for the F4 laboratory. */
+  public resetUpgradeContributions(): void {
+    this.data.upgradeContributions = {};
+    this.data.resonanceContributions = {};
   }
   public finisherCharge(source: FinisherChargeSource, amount: number): void {
     const gained = Math.max(0, amount); this.data.finisher.chargesGained += gained; this.data.finisher.gainedBySource[source] += gained;
@@ -155,7 +295,20 @@ export class CombatStats {
   public invalidWord(word: WordId): void { this.data.invalidWordUses[word] += 1; }
   public setEncounterTime(encounter: 'wave-1' | 'wave-2' | 'wave-3' | 'boss', seconds: number): void { this.data.encounterTimes[encounter] = Math.max(0, seconds); }
   public agencyMilestone(name: AgencyMilestone, seconds: number): void { if (this.data.agency.firstAt[name] === undefined) this.data.agency.firstAt[name] = Math.max(0, seconds); }
-  public agencyDamage(source: AgencyDamageSource, amount: number): void { this.data.agency.damage[source] += Math.max(0, amount); }
+  public agencyDamage(source: AgencyDamageSource, amount: number): void {
+    const value = contributionValue(amount); this.data.agency.damage[source] += value;
+    if (source === 'automatic') this.data.damageAttribution.echoBlade += value;
+    else if (source === 'basicJ' || source === 'enhancedJ') this.data.damageAttribution.cutParry += value;
+    else this.data.damageAttribution.word += value;
+  }
+  /** Records parry/reflection damage that has no legacy agency damage source. */
+  public parryDamage(amount: number): void { this.data.damageAttribution.cutParry += contributionValue(amount); }
+  /**
+   * Records standalone card/resonance damage only. Damage already reported via
+   * `agencyDamage` remains attributed to that originating combat action so the
+   * four result-screen buckets stay mutually exclusive.
+   */
+  public attributedUpgradeDamage(amount: number): void { this.data.damageAttribution.upgradeResonance += contributionValue(amount); }
   public firstRound(duration: number, healthBeforeRecovery: number, healthAfterRecovery: number): void { this.data.agency.firstRound = { duration: Math.max(0, duration), healthBeforeRecovery, healthAfterRecovery }; }
   public snapshot(): CombatStatsSnapshot { return structuredClone(this.data); }
 
@@ -165,7 +318,7 @@ export class CombatStats {
       nearbyMisses: 0, comboTargetChanges: 0, noTargetSelections: 0, outOfRangeSelections: 0,
       upperBoundaryCorrections: 0, enemiesOutsideBounds: 0, telegraphOutsideHits: 0,
       parryAttempts: 0, parrySuccesses: 0, perfectParries: 0, dashes: 0,
-      wordUses: { stop: 0, rewind: 0, link: 0 }, empowerUses: 0, chainCounts: blankChains(), chainAttempts: blankChains(), chainFallbacks: blankChains(), chainDamage: blankChains(),
+      wordUses: { stop: 0, rewind: 0, link: 0 }, empowerUses: 0, empoweredWordUses: { stop: 0, rewind: 0, link: 0 }, chainCounts: blankChains(), chainAttempts: blankChains(), chainFallbacks: blankChains(), chainDamage: blankChains(),
       autoTargetChanges: 0, manualTargetChanges: 0, damageTakenByType: { melee: 0, projectile: 0, ink: 0, boss: 0, other: 0 },
       bossPhaseTimes: {}, upgrades: [],
       lastComboDamage: 0, maximumComboDamage: 0, ttkByKind: {}, maximumParryExtraDistance: 0, resultTransitions: 0,
@@ -180,9 +333,10 @@ export class CombatStats {
       attackHitsByStep: { 1: 0, 2: 0, 3: 0 },
       linkContribution: { sharedDamage: 0, isolatedBonusDamage: 0, explosionDamage: 0 },
       rewindContribution: { healthRecovered: 0, echoDamage: 0 },
-      upgradeContributions: {},
+      upgradeContributions: {}, resonanceContributions: {},
       invalidWordUses: { stop: 0, rewind: 0, link: 0 }, encounterTimes: {},
       agency: { firstAt: {}, rejectedChargeInputs: 0, rejectedTargetInputs: 0, damage: { basicJ: 0, enhancedJ: 0, stop: 0, rewind: 0, link: 0, chain: 0, automatic: 0 } },
+      damageAttribution: { echoBlade: 0, cutParry: 0, word: 0, upgradeResonance: 0 },
     };
   }
 }

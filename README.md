@@ -11,7 +11,7 @@ npm.cmd install
 npm.cmd run dev
 ```
 
-테스트는 `npm.cmd run test`, 프로덕션 빌드는 `npm.cmd run build`입니다.
+테스트는 `npm.cmd run test`, 프로덕션 빌드는 `npm.cmd run build`입니다. 카드 제시 500 Run 검증은 `npm.cmd run simulate:upgrades`, 세 빌드 60초 고정 입력 비교는 `npm.cmd run simulate:builds`로 실행합니다.
 
 ## 조작
 
@@ -33,7 +33,8 @@ npm.cmd run dev
 
 - `F2`: Ground Point, Movement Collider, Hurtbox, Hitbox, Telegraph, 탄환, combatBounds 표시
 - `F3`: 흐름 상태, 정지 토큰, 각 timeScale, heartbeat, 개체·타이머와 전투 통계
-- `F4`: 기존 전투 기반 시나리오 + 8방향 패링, 위·아래 근접 패링, 패링 불가 장판, 10분/20회 가속 안정성 시뮬레이션
+- `F4`: 전투 기반 시나리오 + 8방향 패링, 안정성 시뮬레이션, 잔향/절단/언령 고정 빌드, 공명 4종, 오디오 버스 진단, 카드 기여 통계 초기화
 - `?qa=1`: 피해 없이 진행하며 `P`로 웨이브/보스 단계를 넘기는 검증 모드
+- `?qa=1&upgrade=<카드 ID>&stacks=<1~3>`: 개발 모드에서 원하는 카드와 중첩을 즉시 지급
 - `?legacyCombo=1`: 개발 환경에서만 이전 3연격 구조 비교
 - `?defensiveSlash=1`: 개발 환경에서만 이전 자동 호신 베기 비교
