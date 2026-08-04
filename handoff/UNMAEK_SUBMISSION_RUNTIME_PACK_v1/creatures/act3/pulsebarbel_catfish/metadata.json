@@ -1,0 +1,225 @@
+{
+  "id": "pulsebarbel_catfish",
+  "displayName": "맥수염 메기",
+  "act": 3,
+  "role": "regular-enemy",
+  "aiArchetypeRole": "projectile",
+  "directionMode": "flipX",
+  "canvasSize": {
+    "width": 124,
+    "height": 58
+  },
+  "runtimeScale": 1.0,
+  "groundPoint": {
+    "original": {
+      "normalized": {
+        "x": 0.45,
+        "y": 0.82
+      },
+      "pixel": {
+        "x": 56,
+        "y": 48
+      }
+    },
+    "flippedX": {
+      "normalized": {
+        "x": 0.55,
+        "y": 0.82
+      },
+      "pixel": {
+        "x": 68,
+        "y": 48
+      }
+    }
+  },
+  "shadowAnchor": {
+    "original": {
+      "normalized": {
+        "x": 0.45,
+        "y": 0.82
+      },
+      "pixel": {
+        "x": 56,
+        "y": 48
+      }
+    },
+    "flippedX": {
+      "normalized": {
+        "x": 0.55,
+        "y": 0.82
+      },
+      "pixel": {
+        "x": 68,
+        "y": 48
+      }
+    },
+    "mode": "procedural",
+    "notes": "No baked shadow; generate from Ground Point. Catfish uses water-contact ripple instead."
+  },
+  "hurtbox": {
+    "original": {
+      "x": 15,
+      "y": 16,
+      "width": 82,
+      "height": 32
+    },
+    "flippedX": {
+      "x": 27,
+      "y": 16,
+      "width": 82,
+      "height": 32
+    },
+    "source": "packaging-derived from locked size and Ground Point; verify against engine debug view"
+  },
+  "attackAnchors": [
+    {
+      "id": "mouth",
+      "original": {
+        "normalized": {
+          "x": 0.13,
+          "y": 0.52
+        },
+        "pixel": {
+          "x": 16,
+          "y": 30
+        }
+      },
+      "flippedX": {
+        "normalized": {
+          "x": 0.87,
+          "y": 0.52
+        },
+        "pixel": {
+          "x": 108,
+          "y": 30
+        }
+      }
+    }
+  ],
+  "displayIconAnchor": {
+    "original": {
+      "normalized": {
+        "x": 0.84,
+        "y": 0.16
+      },
+      "pixel": {
+        "x": 104,
+        "y": 9
+      }
+    },
+    "flippedX": {
+      "normalized": {
+        "x": 0.16,
+        "y": 0.16
+      },
+      "pixel": {
+        "x": 20,
+        "y": 9
+      }
+    }
+  },
+  "telegraphDefinition": {
+    "reuseOnly": true,
+    "primitives": [
+      "straight-aim-line",
+      "impact-circle"
+    ],
+    "lineWidthPx": [
+      4,
+      6
+    ],
+    "palette": {
+      "warning": "#D88149",
+      "collision": "#B94A3E",
+      "safe": "#72A99D"
+    }
+  },
+  "states": {
+    "idle": {
+      "resolution": "unique-asset",
+      "assetKey": "idle",
+      "direction": "side",
+      "file": "creatures/act3/pulsebarbel_catfish/runtime/act3_pulsebarbel_catfish_idle_side_01.png"
+    },
+    "move": {
+      "resolution": "unique-asset",
+      "assetKey": "move",
+      "direction": "side",
+      "file": "creatures/act3/pulsebarbel_catfish/runtime/act3_pulsebarbel_catfish_move_side_01.png"
+    },
+    "prep": {
+      "resolution": "unique-asset",
+      "assetKey": "prep",
+      "direction": "side",
+      "file": "creatures/act3/pulsebarbel_catfish/runtime/act3_pulsebarbel_catfish_prep_side_01.png"
+    },
+    "attack": {
+      "resolution": "unique-asset",
+      "assetKey": "attack",
+      "direction": "side",
+      "file": "creatures/act3/pulsebarbel_catfish/runtime/act3_pulsebarbel_catfish_attack_side_01.png"
+    }
+  },
+  "stateAliases": {
+    "hit": {
+      "sourceState": "move",
+      "rotationDeg": 0,
+      "tint": "#B94A3E",
+      "shake": true,
+      "replaceAfterSubmission": true
+    }
+  },
+  "bossPhaseMap": null,
+  "masterFiles": {
+    "idle": "creatures/act3/pulsebarbel_catfish/master/act3_pulsebarbel_catfish_idle_side_master.png",
+    "move": "creatures/act3/pulsebarbel_catfish/master/act3_pulsebarbel_catfish_move_side_master.png",
+    "prep": "creatures/act3/pulsebarbel_catfish/master/act3_pulsebarbel_catfish_prep_side_master.png",
+    "attack": "creatures/act3/pulsebarbel_catfish/master/act3_pulsebarbel_catfish_attack_side_master.png"
+  },
+  "runtimeFiles": {
+    "idle": "creatures/act3/pulsebarbel_catfish/runtime/act3_pulsebarbel_catfish_idle_side_01.png",
+    "move": "creatures/act3/pulsebarbel_catfish/runtime/act3_pulsebarbel_catfish_move_side_01.png",
+    "prep": "creatures/act3/pulsebarbel_catfish/runtime/act3_pulsebarbel_catfish_prep_side_01.png",
+    "attack": "creatures/act3/pulsebarbel_catfish/runtime/act3_pulsebarbel_catfish_attack_side_01.png"
+  },
+  "optionalOverlays": [
+    {
+      "id": "gill-pressure",
+      "file": "vfx/pulsebarbel_catfish_gill_pressure.png"
+    }
+  ],
+  "palette": {
+    "primary": {
+      "name": "강물 청회",
+      "hex": "#485661"
+    },
+    "secondary": {
+      "name": "아가미 은회",
+      "hex": "#87959A"
+    },
+    "accent": {
+      "name": "탁한 황동",
+      "hex": "#84715B"
+    },
+    "reservedTelegraph": {
+      "warning": "#D88149",
+      "collision": "#B94A3E",
+      "safe": "#72A99D"
+    }
+  },
+  "implementationPriority": {
+    "tier": "Must",
+    "order": 5
+  },
+  "notes": [
+    "No repository class name is asserted; aiArchetypeRole is a role key only.",
+    "Water contact point replaces land shadow."
+  ],
+  "sourceToRuntimeScale": {
+    "idle": 0.161972,
+    "prep": 0.161972,
+    "attack": 0.161972,
+    "move": 0.161972
+  },
+  "metadataVersion": 1
+}

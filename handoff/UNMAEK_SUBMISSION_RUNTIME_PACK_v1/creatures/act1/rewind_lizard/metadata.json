@@ -1,0 +1,215 @@
+{
+  "id": "rewind_lizard",
+  "displayName": "되감비늘 도마뱀",
+  "act": 1,
+  "role": "regular-enemy",
+  "aiArchetypeRole": "chaser-melee",
+  "directionMode": "flipX",
+  "canvasSize": {
+    "width": 72,
+    "height": 40
+  },
+  "runtimeScale": 1.0,
+  "groundPoint": {
+    "original": {
+      "normalized": {
+        "x": 0.46,
+        "y": 0.86
+      },
+      "pixel": {
+        "x": 33,
+        "y": 34
+      }
+    },
+    "flippedX": {
+      "normalized": {
+        "x": 0.54,
+        "y": 0.86
+      },
+      "pixel": {
+        "x": 39,
+        "y": 34
+      }
+    }
+  },
+  "shadowAnchor": {
+    "original": {
+      "normalized": {
+        "x": 0.46,
+        "y": 0.86
+      },
+      "pixel": {
+        "x": 33,
+        "y": 34
+      }
+    },
+    "flippedX": {
+      "normalized": {
+        "x": 0.54,
+        "y": 0.86
+      },
+      "pixel": {
+        "x": 39,
+        "y": 34
+      }
+    },
+    "mode": "procedural",
+    "notes": "No baked shadow; generate from Ground Point. Catfish uses water-contact ripple instead."
+  },
+  "hurtbox": {
+    "original": {
+      "x": 9,
+      "y": 12,
+      "width": 48,
+      "height": 22
+    },
+    "flippedX": {
+      "x": 15,
+      "y": 12,
+      "width": 48,
+      "height": 22
+    },
+    "source": "packaging-derived from locked size and Ground Point; verify against engine debug view"
+  },
+  "attackAnchors": [
+    {
+      "id": "snout",
+      "original": {
+        "normalized": {
+          "x": 0.12,
+          "y": 0.55
+        },
+        "pixel": {
+          "x": 9,
+          "y": 22
+        }
+      },
+      "flippedX": {
+        "normalized": {
+          "x": 0.88,
+          "y": 0.55
+        },
+        "pixel": {
+          "x": 63,
+          "y": 22
+        }
+      }
+    }
+  ],
+  "displayIconAnchor": {
+    "original": {
+      "normalized": {
+        "x": 0.84,
+        "y": 0.16
+      },
+      "pixel": {
+        "x": 60,
+        "y": 6
+      }
+    },
+    "flippedX": {
+      "normalized": {
+        "x": 0.16,
+        "y": 0.16
+      },
+      "pixel": {
+        "x": 12,
+        "y": 6
+      }
+    }
+  },
+  "telegraphDefinition": {
+    "reuseOnly": true,
+    "primitives": [
+      "straight-charge-lane"
+    ],
+    "widthPx": [
+      44,
+      56
+    ],
+    "palette": {
+      "warning": "#D88149",
+      "collision": "#B94A3E",
+      "safe": "#72A99D"
+    }
+  },
+  "states": {
+    "idle": {
+      "resolution": "unique-asset",
+      "assetKey": "idle",
+      "direction": "side",
+      "file": "creatures/act1/rewind_lizard/runtime/act1_rewind_lizard_idle_side_01.png"
+    },
+    "move": {
+      "resolution": "unique-asset",
+      "assetKey": "move",
+      "direction": "side",
+      "file": "creatures/act1/rewind_lizard/runtime/act1_rewind_lizard_move_side_01.png"
+    }
+  },
+  "stateAliases": {
+    "prep": {
+      "sourceState": "idle",
+      "rotationDeg": -3,
+      "tint": null,
+      "shake": false,
+      "replaceAfterSubmission": true
+    },
+    "attack": {
+      "sourceState": "move",
+      "rotationDeg": 0,
+      "tint": null,
+      "shake": false,
+      "replaceAfterSubmission": true
+    },
+    "hit": {
+      "sourceState": "idle",
+      "rotationDeg": 0,
+      "tint": "#B94A3E",
+      "shake": true,
+      "replaceAfterSubmission": true
+    }
+  },
+  "bossPhaseMap": null,
+  "masterFiles": {
+    "idle": "creatures/act1/rewind_lizard/master/act1_rewind_lizard_idle_side_master.png",
+    "move": "creatures/act1/rewind_lizard/master/act1_rewind_lizard_move_side_master.png"
+  },
+  "runtimeFiles": {
+    "idle": "creatures/act1/rewind_lizard/runtime/act1_rewind_lizard_idle_side_01.png",
+    "move": "creatures/act1/rewind_lizard/runtime/act1_rewind_lizard_move_side_01.png"
+  },
+  "optionalOverlays": [],
+  "palette": {
+    "primary": {
+      "name": "바위 황갈",
+      "hex": null
+    },
+    "secondary": {
+      "name": "이끼 회색",
+      "hex": null
+    },
+    "accent": {
+      "name": "성장띠",
+      "hex": null
+    },
+    "reservedTelegraph": {
+      "warning": "#D88149",
+      "collision": "#B94A3E",
+      "safe": "#72A99D"
+    }
+  },
+  "implementationPriority": {
+    "tier": "Must",
+    "order": 2
+  },
+  "notes": [
+    "No repository class name is asserted; aiArchetypeRole is a role key only.",
+    "Prioritize low body, adhesive feet and ring tail over micro-scales."
+  ],
+  "sourceToRuntimeScale": {
+    "idle": 0.260163,
+    "move": 0.260163
+  },
+  "metadataVersion": 1
+}

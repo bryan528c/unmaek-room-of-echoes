@@ -1,0 +1,2559 @@
+{
+  "schemaVersion": 1,
+  "packageId": "UNMAEK_SUBMISSION_RUNTIME_PACK_v1",
+  "coordinateSystem": {
+    "origin": "top-left",
+    "anchor": "normalized-plus-pixel",
+    "hurtbox": "pixel-rect"
+  },
+  "allowedAiArchetypeRoles": [
+    "background-cue",
+    "chaser-melee",
+    "projectile",
+    "area-control",
+    "defense-melee",
+    "boss-3phase"
+  ],
+  "allowedDirectionModes": [
+    "fixed",
+    "flipX",
+    "front-side",
+    "front-back-side"
+  ],
+  "flipXRules": {
+    "normalizedAnchor": "flippedX = 1 - originalX",
+    "pixelHurtbox": "flippedX = canvasWidth - originalX - width",
+    "alsoFlip": [
+      "groundPoint",
+      "shadowAnchor",
+      "hurtbox",
+      "attackAnchors",
+      "muzzle/thread/hoof anchors",
+      "displayIconAnchor"
+    ]
+  },
+  "creatures": [
+    {
+      "id": "pressure_swift",
+      "displayName": "압각 칼새",
+      "act": 1,
+      "role": "environmental-cue",
+      "aiArchetypeRole": "background-cue",
+      "directionMode": "flipX",
+      "canvasSize": {
+        "width": 36,
+        "height": 24
+      },
+      "runtimeScale": 1.0,
+      "groundPoint": {
+        "original": {
+          "normalized": {
+            "x": 0.5,
+            "y": 0.82
+          },
+          "pixel": {
+            "x": 18,
+            "y": 20
+          }
+        },
+        "flippedX": {
+          "normalized": {
+            "x": 0.5,
+            "y": 0.82
+          },
+          "pixel": {
+            "x": 18,
+            "y": 20
+          }
+        }
+      },
+      "shadowAnchor": {
+        "original": {
+          "normalized": {
+            "x": 0.5,
+            "y": 0.82
+          },
+          "pixel": {
+            "x": 18,
+            "y": 20
+          }
+        },
+        "flippedX": {
+          "normalized": {
+            "x": 0.5,
+            "y": 0.82
+          },
+          "pixel": {
+            "x": 18,
+            "y": 20
+          }
+        },
+        "mode": "procedural",
+        "notes": "No baked shadow; generate from Ground Point. Catfish uses water-contact ripple instead."
+      },
+      "hurtbox": null,
+      "attackAnchors": [],
+      "displayIconAnchor": {
+        "original": {
+          "normalized": {
+            "x": 0.84,
+            "y": 0.16
+          },
+          "pixel": {
+            "x": 30,
+            "y": 4
+          }
+        },
+        "flippedX": {
+          "normalized": {
+            "x": 0.16,
+            "y": 0.16
+          },
+          "pixel": {
+            "x": 6,
+            "y": 4
+          }
+        }
+      },
+      "telegraphDefinition": {
+        "reuseOnly": true,
+        "primitives": [
+          "rockfall-circle"
+        ],
+        "lineWidthPx": [
+          4,
+          6
+        ],
+        "palette": {
+          "warning": "#D88149",
+          "collision": "#B94A3E",
+          "safe": "#72A99D"
+        }
+      },
+      "states": {
+        "fly": {
+          "resolution": "unique-asset",
+          "assetKey": "fly",
+          "direction": "side",
+          "file": "creatures/act1/pressure_swift/runtime/act1_pressure_swift_fly_side_01.png"
+        },
+        "evade": {
+          "resolution": "unique-asset",
+          "assetKey": "evade",
+          "direction": "side",
+          "file": "creatures/act1/pressure_swift/runtime/act1_pressure_swift_evade_side_01.png"
+        }
+      },
+      "stateAliases": {
+        "idle": {
+          "sourceState": "fly",
+          "rotationDeg": 0,
+          "tint": null,
+          "shake": false,
+          "replaceAfterSubmission": true
+        }
+      },
+      "bossPhaseMap": null,
+      "masterFiles": {
+        "fly": "creatures/act1/pressure_swift/master/act1_pressure_swift_fly_side_master.png",
+        "evade": "creatures/act1/pressure_swift/master/act1_pressure_swift_evade_side_master.png"
+      },
+      "runtimeFiles": {
+        "fly": "creatures/act1/pressure_swift/runtime/act1_pressure_swift_fly_side_01.png",
+        "evade": "creatures/act1/pressure_swift/runtime/act1_pressure_swift_evade_side_01.png"
+      },
+      "optionalOverlays": [],
+      "palette": {
+        "primary": {
+          "name": "차가운 먹색",
+          "hex": null
+        },
+        "secondary": {
+          "name": "회백",
+          "hex": null
+        },
+        "accent": {
+          "name": "없음",
+          "hex": null
+        },
+        "reservedTelegraph": {
+          "warning": "#D88149",
+          "collision": "#B94A3E",
+          "safe": "#72A99D"
+        }
+      },
+      "implementationPriority": {
+        "tier": "Must",
+        "order": 2
+      },
+      "notes": [
+        "No repository class name is asserted; aiArchetypeRole is a role key only.",
+        "Scene places 2–3 copies for a flock; no combat hurtbox."
+      ]
+    },
+    {
+      "id": "deflect_bat",
+      "displayName": "편향관 박쥐",
+      "act": 1,
+      "role": "regular-enemy",
+      "aiArchetypeRole": "projectile",
+      "directionMode": "flipX",
+      "canvasSize": {
+        "width": 52,
+        "height": 36
+      },
+      "runtimeScale": 1.0,
+      "groundPoint": {
+        "original": {
+          "normalized": {
+            "x": 0.5,
+            "y": 0.8
+          },
+          "pixel": {
+            "x": 26,
+            "y": 29
+          }
+        },
+        "flippedX": {
+          "normalized": {
+            "x": 0.5,
+            "y": 0.8
+          },
+          "pixel": {
+            "x": 26,
+            "y": 29
+          }
+        }
+      },
+      "shadowAnchor": {
+        "original": {
+          "normalized": {
+            "x": 0.5,
+            "y": 0.8
+          },
+          "pixel": {
+            "x": 26,
+            "y": 29
+          }
+        },
+        "flippedX": {
+          "normalized": {
+            "x": 0.5,
+            "y": 0.8
+          },
+          "pixel": {
+            "x": 26,
+            "y": 29
+          }
+        },
+        "mode": "procedural",
+        "notes": "No baked shadow; generate from Ground Point. Catfish uses water-contact ripple instead."
+      },
+      "hurtbox": {
+        "original": {
+          "x": 12,
+          "y": 9,
+          "width": 28,
+          "height": 20
+        },
+        "flippedX": {
+          "x": 12,
+          "y": 9,
+          "width": 28,
+          "height": 20
+        },
+        "source": "packaging-derived from locked size and Ground Point; verify against engine debug view"
+      },
+      "attackAnchors": [
+        {
+          "id": "mouth-organ",
+          "original": {
+            "normalized": {
+              "x": 0.5,
+              "y": 0.4
+            },
+            "pixel": {
+              "x": 26,
+              "y": 14
+            }
+          },
+          "flippedX": {
+            "normalized": {
+              "x": 0.5,
+              "y": 0.4
+            },
+            "pixel": {
+              "x": 26,
+              "y": 14
+            }
+          }
+        }
+      ],
+      "displayIconAnchor": {
+        "original": {
+          "normalized": {
+            "x": 0.84,
+            "y": 0.16
+          },
+          "pixel": {
+            "x": 44,
+            "y": 6
+          }
+        },
+        "flippedX": {
+          "normalized": {
+            "x": 0.16,
+            "y": 0.16
+          },
+          "pixel": {
+            "x": 8,
+            "y": 6
+          }
+        }
+      },
+      "telegraphDefinition": {
+        "reuseOnly": true,
+        "primitives": [
+          "straight-aim-line",
+          "visual-echo-offset"
+        ],
+        "lineWidthPx": [
+          4,
+          6
+        ],
+        "palette": {
+          "warning": "#D88149",
+          "collision": "#B94A3E",
+          "safe": "#72A99D"
+        }
+      },
+      "states": {
+        "idle": {
+          "resolution": "unique-asset",
+          "assetKey": "idle",
+          "direction": "side",
+          "file": "creatures/act1/deflect_bat/runtime/act1_deflect_bat_idle_side_01.png"
+        },
+        "move": {
+          "resolution": "unique-asset",
+          "assetKey": "move",
+          "direction": "side",
+          "file": "creatures/act1/deflect_bat/runtime/act1_deflect_bat_move_side_01.png"
+        }
+      },
+      "stateAliases": {
+        "prep": {
+          "sourceState": "idle",
+          "rotationDeg": 0,
+          "tint": null,
+          "shake": false,
+          "replaceAfterSubmission": true
+        },
+        "attack": {
+          "sourceState": "move",
+          "rotationDeg": 0,
+          "tint": null,
+          "shake": false,
+          "replaceAfterSubmission": true
+        },
+        "hit": {
+          "sourceState": "move",
+          "rotationDeg": 0,
+          "tint": "#B94A3E",
+          "shake": true,
+          "replaceAfterSubmission": true
+        }
+      },
+      "bossPhaseMap": null,
+      "masterFiles": {
+        "idle": "creatures/act1/deflect_bat/master/act1_deflect_bat_idle_side_master.png",
+        "move": "creatures/act1/deflect_bat/master/act1_deflect_bat_move_side_master.png"
+      },
+      "runtimeFiles": {
+        "idle": "creatures/act1/deflect_bat/runtime/act1_deflect_bat_idle_side_01.png",
+        "move": "creatures/act1/deflect_bat/runtime/act1_deflect_bat_move_side_01.png"
+      },
+      "optionalOverlays": [],
+      "palette": {
+        "primary": {
+          "name": "따뜻한 암갈색",
+          "hex": null
+        },
+        "secondary": {
+          "name": "막 회갈",
+          "hex": null
+        },
+        "accent": {
+          "name": "목주머니 음영",
+          "hex": null
+        },
+        "reservedTelegraph": {
+          "warning": "#D88149",
+          "collision": "#B94A3E",
+          "safe": "#72A99D"
+        }
+      },
+      "implementationPriority": {
+        "tier": "Must",
+        "order": 2
+      },
+      "notes": [
+        "No repository class name is asserted; aiArchetypeRole is a role key only.",
+        "Prioritize asymmetric ears and throat pouch over fine fur."
+      ]
+    },
+    {
+      "id": "rewind_lizard",
+      "displayName": "되감비늘 도마뱀",
+      "act": 1,
+      "role": "regular-enemy",
+      "aiArchetypeRole": "chaser-melee",
+      "directionMode": "flipX",
+      "canvasSize": {
+        "width": 72,
+        "height": 40
+      },
+      "runtimeScale": 1.0,
+      "groundPoint": {
+        "original": {
+          "normalized": {
+            "x": 0.46,
+            "y": 0.86
+          },
+          "pixel": {
+            "x": 33,
+            "y": 34
+          }
+        },
+        "flippedX": {
+          "normalized": {
+            "x": 0.54,
+            "y": 0.86
+          },
+          "pixel": {
+            "x": 39,
+            "y": 34
+          }
+        }
+      },
+      "shadowAnchor": {
+        "original": {
+          "normalized": {
+            "x": 0.46,
+            "y": 0.86
+          },
+          "pixel": {
+            "x": 33,
+            "y": 34
+          }
+        },
+        "flippedX": {
+          "normalized": {
+            "x": 0.54,
+            "y": 0.86
+          },
+          "pixel": {
+            "x": 39,
+            "y": 34
+          }
+        },
+        "mode": "procedural",
+        "notes": "No baked shadow; generate from Ground Point. Catfish uses water-contact ripple instead."
+      },
+      "hurtbox": {
+        "original": {
+          "x": 9,
+          "y": 12,
+          "width": 48,
+          "height": 22
+        },
+        "flippedX": {
+          "x": 15,
+          "y": 12,
+          "width": 48,
+          "height": 22
+        },
+        "source": "packaging-derived from locked size and Ground Point; verify against engine debug view"
+      },
+      "attackAnchors": [
+        {
+          "id": "snout",
+          "original": {
+            "normalized": {
+              "x": 0.12,
+              "y": 0.55
+            },
+            "pixel": {
+              "x": 9,
+              "y": 22
+            }
+          },
+          "flippedX": {
+            "normalized": {
+              "x": 0.88,
+              "y": 0.55
+            },
+            "pixel": {
+              "x": 63,
+              "y": 22
+            }
+          }
+        }
+      ],
+      "displayIconAnchor": {
+        "original": {
+          "normalized": {
+            "x": 0.84,
+            "y": 0.16
+          },
+          "pixel": {
+            "x": 60,
+            "y": 6
+          }
+        },
+        "flippedX": {
+          "normalized": {
+            "x": 0.16,
+            "y": 0.16
+          },
+          "pixel": {
+            "x": 12,
+            "y": 6
+          }
+        }
+      },
+      "telegraphDefinition": {
+        "reuseOnly": true,
+        "primitives": [
+          "straight-charge-lane"
+        ],
+        "widthPx": [
+          44,
+          56
+        ],
+        "palette": {
+          "warning": "#D88149",
+          "collision": "#B94A3E",
+          "safe": "#72A99D"
+        }
+      },
+      "states": {
+        "idle": {
+          "resolution": "unique-asset",
+          "assetKey": "idle",
+          "direction": "side",
+          "file": "creatures/act1/rewind_lizard/runtime/act1_rewind_lizard_idle_side_01.png"
+        },
+        "move": {
+          "resolution": "unique-asset",
+          "assetKey": "move",
+          "direction": "side",
+          "file": "creatures/act1/rewind_lizard/runtime/act1_rewind_lizard_move_side_01.png"
+        }
+      },
+      "stateAliases": {
+        "prep": {
+          "sourceState": "idle",
+          "rotationDeg": -3,
+          "tint": null,
+          "shake": false,
+          "replaceAfterSubmission": true
+        },
+        "attack": {
+          "sourceState": "move",
+          "rotationDeg": 0,
+          "tint": null,
+          "shake": false,
+          "replaceAfterSubmission": true
+        },
+        "hit": {
+          "sourceState": "idle",
+          "rotationDeg": 0,
+          "tint": "#B94A3E",
+          "shake": true,
+          "replaceAfterSubmission": true
+        }
+      },
+      "bossPhaseMap": null,
+      "masterFiles": {
+        "idle": "creatures/act1/rewind_lizard/master/act1_rewind_lizard_idle_side_master.png",
+        "move": "creatures/act1/rewind_lizard/master/act1_rewind_lizard_move_side_master.png"
+      },
+      "runtimeFiles": {
+        "idle": "creatures/act1/rewind_lizard/runtime/act1_rewind_lizard_idle_side_01.png",
+        "move": "creatures/act1/rewind_lizard/runtime/act1_rewind_lizard_move_side_01.png"
+      },
+      "optionalOverlays": [],
+      "palette": {
+        "primary": {
+          "name": "바위 황갈",
+          "hex": null
+        },
+        "secondary": {
+          "name": "이끼 회색",
+          "hex": null
+        },
+        "accent": {
+          "name": "성장띠",
+          "hex": null
+        },
+        "reservedTelegraph": {
+          "warning": "#D88149",
+          "collision": "#B94A3E",
+          "safe": "#72A99D"
+        }
+      },
+      "implementationPriority": {
+        "tier": "Must",
+        "order": 2
+      },
+      "notes": [
+        "No repository class name is asserted; aiArchetypeRole is a role key only.",
+        "Prioritize low body, adhesive feet and ring tail over micro-scales."
+      ]
+    },
+    {
+      "id": "mineral_spider",
+      "displayName": "광물실거미",
+      "act": 1,
+      "role": "regular-enemy",
+      "aiArchetypeRole": "area-control",
+      "directionMode": "front-side",
+      "canvasSize": {
+        "width": 104,
+        "height": 88
+      },
+      "runtimeScale": 1.0,
+      "groundPoint": {
+        "original": {
+          "normalized": {
+            "x": 0.5,
+            "y": 0.82
+          },
+          "pixel": {
+            "x": 52,
+            "y": 72
+          }
+        },
+        "flippedX": {
+          "normalized": {
+            "x": 0.5,
+            "y": 0.82
+          },
+          "pixel": {
+            "x": 52,
+            "y": 72
+          }
+        }
+      },
+      "shadowAnchor": {
+        "original": {
+          "normalized": {
+            "x": 0.5,
+            "y": 0.82
+          },
+          "pixel": {
+            "x": 52,
+            "y": 72
+          }
+        },
+        "flippedX": {
+          "normalized": {
+            "x": 0.5,
+            "y": 0.82
+          },
+          "pixel": {
+            "x": 52,
+            "y": 72
+          }
+        },
+        "mode": "procedural",
+        "notes": "No baked shadow; generate from Ground Point. Catfish uses water-contact ripple instead."
+      },
+      "hurtbox": {
+        "original": {
+          "x": 17,
+          "y": 22,
+          "width": 70,
+          "height": 50
+        },
+        "flippedX": {
+          "x": 17,
+          "y": 22,
+          "width": 70,
+          "height": 50
+        },
+        "source": "packaging-derived from locked size and Ground Point; verify against engine debug view"
+      },
+      "attackAnchors": [
+        {
+          "id": "thread-spawn-a",
+          "original": {
+            "normalized": {
+              "x": 0.36,
+              "y": 0.4
+            },
+            "pixel": {
+              "x": 37,
+              "y": 35
+            }
+          },
+          "flippedX": {
+            "normalized": {
+              "x": 0.64,
+              "y": 0.4
+            },
+            "pixel": {
+              "x": 67,
+              "y": 35
+            }
+          }
+        },
+        {
+          "id": "thread-spawn-b",
+          "original": {
+            "normalized": {
+              "x": 0.5,
+              "y": 0.4
+            },
+            "pixel": {
+              "x": 52,
+              "y": 35
+            }
+          },
+          "flippedX": {
+            "normalized": {
+              "x": 0.5,
+              "y": 0.4
+            },
+            "pixel": {
+              "x": 52,
+              "y": 35
+            }
+          }
+        },
+        {
+          "id": "thread-spawn-c",
+          "original": {
+            "normalized": {
+              "x": 0.64,
+              "y": 0.4
+            },
+            "pixel": {
+              "x": 67,
+              "y": 35
+            }
+          },
+          "flippedX": {
+            "normalized": {
+              "x": 0.36,
+              "y": 0.4
+            },
+            "pixel": {
+              "x": 37,
+              "y": 35
+            }
+          }
+        }
+      ],
+      "displayIconAnchor": {
+        "original": {
+          "normalized": {
+            "x": 0.84,
+            "y": 0.16
+          },
+          "pixel": {
+            "x": 87,
+            "y": 14
+          }
+        },
+        "flippedX": {
+          "normalized": {
+            "x": 0.16,
+            "y": 0.16
+          },
+          "pixel": {
+            "x": 17,
+            "y": 14
+          }
+        }
+      },
+      "telegraphDefinition": {
+        "reuseOnly": true,
+        "primitives": [
+          "straight-thread-line",
+          "anchor-circle"
+        ],
+        "lineWidthPx": [
+          4,
+          6
+        ],
+        "palette": {
+          "warning": "#D88149",
+          "collision": "#B94A3E",
+          "safe": "#72A99D"
+        }
+      },
+      "states": {
+        "idle": {
+          "resolution": "unique-asset",
+          "assetKey": "idle",
+          "direction": "front",
+          "file": "creatures/act1/mineral_spider/runtime/act1_mineral_spider_idle_front_01.png"
+        },
+        "move": {
+          "resolution": "unique-asset",
+          "assetKey": "move",
+          "direction": "side",
+          "file": "creatures/act1/mineral_spider/runtime/act1_mineral_spider_move_side_01.png"
+        },
+        "alert": {
+          "resolution": "unique-asset",
+          "assetKey": "alert",
+          "direction": "front",
+          "file": "creatures/act1/mineral_spider/runtime/act1_mineral_spider_alert_front_01.png"
+        },
+        "deploy": {
+          "resolution": "unique-asset",
+          "assetKey": "deploy",
+          "direction": "side",
+          "file": "creatures/act1/mineral_spider/runtime/act1_mineral_spider_deploy_side_01.png"
+        },
+        "attack": {
+          "resolution": "unique-asset",
+          "assetKey": "attack",
+          "direction": "side",
+          "file": "creatures/act1/mineral_spider/runtime/act1_mineral_spider_attack_side_01.png"
+        },
+        "stunned": {
+          "resolution": "unique-asset",
+          "assetKey": "stunned",
+          "direction": "front",
+          "file": "creatures/act1/mineral_spider/runtime/act1_mineral_spider_stunned_front_01.png"
+        },
+        "retreat": {
+          "resolution": "unique-asset",
+          "assetKey": "retreat",
+          "direction": "side",
+          "file": "creatures/act1/mineral_spider/runtime/act1_mineral_spider_retreat_side_01.png"
+        }
+      },
+      "stateAliases": {},
+      "bossPhaseMap": null,
+      "masterFiles": {
+        "idle": "creatures/act1/mineral_spider/master/act1_mineral_spider_idle_front_master.png",
+        "move": "creatures/act1/mineral_spider/master/act1_mineral_spider_move_side_master.png",
+        "alert": "creatures/act1/mineral_spider/master/act1_mineral_spider_alert_front_master.png",
+        "deploy": "creatures/act1/mineral_spider/master/act1_mineral_spider_deploy_side_master.png",
+        "attack": "creatures/act1/mineral_spider/master/act1_mineral_spider_attack_side_master.png",
+        "stunned": "creatures/act1/mineral_spider/master/act1_mineral_spider_stunned_front_master.png",
+        "retreat": "creatures/act1/mineral_spider/master/act1_mineral_spider_retreat_side_master.png"
+      },
+      "runtimeFiles": {
+        "idle": "creatures/act1/mineral_spider/runtime/act1_mineral_spider_idle_front_01.png",
+        "move": "creatures/act1/mineral_spider/runtime/act1_mineral_spider_move_side_01.png",
+        "alert": "creatures/act1/mineral_spider/runtime/act1_mineral_spider_alert_front_01.png",
+        "deploy": "creatures/act1/mineral_spider/runtime/act1_mineral_spider_deploy_side_01.png",
+        "attack": "creatures/act1/mineral_spider/runtime/act1_mineral_spider_attack_side_01.png",
+        "stunned": "creatures/act1/mineral_spider/runtime/act1_mineral_spider_stunned_front_01.png",
+        "retreat": "creatures/act1/mineral_spider/runtime/act1_mineral_spider_retreat_side_01.png"
+      },
+      "optionalOverlays": [
+        {
+          "id": "thread-spawn-marker",
+          "file": "vfx/mineral_spider_thread_spawn_marker.png"
+        }
+      ],
+      "palette": {
+        "primary": {
+          "name": "광물 흑회",
+          "hex": null
+        },
+        "secondary": {
+          "name": "회백 실",
+          "hex": null
+        },
+        "accent": {
+          "name": "방적기관 황갈",
+          "hex": null
+        },
+        "reservedTelegraph": {
+          "warning": "#D88149",
+          "collision": "#B94A3E",
+          "safe": "#72A99D"
+        }
+      },
+      "implementationPriority": {
+        "tier": "Must",
+        "order": 2
+      },
+      "notes": [
+        "No repository class name is asserted; aiArchetypeRole is a role key only.",
+        "Three spinnerets and abdomen lift are retained; thread VFX is separate."
+      ]
+    },
+    {
+      "id": "resonance_goral",
+      "displayName": "반향각 산양",
+      "act": 1,
+      "role": "boss",
+      "aiArchetypeRole": "boss-3phase",
+      "directionMode": "fixed",
+      "canvasSize": {
+        "width": 220,
+        "height": 175
+      },
+      "runtimeScale": 1.0,
+      "groundPoint": {
+        "original": {
+          "normalized": {
+            "x": 0.5,
+            "y": 0.88
+          },
+          "pixel": {
+            "x": 110,
+            "y": 154
+          }
+        },
+        "flippedX": null
+      },
+      "shadowAnchor": {
+        "original": {
+          "normalized": {
+            "x": 0.5,
+            "y": 0.88
+          },
+          "pixel": {
+            "x": 110,
+            "y": 154
+          }
+        },
+        "flippedX": null,
+        "mode": "procedural",
+        "notes": "No baked shadow; generate from Ground Point. Catfish uses water-contact ripple instead."
+      },
+      "hurtbox": {
+        "original": {
+          "x": 51,
+          "y": 68,
+          "width": 118,
+          "height": 86
+        },
+        "flippedX": null,
+        "source": "packaging-derived from locked size and Ground Point; verify against engine debug view"
+      },
+      "attackAnchors": [
+        {
+          "id": "horn-root",
+          "original": {
+            "normalized": {
+              "x": 0.5,
+              "y": 0.28
+            },
+            "pixel": {
+              "x": 110,
+              "y": 49
+            }
+          },
+          "flippedX": null
+        },
+        {
+          "id": "forehoof-left",
+          "original": {
+            "normalized": {
+              "x": 0.42,
+              "y": 0.79
+            },
+            "pixel": {
+              "x": 92,
+              "y": 138
+            }
+          },
+          "flippedX": null
+        },
+        {
+          "id": "forehoof-right",
+          "original": {
+            "normalized": {
+              "x": 0.58,
+              "y": 0.79
+            },
+            "pixel": {
+              "x": 128,
+              "y": 138
+            }
+          },
+          "flippedX": null
+        }
+      ],
+      "displayIconAnchor": {
+        "original": {
+          "normalized": {
+            "x": 0.84,
+            "y": 0.16
+          },
+          "pixel": {
+            "x": 185,
+            "y": 28
+          }
+        },
+        "flippedX": null
+      },
+      "telegraphDefinition": {
+        "reuseOnly": true,
+        "primitives": [
+          "straight-charge-lane",
+          "rockfall-circle",
+          "phase-ring"
+        ],
+        "lineWidthPx": [
+          4,
+          6
+        ],
+        "palette": {
+          "warning": "#D88149",
+          "collision": "#B94A3E",
+          "safe": "#72A99D"
+        }
+      },
+      "states": {
+        "idle": {
+          "resolution": "unique-asset",
+          "assetKey": "idle",
+          "direction": "fixed",
+          "file": "creatures/act1/resonance_goral/runtime/act1_resonance_goral_idle_fixed_01.png"
+        },
+        "warning": {
+          "resolution": "unique-asset",
+          "assetKey": "warning",
+          "direction": "fixed",
+          "file": "creatures/act1/resonance_goral/runtime/act1_resonance_goral_warning_fixed_01.png"
+        },
+        "combat": {
+          "resolution": "unique-asset",
+          "assetKey": "combat",
+          "direction": "fixed",
+          "file": "creatures/act1/resonance_goral/runtime/act1_resonance_goral_combat_fixed_01.png"
+        },
+        "retreat": {
+          "resolution": "unique-asset",
+          "assetKey": "retreat",
+          "direction": "fixed",
+          "file": "creatures/act1/resonance_goral/runtime/act1_resonance_goral_retreat_fixed_01.png"
+        }
+      },
+      "stateAliases": {},
+      "bossPhaseMap": {
+        "phase1": {
+          "state": "warning",
+          "displayStringKey": "boss.resonance_goral.phase1"
+        },
+        "phase2": {
+          "state": "combat",
+          "displayStringKey": "boss.resonance_goral.phase2"
+        },
+        "phase3": {
+          "state": "combat",
+          "overlayFiles": [
+            "vfx/resonance_goral_phase3_overlay.png"
+          ],
+          "displayStringKey": "boss.resonance_goral.phase3"
+        },
+        "defeated/nonlethal": {
+          "state": "retreat"
+        }
+      },
+      "masterFiles": {
+        "idle": "creatures/act1/resonance_goral/master/act1_resonance_goral_idle_fixed_master.png",
+        "warning": "creatures/act1/resonance_goral/master/act1_resonance_goral_warning_fixed_master.png",
+        "combat": "creatures/act1/resonance_goral/master/act1_resonance_goral_combat_fixed_master.png",
+        "retreat": "creatures/act1/resonance_goral/master/act1_resonance_goral_retreat_fixed_master.png"
+      },
+      "runtimeFiles": {
+        "idle": "creatures/act1/resonance_goral/runtime/act1_resonance_goral_idle_fixed_01.png",
+        "warning": "creatures/act1/resonance_goral/runtime/act1_resonance_goral_warning_fixed_01.png",
+        "combat": "creatures/act1/resonance_goral/runtime/act1_resonance_goral_combat_fixed_01.png",
+        "retreat": "creatures/act1/resonance_goral/runtime/act1_resonance_goral_retreat_fixed_01.png"
+      },
+      "optionalOverlays": [
+        {
+          "id": "phase3-resonance",
+          "file": "vfx/resonance_goral_phase3_overlay.png"
+        }
+      ],
+      "palette": {
+        "primary": {
+          "name": "깊은 암갈",
+          "hex": null
+        },
+        "secondary": {
+          "name": "회백 뿔·굽",
+          "hex": null
+        },
+        "accent": {
+          "name": "탁한 청록 공동",
+          "hex": null
+        },
+        "reservedTelegraph": {
+          "warning": "#D88149",
+          "collision": "#B94A3E",
+          "safe": "#72A99D"
+        }
+      },
+      "implementationPriority": {
+        "tier": "Must",
+        "order": 1
+      },
+      "notes": [
+        "No repository class name is asserted; aiArchetypeRole is a role key only.",
+        "Hurtbox excludes horns. Four silhouettes were minimally clarified in 01F without a new form."
+      ]
+    },
+    {
+      "id": "resonance_civet",
+      "displayName": "공명수염 사향고양이",
+      "act": 2,
+      "role": "regular-enemy",
+      "aiArchetypeRole": "chaser-melee",
+      "directionMode": "flipX",
+      "canvasSize": {
+        "width": 96,
+        "height": 56
+      },
+      "runtimeScale": 1.0,
+      "groundPoint": {
+        "original": {
+          "normalized": {
+            "x": 0.5,
+            "y": 0.88
+          },
+          "pixel": {
+            "x": 48,
+            "y": 49
+          }
+        },
+        "flippedX": {
+          "normalized": {
+            "x": 0.5,
+            "y": 0.88
+          },
+          "pixel": {
+            "x": 48,
+            "y": 49
+          }
+        }
+      },
+      "shadowAnchor": {
+        "original": {
+          "normalized": {
+            "x": 0.5,
+            "y": 0.88
+          },
+          "pixel": {
+            "x": 48,
+            "y": 49
+          }
+        },
+        "flippedX": {
+          "normalized": {
+            "x": 0.5,
+            "y": 0.88
+          },
+          "pixel": {
+            "x": 48,
+            "y": 49
+          }
+        },
+        "mode": "procedural",
+        "notes": "No baked shadow; generate from Ground Point. Catfish uses water-contact ripple instead."
+      },
+      "hurtbox": {
+        "original": {
+          "x": 16,
+          "y": 19,
+          "width": 64,
+          "height": 30
+        },
+        "flippedX": {
+          "x": 16,
+          "y": 19,
+          "width": 64,
+          "height": 30
+        },
+        "source": "packaging-derived from locked size and Ground Point; verify against engine debug view"
+      },
+      "attackAnchors": [
+        {
+          "id": "snout-whisker",
+          "original": {
+            "normalized": {
+              "x": 0.18,
+              "y": 0.48
+            },
+            "pixel": {
+              "x": 17,
+              "y": 27
+            }
+          },
+          "flippedX": {
+            "normalized": {
+              "x": 0.82,
+              "y": 0.48
+            },
+            "pixel": {
+              "x": 79,
+              "y": 27
+            }
+          }
+        }
+      ],
+      "displayIconAnchor": {
+        "original": {
+          "normalized": {
+            "x": 0.84,
+            "y": 0.16
+          },
+          "pixel": {
+            "x": 81,
+            "y": 9
+          }
+        },
+        "flippedX": {
+          "normalized": {
+            "x": 0.16,
+            "y": 0.16
+          },
+          "pixel": {
+            "x": 15,
+            "y": 9
+          }
+        }
+      },
+      "telegraphDefinition": {
+        "reuseOnly": true,
+        "primitives": [
+          "forward-cone"
+        ],
+        "angleDeg": 34,
+        "lengthPx": 150,
+        "palette": {
+          "warning": "#D88149",
+          "collision": "#B94A3E",
+          "safe": "#72A99D"
+        }
+      },
+      "states": {
+        "idle": {
+          "resolution": "unique-asset",
+          "assetKey": "idle",
+          "direction": "side",
+          "file": "creatures/act2/resonance_civet/runtime/act2_resonance_civet_idle_side_01.png"
+        },
+        "move": {
+          "resolution": "unique-asset",
+          "assetKey": "move",
+          "direction": "side",
+          "file": "creatures/act2/resonance_civet/runtime/act2_resonance_civet_move_side_01.png"
+        },
+        "prep": {
+          "resolution": "unique-asset",
+          "assetKey": "prep",
+          "direction": "side",
+          "file": "creatures/act2/resonance_civet/runtime/act2_resonance_civet_prep_side_01.png"
+        },
+        "attack": {
+          "resolution": "unique-asset",
+          "assetKey": "attack",
+          "direction": "side",
+          "file": "creatures/act2/resonance_civet/runtime/act2_resonance_civet_attack_side_01.png"
+        }
+      },
+      "stateAliases": {
+        "hit": {
+          "sourceState": "move",
+          "rotationDeg": 0,
+          "tint": "#B94A3E",
+          "shake": true,
+          "replaceAfterSubmission": true
+        }
+      },
+      "bossPhaseMap": null,
+      "masterFiles": {
+        "idle": "creatures/act2/resonance_civet/master/act2_resonance_civet_idle_side_master.png",
+        "move": "creatures/act2/resonance_civet/master/act2_resonance_civet_move_side_master.png",
+        "prep": "creatures/act2/resonance_civet/master/act2_resonance_civet_prep_side_master.png",
+        "attack": "creatures/act2/resonance_civet/master/act2_resonance_civet_attack_side_master.png"
+      },
+      "runtimeFiles": {
+        "idle": "creatures/act2/resonance_civet/runtime/act2_resonance_civet_idle_side_01.png",
+        "move": "creatures/act2/resonance_civet/runtime/act2_resonance_civet_move_side_01.png",
+        "prep": "creatures/act2/resonance_civet/runtime/act2_resonance_civet_prep_side_01.png",
+        "attack": "creatures/act2/resonance_civet/runtime/act2_resonance_civet_attack_side_01.png"
+      },
+      "optionalOverlays": [],
+      "palette": {
+        "primary": {
+          "name": "젖은 적갈",
+          "hex": "#6F4637"
+        },
+        "secondary": {
+          "name": "골회",
+          "hex": "#B0A58E"
+        },
+        "accent": {
+          "name": "탈채도 청록",
+          "hex": "#4E716B"
+        },
+        "reservedTelegraph": {
+          "warning": "#D88149",
+          "collision": "#B94A3E",
+          "safe": "#72A99D"
+        }
+      },
+      "implementationPriority": {
+        "tier": "Must",
+        "order": 3
+      },
+      "notes": [
+        "No repository class name is asserted; aiArchetypeRole is a role key only.",
+        "Whisker cage convergence is preserved; fine fur and spots are secondary."
+      ]
+    },
+    {
+      "id": "pleated_frog",
+      "displayName": "주름목 개구리",
+      "act": 2,
+      "role": "regular-enemy",
+      "aiArchetypeRole": "projectile",
+      "directionMode": "front-side",
+      "canvasSize": {
+        "width": 118,
+        "height": 84
+      },
+      "runtimeScale": 1.0,
+      "groundPoint": {
+        "original": {
+          "normalized": {
+            "x": 0.5,
+            "y": 0.9
+          },
+          "pixel": {
+            "x": 59,
+            "y": 76
+          }
+        },
+        "flippedX": {
+          "normalized": {
+            "x": 0.5,
+            "y": 0.9
+          },
+          "pixel": {
+            "x": 59,
+            "y": 76
+          }
+        }
+      },
+      "shadowAnchor": {
+        "original": {
+          "normalized": {
+            "x": 0.5,
+            "y": 0.9
+          },
+          "pixel": {
+            "x": 59,
+            "y": 76
+          }
+        },
+        "flippedX": {
+          "normalized": {
+            "x": 0.5,
+            "y": 0.9
+          },
+          "pixel": {
+            "x": 59,
+            "y": 76
+          }
+        },
+        "mode": "procedural",
+        "notes": "No baked shadow; generate from Ground Point. Catfish uses water-contact ripple instead."
+      },
+      "hurtbox": {
+        "original": {
+          "x": 25,
+          "y": 34,
+          "width": 68,
+          "height": 42
+        },
+        "flippedX": {
+          "x": 25,
+          "y": 34,
+          "width": 68,
+          "height": 42
+        },
+        "source": "packaging-derived from locked size and Ground Point; verify against engine debug view"
+      },
+      "attackAnchors": [
+        {
+          "id": "mouth-pressure-ring",
+          "original": {
+            "normalized": {
+              "x": 0.5,
+              "y": 0.45
+            },
+            "pixel": {
+              "x": 59,
+              "y": 38
+            }
+          },
+          "flippedX": {
+            "normalized": {
+              "x": 0.5,
+              "y": 0.45
+            },
+            "pixel": {
+              "x": 59,
+              "y": 38
+            }
+          }
+        }
+      ],
+      "displayIconAnchor": {
+        "original": {
+          "normalized": {
+            "x": 0.84,
+            "y": 0.16
+          },
+          "pixel": {
+            "x": 99,
+            "y": 13
+          }
+        },
+        "flippedX": {
+          "normalized": {
+            "x": 0.16,
+            "y": 0.16
+          },
+          "pixel": {
+            "x": 19,
+            "y": 13
+          }
+        }
+      },
+      "telegraphDefinition": {
+        "reuseOnly": true,
+        "primitives": [
+          "straight-aim-line",
+          "impact-circle"
+        ],
+        "lineWidthPx": [
+          4,
+          6
+        ],
+        "impactRadiusPx": [
+          48,
+          72
+        ],
+        "palette": {
+          "warning": "#D88149",
+          "collision": "#B94A3E",
+          "safe": "#72A99D"
+        }
+      },
+      "states": {
+        "idle": {
+          "resolution": "unique-asset",
+          "assetKey": "idle",
+          "direction": "front",
+          "file": "creatures/act2/pleated_frog/runtime/act2_pleated_frog_idle_front_01.png"
+        },
+        "move": {
+          "resolution": "unique-asset",
+          "assetKey": "move",
+          "direction": "side",
+          "file": "creatures/act2/pleated_frog/runtime/act2_pleated_frog_move_side_01.png"
+        },
+        "prep": {
+          "resolution": "unique-asset",
+          "assetKey": "prep",
+          "direction": "front",
+          "file": "creatures/act2/pleated_frog/runtime/act2_pleated_frog_prep_front_01.png"
+        },
+        "attack": {
+          "resolution": "unique-asset",
+          "assetKey": "attack",
+          "direction": "front",
+          "file": "creatures/act2/pleated_frog/runtime/act2_pleated_frog_attack_front_01.png"
+        }
+      },
+      "stateAliases": {
+        "hit": {
+          "sourceState": "move",
+          "rotationDeg": 0,
+          "tint": "#B94A3E",
+          "shake": true,
+          "replaceAfterSubmission": true
+        }
+      },
+      "bossPhaseMap": null,
+      "masterFiles": {
+        "idle": "creatures/act2/pleated_frog/master/act2_pleated_frog_idle_front_master.png",
+        "move": "creatures/act2/pleated_frog/master/act2_pleated_frog_move_side_master.png",
+        "prep": "creatures/act2/pleated_frog/master/act2_pleated_frog_prep_front_master.png",
+        "attack": "creatures/act2/pleated_frog/master/act2_pleated_frog_attack_front_master.png"
+      },
+      "runtimeFiles": {
+        "idle": "creatures/act2/pleated_frog/runtime/act2_pleated_frog_idle_front_01.png",
+        "move": "creatures/act2/pleated_frog/runtime/act2_pleated_frog_move_side_01.png",
+        "prep": "creatures/act2/pleated_frog/runtime/act2_pleated_frog_prep_front_01.png",
+        "attack": "creatures/act2/pleated_frog/runtime/act2_pleated_frog_attack_front_01.png"
+      },
+      "optionalOverlays": [
+        {
+          "id": "pressure-ring",
+          "file": "vfx/pleated_frog_pressure_ring.png"
+        }
+      ],
+      "palette": {
+        "primary": {
+          "name": "균류성 올리브",
+          "hex": "#596047"
+        },
+        "secondary": {
+          "name": "균사 크림",
+          "hex": "#C1B89B"
+        },
+        "accent": {
+          "name": "탁한 황토",
+          "hex": "#A27B47"
+        },
+        "reservedTelegraph": {
+          "warning": "#D88149",
+          "collision": "#B94A3E",
+          "safe": "#72A99D"
+        }
+      },
+      "implementationPriority": {
+        "tier": "Must",
+        "order": 3
+      },
+      "notes": [
+        "No repository class name is asserted; aiArchetypeRole is a role key only.",
+        "Pressure-ring compress/open/fire sequence takes priority over skin detail."
+      ]
+    },
+    {
+      "id": "diffraction_pangolin",
+      "displayName": "회절비늘 천산갑",
+      "act": 2,
+      "role": "boss",
+      "aiArchetypeRole": "boss-3phase",
+      "directionMode": "flipX",
+      "canvasSize": {
+        "width": 184,
+        "height": 148
+      },
+      "runtimeScale": 1.0,
+      "groundPoint": {
+        "original": {
+          "normalized": {
+            "x": 0.5,
+            "y": 0.9
+          },
+          "pixel": {
+            "x": 92,
+            "y": 133
+          }
+        },
+        "flippedX": {
+          "normalized": {
+            "x": 0.5,
+            "y": 0.9
+          },
+          "pixel": {
+            "x": 92,
+            "y": 133
+          }
+        }
+      },
+      "shadowAnchor": {
+        "original": {
+          "normalized": {
+            "x": 0.5,
+            "y": 0.9
+          },
+          "pixel": {
+            "x": 92,
+            "y": 133
+          }
+        },
+        "flippedX": {
+          "normalized": {
+            "x": 0.5,
+            "y": 0.9
+          },
+          "pixel": {
+            "x": 92,
+            "y": 133
+          }
+        },
+        "mode": "procedural",
+        "notes": "No baked shadow; generate from Ground Point. Catfish uses water-contact ripple instead."
+      },
+      "hurtbox": {
+        "original": {
+          "x": 37,
+          "y": 63,
+          "width": 110,
+          "height": 70
+        },
+        "flippedX": {
+          "x": 37,
+          "y": 63,
+          "width": 110,
+          "height": 70
+        },
+        "source": "packaging-derived from locked size and Ground Point; verify against engine debug view"
+      },
+      "attackAnchors": [
+        {
+          "id": "snout",
+          "original": {
+            "normalized": {
+              "x": 0.15,
+              "y": 0.58
+            },
+            "pixel": {
+              "x": 28,
+              "y": 86
+            }
+          },
+          "flippedX": {
+            "normalized": {
+              "x": 0.85,
+              "y": 0.58
+            },
+            "pixel": {
+              "x": 156,
+              "y": 86
+            }
+          }
+        },
+        {
+          "id": "dorsal-ridge",
+          "original": {
+            "normalized": {
+              "x": 0.52,
+              "y": 0.37
+            },
+            "pixel": {
+              "x": 96,
+              "y": 55
+            }
+          },
+          "flippedX": {
+            "normalized": {
+              "x": 0.48,
+              "y": 0.37
+            },
+            "pixel": {
+              "x": 88,
+              "y": 55
+            }
+          }
+        },
+        {
+          "id": "tail-tip",
+          "original": {
+            "normalized": {
+              "x": 0.88,
+              "y": 0.64
+            },
+            "pixel": {
+              "x": 162,
+              "y": 95
+            }
+          },
+          "flippedX": {
+            "normalized": {
+              "x": 0.12,
+              "y": 0.64
+            },
+            "pixel": {
+              "x": 22,
+              "y": 95
+            }
+          }
+        }
+      ],
+      "displayIconAnchor": {
+        "original": {
+          "normalized": {
+            "x": 0.84,
+            "y": 0.16
+          },
+          "pixel": {
+            "x": 155,
+            "y": 24
+          }
+        },
+        "flippedX": {
+          "normalized": {
+            "x": 0.16,
+            "y": 0.16
+          },
+          "pixel": {
+            "x": 29,
+            "y": 24
+          }
+        }
+      },
+      "telegraphDefinition": {
+        "reuseOnly": true,
+        "primitives": [
+          "straight-charge-lane",
+          "circle",
+          "phase-ring"
+        ],
+        "chargeWidthPx": 96,
+        "palette": {
+          "warning": "#D88149",
+          "collision": "#B94A3E",
+          "safe": "#72A99D"
+        }
+      },
+      "states": {
+        "idle": {
+          "resolution": "unique-asset",
+          "assetKey": "idle",
+          "direction": "side",
+          "file": "creatures/act2/diffraction_pangolin/runtime/act2_diffraction_pangolin_idle_side_01.png"
+        },
+        "phase2": {
+          "resolution": "unique-asset",
+          "assetKey": "phase2",
+          "direction": "side",
+          "file": "creatures/act2/diffraction_pangolin/runtime/act2_diffraction_pangolin_phase2_side_01.png"
+        },
+        "attack_or_burrow": {
+          "resolution": "unique-asset",
+          "assetKey": "attack_or_burrow",
+          "direction": "side",
+          "file": "creatures/act2/diffraction_pangolin/runtime/act2_diffraction_pangolin_attack_or_burrow_side_01.png"
+        },
+        "phase3": {
+          "resolution": "unique-asset",
+          "assetKey": "phase3",
+          "direction": "side",
+          "file": "creatures/act2/diffraction_pangolin/runtime/act2_diffraction_pangolin_phase3_side_01.png"
+        }
+      },
+      "stateAliases": {
+        "warning": {
+          "sourceState": "idle",
+          "rotationDeg": 0,
+          "tint": null,
+          "shake": false,
+          "overlayFiles": [
+            "vfx/diffraction_pangolin_scale_highlight_overlay.png"
+          ],
+          "replaceAfterSubmission": true
+        },
+        "phase1": {
+          "sourceState": "idle",
+          "rotationDeg": 0,
+          "tint": null,
+          "shake": false,
+          "replaceAfterSubmission": true
+        },
+        "retreat": {
+          "sourceState": "idle",
+          "rotationDeg": 4,
+          "tint": null,
+          "shake": false,
+          "flipX": true,
+          "replaceAfterSubmission": true
+        }
+      },
+      "bossPhaseMap": {
+        "preFight": {
+          "state": "warning"
+        },
+        "phase1": {
+          "state": "phase1",
+          "displayStringKey": "boss.diffraction_pangolin.phase1"
+        },
+        "phase2": {
+          "state": "phase2",
+          "displayStringKey": "boss.diffraction_pangolin.phase2"
+        },
+        "phase3": {
+          "state": "phase3",
+          "displayStringKey": "boss.diffraction_pangolin.phase3"
+        },
+        "attackOrBurrow": {
+          "state": "attack_or_burrow"
+        },
+        "defeated/nonlethal": {
+          "state": "retreat"
+        }
+      },
+      "masterFiles": {
+        "idle": "creatures/act2/diffraction_pangolin/master/act2_diffraction_pangolin_idle_side_master.png",
+        "phase2": "creatures/act2/diffraction_pangolin/master/act2_diffraction_pangolin_phase2_side_master.png",
+        "attack_or_burrow": "creatures/act2/diffraction_pangolin/master/act2_diffraction_pangolin_attack_or_burrow_side_master.png",
+        "phase3": "creatures/act2/diffraction_pangolin/master/act2_diffraction_pangolin_phase3_side_master.png"
+      },
+      "runtimeFiles": {
+        "idle": "creatures/act2/diffraction_pangolin/runtime/act2_diffraction_pangolin_idle_side_01.png",
+        "phase2": "creatures/act2/diffraction_pangolin/runtime/act2_diffraction_pangolin_phase2_side_01.png",
+        "attack_or_burrow": "creatures/act2/diffraction_pangolin/runtime/act2_diffraction_pangolin_attack_or_burrow_side_01.png",
+        "phase3": "creatures/act2/diffraction_pangolin/runtime/act2_diffraction_pangolin_phase3_side_01.png"
+      },
+      "optionalOverlays": [
+        {
+          "id": "scale-highlight",
+          "file": "vfx/diffraction_pangolin_scale_highlight_overlay.png"
+        }
+      ],
+      "palette": {
+        "primary": {
+          "name": "토탄 흑회",
+          "hex": "#2F3331"
+        },
+        "secondary": {
+          "name": "산화동",
+          "hex": "#765446"
+        },
+        "accent": {
+          "name": "백악질 회백",
+          "hex": "#A99F87"
+        },
+        "reservedTelegraph": {
+          "warning": "#D88149",
+          "collision": "#B94A3E",
+          "safe": "#72A99D"
+        }
+      },
+      "implementationPriority": {
+        "tier": "Must",
+        "order": 4
+      },
+      "notes": [
+        "No repository class name is asserted; aiArchetypeRole is a role key only.",
+        "01F correction increases layer gap/ridge/head-shoulder readability without adding scales."
+      ]
+    },
+    {
+      "id": "flowjaw_crab",
+      "displayName": "흐름턱 게",
+      "act": 3,
+      "role": "regular-enemy",
+      "aiArchetypeRole": "defense-melee",
+      "directionMode": "front-side",
+      "canvasSize": {
+        "width": 112,
+        "height": 72
+      },
+      "runtimeScale": 1.0,
+      "groundPoint": {
+        "original": {
+          "normalized": {
+            "x": 0.5,
+            "y": 0.88
+          },
+          "pixel": {
+            "x": 56,
+            "y": 63
+          }
+        },
+        "flippedX": {
+          "normalized": {
+            "x": 0.5,
+            "y": 0.88
+          },
+          "pixel": {
+            "x": 56,
+            "y": 63
+          }
+        }
+      },
+      "shadowAnchor": {
+        "original": {
+          "normalized": {
+            "x": 0.5,
+            "y": 0.88
+          },
+          "pixel": {
+            "x": 56,
+            "y": 63
+          }
+        },
+        "flippedX": {
+          "normalized": {
+            "x": 0.5,
+            "y": 0.88
+          },
+          "pixel": {
+            "x": 56,
+            "y": 63
+          }
+        },
+        "mode": "procedural",
+        "notes": "No baked shadow; generate from Ground Point. Catfish uses water-contact ripple instead."
+      },
+      "hurtbox": {
+        "original": {
+          "x": 19,
+          "y": 21,
+          "width": 74,
+          "height": 42
+        },
+        "flippedX": {
+          "x": 19,
+          "y": 21,
+          "width": 74,
+          "height": 42
+        },
+        "source": "packaging-derived from locked size and Ground Point; verify against engine debug view"
+      },
+      "attackAnchors": [
+        {
+          "id": "gate-jaw",
+          "original": {
+            "normalized": {
+              "x": 0.5,
+              "y": 0.58
+            },
+            "pixel": {
+              "x": 56,
+              "y": 42
+            }
+          },
+          "flippedX": {
+            "normalized": {
+              "x": 0.5,
+              "y": 0.58
+            },
+            "pixel": {
+              "x": 56,
+              "y": 42
+            }
+          }
+        }
+      ],
+      "displayIconAnchor": {
+        "original": {
+          "normalized": {
+            "x": 0.84,
+            "y": 0.16
+          },
+          "pixel": {
+            "x": 94,
+            "y": 12
+          }
+        },
+        "flippedX": {
+          "normalized": {
+            "x": 0.16,
+            "y": 0.16
+          },
+          "pixel": {
+            "x": 18,
+            "y": 12
+          }
+        }
+      },
+      "telegraphDefinition": {
+        "reuseOnly": true,
+        "primitives": [
+          "front-semicircle",
+          "direction-arrow"
+        ],
+        "radiusPx": 92,
+        "palette": {
+          "warning": "#D88149",
+          "collision": "#B94A3E",
+          "safe": "#72A99D"
+        }
+      },
+      "states": {
+        "idle": {
+          "resolution": "unique-asset",
+          "assetKey": "idle",
+          "direction": "front",
+          "file": "creatures/act3/flowjaw_crab/runtime/act3_flowjaw_crab_idle_front_01.png"
+        },
+        "guard": {
+          "resolution": "unique-asset",
+          "assetKey": "guard",
+          "direction": "front",
+          "file": "creatures/act3/flowjaw_crab/runtime/act3_flowjaw_crab_guard_front_01.png"
+        },
+        "attack": {
+          "resolution": "unique-asset",
+          "assetKey": "attack",
+          "direction": "front",
+          "file": "creatures/act3/flowjaw_crab/runtime/act3_flowjaw_crab_attack_front_01.png"
+        },
+        "hit": {
+          "resolution": "unique-asset",
+          "assetKey": "hit",
+          "direction": "side",
+          "file": "creatures/act3/flowjaw_crab/runtime/act3_flowjaw_crab_hit_side_01.png"
+        }
+      },
+      "stateAliases": {
+        "move": {
+          "sourceState": "idle",
+          "rotationDeg": 0,
+          "tint": null,
+          "shake": false,
+          "replaceAfterSubmission": true
+        }
+      },
+      "bossPhaseMap": null,
+      "masterFiles": {
+        "idle": "creatures/act3/flowjaw_crab/master/act3_flowjaw_crab_idle_front_master.png",
+        "guard": "creatures/act3/flowjaw_crab/master/act3_flowjaw_crab_guard_front_master.png",
+        "attack": "creatures/act3/flowjaw_crab/master/act3_flowjaw_crab_attack_front_master.png",
+        "hit": "creatures/act3/flowjaw_crab/master/act3_flowjaw_crab_hit_side_master.png"
+      },
+      "runtimeFiles": {
+        "idle": "creatures/act3/flowjaw_crab/runtime/act3_flowjaw_crab_idle_front_01.png",
+        "guard": "creatures/act3/flowjaw_crab/runtime/act3_flowjaw_crab_guard_front_01.png",
+        "attack": "creatures/act3/flowjaw_crab/runtime/act3_flowjaw_crab_attack_front_01.png",
+        "hit": "creatures/act3/flowjaw_crab/runtime/act3_flowjaw_crab_hit_side_01.png"
+      },
+      "optionalOverlays": [
+        {
+          "id": "gate-direction",
+          "file": "vfx/flowjaw_crab_gate_direction.png"
+        }
+      ],
+      "palette": {
+        "primary": {
+          "name": "퇴적 베이지",
+          "hex": "#8B7A63"
+        },
+        "secondary": {
+          "name": "녹갈",
+          "hex": "#765243"
+        },
+        "accent": {
+          "name": "광물 가장자리",
+          "hex": "#C0B6A0"
+        },
+        "reservedTelegraph": {
+          "warning": "#D88149",
+          "collision": "#B94A3E",
+          "safe": "#72A99D"
+        }
+      },
+      "implementationPriority": {
+        "tier": "Must",
+        "order": 5
+      },
+      "notes": [
+        "No repository class name is asserted; aiArchetypeRole is a role key only.",
+        "Closed/open front plate distinction takes priority over shell detail."
+      ]
+    },
+    {
+      "id": "pulsebarbel_catfish",
+      "displayName": "맥수염 메기",
+      "act": 3,
+      "role": "regular-enemy",
+      "aiArchetypeRole": "projectile",
+      "directionMode": "flipX",
+      "canvasSize": {
+        "width": 124,
+        "height": 58
+      },
+      "runtimeScale": 1.0,
+      "groundPoint": {
+        "original": {
+          "normalized": {
+            "x": 0.45,
+            "y": 0.82
+          },
+          "pixel": {
+            "x": 56,
+            "y": 48
+          }
+        },
+        "flippedX": {
+          "normalized": {
+            "x": 0.55,
+            "y": 0.82
+          },
+          "pixel": {
+            "x": 68,
+            "y": 48
+          }
+        }
+      },
+      "shadowAnchor": {
+        "original": {
+          "normalized": {
+            "x": 0.45,
+            "y": 0.82
+          },
+          "pixel": {
+            "x": 56,
+            "y": 48
+          }
+        },
+        "flippedX": {
+          "normalized": {
+            "x": 0.55,
+            "y": 0.82
+          },
+          "pixel": {
+            "x": 68,
+            "y": 48
+          }
+        },
+        "mode": "procedural",
+        "notes": "No baked shadow; generate from Ground Point. Catfish uses water-contact ripple instead."
+      },
+      "hurtbox": {
+        "original": {
+          "x": 15,
+          "y": 16,
+          "width": 82,
+          "height": 32
+        },
+        "flippedX": {
+          "x": 27,
+          "y": 16,
+          "width": 82,
+          "height": 32
+        },
+        "source": "packaging-derived from locked size and Ground Point; verify against engine debug view"
+      },
+      "attackAnchors": [
+        {
+          "id": "mouth",
+          "original": {
+            "normalized": {
+              "x": 0.13,
+              "y": 0.52
+            },
+            "pixel": {
+              "x": 16,
+              "y": 30
+            }
+          },
+          "flippedX": {
+            "normalized": {
+              "x": 0.87,
+              "y": 0.52
+            },
+            "pixel": {
+              "x": 108,
+              "y": 30
+            }
+          }
+        }
+      ],
+      "displayIconAnchor": {
+        "original": {
+          "normalized": {
+            "x": 0.84,
+            "y": 0.16
+          },
+          "pixel": {
+            "x": 104,
+            "y": 9
+          }
+        },
+        "flippedX": {
+          "normalized": {
+            "x": 0.16,
+            "y": 0.16
+          },
+          "pixel": {
+            "x": 20,
+            "y": 9
+          }
+        }
+      },
+      "telegraphDefinition": {
+        "reuseOnly": true,
+        "primitives": [
+          "straight-aim-line",
+          "impact-circle"
+        ],
+        "lineWidthPx": [
+          4,
+          6
+        ],
+        "palette": {
+          "warning": "#D88149",
+          "collision": "#B94A3E",
+          "safe": "#72A99D"
+        }
+      },
+      "states": {
+        "idle": {
+          "resolution": "unique-asset",
+          "assetKey": "idle",
+          "direction": "side",
+          "file": "creatures/act3/pulsebarbel_catfish/runtime/act3_pulsebarbel_catfish_idle_side_01.png"
+        },
+        "move": {
+          "resolution": "unique-asset",
+          "assetKey": "move",
+          "direction": "side",
+          "file": "creatures/act3/pulsebarbel_catfish/runtime/act3_pulsebarbel_catfish_move_side_01.png"
+        },
+        "prep": {
+          "resolution": "unique-asset",
+          "assetKey": "prep",
+          "direction": "side",
+          "file": "creatures/act3/pulsebarbel_catfish/runtime/act3_pulsebarbel_catfish_prep_side_01.png"
+        },
+        "attack": {
+          "resolution": "unique-asset",
+          "assetKey": "attack",
+          "direction": "side",
+          "file": "creatures/act3/pulsebarbel_catfish/runtime/act3_pulsebarbel_catfish_attack_side_01.png"
+        }
+      },
+      "stateAliases": {
+        "hit": {
+          "sourceState": "move",
+          "rotationDeg": 0,
+          "tint": "#B94A3E",
+          "shake": true,
+          "replaceAfterSubmission": true
+        }
+      },
+      "bossPhaseMap": null,
+      "masterFiles": {
+        "idle": "creatures/act3/pulsebarbel_catfish/master/act3_pulsebarbel_catfish_idle_side_master.png",
+        "move": "creatures/act3/pulsebarbel_catfish/master/act3_pulsebarbel_catfish_move_side_master.png",
+        "prep": "creatures/act3/pulsebarbel_catfish/master/act3_pulsebarbel_catfish_prep_side_master.png",
+        "attack": "creatures/act3/pulsebarbel_catfish/master/act3_pulsebarbel_catfish_attack_side_master.png"
+      },
+      "runtimeFiles": {
+        "idle": "creatures/act3/pulsebarbel_catfish/runtime/act3_pulsebarbel_catfish_idle_side_01.png",
+        "move": "creatures/act3/pulsebarbel_catfish/runtime/act3_pulsebarbel_catfish_move_side_01.png",
+        "prep": "creatures/act3/pulsebarbel_catfish/runtime/act3_pulsebarbel_catfish_prep_side_01.png",
+        "attack": "creatures/act3/pulsebarbel_catfish/runtime/act3_pulsebarbel_catfish_attack_side_01.png"
+      },
+      "optionalOverlays": [
+        {
+          "id": "gill-pressure",
+          "file": "vfx/pulsebarbel_catfish_gill_pressure.png"
+        }
+      ],
+      "palette": {
+        "primary": {
+          "name": "강물 청회",
+          "hex": "#485661"
+        },
+        "secondary": {
+          "name": "아가미 은회",
+          "hex": "#87959A"
+        },
+        "accent": {
+          "name": "탁한 황동",
+          "hex": "#84715B"
+        },
+        "reservedTelegraph": {
+          "warning": "#D88149",
+          "collision": "#B94A3E",
+          "safe": "#72A99D"
+        }
+      },
+      "implementationPriority": {
+        "tier": "Must",
+        "order": 5
+      },
+      "notes": [
+        "No repository class name is asserted; aiArchetypeRole is a role key only.",
+        "Water contact point replaces land shadow."
+      ]
+    },
+    {
+      "id": "channel_otter_mother",
+      "displayName": "유로맥 수달어미",
+      "act": 3,
+      "role": "boss",
+      "aiArchetypeRole": "boss-3phase",
+      "directionMode": "flipX",
+      "canvasSize": {
+        "width": 210,
+        "height": 148
+      },
+      "runtimeScale": 1.0,
+      "groundPoint": {
+        "original": {
+          "normalized": {
+            "x": 0.42,
+            "y": 0.88
+          },
+          "pixel": {
+            "x": 88,
+            "y": 130
+          }
+        },
+        "flippedX": {
+          "normalized": {
+            "x": 0.58,
+            "y": 0.88
+          },
+          "pixel": {
+            "x": 122,
+            "y": 130
+          }
+        }
+      },
+      "shadowAnchor": {
+        "original": {
+          "normalized": {
+            "x": 0.42,
+            "y": 0.88
+          },
+          "pixel": {
+            "x": 88,
+            "y": 130
+          }
+        },
+        "flippedX": {
+          "normalized": {
+            "x": 0.58,
+            "y": 0.88
+          },
+          "pixel": {
+            "x": 122,
+            "y": 130
+          }
+        },
+        "mode": "procedural",
+        "notes": "No baked shadow; generate from Ground Point. Catfish uses water-contact ripple instead."
+      },
+      "hurtbox": {
+        "original": {
+          "x": 30,
+          "y": 64,
+          "width": 116,
+          "height": 66
+        },
+        "flippedX": {
+          "x": 64,
+          "y": 64,
+          "width": 116,
+          "height": 66
+        },
+        "source": "packaging-derived from locked size and Ground Point; verify against engine debug view"
+      },
+      "attackAnchors": [
+        {
+          "id": "forepaw",
+          "original": {
+            "normalized": {
+              "x": 0.28,
+              "y": 0.7
+            },
+            "pixel": {
+              "x": 59,
+              "y": 104
+            }
+          },
+          "flippedX": {
+            "normalized": {
+              "x": 0.72,
+              "y": 0.7
+            },
+            "pixel": {
+              "x": 151,
+              "y": 104
+            }
+          }
+        },
+        {
+          "id": "snout",
+          "original": {
+            "normalized": {
+              "x": 0.22,
+              "y": 0.47
+            },
+            "pixel": {
+              "x": 46,
+              "y": 70
+            }
+          },
+          "flippedX": {
+            "normalized": {
+              "x": 0.78,
+              "y": 0.47
+            },
+            "pixel": {
+              "x": 164,
+              "y": 70
+            }
+          }
+        }
+      ],
+      "displayIconAnchor": {
+        "original": {
+          "normalized": {
+            "x": 0.84,
+            "y": 0.16
+          },
+          "pixel": {
+            "x": 176,
+            "y": 24
+          }
+        },
+        "flippedX": {
+          "normalized": {
+            "x": 0.16,
+            "y": 0.16
+          },
+          "pixel": {
+            "x": 34,
+            "y": 24
+          }
+        }
+      },
+      "telegraphDefinition": {
+        "reuseOnly": true,
+        "primitives": [
+          "circle",
+          "straight-lane",
+          "map-spawn-point"
+        ],
+        "palette": {
+          "warning": "#D88149",
+          "collision": "#B94A3E",
+          "safe": "#72A99D"
+        }
+      },
+      "states": {
+        "phase1": {
+          "resolution": "unique-asset",
+          "assetKey": "phase1",
+          "direction": "side",
+          "file": "creatures/act3/channel_otter_mother/runtime/act3_channel_otter_mother_phase1_side_01.png"
+        },
+        "warning": {
+          "resolution": "unique-asset",
+          "assetKey": "warning",
+          "direction": "side",
+          "file": "creatures/act3/channel_otter_mother/runtime/act3_channel_otter_mother_warning_side_01.png"
+        },
+        "phase3_or_diveprep": {
+          "resolution": "unique-asset",
+          "assetKey": "phase3_or_diveprep",
+          "direction": "side",
+          "file": "creatures/act3/channel_otter_mother/runtime/act3_channel_otter_mother_phase3_or_diveprep_side_01.png"
+        },
+        "protect_idle": {
+          "resolution": "unique-asset",
+          "assetKey": "protect_idle",
+          "direction": "side",
+          "file": "creatures/act3/channel_otter_mother/runtime/act3_channel_otter_mother_protect_idle_side_01.png"
+        }
+      },
+      "stateAliases": {
+        "phase2": {
+          "sourceState": "warning",
+          "rotationDeg": 0,
+          "scale": 1.03,
+          "tint": null,
+          "shake": false,
+          "overlayFiles": [
+            "vfx/channel_otter_mother_water_membrane_overlay.png"
+          ],
+          "replaceAfterSubmission": true
+        },
+        "attack_or_surface": {
+          "sourceState": "phase3_or_diveprep",
+          "rotationDeg": -4,
+          "tint": null,
+          "shake": false,
+          "replaceAfterSubmission": true
+        },
+        "retreat": {
+          "sourceState": "protect_idle",
+          "rotationDeg": 3,
+          "tint": null,
+          "shake": false,
+          "flipX": true,
+          "replaceAfterSubmission": true
+        }
+      },
+      "bossPhaseMap": {
+        "preFight": {
+          "state": "warning"
+        },
+        "phase1": {
+          "state": "phase1",
+          "displayStringKey": "boss.channel_otter_mother.phase1"
+        },
+        "phase2": {
+          "state": "phase2",
+          "displayStringKey": "boss.channel_otter_mother.phase2"
+        },
+        "phase3": {
+          "state": "phase3_or_diveprep",
+          "displayStringKey": "boss.channel_otter_mother.phase3"
+        },
+        "attackOrSurface": {
+          "state": "attack_or_surface"
+        },
+        "defeated/nonlethal": {
+          "state": "retreat"
+        }
+      },
+      "masterFiles": {
+        "phase1": "creatures/act3/channel_otter_mother/master/act3_channel_otter_mother_phase1_side_master.png",
+        "warning": "creatures/act3/channel_otter_mother/master/act3_channel_otter_mother_warning_side_master.png",
+        "phase3_or_diveprep": "creatures/act3/channel_otter_mother/master/act3_channel_otter_mother_phase3_or_diveprep_side_master.png",
+        "protect_idle": "creatures/act3/channel_otter_mother/master/act3_channel_otter_mother_protect_idle_side_master.png"
+      },
+      "runtimeFiles": {
+        "phase1": "creatures/act3/channel_otter_mother/runtime/act3_channel_otter_mother_phase1_side_01.png",
+        "warning": "creatures/act3/channel_otter_mother/runtime/act3_channel_otter_mother_warning_side_01.png",
+        "phase3_or_diveprep": "creatures/act3/channel_otter_mother/runtime/act3_channel_otter_mother_phase3_or_diveprep_side_01.png",
+        "protect_idle": "creatures/act3/channel_otter_mother/runtime/act3_channel_otter_mother_protect_idle_side_01.png"
+      },
+      "optionalOverlays": [
+        {
+          "id": "water-membrane-pulse",
+          "file": "vfx/channel_otter_mother_water_membrane_overlay.png"
+        }
+      ],
+      "palette": {
+        "primary": {
+          "name": "젖은 밤갈",
+          "hex": "#5C4033"
+        },
+        "secondary": {
+          "name": "탁한 황백",
+          "hex": "#B1A48C"
+        },
+        "accent": {
+          "name": "수류막 암청록",
+          "hex": "#425A5A"
+        },
+        "reservedTelegraph": {
+          "warning": "#D88149",
+          "collision": "#B94A3E",
+          "safe": "#72A99D"
+        }
+      },
+      "implementationPriority": {
+        "tier": "Must",
+        "order": 6
+      },
+      "notes": [
+        "No repository class name is asserted; aiArchetypeRole is a role key only.",
+        "01F correction replaces rigid dorsal blades with one flexible water membrane; protected young retains muzzle, ear and tail."
+      ]
+    }
+  ]
+}

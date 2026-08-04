@@ -1,0 +1,309 @@
+{
+  "id": "diffraction_pangolin",
+  "displayName": "회절비늘 천산갑",
+  "act": 2,
+  "role": "boss",
+  "aiArchetypeRole": "boss-3phase",
+  "directionMode": "flipX",
+  "canvasSize": {
+    "width": 184,
+    "height": 148
+  },
+  "runtimeScale": 1.0,
+  "groundPoint": {
+    "original": {
+      "normalized": {
+        "x": 0.5,
+        "y": 0.9
+      },
+      "pixel": {
+        "x": 92,
+        "y": 133
+      }
+    },
+    "flippedX": {
+      "normalized": {
+        "x": 0.5,
+        "y": 0.9
+      },
+      "pixel": {
+        "x": 92,
+        "y": 133
+      }
+    }
+  },
+  "shadowAnchor": {
+    "original": {
+      "normalized": {
+        "x": 0.5,
+        "y": 0.9
+      },
+      "pixel": {
+        "x": 92,
+        "y": 133
+      }
+    },
+    "flippedX": {
+      "normalized": {
+        "x": 0.5,
+        "y": 0.9
+      },
+      "pixel": {
+        "x": 92,
+        "y": 133
+      }
+    },
+    "mode": "procedural",
+    "notes": "No baked shadow; generate from Ground Point. Catfish uses water-contact ripple instead."
+  },
+  "hurtbox": {
+    "original": {
+      "x": 37,
+      "y": 63,
+      "width": 110,
+      "height": 70
+    },
+    "flippedX": {
+      "x": 37,
+      "y": 63,
+      "width": 110,
+      "height": 70
+    },
+    "source": "packaging-derived from locked size and Ground Point; verify against engine debug view"
+  },
+  "attackAnchors": [
+    {
+      "id": "snout",
+      "original": {
+        "normalized": {
+          "x": 0.15,
+          "y": 0.58
+        },
+        "pixel": {
+          "x": 28,
+          "y": 86
+        }
+      },
+      "flippedX": {
+        "normalized": {
+          "x": 0.85,
+          "y": 0.58
+        },
+        "pixel": {
+          "x": 156,
+          "y": 86
+        }
+      }
+    },
+    {
+      "id": "dorsal-ridge",
+      "original": {
+        "normalized": {
+          "x": 0.52,
+          "y": 0.37
+        },
+        "pixel": {
+          "x": 96,
+          "y": 55
+        }
+      },
+      "flippedX": {
+        "normalized": {
+          "x": 0.48,
+          "y": 0.37
+        },
+        "pixel": {
+          "x": 88,
+          "y": 55
+        }
+      }
+    },
+    {
+      "id": "tail-tip",
+      "original": {
+        "normalized": {
+          "x": 0.88,
+          "y": 0.64
+        },
+        "pixel": {
+          "x": 162,
+          "y": 95
+        }
+      },
+      "flippedX": {
+        "normalized": {
+          "x": 0.12,
+          "y": 0.64
+        },
+        "pixel": {
+          "x": 22,
+          "y": 95
+        }
+      }
+    }
+  ],
+  "displayIconAnchor": {
+    "original": {
+      "normalized": {
+        "x": 0.84,
+        "y": 0.16
+      },
+      "pixel": {
+        "x": 155,
+        "y": 24
+      }
+    },
+    "flippedX": {
+      "normalized": {
+        "x": 0.16,
+        "y": 0.16
+      },
+      "pixel": {
+        "x": 29,
+        "y": 24
+      }
+    }
+  },
+  "telegraphDefinition": {
+    "reuseOnly": true,
+    "primitives": [
+      "straight-charge-lane",
+      "circle",
+      "phase-ring"
+    ],
+    "chargeWidthPx": 96,
+    "palette": {
+      "warning": "#D88149",
+      "collision": "#B94A3E",
+      "safe": "#72A99D"
+    }
+  },
+  "states": {
+    "idle": {
+      "resolution": "unique-asset",
+      "assetKey": "idle",
+      "direction": "side",
+      "file": "creatures/act2/diffraction_pangolin/runtime/act2_diffraction_pangolin_idle_side_01.png"
+    },
+    "phase2": {
+      "resolution": "unique-asset",
+      "assetKey": "phase2",
+      "direction": "side",
+      "file": "creatures/act2/diffraction_pangolin/runtime/act2_diffraction_pangolin_phase2_side_01.png"
+    },
+    "attack_or_burrow": {
+      "resolution": "unique-asset",
+      "assetKey": "attack_or_burrow",
+      "direction": "side",
+      "file": "creatures/act2/diffraction_pangolin/runtime/act2_diffraction_pangolin_attack_or_burrow_side_01.png"
+    },
+    "phase3": {
+      "resolution": "unique-asset",
+      "assetKey": "phase3",
+      "direction": "side",
+      "file": "creatures/act2/diffraction_pangolin/runtime/act2_diffraction_pangolin_phase3_side_01.png"
+    }
+  },
+  "stateAliases": {
+    "warning": {
+      "sourceState": "idle",
+      "rotationDeg": 0,
+      "tint": null,
+      "shake": false,
+      "overlayFiles": [
+        "vfx/diffraction_pangolin_scale_highlight_overlay.png"
+      ],
+      "replaceAfterSubmission": true
+    },
+    "phase1": {
+      "sourceState": "idle",
+      "rotationDeg": 0,
+      "tint": null,
+      "shake": false,
+      "replaceAfterSubmission": true
+    },
+    "retreat": {
+      "sourceState": "idle",
+      "rotationDeg": 4,
+      "tint": null,
+      "shake": false,
+      "flipX": true,
+      "replaceAfterSubmission": true
+    }
+  },
+  "bossPhaseMap": {
+    "preFight": {
+      "state": "warning"
+    },
+    "phase1": {
+      "state": "phase1",
+      "displayStringKey": "boss.diffraction_pangolin.phase1"
+    },
+    "phase2": {
+      "state": "phase2",
+      "displayStringKey": "boss.diffraction_pangolin.phase2"
+    },
+    "phase3": {
+      "state": "phase3",
+      "displayStringKey": "boss.diffraction_pangolin.phase3"
+    },
+    "attackOrBurrow": {
+      "state": "attack_or_burrow"
+    },
+    "defeated/nonlethal": {
+      "state": "retreat"
+    }
+  },
+  "masterFiles": {
+    "idle": "creatures/act2/diffraction_pangolin/master/act2_diffraction_pangolin_idle_side_master.png",
+    "phase2": "creatures/act2/diffraction_pangolin/master/act2_diffraction_pangolin_phase2_side_master.png",
+    "attack_or_burrow": "creatures/act2/diffraction_pangolin/master/act2_diffraction_pangolin_attack_or_burrow_side_master.png",
+    "phase3": "creatures/act2/diffraction_pangolin/master/act2_diffraction_pangolin_phase3_side_master.png"
+  },
+  "runtimeFiles": {
+    "idle": "creatures/act2/diffraction_pangolin/runtime/act2_diffraction_pangolin_idle_side_01.png",
+    "phase2": "creatures/act2/diffraction_pangolin/runtime/act2_diffraction_pangolin_phase2_side_01.png",
+    "attack_or_burrow": "creatures/act2/diffraction_pangolin/runtime/act2_diffraction_pangolin_attack_or_burrow_side_01.png",
+    "phase3": "creatures/act2/diffraction_pangolin/runtime/act2_diffraction_pangolin_phase3_side_01.png"
+  },
+  "optionalOverlays": [
+    {
+      "id": "scale-highlight",
+      "file": "vfx/diffraction_pangolin_scale_highlight_overlay.png"
+    }
+  ],
+  "palette": {
+    "primary": {
+      "name": "토탄 흑회",
+      "hex": "#2F3331"
+    },
+    "secondary": {
+      "name": "산화동",
+      "hex": "#765446"
+    },
+    "accent": {
+      "name": "백악질 회백",
+      "hex": "#A99F87"
+    },
+    "reservedTelegraph": {
+      "warning": "#D88149",
+      "collision": "#B94A3E",
+      "safe": "#72A99D"
+    }
+  },
+  "implementationPriority": {
+    "tier": "Must",
+    "order": 4
+  },
+  "notes": [
+    "No repository class name is asserted; aiArchetypeRole is a role key only.",
+    "01F correction increases layer gap/ridge/head-shoulder readability without adding scales."
+  ],
+  "sourceToRuntimeScale": {
+    "idle": 0.331646,
+    "phase2": 0.331646,
+    "attack_or_burrow": 0.331646,
+    "phase3": 0.331646
+  },
+  "metadataVersion": 1
+}

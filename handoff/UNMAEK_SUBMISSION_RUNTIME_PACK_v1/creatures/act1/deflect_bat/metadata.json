@@ -1,0 +1,216 @@
+{
+  "id": "deflect_bat",
+  "displayName": "편향관 박쥐",
+  "act": 1,
+  "role": "regular-enemy",
+  "aiArchetypeRole": "projectile",
+  "directionMode": "flipX",
+  "canvasSize": {
+    "width": 52,
+    "height": 36
+  },
+  "runtimeScale": 1.0,
+  "groundPoint": {
+    "original": {
+      "normalized": {
+        "x": 0.5,
+        "y": 0.8
+      },
+      "pixel": {
+        "x": 26,
+        "y": 29
+      }
+    },
+    "flippedX": {
+      "normalized": {
+        "x": 0.5,
+        "y": 0.8
+      },
+      "pixel": {
+        "x": 26,
+        "y": 29
+      }
+    }
+  },
+  "shadowAnchor": {
+    "original": {
+      "normalized": {
+        "x": 0.5,
+        "y": 0.8
+      },
+      "pixel": {
+        "x": 26,
+        "y": 29
+      }
+    },
+    "flippedX": {
+      "normalized": {
+        "x": 0.5,
+        "y": 0.8
+      },
+      "pixel": {
+        "x": 26,
+        "y": 29
+      }
+    },
+    "mode": "procedural",
+    "notes": "No baked shadow; generate from Ground Point. Catfish uses water-contact ripple instead."
+  },
+  "hurtbox": {
+    "original": {
+      "x": 12,
+      "y": 9,
+      "width": 28,
+      "height": 20
+    },
+    "flippedX": {
+      "x": 12,
+      "y": 9,
+      "width": 28,
+      "height": 20
+    },
+    "source": "packaging-derived from locked size and Ground Point; verify against engine debug view"
+  },
+  "attackAnchors": [
+    {
+      "id": "mouth-organ",
+      "original": {
+        "normalized": {
+          "x": 0.5,
+          "y": 0.4
+        },
+        "pixel": {
+          "x": 26,
+          "y": 14
+        }
+      },
+      "flippedX": {
+        "normalized": {
+          "x": 0.5,
+          "y": 0.4
+        },
+        "pixel": {
+          "x": 26,
+          "y": 14
+        }
+      }
+    }
+  ],
+  "displayIconAnchor": {
+    "original": {
+      "normalized": {
+        "x": 0.84,
+        "y": 0.16
+      },
+      "pixel": {
+        "x": 44,
+        "y": 6
+      }
+    },
+    "flippedX": {
+      "normalized": {
+        "x": 0.16,
+        "y": 0.16
+      },
+      "pixel": {
+        "x": 8,
+        "y": 6
+      }
+    }
+  },
+  "telegraphDefinition": {
+    "reuseOnly": true,
+    "primitives": [
+      "straight-aim-line",
+      "visual-echo-offset"
+    ],
+    "lineWidthPx": [
+      4,
+      6
+    ],
+    "palette": {
+      "warning": "#D88149",
+      "collision": "#B94A3E",
+      "safe": "#72A99D"
+    }
+  },
+  "states": {
+    "idle": {
+      "resolution": "unique-asset",
+      "assetKey": "idle",
+      "direction": "side",
+      "file": "creatures/act1/deflect_bat/runtime/act1_deflect_bat_idle_side_01.png"
+    },
+    "move": {
+      "resolution": "unique-asset",
+      "assetKey": "move",
+      "direction": "side",
+      "file": "creatures/act1/deflect_bat/runtime/act1_deflect_bat_move_side_01.png"
+    }
+  },
+  "stateAliases": {
+    "prep": {
+      "sourceState": "idle",
+      "rotationDeg": 0,
+      "tint": null,
+      "shake": false,
+      "replaceAfterSubmission": true
+    },
+    "attack": {
+      "sourceState": "move",
+      "rotationDeg": 0,
+      "tint": null,
+      "shake": false,
+      "replaceAfterSubmission": true
+    },
+    "hit": {
+      "sourceState": "move",
+      "rotationDeg": 0,
+      "tint": "#B94A3E",
+      "shake": true,
+      "replaceAfterSubmission": true
+    }
+  },
+  "bossPhaseMap": null,
+  "masterFiles": {
+    "idle": "creatures/act1/deflect_bat/master/act1_deflect_bat_idle_side_master.png",
+    "move": "creatures/act1/deflect_bat/master/act1_deflect_bat_move_side_master.png"
+  },
+  "runtimeFiles": {
+    "idle": "creatures/act1/deflect_bat/runtime/act1_deflect_bat_idle_side_01.png",
+    "move": "creatures/act1/deflect_bat/runtime/act1_deflect_bat_move_side_01.png"
+  },
+  "optionalOverlays": [],
+  "palette": {
+    "primary": {
+      "name": "따뜻한 암갈색",
+      "hex": null
+    },
+    "secondary": {
+      "name": "막 회갈",
+      "hex": null
+    },
+    "accent": {
+      "name": "목주머니 음영",
+      "hex": null
+    },
+    "reservedTelegraph": {
+      "warning": "#D88149",
+      "collision": "#B94A3E",
+      "safe": "#72A99D"
+    }
+  },
+  "implementationPriority": {
+    "tier": "Must",
+    "order": 2
+  },
+  "notes": [
+    "No repository class name is asserted; aiArchetypeRole is a role key only.",
+    "Prioritize asymmetric ears and throat pouch over fine fur."
+  ],
+  "sourceToRuntimeScale": {
+    "idle": 0.198529,
+    "move": 0.198529
+  },
+  "metadataVersion": 1
+}

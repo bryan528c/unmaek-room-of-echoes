@@ -1,0 +1,163 @@
+{
+  "id": "pressure_swift",
+  "displayName": "압각 칼새",
+  "act": 1,
+  "role": "environmental-cue",
+  "aiArchetypeRole": "background-cue",
+  "directionMode": "flipX",
+  "canvasSize": {
+    "width": 36,
+    "height": 24
+  },
+  "runtimeScale": 1.0,
+  "groundPoint": {
+    "original": {
+      "normalized": {
+        "x": 0.5,
+        "y": 0.82
+      },
+      "pixel": {
+        "x": 18,
+        "y": 20
+      }
+    },
+    "flippedX": {
+      "normalized": {
+        "x": 0.5,
+        "y": 0.82
+      },
+      "pixel": {
+        "x": 18,
+        "y": 20
+      }
+    }
+  },
+  "shadowAnchor": {
+    "original": {
+      "normalized": {
+        "x": 0.5,
+        "y": 0.82
+      },
+      "pixel": {
+        "x": 18,
+        "y": 20
+      }
+    },
+    "flippedX": {
+      "normalized": {
+        "x": 0.5,
+        "y": 0.82
+      },
+      "pixel": {
+        "x": 18,
+        "y": 20
+      }
+    },
+    "mode": "procedural",
+    "notes": "No baked shadow; generate from Ground Point. Catfish uses water-contact ripple instead."
+  },
+  "hurtbox": null,
+  "attackAnchors": [],
+  "displayIconAnchor": {
+    "original": {
+      "normalized": {
+        "x": 0.84,
+        "y": 0.16
+      },
+      "pixel": {
+        "x": 30,
+        "y": 4
+      }
+    },
+    "flippedX": {
+      "normalized": {
+        "x": 0.16,
+        "y": 0.16
+      },
+      "pixel": {
+        "x": 6,
+        "y": 4
+      }
+    }
+  },
+  "telegraphDefinition": {
+    "reuseOnly": true,
+    "primitives": [
+      "rockfall-circle"
+    ],
+    "lineWidthPx": [
+      4,
+      6
+    ],
+    "palette": {
+      "warning": "#D88149",
+      "collision": "#B94A3E",
+      "safe": "#72A99D"
+    }
+  },
+  "states": {
+    "fly": {
+      "resolution": "unique-asset",
+      "assetKey": "fly",
+      "direction": "side",
+      "file": "creatures/act1/pressure_swift/runtime/act1_pressure_swift_fly_side_01.png"
+    },
+    "evade": {
+      "resolution": "unique-asset",
+      "assetKey": "evade",
+      "direction": "side",
+      "file": "creatures/act1/pressure_swift/runtime/act1_pressure_swift_evade_side_01.png"
+    }
+  },
+  "stateAliases": {
+    "idle": {
+      "sourceState": "fly",
+      "rotationDeg": 0,
+      "tint": null,
+      "shake": false,
+      "replaceAfterSubmission": true
+    }
+  },
+  "bossPhaseMap": null,
+  "masterFiles": {
+    "fly": "creatures/act1/pressure_swift/master/act1_pressure_swift_fly_side_master.png",
+    "evade": "creatures/act1/pressure_swift/master/act1_pressure_swift_evade_side_master.png"
+  },
+  "runtimeFiles": {
+    "fly": "creatures/act1/pressure_swift/runtime/act1_pressure_swift_fly_side_01.png",
+    "evade": "creatures/act1/pressure_swift/runtime/act1_pressure_swift_evade_side_01.png"
+  },
+  "optionalOverlays": [],
+  "palette": {
+    "primary": {
+      "name": "차가운 먹색",
+      "hex": null
+    },
+    "secondary": {
+      "name": "회백",
+      "hex": null
+    },
+    "accent": {
+      "name": "없음",
+      "hex": null
+    },
+    "reservedTelegraph": {
+      "warning": "#D88149",
+      "collision": "#B94A3E",
+      "safe": "#72A99D"
+    }
+  },
+  "implementationPriority": {
+    "tier": "Must",
+    "order": 2
+  },
+  "notes": [
+    "No repository class name is asserted; aiArchetypeRole is a role key only.",
+    "Scene places 2–3 copies for a flock; no combat hurtbox."
+  ],
+  "sourceToRuntimeScale": {
+    "fly": 0.117647,
+    "evade": 0.117647
+  },
+  "metadataVersion": 1
+}

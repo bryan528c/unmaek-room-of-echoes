@@ -1,0 +1,217 @@
+{
+  "id": "resonance_civet",
+  "displayName": "공명수염 사향고양이",
+  "act": 2,
+  "role": "regular-enemy",
+  "aiArchetypeRole": "chaser-melee",
+  "directionMode": "flipX",
+  "canvasSize": {
+    "width": 96,
+    "height": 56
+  },
+  "runtimeScale": 1.0,
+  "groundPoint": {
+    "original": {
+      "normalized": {
+        "x": 0.5,
+        "y": 0.88
+      },
+      "pixel": {
+        "x": 48,
+        "y": 49
+      }
+    },
+    "flippedX": {
+      "normalized": {
+        "x": 0.5,
+        "y": 0.88
+      },
+      "pixel": {
+        "x": 48,
+        "y": 49
+      }
+    }
+  },
+  "shadowAnchor": {
+    "original": {
+      "normalized": {
+        "x": 0.5,
+        "y": 0.88
+      },
+      "pixel": {
+        "x": 48,
+        "y": 49
+      }
+    },
+    "flippedX": {
+      "normalized": {
+        "x": 0.5,
+        "y": 0.88
+      },
+      "pixel": {
+        "x": 48,
+        "y": 49
+      }
+    },
+    "mode": "procedural",
+    "notes": "No baked shadow; generate from Ground Point. Catfish uses water-contact ripple instead."
+  },
+  "hurtbox": {
+    "original": {
+      "x": 16,
+      "y": 19,
+      "width": 64,
+      "height": 30
+    },
+    "flippedX": {
+      "x": 16,
+      "y": 19,
+      "width": 64,
+      "height": 30
+    },
+    "source": "packaging-derived from locked size and Ground Point; verify against engine debug view"
+  },
+  "attackAnchors": [
+    {
+      "id": "snout-whisker",
+      "original": {
+        "normalized": {
+          "x": 0.18,
+          "y": 0.48
+        },
+        "pixel": {
+          "x": 17,
+          "y": 27
+        }
+      },
+      "flippedX": {
+        "normalized": {
+          "x": 0.82,
+          "y": 0.48
+        },
+        "pixel": {
+          "x": 79,
+          "y": 27
+        }
+      }
+    }
+  ],
+  "displayIconAnchor": {
+    "original": {
+      "normalized": {
+        "x": 0.84,
+        "y": 0.16
+      },
+      "pixel": {
+        "x": 81,
+        "y": 9
+      }
+    },
+    "flippedX": {
+      "normalized": {
+        "x": 0.16,
+        "y": 0.16
+      },
+      "pixel": {
+        "x": 15,
+        "y": 9
+      }
+    }
+  },
+  "telegraphDefinition": {
+    "reuseOnly": true,
+    "primitives": [
+      "forward-cone"
+    ],
+    "angleDeg": 34,
+    "lengthPx": 150,
+    "palette": {
+      "warning": "#D88149",
+      "collision": "#B94A3E",
+      "safe": "#72A99D"
+    }
+  },
+  "states": {
+    "idle": {
+      "resolution": "unique-asset",
+      "assetKey": "idle",
+      "direction": "side",
+      "file": "creatures/act2/resonance_civet/runtime/act2_resonance_civet_idle_side_01.png"
+    },
+    "move": {
+      "resolution": "unique-asset",
+      "assetKey": "move",
+      "direction": "side",
+      "file": "creatures/act2/resonance_civet/runtime/act2_resonance_civet_move_side_01.png"
+    },
+    "prep": {
+      "resolution": "unique-asset",
+      "assetKey": "prep",
+      "direction": "side",
+      "file": "creatures/act2/resonance_civet/runtime/act2_resonance_civet_prep_side_01.png"
+    },
+    "attack": {
+      "resolution": "unique-asset",
+      "assetKey": "attack",
+      "direction": "side",
+      "file": "creatures/act2/resonance_civet/runtime/act2_resonance_civet_attack_side_01.png"
+    }
+  },
+  "stateAliases": {
+    "hit": {
+      "sourceState": "move",
+      "rotationDeg": 0,
+      "tint": "#B94A3E",
+      "shake": true,
+      "replaceAfterSubmission": true
+    }
+  },
+  "bossPhaseMap": null,
+  "masterFiles": {
+    "idle": "creatures/act2/resonance_civet/master/act2_resonance_civet_idle_side_master.png",
+    "move": "creatures/act2/resonance_civet/master/act2_resonance_civet_move_side_master.png",
+    "prep": "creatures/act2/resonance_civet/master/act2_resonance_civet_prep_side_master.png",
+    "attack": "creatures/act2/resonance_civet/master/act2_resonance_civet_attack_side_master.png"
+  },
+  "runtimeFiles": {
+    "idle": "creatures/act2/resonance_civet/runtime/act2_resonance_civet_idle_side_01.png",
+    "move": "creatures/act2/resonance_civet/runtime/act2_resonance_civet_move_side_01.png",
+    "prep": "creatures/act2/resonance_civet/runtime/act2_resonance_civet_prep_side_01.png",
+    "attack": "creatures/act2/resonance_civet/runtime/act2_resonance_civet_attack_side_01.png"
+  },
+  "optionalOverlays": [],
+  "palette": {
+    "primary": {
+      "name": "젖은 적갈",
+      "hex": "#6F4637"
+    },
+    "secondary": {
+      "name": "골회",
+      "hex": "#B0A58E"
+    },
+    "accent": {
+      "name": "탈채도 청록",
+      "hex": "#4E716B"
+    },
+    "reservedTelegraph": {
+      "warning": "#D88149",
+      "collision": "#B94A3E",
+      "safe": "#72A99D"
+    }
+  },
+  "implementationPriority": {
+    "tier": "Must",
+    "order": 3
+  },
+  "notes": [
+    "No repository class name is asserted; aiArchetypeRole is a role key only.",
+    "Whisker cage convergence is preserved; fine fur and spots are secondary."
+  ],
+  "sourceToRuntimeScale": {
+    "idle": 0.17803,
+    "move": 0.17803,
+    "prep": 0.17803,
+    "attack": 0.17803
+  },
+  "metadataVersion": 1
+}

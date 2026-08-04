@@ -1,0 +1,286 @@
+{
+  "id": "channel_otter_mother",
+  "displayName": "유로맥 수달어미",
+  "act": 3,
+  "role": "boss",
+  "aiArchetypeRole": "boss-3phase",
+  "directionMode": "flipX",
+  "canvasSize": {
+    "width": 210,
+    "height": 148
+  },
+  "runtimeScale": 1.0,
+  "groundPoint": {
+    "original": {
+      "normalized": {
+        "x": 0.42,
+        "y": 0.88
+      },
+      "pixel": {
+        "x": 88,
+        "y": 130
+      }
+    },
+    "flippedX": {
+      "normalized": {
+        "x": 0.58,
+        "y": 0.88
+      },
+      "pixel": {
+        "x": 122,
+        "y": 130
+      }
+    }
+  },
+  "shadowAnchor": {
+    "original": {
+      "normalized": {
+        "x": 0.42,
+        "y": 0.88
+      },
+      "pixel": {
+        "x": 88,
+        "y": 130
+      }
+    },
+    "flippedX": {
+      "normalized": {
+        "x": 0.58,
+        "y": 0.88
+      },
+      "pixel": {
+        "x": 122,
+        "y": 130
+      }
+    },
+    "mode": "procedural",
+    "notes": "No baked shadow; generate from Ground Point. Catfish uses water-contact ripple instead."
+  },
+  "hurtbox": {
+    "original": {
+      "x": 30,
+      "y": 64,
+      "width": 116,
+      "height": 66
+    },
+    "flippedX": {
+      "x": 64,
+      "y": 64,
+      "width": 116,
+      "height": 66
+    },
+    "source": "packaging-derived from locked size and Ground Point; verify against engine debug view"
+  },
+  "attackAnchors": [
+    {
+      "id": "forepaw",
+      "original": {
+        "normalized": {
+          "x": 0.28,
+          "y": 0.7
+        },
+        "pixel": {
+          "x": 59,
+          "y": 104
+        }
+      },
+      "flippedX": {
+        "normalized": {
+          "x": 0.72,
+          "y": 0.7
+        },
+        "pixel": {
+          "x": 151,
+          "y": 104
+        }
+      }
+    },
+    {
+      "id": "snout",
+      "original": {
+        "normalized": {
+          "x": 0.22,
+          "y": 0.47
+        },
+        "pixel": {
+          "x": 46,
+          "y": 70
+        }
+      },
+      "flippedX": {
+        "normalized": {
+          "x": 0.78,
+          "y": 0.47
+        },
+        "pixel": {
+          "x": 164,
+          "y": 70
+        }
+      }
+    }
+  ],
+  "displayIconAnchor": {
+    "original": {
+      "normalized": {
+        "x": 0.84,
+        "y": 0.16
+      },
+      "pixel": {
+        "x": 176,
+        "y": 24
+      }
+    },
+    "flippedX": {
+      "normalized": {
+        "x": 0.16,
+        "y": 0.16
+      },
+      "pixel": {
+        "x": 34,
+        "y": 24
+      }
+    }
+  },
+  "telegraphDefinition": {
+    "reuseOnly": true,
+    "primitives": [
+      "circle",
+      "straight-lane",
+      "map-spawn-point"
+    ],
+    "palette": {
+      "warning": "#D88149",
+      "collision": "#B94A3E",
+      "safe": "#72A99D"
+    }
+  },
+  "states": {
+    "phase1": {
+      "resolution": "unique-asset",
+      "assetKey": "phase1",
+      "direction": "side",
+      "file": "creatures/act3/channel_otter_mother/runtime/act3_channel_otter_mother_phase1_side_01.png"
+    },
+    "warning": {
+      "resolution": "unique-asset",
+      "assetKey": "warning",
+      "direction": "side",
+      "file": "creatures/act3/channel_otter_mother/runtime/act3_channel_otter_mother_warning_side_01.png"
+    },
+    "phase3_or_diveprep": {
+      "resolution": "unique-asset",
+      "assetKey": "phase3_or_diveprep",
+      "direction": "side",
+      "file": "creatures/act3/channel_otter_mother/runtime/act3_channel_otter_mother_phase3_or_diveprep_side_01.png"
+    },
+    "protect_idle": {
+      "resolution": "unique-asset",
+      "assetKey": "protect_idle",
+      "direction": "side",
+      "file": "creatures/act3/channel_otter_mother/runtime/act3_channel_otter_mother_protect_idle_side_01.png"
+    }
+  },
+  "stateAliases": {
+    "phase2": {
+      "sourceState": "warning",
+      "rotationDeg": 0,
+      "scale": 1.03,
+      "tint": null,
+      "shake": false,
+      "overlayFiles": [
+        "vfx/channel_otter_mother_water_membrane_overlay.png"
+      ],
+      "replaceAfterSubmission": true
+    },
+    "attack_or_surface": {
+      "sourceState": "phase3_or_diveprep",
+      "rotationDeg": -4,
+      "tint": null,
+      "shake": false,
+      "replaceAfterSubmission": true
+    },
+    "retreat": {
+      "sourceState": "protect_idle",
+      "rotationDeg": 3,
+      "tint": null,
+      "shake": false,
+      "flipX": true,
+      "replaceAfterSubmission": true
+    }
+  },
+  "bossPhaseMap": {
+    "preFight": {
+      "state": "warning"
+    },
+    "phase1": {
+      "state": "phase1",
+      "displayStringKey": "boss.channel_otter_mother.phase1"
+    },
+    "phase2": {
+      "state": "phase2",
+      "displayStringKey": "boss.channel_otter_mother.phase2"
+    },
+    "phase3": {
+      "state": "phase3_or_diveprep",
+      "displayStringKey": "boss.channel_otter_mother.phase3"
+    },
+    "attackOrSurface": {
+      "state": "attack_or_surface"
+    },
+    "defeated/nonlethal": {
+      "state": "retreat"
+    }
+  },
+  "masterFiles": {
+    "phase1": "creatures/act3/channel_otter_mother/master/act3_channel_otter_mother_phase1_side_master.png",
+    "warning": "creatures/act3/channel_otter_mother/master/act3_channel_otter_mother_warning_side_master.png",
+    "phase3_or_diveprep": "creatures/act3/channel_otter_mother/master/act3_channel_otter_mother_phase3_or_diveprep_side_master.png",
+    "protect_idle": "creatures/act3/channel_otter_mother/master/act3_channel_otter_mother_protect_idle_side_master.png"
+  },
+  "runtimeFiles": {
+    "phase1": "creatures/act3/channel_otter_mother/runtime/act3_channel_otter_mother_phase1_side_01.png",
+    "warning": "creatures/act3/channel_otter_mother/runtime/act3_channel_otter_mother_warning_side_01.png",
+    "phase3_or_diveprep": "creatures/act3/channel_otter_mother/runtime/act3_channel_otter_mother_phase3_or_diveprep_side_01.png",
+    "protect_idle": "creatures/act3/channel_otter_mother/runtime/act3_channel_otter_mother_protect_idle_side_01.png"
+  },
+  "optionalOverlays": [
+    {
+      "id": "water-membrane-pulse",
+      "file": "vfx/channel_otter_mother_water_membrane_overlay.png"
+    }
+  ],
+  "palette": {
+    "primary": {
+      "name": "젖은 밤갈",
+      "hex": "#5C4033"
+    },
+    "secondary": {
+      "name": "탁한 황백",
+      "hex": "#B1A48C"
+    },
+    "accent": {
+      "name": "수류막 암청록",
+      "hex": "#425A5A"
+    },
+    "reservedTelegraph": {
+      "warning": "#D88149",
+      "collision": "#B94A3E",
+      "safe": "#72A99D"
+    }
+  },
+  "implementationPriority": {
+    "tier": "Must",
+    "order": 6
+  },
+  "notes": [
+    "No repository class name is asserted; aiArchetypeRole is a role key only.",
+    "01F correction replaces rigid dorsal blades with one flexible water membrane; protected young retains muzzle, ear and tail."
+  ],
+  "sourceToRuntimeScale": {
+    "phase1": 0.266112,
+    "warning": 0.266112,
+    "phase3_or_diveprep": 0.266112,
+    "protect_idle": 0.266112
+  },
+  "metadataVersion": 1
+}

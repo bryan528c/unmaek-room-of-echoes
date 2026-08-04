@@ -1,0 +1,229 @@
+{
+  "id": "pleated_frog",
+  "displayName": "주름목 개구리",
+  "act": 2,
+  "role": "regular-enemy",
+  "aiArchetypeRole": "projectile",
+  "directionMode": "front-side",
+  "canvasSize": {
+    "width": 118,
+    "height": 84
+  },
+  "runtimeScale": 1.0,
+  "groundPoint": {
+    "original": {
+      "normalized": {
+        "x": 0.5,
+        "y": 0.9
+      },
+      "pixel": {
+        "x": 59,
+        "y": 76
+      }
+    },
+    "flippedX": {
+      "normalized": {
+        "x": 0.5,
+        "y": 0.9
+      },
+      "pixel": {
+        "x": 59,
+        "y": 76
+      }
+    }
+  },
+  "shadowAnchor": {
+    "original": {
+      "normalized": {
+        "x": 0.5,
+        "y": 0.9
+      },
+      "pixel": {
+        "x": 59,
+        "y": 76
+      }
+    },
+    "flippedX": {
+      "normalized": {
+        "x": 0.5,
+        "y": 0.9
+      },
+      "pixel": {
+        "x": 59,
+        "y": 76
+      }
+    },
+    "mode": "procedural",
+    "notes": "No baked shadow; generate from Ground Point. Catfish uses water-contact ripple instead."
+  },
+  "hurtbox": {
+    "original": {
+      "x": 25,
+      "y": 34,
+      "width": 68,
+      "height": 42
+    },
+    "flippedX": {
+      "x": 25,
+      "y": 34,
+      "width": 68,
+      "height": 42
+    },
+    "source": "packaging-derived from locked size and Ground Point; verify against engine debug view"
+  },
+  "attackAnchors": [
+    {
+      "id": "mouth-pressure-ring",
+      "original": {
+        "normalized": {
+          "x": 0.5,
+          "y": 0.45
+        },
+        "pixel": {
+          "x": 59,
+          "y": 38
+        }
+      },
+      "flippedX": {
+        "normalized": {
+          "x": 0.5,
+          "y": 0.45
+        },
+        "pixel": {
+          "x": 59,
+          "y": 38
+        }
+      }
+    }
+  ],
+  "displayIconAnchor": {
+    "original": {
+      "normalized": {
+        "x": 0.84,
+        "y": 0.16
+      },
+      "pixel": {
+        "x": 99,
+        "y": 13
+      }
+    },
+    "flippedX": {
+      "normalized": {
+        "x": 0.16,
+        "y": 0.16
+      },
+      "pixel": {
+        "x": 19,
+        "y": 13
+      }
+    }
+  },
+  "telegraphDefinition": {
+    "reuseOnly": true,
+    "primitives": [
+      "straight-aim-line",
+      "impact-circle"
+    ],
+    "lineWidthPx": [
+      4,
+      6
+    ],
+    "impactRadiusPx": [
+      48,
+      72
+    ],
+    "palette": {
+      "warning": "#D88149",
+      "collision": "#B94A3E",
+      "safe": "#72A99D"
+    }
+  },
+  "states": {
+    "idle": {
+      "resolution": "unique-asset",
+      "assetKey": "idle",
+      "direction": "front",
+      "file": "creatures/act2/pleated_frog/runtime/act2_pleated_frog_idle_front_01.png"
+    },
+    "move": {
+      "resolution": "unique-asset",
+      "assetKey": "move",
+      "direction": "side",
+      "file": "creatures/act2/pleated_frog/runtime/act2_pleated_frog_move_side_01.png"
+    },
+    "prep": {
+      "resolution": "unique-asset",
+      "assetKey": "prep",
+      "direction": "front",
+      "file": "creatures/act2/pleated_frog/runtime/act2_pleated_frog_prep_front_01.png"
+    },
+    "attack": {
+      "resolution": "unique-asset",
+      "assetKey": "attack",
+      "direction": "front",
+      "file": "creatures/act2/pleated_frog/runtime/act2_pleated_frog_attack_front_01.png"
+    }
+  },
+  "stateAliases": {
+    "hit": {
+      "sourceState": "move",
+      "rotationDeg": 0,
+      "tint": "#B94A3E",
+      "shake": true,
+      "replaceAfterSubmission": true
+    }
+  },
+  "bossPhaseMap": null,
+  "masterFiles": {
+    "idle": "creatures/act2/pleated_frog/master/act2_pleated_frog_idle_front_master.png",
+    "move": "creatures/act2/pleated_frog/master/act2_pleated_frog_move_side_master.png",
+    "prep": "creatures/act2/pleated_frog/master/act2_pleated_frog_prep_front_master.png",
+    "attack": "creatures/act2/pleated_frog/master/act2_pleated_frog_attack_front_master.png"
+  },
+  "runtimeFiles": {
+    "idle": "creatures/act2/pleated_frog/runtime/act2_pleated_frog_idle_front_01.png",
+    "move": "creatures/act2/pleated_frog/runtime/act2_pleated_frog_move_side_01.png",
+    "prep": "creatures/act2/pleated_frog/runtime/act2_pleated_frog_prep_front_01.png",
+    "attack": "creatures/act2/pleated_frog/runtime/act2_pleated_frog_attack_front_01.png"
+  },
+  "optionalOverlays": [
+    {
+      "id": "pressure-ring",
+      "file": "vfx/pleated_frog_pressure_ring.png"
+    }
+  ],
+  "palette": {
+    "primary": {
+      "name": "균류성 올리브",
+      "hex": "#596047"
+    },
+    "secondary": {
+      "name": "균사 크림",
+      "hex": "#C1B89B"
+    },
+    "accent": {
+      "name": "탁한 황토",
+      "hex": "#A27B47"
+    },
+    "reservedTelegraph": {
+      "warning": "#D88149",
+      "collision": "#B94A3E",
+      "safe": "#72A99D"
+    }
+  },
+  "implementationPriority": {
+    "tier": "Must",
+    "order": 3
+  },
+  "notes": [
+    "No repository class name is asserted; aiArchetypeRole is a role key only.",
+    "Pressure-ring compress/open/fire sequence takes priority over skin detail."
+  ],
+  "sourceToRuntimeScale": {
+    "idle": 0.264286,
+    "prep": 0.264286,
+    "attack": 0.264286,
+    "move": 0.264286
+  },
+  "metadataVersion": 1
+}

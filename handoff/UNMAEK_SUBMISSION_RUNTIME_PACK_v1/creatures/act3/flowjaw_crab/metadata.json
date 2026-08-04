@@ -1,0 +1,222 @@
+{
+  "id": "flowjaw_crab",
+  "displayName": "흐름턱 게",
+  "act": 3,
+  "role": "regular-enemy",
+  "aiArchetypeRole": "defense-melee",
+  "directionMode": "front-side",
+  "canvasSize": {
+    "width": 112,
+    "height": 72
+  },
+  "runtimeScale": 1.0,
+  "groundPoint": {
+    "original": {
+      "normalized": {
+        "x": 0.5,
+        "y": 0.88
+      },
+      "pixel": {
+        "x": 56,
+        "y": 63
+      }
+    },
+    "flippedX": {
+      "normalized": {
+        "x": 0.5,
+        "y": 0.88
+      },
+      "pixel": {
+        "x": 56,
+        "y": 63
+      }
+    }
+  },
+  "shadowAnchor": {
+    "original": {
+      "normalized": {
+        "x": 0.5,
+        "y": 0.88
+      },
+      "pixel": {
+        "x": 56,
+        "y": 63
+      }
+    },
+    "flippedX": {
+      "normalized": {
+        "x": 0.5,
+        "y": 0.88
+      },
+      "pixel": {
+        "x": 56,
+        "y": 63
+      }
+    },
+    "mode": "procedural",
+    "notes": "No baked shadow; generate from Ground Point. Catfish uses water-contact ripple instead."
+  },
+  "hurtbox": {
+    "original": {
+      "x": 19,
+      "y": 21,
+      "width": 74,
+      "height": 42
+    },
+    "flippedX": {
+      "x": 19,
+      "y": 21,
+      "width": 74,
+      "height": 42
+    },
+    "source": "packaging-derived from locked size and Ground Point; verify against engine debug view"
+  },
+  "attackAnchors": [
+    {
+      "id": "gate-jaw",
+      "original": {
+        "normalized": {
+          "x": 0.5,
+          "y": 0.58
+        },
+        "pixel": {
+          "x": 56,
+          "y": 42
+        }
+      },
+      "flippedX": {
+        "normalized": {
+          "x": 0.5,
+          "y": 0.58
+        },
+        "pixel": {
+          "x": 56,
+          "y": 42
+        }
+      }
+    }
+  ],
+  "displayIconAnchor": {
+    "original": {
+      "normalized": {
+        "x": 0.84,
+        "y": 0.16
+      },
+      "pixel": {
+        "x": 94,
+        "y": 12
+      }
+    },
+    "flippedX": {
+      "normalized": {
+        "x": 0.16,
+        "y": 0.16
+      },
+      "pixel": {
+        "x": 18,
+        "y": 12
+      }
+    }
+  },
+  "telegraphDefinition": {
+    "reuseOnly": true,
+    "primitives": [
+      "front-semicircle",
+      "direction-arrow"
+    ],
+    "radiusPx": 92,
+    "palette": {
+      "warning": "#D88149",
+      "collision": "#B94A3E",
+      "safe": "#72A99D"
+    }
+  },
+  "states": {
+    "idle": {
+      "resolution": "unique-asset",
+      "assetKey": "idle",
+      "direction": "front",
+      "file": "creatures/act3/flowjaw_crab/runtime/act3_flowjaw_crab_idle_front_01.png"
+    },
+    "guard": {
+      "resolution": "unique-asset",
+      "assetKey": "guard",
+      "direction": "front",
+      "file": "creatures/act3/flowjaw_crab/runtime/act3_flowjaw_crab_guard_front_01.png"
+    },
+    "attack": {
+      "resolution": "unique-asset",
+      "assetKey": "attack",
+      "direction": "front",
+      "file": "creatures/act3/flowjaw_crab/runtime/act3_flowjaw_crab_attack_front_01.png"
+    },
+    "hit": {
+      "resolution": "unique-asset",
+      "assetKey": "hit",
+      "direction": "side",
+      "file": "creatures/act3/flowjaw_crab/runtime/act3_flowjaw_crab_hit_side_01.png"
+    }
+  },
+  "stateAliases": {
+    "move": {
+      "sourceState": "idle",
+      "rotationDeg": 0,
+      "tint": null,
+      "shake": false,
+      "replaceAfterSubmission": true
+    }
+  },
+  "bossPhaseMap": null,
+  "masterFiles": {
+    "idle": "creatures/act3/flowjaw_crab/master/act3_flowjaw_crab_idle_front_master.png",
+    "guard": "creatures/act3/flowjaw_crab/master/act3_flowjaw_crab_guard_front_master.png",
+    "attack": "creatures/act3/flowjaw_crab/master/act3_flowjaw_crab_attack_front_master.png",
+    "hit": "creatures/act3/flowjaw_crab/master/act3_flowjaw_crab_hit_side_master.png"
+  },
+  "runtimeFiles": {
+    "idle": "creatures/act3/flowjaw_crab/runtime/act3_flowjaw_crab_idle_front_01.png",
+    "guard": "creatures/act3/flowjaw_crab/runtime/act3_flowjaw_crab_guard_front_01.png",
+    "attack": "creatures/act3/flowjaw_crab/runtime/act3_flowjaw_crab_attack_front_01.png",
+    "hit": "creatures/act3/flowjaw_crab/runtime/act3_flowjaw_crab_hit_side_01.png"
+  },
+  "optionalOverlays": [
+    {
+      "id": "gate-direction",
+      "file": "vfx/flowjaw_crab_gate_direction.png"
+    }
+  ],
+  "palette": {
+    "primary": {
+      "name": "퇴적 베이지",
+      "hex": "#8B7A63"
+    },
+    "secondary": {
+      "name": "녹갈",
+      "hex": "#765243"
+    },
+    "accent": {
+      "name": "광물 가장자리",
+      "hex": "#C0B6A0"
+    },
+    "reservedTelegraph": {
+      "warning": "#D88149",
+      "collision": "#B94A3E",
+      "safe": "#72A99D"
+    }
+  },
+  "implementationPriority": {
+    "tier": "Must",
+    "order": 5
+  },
+  "notes": [
+    "No repository class name is asserted; aiArchetypeRole is a role key only.",
+    "Closed/open front plate distinction takes priority over shell detail."
+  ],
+  "sourceToRuntimeScale": {
+    "idle": 0.234615,
+    "guard": 0.234615,
+    "attack": 0.234615,
+    "hit": 0.234615
+  },
+  "metadataVersion": 1
+}

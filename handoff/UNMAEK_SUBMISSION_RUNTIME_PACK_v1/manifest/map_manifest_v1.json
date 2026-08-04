@@ -1,0 +1,360 @@
+{
+  "schemaVersion": 1,
+  "coordinateSystem": {
+    "origin": "top-left",
+    "unit": "px"
+  },
+  "maps": [
+    {
+      "id": "act1_general",
+      "displayName": "서벽 절벽지대",
+      "act": 1,
+      "width": 1280,
+      "height": 720,
+      "backgroundFile": "maps/act1/act1_general_bg_1280x720.png",
+      "collisionMaskFile": "maps/act1/act1_general_collision.png",
+      "hazardMaskFile": "maps/act1/act1_general_hazard.png",
+      "playerSpawn": {
+        "x": 410,
+        "y": 525
+      },
+      "enemySpawnSlots": [
+        {
+          "id": "bat",
+          "x": 705,
+          "y": 145
+        },
+        {
+          "id": "spider",
+          "x": 623,
+          "y": 401
+        },
+        {
+          "id": "lizard",
+          "x": 930,
+          "y": 400
+        }
+      ],
+      "bossSpawn": null,
+      "bossTerritory": null,
+      "safeMargins": {
+        "top": 87,
+        "right": 168,
+        "bottom": 81,
+        "left": 225
+      },
+      "mapBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 720
+      },
+      "foregroundOcclusion": [
+        {
+          "id": "upper-root-cliff",
+          "shape": "polygon",
+          "points": [
+            [
+              720,
+              70
+            ],
+            [
+              1040,
+              70
+            ],
+            [
+              1050,
+              250
+            ],
+            [
+              780,
+              250
+            ]
+          ],
+          "alphaWhenOccluding": 0.35
+        }
+      ],
+      "notes": [
+        "Submission general map selects the locked Cell B encounter as the single representative map; A/B/C are not merged.",
+        "Walk geometry and spawns are packaging-derived from the existing review overlay and handoff coordinates."
+      ]
+    },
+    {
+      "id": "act1_boss",
+      "displayName": "반향단",
+      "act": 1,
+      "width": 1280,
+      "height": 720,
+      "backgroundFile": "maps/act1/act1_boss_bg_1280x720.png",
+      "collisionMaskFile": "maps/act1/act1_boss_collision.png",
+      "hazardMaskFile": "maps/act1/act1_boss_hazard.png",
+      "playerSpawn": {
+        "x": 350,
+        "y": 530
+      },
+      "enemySpawnSlots": [],
+      "bossSpawn": {
+        "x": 620,
+        "y": 150
+      },
+      "bossTerritory": {
+        "shape": "circle",
+        "center": {
+          "x": 640,
+          "y": 340
+        },
+        "radius": 280
+      },
+      "safeMargins": {
+        "top": 66,
+        "right": 60,
+        "bottom": 78,
+        "left": 188
+      },
+      "mapBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 720
+      },
+      "foregroundOcclusion": [
+        {
+          "id": "root-brace",
+          "shape": "circle",
+          "center": {
+            "x": 234,
+            "y": 168
+          },
+          "radius": 88,
+          "alphaWhenOccluding": 0.35
+        }
+      ],
+      "notes": [
+        "Right and lower outer cliffs are fall hazard.",
+        "Coordinates preserve the locked boss handoff."
+      ]
+    },
+    {
+      "id": "act2_general",
+      "displayName": "천갱 저지림",
+      "act": 2,
+      "width": 1280,
+      "height": 720,
+      "backgroundFile": "maps/act2/act2_general_bg_1280x720.png",
+      "collisionMaskFile": "maps/act2/act2_general_collision.png",
+      "hazardMaskFile": null,
+      "playerSpawn": {
+        "x": 599,
+        "y": 604
+      },
+      "enemySpawnSlots": [
+        {
+          "id": "enemy-a",
+          "x": 229,
+          "y": 214
+        },
+        {
+          "id": "enemy-b",
+          "x": 1023,
+          "y": 306
+        }
+      ],
+      "bossSpawn": null,
+      "bossTerritory": null,
+      "safeMargins": {
+        "top": 68,
+        "right": 92,
+        "bottom": 82,
+        "left": 83
+      },
+      "mapBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 720
+      },
+      "foregroundOcclusion": [
+        {
+          "id": "outer-roots",
+          "shape": "edge-band",
+          "width": 56,
+          "alphaWhenOccluding": 0.45
+        }
+      ],
+      "notes": [
+        "Rounded battle area and coordinates are extracted from the locked overlay; a short bottom entrance corridor is included so player spawn is walkable."
+      ]
+    },
+    {
+      "id": "act2_boss",
+      "displayName": "뿌리 고리 분지",
+      "act": 2,
+      "width": 1280,
+      "height": 720,
+      "backgroundFile": "maps/act2/act2_boss_bg_1280x720.png",
+      "collisionMaskFile": "maps/act2/act2_boss_collision.png",
+      "hazardMaskFile": null,
+      "playerSpawn": {
+        "x": 631,
+        "y": 604
+      },
+      "enemySpawnSlots": [],
+      "bossSpawn": {
+        "x": 618,
+        "y": 175
+      },
+      "bossTerritory": {
+        "shape": "ellipse",
+        "bounds": {
+          "x": 166,
+          "y": 95,
+          "width": 953,
+          "height": 479
+        }
+      },
+      "safeMargins": {
+        "top": 54,
+        "right": 97,
+        "bottom": 104,
+        "left": 101
+      },
+      "mapBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 720
+      },
+      "foregroundOcclusion": [
+        {
+          "id": "fungal-mound",
+          "shape": "ellipse",
+          "bounds": {
+            "x": 505,
+            "y": 54,
+            "width": 230,
+            "height": 175
+          },
+          "alphaWhenOccluding": 0.45
+        }
+      ],
+      "notes": [
+        "Burrow markers remain existing spawn behavior; no new burrow AI or locked extra point is asserted."
+      ]
+    },
+    {
+      "id": "act3_general",
+      "displayName": "중앙 습지와 지하 수로",
+      "act": 3,
+      "width": 1280,
+      "height": 720,
+      "backgroundFile": "maps/act3/act3_general_bg_1280x720.png",
+      "collisionMaskFile": "maps/act3/act3_general_collision.png",
+      "hazardMaskFile": null,
+      "playerSpawn": {
+        "x": 605,
+        "y": 604
+      },
+      "enemySpawnSlots": [
+        {
+          "id": "crab",
+          "x": 229,
+          "y": 285
+        },
+        {
+          "id": "catfish",
+          "x": 1035,
+          "y": 212
+        }
+      ],
+      "bossSpawn": null,
+      "bossTerritory": null,
+      "safeMargins": {
+        "top": 54,
+        "right": 87,
+        "bottom": 78,
+        "left": 74
+      },
+      "mapBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 720
+      },
+      "foregroundOcclusion": [
+        {
+          "id": "reed-bands",
+          "shape": "edge-band",
+          "width": 52,
+          "alphaWhenOccluding": 0.45
+        }
+      ],
+      "notes": [
+        "Shallow water and land are walkable; deep outer water/reeds are collision, not a separate hazard behavior."
+      ]
+    },
+    {
+      "id": "act3_boss",
+      "displayName": "우각호·자갈섬",
+      "act": 3,
+      "width": 1280,
+      "height": 720,
+      "backgroundFile": "maps/act3/act3_boss_bg_1280x720.png",
+      "collisionMaskFile": "maps/act3/act3_boss_collision.png",
+      "hazardMaskFile": null,
+      "playerSpawn": {
+        "x": 631,
+        "y": 604
+      },
+      "enemySpawnSlots": [],
+      "bossSpawn": {
+        "x": 227,
+        "y": 170
+      },
+      "bossTerritory": {
+        "shape": "ellipse",
+        "bounds": {
+          "x": 157,
+          "y": 91,
+          "width": 972,
+          "height": 483
+        }
+      },
+      "safeMargins": {
+        "top": 49,
+        "right": 88,
+        "bottom": 104,
+        "left": 92
+      },
+      "mapBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 720
+      },
+      "foregroundOcclusion": [
+        {
+          "id": "gravel-islands",
+          "shape": "multiple-ellipses",
+          "bounds": [
+            [
+              320,
+              70,
+              240,
+              120
+            ],
+            [
+              735,
+              340,
+              210,
+              130
+            ]
+          ],
+          "alphaWhenOccluding": 0.45
+        }
+      ],
+      "notes": [
+        "Dive uses existing spawn-point arrays; no unconfirmed curve or additional point is asserted."
+      ]
+    }
+  ]
+}

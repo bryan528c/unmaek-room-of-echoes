@@ -1,0 +1,224 @@
+{
+  "id": "resonance_goral",
+  "displayName": "반향각 산양",
+  "act": 1,
+  "role": "boss",
+  "aiArchetypeRole": "boss-3phase",
+  "directionMode": "fixed",
+  "canvasSize": {
+    "width": 220,
+    "height": 175
+  },
+  "runtimeScale": 1.0,
+  "groundPoint": {
+    "original": {
+      "normalized": {
+        "x": 0.5,
+        "y": 0.88
+      },
+      "pixel": {
+        "x": 110,
+        "y": 154
+      }
+    },
+    "flippedX": null
+  },
+  "shadowAnchor": {
+    "original": {
+      "normalized": {
+        "x": 0.5,
+        "y": 0.88
+      },
+      "pixel": {
+        "x": 110,
+        "y": 154
+      }
+    },
+    "flippedX": null,
+    "mode": "procedural",
+    "notes": "No baked shadow; generate from Ground Point. Catfish uses water-contact ripple instead."
+  },
+  "hurtbox": {
+    "original": {
+      "x": 51,
+      "y": 68,
+      "width": 118,
+      "height": 86
+    },
+    "flippedX": null,
+    "source": "packaging-derived from locked size and Ground Point; verify against engine debug view"
+  },
+  "attackAnchors": [
+    {
+      "id": "horn-root",
+      "original": {
+        "normalized": {
+          "x": 0.5,
+          "y": 0.28
+        },
+        "pixel": {
+          "x": 110,
+          "y": 49
+        }
+      },
+      "flippedX": null
+    },
+    {
+      "id": "forehoof-left",
+      "original": {
+        "normalized": {
+          "x": 0.42,
+          "y": 0.79
+        },
+        "pixel": {
+          "x": 92,
+          "y": 138
+        }
+      },
+      "flippedX": null
+    },
+    {
+      "id": "forehoof-right",
+      "original": {
+        "normalized": {
+          "x": 0.58,
+          "y": 0.79
+        },
+        "pixel": {
+          "x": 128,
+          "y": 138
+        }
+      },
+      "flippedX": null
+    }
+  ],
+  "displayIconAnchor": {
+    "original": {
+      "normalized": {
+        "x": 0.84,
+        "y": 0.16
+      },
+      "pixel": {
+        "x": 185,
+        "y": 28
+      }
+    },
+    "flippedX": null
+  },
+  "telegraphDefinition": {
+    "reuseOnly": true,
+    "primitives": [
+      "straight-charge-lane",
+      "rockfall-circle",
+      "phase-ring"
+    ],
+    "lineWidthPx": [
+      4,
+      6
+    ],
+    "palette": {
+      "warning": "#D88149",
+      "collision": "#B94A3E",
+      "safe": "#72A99D"
+    }
+  },
+  "states": {
+    "idle": {
+      "resolution": "unique-asset",
+      "assetKey": "idle",
+      "direction": "fixed",
+      "file": "creatures/act1/resonance_goral/runtime/act1_resonance_goral_idle_fixed_01.png"
+    },
+    "warning": {
+      "resolution": "unique-asset",
+      "assetKey": "warning",
+      "direction": "fixed",
+      "file": "creatures/act1/resonance_goral/runtime/act1_resonance_goral_warning_fixed_01.png"
+    },
+    "combat": {
+      "resolution": "unique-asset",
+      "assetKey": "combat",
+      "direction": "fixed",
+      "file": "creatures/act1/resonance_goral/runtime/act1_resonance_goral_combat_fixed_01.png"
+    },
+    "retreat": {
+      "resolution": "unique-asset",
+      "assetKey": "retreat",
+      "direction": "fixed",
+      "file": "creatures/act1/resonance_goral/runtime/act1_resonance_goral_retreat_fixed_01.png"
+    }
+  },
+  "stateAliases": {},
+  "bossPhaseMap": {
+    "phase1": {
+      "state": "warning",
+      "displayStringKey": "boss.resonance_goral.phase1"
+    },
+    "phase2": {
+      "state": "combat",
+      "displayStringKey": "boss.resonance_goral.phase2"
+    },
+    "phase3": {
+      "state": "combat",
+      "overlayFiles": [
+        "vfx/resonance_goral_phase3_overlay.png"
+      ],
+      "displayStringKey": "boss.resonance_goral.phase3"
+    },
+    "defeated/nonlethal": {
+      "state": "retreat"
+    }
+  },
+  "masterFiles": {
+    "idle": "creatures/act1/resonance_goral/master/act1_resonance_goral_idle_fixed_master.png",
+    "warning": "creatures/act1/resonance_goral/master/act1_resonance_goral_warning_fixed_master.png",
+    "combat": "creatures/act1/resonance_goral/master/act1_resonance_goral_combat_fixed_master.png",
+    "retreat": "creatures/act1/resonance_goral/master/act1_resonance_goral_retreat_fixed_master.png"
+  },
+  "runtimeFiles": {
+    "idle": "creatures/act1/resonance_goral/runtime/act1_resonance_goral_idle_fixed_01.png",
+    "warning": "creatures/act1/resonance_goral/runtime/act1_resonance_goral_warning_fixed_01.png",
+    "combat": "creatures/act1/resonance_goral/runtime/act1_resonance_goral_combat_fixed_01.png",
+    "retreat": "creatures/act1/resonance_goral/runtime/act1_resonance_goral_retreat_fixed_01.png"
+  },
+  "optionalOverlays": [
+    {
+      "id": "phase3-resonance",
+      "file": "vfx/resonance_goral_phase3_overlay.png"
+    }
+  ],
+  "palette": {
+    "primary": {
+      "name": "깊은 암갈",
+      "hex": null
+    },
+    "secondary": {
+      "name": "회백 뿔·굽",
+      "hex": null
+    },
+    "accent": {
+      "name": "탁한 청록 공동",
+      "hex": null
+    },
+    "reservedTelegraph": {
+      "warning": "#D88149",
+      "collision": "#B94A3E",
+      "safe": "#72A99D"
+    }
+  },
+  "implementationPriority": {
+    "tier": "Must",
+    "order": 1
+  },
+  "notes": [
+    "No repository class name is asserted; aiArchetypeRole is a role key only.",
+    "Hurtbox excludes horns. Four silhouettes were minimally clarified in 01F without a new form."
+  ],
+  "sourceToRuntimeScale": {
+    "idle": 0.310204,
+    "warning": 0.310204,
+    "combat": 0.310204,
+    "retreat": 0.310204
+  },
+  "metadataVersion": 1
+}

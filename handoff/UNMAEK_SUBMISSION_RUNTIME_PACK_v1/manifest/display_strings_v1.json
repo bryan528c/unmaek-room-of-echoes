@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "acts": {
+    "act1": "서벽 절벽지대",
+    "act2": "천갱 저지림",
+    "act3": "중앙 습지와 지하 수로"
+  },
+  "maps": {
+    "act1_general": "서벽 절벽지대",
+    "act1_boss": "반향단",
+    "act2_general": "천갱 저지림",
+    "act2_boss": "뿌리 고리 분지",
+    "act3_general": "중앙 습지와 지하 수로",
+    "act3_boss": "우각호·자갈섬"
+  },
+  "creatures": {
+    "pressure_swift": "압각 칼새",
+    "deflect_bat": "편향관 박쥐",
+    "rewind_lizard": "되감비늘 도마뱀",
+    "mineral_spider": "광물실거미",
+    "resonance_goral": "반향각 산양",
+    "resonance_civet": "공명수염 사향고양이",
+    "pleated_frog": "주름목 개구리",
+    "diffraction_pangolin": "회절비늘 천산갑",
+    "flowjaw_crab": "흐름턱 게",
+    "pulsebarbel_catfish": "맥수염 메기",
+    "channel_otter_mother": "유로맥 수달어미"
+  },
+  "bosses": {
+    "resonance_goral": "반향각 산양",
+    "diffraction_pangolin": "회절비늘 천산갑",
+    "channel_otter_mother": "유로맥 수달어미"
+  },
+  "bossPhases": {
+    "resonance_goral": {
+      "phase1": "영역 경고",
+      "phase2": "반향 개방",
+      "phase3": "길 복구"
+    },
+    "diffraction_pangolin": {
+      "phase1": "제1형",
+      "phase2": "제2형",
+      "phase3": "제3형"
+    },
+    "channel_otter_mother": {
+      "phase1": "제1형",
+      "phase2": "제2형",
+      "phase3": "제3형"
+    }
+  }
+}
