@@ -49,12 +49,12 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   private frozenStartedAt = 0;
   private static sequence = 0;
 
-  public constructor(scene: Phaser.Scene, x: number, y: number, kind: EnemyKind, callbacks: EnemyCallbacks) {
+  public constructor(scene: Phaser.Scene, x: number, y: number, kind: EnemyKind, callbacks: EnemyCallbacks, healthMultiplier = 1) {
     super(scene, x, y, `enemy-${kind === 'minion' ? 'chaser' : kind}`);
     this.kind = kind;
     this.callbacks = callbacks;
     const definition = kind === 'minion' ? { hp: 34, speed: 112, damage: 10, score: 80 } : BALANCE.enemies[kind];
-    this.health = definition.hp; this.maxHealth = definition.hp;
+    this.health = Math.max(1, Math.round(definition.hp * healthMultiplier)); this.maxHealth = this.health;
     this.id = `${kind}-${Enemy.sequence += 1}`;
     this.nextActionAt = scene.time.now + Phaser.Math.Between(700, 1300);
     scene.add.existing(this); scene.physics.add.existing(this);
@@ -252,6 +252,11 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   public takeDamage(amount: number, sourceAngle: number, parried = false, deathSource: EnemyDeathSource = 'other'): number {
     if (!this.active || this.health <= 0) return 0;
     this.lastDamageSource = deathSource;
+    const actual = this.resolveIncomingDamage(amount, sourceAngle, parried);
+    return this.commitResolvedDamage(actual, deathSource);
+  }
+
+  protected resolveIncomingDamage(amount: number, sourceAngle: number, parried = false): number {
     let actual = amount;
     if (this.kind === 'elite') {
       const frontal = angleDelta(sourceAngle + Math.PI, this.facingAngle) < 1.05;
@@ -259,11 +264,20 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
       if (parried) this.vulnerableUntil = this.scene.time.now + 1800;
     }
     if (this.kind === 'boss' && this.scene.time.now < this.vulnerableUntil) actual *= BALANCE.boss.vulnerabilityMultiplier;
+    return Math.max(0, actual);
+  }
+
+  protected commitResolvedDamage(actual: number, deathSource: EnemyDeathSource): number {
+    if (!this.active || this.health <= 0 || actual <= 0) return 0;
     this.health -= actual;
-    this.setTintFill(0xf1e7d2);
-    this.scene.time.delayedCall(70, () => { if (this.active) this.clearTint(); });
+    this.flashDamage();
     if (this.health <= 0) this.die(deathSource);
     return actual;
+  }
+
+  protected flashDamage(): void {
+    this.setTintFill(0xf1e7d2);
+    this.scene.time.delayedCall(70, () => { if (this.active) this.clearTint(); });
   }
 
   protected die(source: EnemyDeathSource): void {
@@ -325,8 +339,14 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   public get meleeHitRadius(): number { return BALANCE.collision.movementRadius[this.kind] + 14; }
   public get meleeAttackId(): string { return this.meleeAttackIdValue || `${this.id}:melee:idle`; }
   public get meleeParryable(): boolean { return true; }
-  public get isStopped(): boolean { return this.scene.time.now < this.frozenUntil || this.scene.time.now < this.slowUntil; }
-  public get isEchoMarked(): boolean { return this.scene.time.now < this.echoUntil; }
+  public get isStopped(): boolean {
+    const now = this.scene?.time?.now;
+    return typeof now === 'number' && (now < this.frozenUntil || now < this.slowUntil);
+  }
+  public get isEchoMarked(): boolean {
+    const now = this.scene?.time?.now;
+    return typeof now === 'number' && now < this.echoUntil;
+  }
 
   public setGroundPosition(x: number, y: number): this {
     this.setPosition(x, y);

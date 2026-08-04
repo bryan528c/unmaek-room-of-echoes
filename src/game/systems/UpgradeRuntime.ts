@@ -4,8 +4,9 @@ export const ACTIVE_EFFECT_HANDLERS: ReadonlySet<UpgradeId> = new Set([
   'dual-moon-echo', 'wide-orbit', 'cut-sentence', 'backflow-blade', 'returning-scar', 'isolation-chain',
   'chain-breath', 'stop-resonance', 'perfect-counter', 'counter-inscription', 'link-contagion', 'rewind-breath',
   'echo-harvest', 'ink-cloak', 'sentence-overcharge', 'rupture-step', 'sealed-sentence', 'fragment-recovery',
+  'gravity-inscription', 'captured-projectile', 'deep-mark', 'contagious-mark', 'recoil-ripple', 'headwind-veil',
 ]);
-export const RESONANCE_EFFECT_HANDLERS: ReadonlySet<ResonanceId> = new Set(['moon-ring', 'time-undertow', 'counter-cut', 'regression-chain']);
+export const RESONANCE_EFFECT_HANDLERS: ReadonlySet<ResonanceId> = new Set(['moon-ring', 'time-undertow', 'counter-cut', 'regression-chain', 'compression-seal', 'mark-chain', 'reversal-burst']);
 
 export interface PerfectCounterProfile {
   cutReady: boolean;
@@ -51,6 +52,26 @@ export function ruptureStepProfile(stacks: number, dashAge: number): { active: b
 export function stopResonanceProfile(stacks: number): { damage: number; radius: number; slowDuration: number } {
   const capped = Math.max(0, Math.min(2, Math.floor(stacks)));
   return { damage: capped * 9, radius: 76, slowDuration: capped > 0 ? 650 : 0 };
+}
+
+export function gravityInscriptionProfile(stacks: number): { rangeMultiplier: number; durationBonus: number; damage: number } {
+  const capped = Math.max(0, Math.min(2, Math.floor(stacks)));
+  return { rangeMultiplier: 1 + capped * .14, durationBonus: capped * 180, damage: capped * 8 };
+}
+
+export function deepMarkProfile(stacks: number): { maximumStacks: number; explosionDamage: number } {
+  const capped = Math.max(0, Math.min(2, Math.floor(stacks)));
+  return { maximumStacks: 3 + capped, explosionDamage: 24 + capped * 10 };
+}
+
+export function recoilRippleProfile(stacks: number): { damage: number; radius: number } {
+  const capped = Math.max(0, Math.min(2, Math.floor(stacks)));
+  return { damage: capped * 9, radius: 68 };
+}
+
+export function headwindVeilProfile(stacks: number): { reduction: number; duration: number } {
+  const capped = Math.max(0, Math.min(2, Math.floor(stacks)));
+  return { reduction: capped * .14, duration: capped > 0 ? 1300 : 0 };
 }
 
 export class ResonanceRuntime {

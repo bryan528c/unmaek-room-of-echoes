@@ -21,6 +21,7 @@ describe('AudioSystem diagnostics', () => {
       combat: 1,
       music: 0.72,
       activeVoices: 0,
+      limiterActive: false,
     });
   });
 });

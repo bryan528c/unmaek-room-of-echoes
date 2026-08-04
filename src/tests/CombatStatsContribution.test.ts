@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { CombatStats } from '../game/systems/CombatStats';
+import { CombatStats, empoweredWordEffectIsValid } from '../game/systems/CombatStats';
 
 describe('CombatStats contribution ledger', () => {
   it('accumulates every canonical upgrade contribution field', () => {
@@ -121,11 +121,12 @@ describe('CombatStats contribution ledger', () => {
     const attribution = stats.snapshot().damageAttribution;
     expect(attribution).toEqual({
       echoBlade: 10,
-      cutParry: 25,
+      cut: 20,
+      parry: 5,
       word: 37,
-      upgradeResonance: 8,
+      other: 0,
     });
-    expect(Object.values(attribution).reduce((sum, value) => sum + value, 0)).toBe(80);
+    expect(Object.values(attribution).reduce((sum, value) => sum + value, 0)).toBe(72);
   });
 
   it('rejects invalid damage-attribution deltas', () => {
@@ -137,9 +138,48 @@ describe('CombatStats contribution ledger', () => {
 
     expect(stats.snapshot().damageAttribution).toEqual({
       echoBlade: 0,
-      cutParry: 0,
+      cut: 0,
+      parry: 0,
       word: 0,
-      upgradeResonance: 0,
+      other: 0,
+    });
+  });
+
+  it('records a scoped damage event once without folding modifier cards into the base axis', () => {
+    const stats = new CombatStats();
+    expect(stats.damageEvent({
+      baseSource: 'cut', sourceEntityId: 'hero', skillId: 'cut',
+      modifierSourceIds: ['cut-sentence', 'counter-inscription'], resonanceId: 'counter-cut',
+      amount: 28, runId: 4, actId: 'act-2', recursiveDepth: 0,
+    }, 4, 'act-2')).toBe(true);
+    expect(stats.snapshot()).toMatchObject({ damageAttribution: { cut: 28 }, damageEventCount: 1 });
+    expect(stats.damageEvent({ baseSource: 'word', amount: 20, runId: 3, actId: 'act-1' }, 4, 'act-2')).toBe(false);
+    expect(stats.damageEvent({ baseSource: 'word', amount: 20, runId: 4, actId: 'act-2', recursiveDepth: 2 }, 4, 'act-2')).toBe(false);
+    expect(stats.snapshot()).toMatchObject({ damageEventCount: 1, staleDamageEventsRejected: 1 });
+  });
+
+  it('commits an empowered word for damage, recovery, status or duration but not an empty cast', () => {
+    expect(empoweredWordEffectIsValid({ damage: 1 })).toBe(true);
+    expect(empoweredWordEffectIsValid({ healing: 1 })).toBe(true);
+    expect(empoweredWordEffectIsValid({ movedDistance: 24 })).toBe(true);
+    expect(empoweredWordEffectIsValid({ statusApplications: 1 })).toBe(true);
+    expect(empoweredWordEffectIsValid({ durationApplications: 1 })).toBe(true);
+    expect(empoweredWordEffectIsValid({ damage: 0, healing: 0, statusApplications: 0 })).toBe(false);
+  });
+
+  it('separates perfect parries and records empowered-word failure reasons', () => {
+    const stats = new CombatStats();
+    stats.parryAttempt(); stats.parrySuccess(false, 'projectile');
+    stats.parryAttempt(); stats.parrySuccess(true, 'melee');
+    stats.empoweredWordFailure('stop', 'no-stop-effect');
+    stats.empoweredWordFailure('rewind', 'no-rewind-effect');
+    stats.empoweredWordFailure('link', 'no-link-target');
+    expect(stats.snapshot()).toMatchObject({
+      parryAttempts: 2, parrySuccesses: 2, perfectParries: 1,
+      parryBreakdown: { normalParries: 1, projectileReflections: 1, meleeCounters: 1 },
+      empoweredWordFailures: {
+        stop: { 'no-stop-effect': 1 }, rewind: { 'no-rewind-effect': 1 }, link: { 'no-link-target': 1 },
+      },
     });
   });
 
@@ -156,6 +196,6 @@ describe('CombatStats contribution ledger', () => {
 
     stats.reset();
     expect(stats.snapshot().upgrades).toEqual([]);
-    expect(stats.snapshot().empoweredWordUses).toEqual({ stop: 0, rewind: 0, link: 0 });
+    expect(stats.snapshot().empoweredWordUses).toEqual({ stop: 0, rewind: 0, link: 0, pull: 0, mark: 0, push: 0 });
   });
 });

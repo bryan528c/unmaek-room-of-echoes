@@ -98,4 +98,28 @@ describe('TimeControlService', () => {
     control.release('BOSS_DEFEATED', 'scene');
     expect(state.physicsPaused).toBe(false);
   });
+
+  it('applies death slow motion without releasing an independent pause token', () => {
+    const { control, state } = fixture();
+    control.acquire('DEATH_SLOWMO', 'scene');
+    expect(state.physicsPaused).toBe(false);
+    expect(state.gameTimeScale).toBe(0.28);
+    expect(state.physicsScale).toBe(0.28);
+    control.acquire('USER_PAUSE', 'scene');
+    expect(state.physicsPaused).toBe(true);
+    control.release('DEATH_SLOWMO', 'scene');
+    expect(control.hasReason('USER_PAUSE')).toBe(true);
+    expect(state.physicsPaused).toBe(true);
+  });
+
+  it('clears only an expired HITSTOP token when stale recovery runs', () => {
+    const { control, scheduler, state } = fixture();
+    control.acquire('TAB_HIDDEN', 'visibility');
+    control.requestHitstop('scene', 100);
+    scheduler.time = 500;
+    expect(control.clearStaleHitstop()).toBe(true);
+    expect(control.hasReason('HITSTOP')).toBe(false);
+    expect(control.hasReason('TAB_HIDDEN')).toBe(true);
+    expect(state.physicsPaused).toBe(true);
+  });
 });

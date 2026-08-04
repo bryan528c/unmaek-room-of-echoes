@@ -7,6 +7,7 @@ import {
   type UpgradeDefinition,
   type UpgradeId,
 } from '../data/upgrades';
+import type { WordId } from './WordSystem';
 
 export interface SealedSentenceStats {
   stacks: number;
@@ -58,6 +59,7 @@ export interface UpgradeSelectionContext {
   /** Current health divided by maximum health. Values are clamped to 0..1. */
   healthRatio?: number;
   rewardIndex?: number;
+  equippedWordIds?: readonly WordId[];
 }
 
 export interface UpgradeOfferHistorySnapshot {
@@ -177,8 +179,10 @@ export class UpgradeSystem {
       .map((resonance) => resonance.id);
   }
 
-  private pool(exclude: ReadonlySet<UpgradeId> = new Set()): UpgradeDefinition[] {
-    return ACTIVE_UPGRADES.filter((upgrade) => this.canAdd(upgrade.id) && !exclude.has(upgrade.id));
+  private pool(exclude: ReadonlySet<UpgradeId> = new Set(), equippedWordIds?: readonly WordId[]): UpgradeDefinition[] {
+    const equipped = equippedWordIds ? new Set(equippedWordIds) : undefined;
+    return ACTIVE_UPGRADES.filter((upgrade) => this.canAdd(upgrade.id) && !exclude.has(upgrade.id)
+      && (!upgrade.requiredWordIds?.length || !equipped || upgrade.requiredWordIds.some((id) => equipped.has(id))));
   }
 
   private score(upgrade: UpgradeDefinition, ownedTags: ReadonlySet<string>, context: UpgradeSelectionContext): number {
@@ -199,7 +203,11 @@ export class UpgradeSystem {
 
     // Repeatedly seeing the same unchosen card erodes trust. Immediate repeats
     // are excluded completely; older appearances receive this soft penalty.
-    score /= 1 + (this.offerCounts.get(upgrade.id) ?? 0) * 0.28;
+    // A selected card may legitimately return for stacking, but each prior
+    // appearance must still reduce its offer weight.  This keeps stackable
+    // survival/behavior cards from dominating short runs while resonance
+    // completers remain reachable through the dedicated first slot.
+    score /= 1 + (this.offerCounts.get(upgrade.id) ?? 0);
     if (upgrade.rarity === '전설') score *= 0.82;
     return Math.max(0.05, score);
   }
@@ -224,28 +232,34 @@ export class UpgradeSystem {
   public choices(count = 3, random: () => number = Math.random, context: UpgradeSelectionContext = {}, excludePrevious = false): UpgradeDefinition[] {
     const excluded = new Set(this.recentUnselected);
     if (excludePrevious) for (const id of this.lastOffered) excluded.add(id);
-    let pool = this.pool(excluded);
+    let pool = this.pool(excluded, context.equippedWordIds);
     const result: UpgradeDefinition[] = [];
     const ownedEntries = this.entries();
     const ownedTags = new Set(ownedEntries.flatMap(({ id }) => upgradeById(id)?.tags ?? []));
     const ownedCategories = new Set(ownedEntries.map(({ id }) => upgradeById(id)?.category).filter((category): category is UpgradeDefinition['category'] => category !== undefined));
-    const take = (candidates: UpgradeDefinition[]): void => {
-      if (result.length >= count) return;
+    const take = (candidates: UpgradeDefinition[]): boolean => {
+      if (result.length >= count) return false;
       const available = candidates.filter((candidate) => pool.includes(candidate)
         && !result.some((choice) => choice.id === candidate.id)
         && (!candidate.survival || !result.some((choice) => choice.survival)));
       const selected = this.weightedPick(available, random, ownedTags, context);
-      if (!selected) return;
+      if (!selected) return false;
       result.push(selected);
       pool = pool.filter((candidate) => candidate.id !== selected.id);
+      return true;
     };
 
     // Slot one deepens the current build, with a resonance completion taking
     // precedence over a merely shared tag.
     if (ownedEntries.length > 0) {
       const completers = pool.filter((upgrade) => this.resonanceCompleters(upgrade.id).length > 0);
-      if (completers.length > 0) take(completers);
-      else take(pool.filter((upgrade) => upgrade.tags.some((tag) => ownedTags.has(tag))));
+      const buildMatches = pool.filter((upgrade) => upgrade.tags.some((tag) => ownedTags.has(tag)));
+      // Completion cards receive a strong score bonus, but are not a mandatory
+      // first-slot pick on every reward. This preserves player choice and stops
+      // a single common partner (notably 절단 문장) from crowding out a build's
+      // other compatible behavior cards.
+      if (completers.length > 0) take([...new Set([...completers, ...buildMatches])]);
+      else take(buildMatches);
     }
 
     // Slot two exposes an unowned behavior, preferably from a new category.
@@ -258,7 +272,7 @@ export class UpgradeSystem {
     if (healthRatio <= 0.45) take(pool.filter((upgrade) => upgrade.survival));
     else take(pool.filter((upgrade) => !upgrade.survival && !result.some((choice) => choice.category === upgrade.category)));
 
-    while (result.length < count && pool.length > 0) take(pool);
+    while (result.length < count && pool.length > 0) if (!take(pool)) break;
 
     if (!result.some((upgrade) => upgrade.behaviorChange)) {
       const replacement = pool.find((upgrade) => upgrade.behaviorChange);
@@ -296,18 +310,36 @@ export class UpgradeSystem {
     };
   }
 
-  public firstChoices(random: () => number = Math.random): UpgradeDefinition[] {
+  public firstChoices(random: () => number = Math.random, context: UpgradeSelectionContext = {}): UpgradeDefinition[] {
     const result: UpgradeDefinition[] = [];
     const pick = (ids: readonly UpgradeId[]): void => {
-      const pool = ids.map((id) => upgradeById(id)).filter((upgrade): upgrade is UpgradeDefinition => upgrade?.active === true && this.canAdd(upgrade.id) && !result.includes(upgrade));
+      const equipped = context.equippedWordIds ? new Set(context.equippedWordIds) : undefined;
+      const pool = ids.map((id) => upgradeById(id)).filter((upgrade): upgrade is UpgradeDefinition => upgrade?.active === true && this.canAdd(upgrade.id) && !result.includes(upgrade)
+        && (!upgrade.requiredWordIds?.length || !equipped || upgrade.requiredWordIds.some((wordId) => equipped.has(wordId))));
       if (pool.length === 0) return;
       result.push(pool[Math.min(pool.length - 1, Math.floor(Math.max(0, Math.min(.999999, random())) * pool.length))]!);
     };
     pick(['dual-moon-echo', 'wide-orbit', 'cut-sentence', 'rupture-step']);
-    pick(['perfect-counter', 'counter-inscription', 'chain-breath', 'stop-resonance']);
+    pick(['perfect-counter', 'counter-inscription', 'chain-breath', 'stop-resonance', 'gravity-inscription', 'deep-mark', 'recoil-ripple']);
     pick(['ink-cloak', 'rewind-breath', 'fragment-recovery']);
     this.recordOffer(result);
     return result;
+  }
+
+  public bossChoices(random: () => number = Math.random, context: UpgradeSelectionContext = {}): UpgradeDefinition[] {
+    const pool = this.pool(new Set(this.recentUnselected), context.equippedWordIds);
+    const result: UpgradeDefinition[] = [];
+    const take = (candidates: UpgradeDefinition[]): void => {
+      const available = candidates.filter((candidate) => !result.some((item) => item.id === candidate.id));
+      if (available.length === 0) return;
+      const ownedTags = new Set(this.entries().flatMap(({ id }) => upgradeById(id)?.tags ?? []));
+      const selected = this.weightedPick(available, random, ownedTags, context); if (selected) result.push(selected);
+    };
+    take(pool.filter((upgrade) => upgrade.behaviorChange && (upgrade.rarity === '희귀' || upgrade.rarity === '전설')));
+    take(pool.filter((upgrade) => this.resonanceCompleters(upgrade.id).length > 0 || (this.getStack(upgrade.id) > 0 && upgrade.behaviorChange)));
+    take(pool.filter((upgrade) => upgrade.survival || upgrade.category === 'generic' || !result.some((item) => item.category === upgrade.category)));
+    while (result.length < 3) take(pool);
+    this.recordOffer(result); return result;
   }
 
   public reroll(random: () => number = Math.random, context: UpgradeSelectionContext = {}): UpgradeDefinition[] | null {

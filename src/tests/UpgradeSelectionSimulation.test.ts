@@ -65,7 +65,8 @@ describe('UPGRADE-04R 500-run reward simulation', () => {
     expect(frequencies.size).toBe(ACTIVE_UPGRADES.length);
     const counts = [...frequencies.values()];
     const average = counts.reduce((sum, count) => sum + count, 0) / counts.length;
-    expect(Math.max(...counts)).toBeLessThan(average * 2.5);
+    const mostFrequent = [...frequencies.entries()].sort((left, right) => right[1] - left[1]).slice(0, 5);
+    expect(Math.max(...counts), `most frequent offers: ${JSON.stringify(mostFrequent)}`).toBeLessThan(average * 2.5);
   });
 
   it('weights survival toward low health without forcing it at healthy HP', () => {

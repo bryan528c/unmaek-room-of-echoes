@@ -136,4 +136,13 @@ describe('UpgradeSystem', () => {
     expect(lowHealthSurvival).toBe(80);
     expect(highHealthSurvival).toBeLessThan(lowHealthSurvival);
   });
+
+  it('Act 보스 보상은 고급 행동 변화와 빌드 심화를 포함한다', () => {
+    const run = new UpgradeSystem(); run.add('stop-resonance');
+    const choices = run.bossChoices(() => 0.31, { wordUses: 12, healthRatio: 0.62 });
+    expect(choices).toHaveLength(3);
+    expect(new Set(choices.map((choice) => choice.id)).size).toBe(3);
+    expect(choices.some((choice) => choice.behaviorChange && (choice.rarity === '희귀' || choice.rarity === '전설'))).toBe(true);
+    expect(choices.some((choice) => run.resonanceCompleters(choice.id).length > 0 || choice.category === 'word')).toBe(true);
+  });
 });

@@ -45,4 +45,32 @@ describe('SaveSystem', () => {
     save.settings.controlMode = 'mouse'; saveGame(storage, save);
     expect(loadSave(storage).settings.controlMode).toBe('mouse');
   });
+
+  it('Act 기록은 저장하고 기존 저장에는 안전한 기본값을 채운다', () => {
+    const storage = new MemoryStorage();
+    const save = structuredClone(DEFAULT_SAVE);
+    save.highestAct = 7; save.mostBossesDefeated = 6; save.longestSurvivalSeconds = 1284;
+    saveGame(storage, save);
+    expect(loadSave(storage)).toMatchObject({ highestAct: 7, mostBossesDefeated: 6, longestSurvivalSeconds: 1284 });
+
+    storage.value = JSON.stringify({ settings: DEFAULT_SAVE.settings, bestScore: 100, bestRank: 'C' });
+    expect(loadSave(storage)).toMatchObject({ highestAct: 1, mostBossesDefeated: 0, longestSurvivalSeconds: 0 });
+  });
+  it('persists modifier tutorial history and defaults legacy saves to none seen', () => {
+    const storage = new MemoryStorage(); const save = structuredClone(DEFAULT_SAVE);
+    save.modifierTutorialsSeen = ['stitch-pair', 'past-position'];
+    saveGame(storage, save);
+    expect(loadSave(storage).modifierTutorialsSeen).toEqual(['stitch-pair', 'past-position']);
+    storage.value = JSON.stringify({ settings: DEFAULT_SAVE.settings, tutorialSeen: true });
+    expect(loadSave(storage).modifierTutorialsSeen).toEqual([]);
+  });
+
+  it('persists the most recent valid word loadout for the next Run', () => {
+    const storage = new MemoryStorage(); const save = structuredClone(DEFAULT_SAVE);
+    save.recentWordLoadout = ['pull', 'link', 'push'];
+    saveGame(storage, save);
+    expect(loadSave(storage).recentWordLoadout).toEqual(['pull', 'link', 'push']);
+    storage.value = JSON.stringify({ settings: DEFAULT_SAVE.settings });
+    expect(loadSave(storage).recentWordLoadout).toEqual(['stop', 'rewind', 'link']);
+  });
 });

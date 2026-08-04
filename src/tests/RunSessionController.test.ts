@@ -45,10 +45,19 @@ describe('RunSessionController', () => {
       expect(runId).toBeGreaterThan(previous);
       expect(runs.shouldShowBossHud(runId, 'COMBAT')).toBe(false);
       runs.activateBoss(runId, `boss-${index}`, 900, 900);
-      expect(runs.shouldShowBossHud(runId, 'COMBAT', `boss-${index}`)).toBe(true);
+      expect(runs.shouldShowBossHud(runId, 'BOSS_COMBAT', `boss-${index}`)).toBe(true);
       runs.clearBoss(runId, true);
-      expect(runs.shouldShowBossHud(runId, 'COMBAT', `boss-${index}`)).toBe(false);
+      expect(runs.shouldShowBossHud(runId, 'BOSS_COMBAT', `boss-${index}`)).toBe(false);
       previous = runId;
     }
+  });
+
+  it('shows a boss HUD only for the current run during BOSS_COMBAT', () => {
+    const runs = new RunSessionController();
+    const runId = runs.beginRun();
+    runs.activateBoss(runId, 'record-editor', 1200, 1200);
+    expect(runs.shouldShowBossHud(runId, 'BOSS_COMBAT', 'record-editor')).toBe(true);
+    expect(runs.shouldShowBossHud(runId, 'WAVE_COMBAT', 'record-editor')).toBe(false);
+    expect(runs.shouldShowBossHud(runId - 1, 'BOSS_COMBAT', 'record-editor')).toBe(false);
   });
 });

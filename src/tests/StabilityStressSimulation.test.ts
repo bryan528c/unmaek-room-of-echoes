@@ -11,4 +11,14 @@ describe('STABILITY-01 accelerated stress simulation', () => {
     expect(report.unexpectedPauseStates).toBe(0);
     expect(report.staleTokens).toBe(0);
   });
+
+  it('simulates a twenty-minute word/reaction Run without accumulating pause tokens', () => {
+    const report = runStabilityStressSimulation(1_200_000, 20);
+    expect(report.simulatedMs).toBe(1_200_000);
+    expect(report.restarts).toBe(20);
+    expect(report.hitstops).toBeGreaterThan(4000);
+    expect(report.parries).toBeGreaterThan(2500);
+    expect(report.unexpectedPauseStates).toBe(0);
+    expect(report.staleTokens).toBe(0);
+  });
 });

@@ -5,16 +5,24 @@ import type { RunId } from './RunSessionController';
 
 export interface ActState {
   actNumber: number;
+  actId: string;
+  actName: string;
   waveIndex: number;
   themeId: string;
   enemySetId: string;
+  bossId: string;
+  modifiers: readonly string[];
   generation: number;
 }
 
 export interface ActConfiguration {
   actNumber: number;
+  actId?: string;
+  actName?: string;
   themeId: string;
   enemySetId: string;
+  bossId?: string;
+  modifiers?: readonly string[];
 }
 
 export interface RunActScope {
@@ -32,9 +40,13 @@ export interface RunProgressSnapshot {
 
 const initialAct = (generation = 0): ActState => ({
   actNumber: 1,
+  actId: 'act-1-echo-room',
+  actName: '계승실',
   waveIndex: 0,
   themeId: 'echo-room',
   enemySetId: 'archive-ruins',
+  bossId: 'record-devourer',
+  modifiers: [],
   generation,
 });
 
@@ -63,9 +75,13 @@ export class RunProgressController {
     if (!this.isCurrentRun(runId) || !Number.isInteger(configuration.actNumber) || configuration.actNumber < 1) return false;
     this.actState = {
       actNumber: configuration.actNumber,
+      actId: configuration.actId ?? `act-${configuration.actNumber}`,
+      actName: configuration.actName ?? `Act ${configuration.actNumber}`,
       waveIndex: 0,
       themeId: configuration.themeId,
       enemySetId: configuration.enemySetId,
+      bossId: configuration.bossId ?? 'record-devourer',
+      modifiers: [...(configuration.modifiers ?? [])],
       generation: this.actState.generation + 1,
     };
     return true;

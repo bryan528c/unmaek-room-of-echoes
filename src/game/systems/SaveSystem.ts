@@ -15,9 +15,14 @@ export interface GameSave {
   bestScore: number;
   bestRank: GameRank;
   tutorialSeen: boolean;
+  modifierTutorialsSeen: string[];
   bestStage: number;
   bossReached: boolean;
   cleared: boolean;
+  highestAct: number;
+  mostBossesDefeated: number;
+  longestSurvivalSeconds: number;
+  recentWordLoadout: string[];
 }
 
 export type GameRank = 'S' | 'A' | 'B' | 'C+' | 'C' | 'C-' | '-';
@@ -42,9 +47,14 @@ export const DEFAULT_SAVE: GameSave = {
   bestScore: 0,
   bestRank: '-',
   tutorialSeen: false,
+  modifierTutorialsSeen: [],
   bestStage: 0,
   bossReached: false,
   cleared: false,
+  highestAct: 1,
+  mostBossesDefeated: 0,
+  longestSurvivalSeconds: 0,
+  recentWordLoadout: ['stop', 'rewind', 'link'],
 };
 
 const KEY = 'eonmaek-save-v1';
@@ -70,9 +80,16 @@ export function loadSave(storage: StorageLike): GameSave {
       bestScore: typeof parsed.bestScore === 'number' && parsed.bestScore >= 0 ? parsed.bestScore : 0,
       bestRank,
       tutorialSeen: parsed.tutorialSeen === true,
+      modifierTutorialsSeen: Array.isArray(parsed.modifierTutorialsSeen)
+        ? parsed.modifierTutorialsSeen.filter((id): id is string => typeof id === 'string')
+        : [],
       bestStage: typeof parsed.bestStage === 'number' && parsed.bestStage >= 0 ? Math.min(7, Math.floor(parsed.bestStage)) : 0,
       bossReached: parsed.bossReached === true,
       cleared: parsed.cleared === true,
+      highestAct: typeof parsed.highestAct === 'number' && parsed.highestAct >= 1 ? Math.floor(parsed.highestAct) : 1,
+      mostBossesDefeated: typeof parsed.mostBossesDefeated === 'number' && parsed.mostBossesDefeated >= 0 ? Math.floor(parsed.mostBossesDefeated) : 0,
+      longestSurvivalSeconds: typeof parsed.longestSurvivalSeconds === 'number' && parsed.longestSurvivalSeconds >= 0 ? parsed.longestSurvivalSeconds : 0,
+      recentWordLoadout: Array.isArray(parsed.recentWordLoadout) ? parsed.recentWordLoadout.filter((id): id is string => typeof id === 'string') : ['stop', 'rewind', 'link'],
     } as GameSave;
   } catch {
     return structuredClone(DEFAULT_SAVE);

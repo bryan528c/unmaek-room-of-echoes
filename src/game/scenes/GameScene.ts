@@ -8,13 +8,16 @@ import { Projectile } from '../entities/Projectile';
 import { resonanceById, upgradeById, upgradeDescription, type ResonanceId, type UpgradeId } from '../data/upgrades';
 import { getServices, type AppServices } from '../services';
 import { parrySentenceReward } from '../systems/CombatRules';
+import { modifierDefinition, modifierDescription, modifierLabel, modifierLabelsForAct, ModifierIntroductionTracker } from '../systems/ActModifiers';
+import { attackDisplayName, enemyDisplayName } from '../systems/CombatPresentation';
 import { clampGroundPointToBounds, clampPointToBounds, groundFootprintInsideBounds } from '../systems/CombatBounds';
 import { AttackHitRegistry, distanceToEllipse, sectorHitsEllipse, separateAttackerFromAnchoredHero, separationOffset, sweptCircleHitsEllipse } from '../systems/CombatGeometry';
 import { attackTargetMultiplier } from '../systems/BasicAttackBalance';
 import { FinisherChargeSystem, finisherProfile, finisherStatusFor, selectDefensiveSlashTarget, type FinisherChargeSource } from '../systems/CombatCoreSystem';
 import { RisingEdgeInput } from '../systems/CombatInputGate';
 import { RunOutcomeController, type EnemyDeathSource } from '../systems/CombatLifecycle';
-import { CombatStats, type DamageSource } from '../systems/CombatStats';
+import { CombatStats, empoweredWordEffectIsValid, type DamageSource, type EmpowerFailureReason } from '../systems/CombatStats';
+import { DamageQueue, simulateDamageFreezeRegression, type DamageEventFlag } from '../systems/DamageQueue';
 import { DamageHistory, type RecordedDamageKind } from '../systems/DamageHistory';
 import { GameFlowController, type BaseGameFlowState } from '../systems/GameFlowController';
 import { InputRouter, type InputContext } from '../systems/InputRouter';
@@ -22,26 +25,60 @@ import { distributeLinkedDamage } from '../systems/LinkDamage';
 import { ParryResolver } from '../systems/ParrySystem';
 import { RewindBuffer } from '../systems/RewindBuffer';
 import { RunProgressController } from '../systems/RunProgressController';
+import { activeModifiersForWave, RunActDirector, type ActPatternId, type EndlessModifierId } from '../systems/RunActDirector';
 import { RunSessionController, type RunId } from '../systems/RunSessionController';
 import { runStabilityStressSimulation } from '../systems/StabilityStressSimulation';
 import { TimeControlService } from '../systems/TimeControlService';
+import { mixedModifierProfile, ThreatBudget, type ThreatTier } from '../systems/ThreatBudget';
 import { SoftTargetLock, TargetingSystem, type TargetCandidate, type TargetSelection } from '../systems/TargetingSystem';
 import { sealedSentenceStats, UpgradeSystem } from '../systems/UpgradeSystem';
-import { counterInscriptionProfile, echoHarvestGain, linkContagionProfile, overchargedWordProfile, perfectCounterProfile, ResonanceRuntime, rewindBreathHealing, ruptureStepProfile, stopResonanceProfile } from '../systems/UpgradeRuntime';
+import { counterInscriptionProfile, deepMarkProfile, echoHarvestGain, gravityInscriptionProfile, headwindVeilProfile, linkContagionProfile, overchargedWordProfile, perfectCounterProfile, recoilRippleProfile, ResonanceRuntime, rewindBreathHealing, ruptureStepProfile, stopResonanceProfile } from '../systems/UpgradeRuntime';
 import { WordChainSystem, type WordChainId, type WordId } from '../systems/WordChainSystem';
+import { DEFAULT_WORD_LOADOUT, reactionDefinition, WordLoadoutState, WordStatusRuntime, wordDefinition, wordDisplayName, type WordSlot } from '../systems/WordSystem';
 import { WaveDirector, type WaveEnemySnapshot } from '../systems/WaveDirector';
 import { adjustLinkedIncomingDamage, linkShareRatio } from '../systems/WordCombatRules';
 import { backflowBladeDamage, cutDamageMultiplier, cutHitsTarget, cutSentenceBonus, echoBladeProfile, echoBladeTargets, isolationChainProfile, quantizeEightDirection, returningScarProfile, selectEchoReplayTarget, WeaponCooldowns } from '../systems/WeaponCombatSystem';
 import { angleDelta, distanceSq, rankFor } from '../utils/math';
-import { createArchiveArena } from '../utils/arena';
+import { createArchiveArena, createInkArchiveArena } from '../utils/arena';
 import type { ResultStats } from '../../ui/OverlayUI';
 
-interface InkZone { circle: Phaser.GameObjects.Arc; expiresAt: number; nextDamageAt: number; radius: number }
+interface InkZone { circle: Phaser.GameObjects.Arc; expiresAt: number; nextDamageAt: number; radius: number; damage: number; style: 'ink' | 'erasure'; patternName: string; modifier?: string }
 interface RecordedAttack { time: number; x: number; y: number; angle: number; kind: 'guard' | 'finisher' | 'legacy' | 'echo-blade' | 'cut'; damage: number }
-type CombatAction = 'attack' | 'parry' | 'dash' | 'stop' | 'rewind' | 'link';
+interface DamageDispatchContext {
+  handler?: string;
+  sourceEntityId?: string;
+  baseSource?: 'echoBlade' | 'cut' | 'parry' | 'word' | 'other';
+  skillId?: string;
+  cardId?: string;
+  resonanceId?: ResonanceId;
+  modifierSourceIds?: readonly string[];
+  damageKind?: string;
+  flags?: readonly DamageEventFlag[];
+  onApplied?: (amount: number) => void;
+}
+interface HeroDamageContext {
+  attackerId: string;
+  attackerDisplayName?: string;
+  attackId: string;
+  patternName: string;
+  modifier?: string;
+  parryable: boolean;
+}
+interface WordCastContext {
+  enhanced: boolean;
+  empoweredByF: boolean;
+  overchargeMultiplier: number;
+  overchargeDurationBonus: number;
+}
+type CombatAction = 'attack' | 'parry' | 'dash' | WordId;
 type DebugWindow = Window & { __EONMAEK_DEBUG__?: () => unknown };
 
-const WAVE_LABELS = ['제1전투 · 잿빛 추적자', '제2전투 · 먹빛 사선', '제3전투 · 봉합된 문장'] as const;
+const modifierIdsForPause = (patterns: ReadonlySet<ActPatternId>, endless: readonly EndlessModifierId[]): string[] =>
+  [...new Set<ActPatternId | EndlessModifierId>([
+    ...[...patterns].filter((id) => id !== 'archive-baseline'),
+    ...endless,
+  ])].map((id) => `${modifierLabel(id)} — ${modifierDescription(id)}`);
+
 const TUTORIAL = [
   { action: 'move', text: '<kbd>WASD</kbd> 또는 <kbd>방향키</kbd>로 움직여 공격선을 벗어나라' },
   { action: 'attack', text: '<kbd>J</kbd>로 마지막 이동 방향을 넓게 <b>절단</b>하라' },
@@ -51,6 +88,7 @@ const TUTORIAL = [
   { action: 'rewind', text: '<kbd>E</kbd> <b>되돌린다</b> — 너의 위치와 체력만 2초 전으로' },
   { action: 'link', text: '<kbd>R</kbd> <b>잇는다</b> — 최대 3명의 피해를 서로 잇는다' },
 ] as const;
+const WORD_TUTORIAL_TEXT = (slot: WordSlot, word: WordId): string => `<kbd>${slot}</kbd> <b>${wordDisplayName(word)}</b> — ${wordDefinition(word).shortDescription}`;
 
 export class GameScene extends Phaser.Scene {
   private services!: AppServices;
@@ -76,17 +114,33 @@ export class GameScene extends Phaser.Scene {
   private rewind = new RewindBuffer(BALANCE.words.rewindDuration);
   private targeting = new TargetingSystem(BALANCE.targeting);
   private wordChain = new WordChainSystem(BALANCE.chain.window);
+  private wordLoadout = new WordLoadoutState();
+  private wordStatuses = new WordStatusRuntime();
+  private wordReadyAt: Record<WordId, number> = { stop: 0, rewind: 0, link: 0, pull: 0, mark: 0, push: 0 };
   private damageHistory = new DamageHistory(BALANCE.chain.damageHistoryRetention);
+  private damageQueue = new DamageQueue();
+  private damageFrameId = 0;
   private combatStats = new CombatStats();
   private attackRegistry = new AttackHitRegistry();
   private attackInput = new RisingEdgeInput();
   private comboLock = new SoftTargetLock();
   private flow = new GameFlowController();
   private waveDirector = new WaveDirector(BALANCE.pacing.roundClearStability, BALANCE.pacing.staleEnemyRecovery);
+  private threatBudget = new ThreatBudget();
   private runOutcome = new RunOutcomeController();
   private readonly runSession = new RunSessionController();
   private readonly runProgress = new RunProgressController();
+  private readonly runAct = new RunActDirector();
+  private modifierIntroductions = new ModifierIntroductionTracker();
   private runId: RunId = 0;
+  private arenaContainer?: Phaser.GameObjects.Container;
+  private atmosphere?: Phaser.GameObjects.Particles.ParticleEmitter;
+  private modifierEnvironment?: Phaser.GameObjects.Graphics;
+  private activeActPatterns = new Set<ActPatternId>();
+  private activeEndlessModifiers: readonly EndlessModifierId[] = [];
+  private actPatternGeneration = 0;
+  private echoProjectileSequence = 0;
+  private stitchedPairs = new Map<string, string>();
   private inputRouter = new InputRouter();
   private parryResolver = new ParryResolver();
   private finisherCharges = new FinisherChargeSystem(BALANCE.hero.finisher.maximumCharges);
@@ -103,7 +157,6 @@ export class GameScene extends Phaser.Scene {
   private nextDefensiveSlashAt = 0;
   private defensiveSlashEnabled = false;
   private nextHeldComboAt = 0;
-  private enemyAttackReservedUntil = 0;
   private firstWaveSpawnOrdinal = 0;
   private defensiveSlashSequence = 100000;
   private echoBladeSequence = 200000;
@@ -130,9 +183,11 @@ export class GameScene extends Phaser.Scene {
   private wordInputAt = -1;
   private startTime = 0;
   private damageTaken = 0;
+  private deathSequenceStarted = false;
   private parries = 0;
-  private wordUses: ResultStats['wordUses'] = { '멎는다': 0, '되돌린다': 0, '잇는다': 0 };
+  private wordUses: ResultStats['wordUses'] = { '멎는다': 0, '되돌린다': 0, '잇는다': 0, '당긴다': 0, '새긴다': 0, '밀어낸다': 0 };
   private tutorialIndex = 0;
+  private tutorialSteps: Array<{ action: string; text: string }> = TUTORIAL.map((step) => ({ ...step }));
   private tutorialEnabled = false;
   private tutorialHideAt = 0;
   private firstHitAvailable = true;
@@ -143,14 +198,14 @@ export class GameScene extends Phaser.Scene {
   private parryAimUntil = 0;
   private parryStartedAt = 0;
   private sentencePulseUntil = 0;
+  private sentenceFullAt = 0;
+  private sentenceReminderShown = false;
   private perfectCounterUntil = 0;
+  private headwindGuardUntil = 0;
   private cutPerfectCounterActive = false;
   private lastDashAt = Number.NEGATIVE_INFINITY;
   private echoHarvestWindowStartedAt = 0;
   private echoHarvestWindowGain = 0;
-  private wordOverchargeMultiplier = 1;
-  private wordOverchargeDurationBonus = 0;
-  private wordEmpoweredByF = false;
   private lastUpgradeToastAt = new Map<UpgradeId, number>();
   private lastActivatedUpgrade?: UpgradeId;
   private lastActivatedUpgradeUntil = 0;
@@ -158,6 +213,10 @@ export class GameScene extends Phaser.Scene {
   private lastActivatedResonanceUntil = 0;
   private readonly transientCombatObjects = new Set<Phaser.GameObjects.GameObject>();
   private bossTransitionUntil = 0;
+  private bossSignatureExecutions = new Set<string>();
+  private bossDeathEvents = 0;
+  private actTransitionStartedAt = 0;
+  private lastActTransitionDuration = 0;
   private bufferedAction?: { action: CombatAction; expiresAt: number; x: number; y: number };
   private timeouts: number[] = [];
   private qaMode = false;
@@ -190,12 +249,19 @@ export class GameScene extends Phaser.Scene {
   private lastHitAt = 0;
   private lastDebugPublishAt = 0;
   private frameDelta = 1000 / 60;
+  private combatHeartbeats = { scene: 0, physics: 0, damageQueue: 0, timeControl: 0, audio: 0, bossAi: 0 };
 
   public constructor() { super('GameScene'); }
 
   public create(): void {
-    this.startNewRun();
     this.services = getServices();
+    // startNewRun rebuilds Run-scoped systems from persisted settings (recent
+    // word loadout, modifier tutorials, upgrade state).  On the first scene
+    // entry the service field has not been populated yet, so initialize it
+    // before touching any of those systems. Scene restarts used to hide this
+    // ordering bug because the reused Scene instance retained the old field.
+    this.startNewRun();
+    this.modifierIntroductions = new ModifierIntroductionTracker(this.services.save.modifierTutorialsSeen);
     // Phaser reuses Scene plugins for scene.restart(). A previous RESULT or
     // reward token can therefore leave their scales paused unless we restore
     // the scene clocks before constructing the next run's controller.
@@ -207,7 +273,7 @@ export class GameScene extends Phaser.Scene {
     this.timeControl = new TimeControlService({
       setPhysicsPaused: (paused) => { if (paused) this.physics.world.pause(); else this.physics.world.resume(); },
       setGameTimeScale: (scale) => { this.time.timeScale = scale; },
-      setPhysicsScale: (scale) => { this.physics.world.timeScale = scale; },
+      setPhysicsScale: (scale) => { this.physics.world.timeScale = scale > 0 ? 1 / scale : 1; },
       setTweenScale: (scale) => { this.tweens.timeScale = scale; },
       setAnimationScale: (scale) => { this.anims.globalTimeScale = scale; },
     });
@@ -221,7 +287,16 @@ export class GameScene extends Phaser.Scene {
       const upgradeId = developmentParams.get('upgrade'); const stacks = Math.max(0, Math.min(3, Number(developmentParams.get('stacks') ?? 1)));
       if (upgradeId) for (let index = 0; index < stacks; index += 1) this.upgrades.add(upgradeId as Parameters<UpgradeSystem['add']>[0]);
     }
-    createArchiveArena(this);
+    if (this.qaMode) {
+      const requestedAct = Phaser.Math.Clamp(Math.floor(Number(developmentParams.get('act') ?? 1)), 1, 20);
+      while (this.runAct.current.index < requestedAct) this.runAct.advanceAct(0, 0);
+      const act = this.runAct.current;
+      if (act.index > 1) this.runProgress.beginAct(this.runId, { actNumber: act.index, actId: act.id, actName: act.name, themeId: act.theme, enemySetId: act.enemySetId, bossId: act.bossId, modifiers: act.modifiers });
+    }
+    const initialAct = this.runAct.current;
+    this.arenaContainer = initialAct.theme === 'echo-room' || initialAct.theme === 'endless-echo'
+      ? createArchiveArena(this)
+      : createInkArchiveArena(this, initialAct.index >= 3 ? initialAct.index : 0);
     this.createAtmosphere();
     this.heroShadow = this.add.ellipse(480, 304, 38, 12, 0x020506, 0.55).setDepth(DEPTH.shadow);
     this.hero = new Hero(this, 480, 300);
@@ -239,6 +314,7 @@ export class GameScene extends Phaser.Scene {
       state: this.flow.state,
       run: this.runSession.snapshot(),
       progress: this.runProgress.snapshot(),
+      act: this.runAct.snapshot(),
       time: this.timeControl.snapshot(),
       input: this.inputRouter.snapshot(),
       hero: { x: this.hero.x, y: this.hero.y, comboActive: this.hero.isComboActive, comboStep: this.hero.comboStep, direction: this.hero.attackDirection, health: this.hero.health, finisherCharges: this.finisherCharges.charges },
@@ -246,48 +322,83 @@ export class GameScene extends Phaser.Scene {
       targetDistance: this.targetDistance,
       enemies: [...this.enemies].filter((enemy) => enemy.active).map((enemy) => ({ id: enemy.id, kind: enemy.kind, x: enemy.x, y: enemy.y, health: enemy.health, insideBounds: groundFootprintInsideBounds(enemy.groundPoint, enemyGroundExtents(enemy.kind), COMBAT_BOUNDS) })),
       wave: this.waveDirector.snapshot(),
+      runActFlow: {
+        currentBossDefinition: this.boss?.definition.bossId,
+        bossPhase: this.boss?.phaseSnapshot,
+        signaturePatternsExecuted: [...this.bossSignatureExecutions],
+        skippedBossPhases: this.boss?.phaseSnapshot.skippedPhaseCount ?? 0,
+        bossDeathEvents: this.bossDeathEvents,
+        actTransitionDurationMs: this.lastActTransitionDuration,
+        modifiers: modifierIdsForPause(this.activeActPatterns, this.runAct.current.modifiers),
+        sentenceFullDurationMs: this.sentence >= this.sentenceMax && this.sentenceFullAt > 0 ? Math.max(0, this.time.now - this.sentenceFullAt) : 0,
+      },
       outcome: this.runOutcome.snapshot(),
+      damageQueue: this.damageQueue.snapshot(),
+      threatBudget: this.threatBudget.snapshot(this.time.now),
+      heartbeats: { ...this.combatHeartbeats },
       stats: this.combatStats.snapshot(),
       bounds: COMBAT_BOUNDS,
     });
-    this.services.ui.showHud();
-    this.startTime = this.time.now;
-    this.tutorialEnabled = this.services.save.settings.showTutorial;
-    if (this.tutorialEnabled) { this.services.ui.showTutorial(TUTORIAL[0].text); this.tutorialHideAt = this.time.now + 5000; }
     // Arcade Physics applies Body movement to Game Objects in its own
     // POST_UPDATE listener. Manual separation must run afterwards; doing it in
     // Scene.update overwrites the movement calculated for the same frame and
     // can pin the hero inside an enemy.
     this.events.on(Phaser.Scenes.Events.POST_UPDATE, this.handlePostPhysicsUpdate, this);
-    this.spawnWave(0);
+    const requestedWords = developmentParams.get('words')?.split(',') ?? this.services.save.recentWordLoadout;
+    if (this.qaMode || developmentParams.has('skipLoadout')) this.beginEquippedRun(requestedWords, developmentParams.has('boss'));
+    else {
+      this.timeControl.acquire('SCENE_TRANSITION', this.timeOwner); this.hero.controlsLocked = true; this.inputRouter.setContext('NONE'); this.clearCombatInput();
+      this.services.ui.showWordLoadout(requestedWords, (words) => this.beginEquippedRun(words, false));
+    }
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup, this);
+  }
+
+  private beginEquippedRun(words: readonly unknown[], startAtBoss: boolean): void {
+    this.wordLoadout = new WordLoadoutState(words);
+    const equipped = this.wordLoadout.finalize();
+    this.services.save.recentWordLoadout = [...equipped]; this.services.persist(); this.combatStats.setEquippedWords(equipped);
+    this.tutorialSteps = [...TUTORIAL.slice(0, 4).map((step) => ({ ...step })), ...(['Q', 'E', 'R'] as WordSlot[]).map((slot) => { const word = this.wordLoadout.wordForSlot(slot); return { action: word, text: WORD_TUTORIAL_TEXT(slot, word) }; })];
+    this.timeControl.release('SCENE_TRANSITION', this.timeOwner); this.hero.controlsLocked = false;
+    if (this.flow.baseState === 'RUN_START') this.transitionFlow('WAVE_COMBAT');
+    this.services.ui.showHud(); this.startTime = this.time.now;
+    this.tutorialEnabled = this.services.save.settings.showTutorial && !this.services.save.tutorialSeen;
+    if (this.tutorialEnabled) { const first = this.tutorialSteps[0]; if (first) this.services.ui.showTutorial(first.text); this.tutorialHideAt = this.time.now + 5000; }
+    if (startAtBoss) { this.debugInvulnerable = true; this.startBoss(); } else this.spawnWave(0);
   }
 
   private startNewRun(): void {
     this.runId = this.runSession.beginRun();
     this.runProgress.beginRun(this.runId);
+    this.runAct.beginRun(this.runId, 0, 0);
+    this.damageFrameId = 0;
+    this.damageQueue = new DamageQueue(undefined, (runId, actId) => this.runSession.isCurrent(runId) && this.runAct.current.id === actId, (trace) => {
+      this.watchdogMessage = `damage blocked · ${trace.blockedReason ?? 'unknown'} · ${trace.rootEventId}`;
+      if (import.meta.env.DEV) console.warn('[RUN-ACT-05R2 DamageQueue guard]', trace);
+    });
     // Phaser reuses the Scene instance for restart/start. Object fields are not
     // cleared automatically even though display-list children are destroyed.
     this.boss = undefined;
     this.enemies = new Set(); this.projectiles = new Set(); this.inkZones = []; this.linkedTargets = new Set(); this.linkMarkers = new Map(); this.linkShareRatio = BALANCE.words.linkShare; this.linkGeneration = 0;
-    this.upgrades = this.runProgress.upgrades; this.rewind = new RewindBuffer(BALANCE.words.rewindDuration); this.targeting = new TargetingSystem(BALANCE.targeting); this.wordChain = new WordChainSystem(BALANCE.chain.window); this.damageHistory = new DamageHistory(BALANCE.chain.damageHistoryRetention); this.combatStats = this.runProgress.combatStats; this.attackRegistry = new AttackHitRegistry(); this.attackInput = new RisingEdgeInput(); this.comboLock = new SoftTargetLock(); this.flow = new GameFlowController('COMBAT', import.meta.env.DEV ? (message) => console.warn(`[GameFlow] ${message}`) : undefined, performance.now()); this.inputRouter = new InputRouter(); this.parryResolver = new ParryResolver(); this.finisherCharges = new FinisherChargeSystem(BALANCE.hero.finisher.maximumCharges); this.weaponCooldowns = new WeaponCooldowns(); this.weaponCooldowns.reset(0); this.resonanceRuntime = new ResonanceRuntime(); this.waveDirector = new WaveDirector(BALANCE.pacing.roundClearStability, BALANCE.pacing.staleEnemyRecovery); this.runOutcome = new RunOutcomeController(); this.attacks = [];
-    this.waveIndex = 0; this.waveSpawnGeneration = 0; this.enemySpawnTimes = new Map(); this.enemyFirstDamageAt = new Map(); this.currentComboDamage = 0; this.nextDefensiveSlashAt = 0; this.defensiveSlashEnabled = false; this.nextHeldComboAt = 0; this.enemyAttackReservedUntil = 0; this.firstWaveSpawnOrdinal = 0; this.defensiveSlashSequence = 100000; this.echoBladeSequence = 200000; this.lastDirectTargetId = undefined; this.echoFinisherUntil = 0; this.echoAmplifierUntil = 0; this.bossMechanicRewardUntil = 0; this.encounterStartedAt = 0; this.bossPhaseStartedAt = 0; this.currentWaveBatches = []; this.nextBatchIndex = 0; this.activeBatchPendingSpawns = 0; this.miniWaveReadyAt = 0; this.parryAnchorUntil = 0; this.lastWaveDiagnosticAt = 0; this.score = 0;
+    this.upgrades = this.runProgress.upgrades; this.rewind = new RewindBuffer(BALANCE.words.rewindDuration); this.targeting = new TargetingSystem(BALANCE.targeting); this.wordChain = new WordChainSystem(BALANCE.chain.window); this.wordLoadout = new WordLoadoutState(DEFAULT_WORD_LOADOUT); this.wordStatuses = new WordStatusRuntime(); this.wordReadyAt = { stop: 0, rewind: 0, link: 0, pull: 0, mark: 0, push: 0 }; this.damageHistory = new DamageHistory(BALANCE.chain.damageHistoryRetention); this.combatStats = this.runProgress.combatStats; this.attackRegistry = new AttackHitRegistry(); this.attackInput = new RisingEdgeInput(); this.comboLock = new SoftTargetLock(); this.flow = new GameFlowController('RUN_START', import.meta.env.DEV ? (message) => console.warn(`[GameFlow] ${message}`) : undefined, performance.now()); this.inputRouter = new InputRouter(); this.parryResolver = new ParryResolver(); this.finisherCharges = new FinisherChargeSystem(BALANCE.hero.finisher.maximumCharges); this.weaponCooldowns = new WeaponCooldowns(); this.weaponCooldowns.reset(0); this.resonanceRuntime = new ResonanceRuntime(); this.waveDirector = new WaveDirector(BALANCE.pacing.roundClearStability, BALANCE.pacing.staleEnemyRecovery); this.threatBudget = new ThreatBudget(); this.runOutcome = new RunOutcomeController(); this.attacks = [];
+    this.waveIndex = 0; this.waveSpawnGeneration = 0; this.enemySpawnTimes = new Map(); this.enemyFirstDamageAt = new Map(); this.currentComboDamage = 0; this.nextDefensiveSlashAt = 0; this.defensiveSlashEnabled = false; this.nextHeldComboAt = 0; this.firstWaveSpawnOrdinal = 0; this.defensiveSlashSequence = 100000; this.echoBladeSequence = 200000; this.lastDirectTargetId = undefined; this.echoFinisherUntil = 0; this.echoAmplifierUntil = 0; this.bossMechanicRewardUntil = 0; this.encounterStartedAt = 0; this.bossPhaseStartedAt = 0; this.currentWaveBatches = []; this.nextBatchIndex = 0; this.activeBatchPendingSpawns = 0; this.miniWaveReadyAt = 0; this.parryAnchorUntil = 0; this.lastWaveDiagnosticAt = 0; this.score = 0; this.activeActPatterns = new Set(); this.activeEndlessModifiers = []; this.actPatternGeneration = 0; this.echoProjectileSequence = 0; this.stitchedPairs = new Map(); this.arenaContainer = undefined; this.modifierEnvironment = undefined; this.modifierIntroductions = new ModifierIntroductionTracker(this.services.save.modifierTutorialsSeen);
     this.sentence = 0; this.empowered = false; this.stopReadyAt = 0; this.rewindReadyAt = 0; this.linkReadyAt = 0;
-    this.damageTaken = 0; this.parries = 0; this.wordUses = { '멎는다': 0, '되돌린다': 0, '잇는다': 0 };
-    this.tutorialIndex = 0; this.tutorialHideAt = 0; this.firstHitAvailable = true; this.lastPursuitId = ''; this.pursuitCount = 0; this.regressionCharged = false; this.parryCounterUntil = 0; this.parryAimUntil = 0; this.parryStartedAt = 0; this.sentencePulseUntil = 0; this.perfectCounterUntil = 0; this.cutPerfectCounterActive = false; this.lastDashAt = Number.NEGATIVE_INFINITY; this.echoHarvestWindowStartedAt = 0; this.echoHarvestWindowGain = 0; this.wordOverchargeMultiplier = 1; this.wordOverchargeDurationBonus = 0; this.wordEmpoweredByF = false; this.lastUpgradeToastAt = new Map(); this.lastActivatedUpgrade = undefined; this.lastActivatedUpgradeUntil = 0; this.lastActivatedResonance = undefined; this.lastActivatedResonanceUntil = 0; this.transientCombatObjects.clear(); this.bossTransitionUntil = 0; this.bufferedAction = undefined; this.currentTarget = undefined; this.comboTarget = undefined; this.heldAttackTarget = undefined; this.targetMarkerUntil = 0; this.targetDistance = 0; this.timeouts = []; this.rewindPreviewGhosts = [];
-    this.activeDaggerDebug = undefined; this.debugHitboxes = false; this.debugStatsVisible = false; this.debugScenarioIndex = 0; this.debugInvulnerable = false; this.watchdogHandle = undefined; this.lastHeartbeatAt = performance.now(); this.lastWatchdogReportAt = 0; this.watchdogMessage = 'normal'; this.watchdogStalled = false; this.lastAttackAt = 0; this.lastHitAt = 0; this.lastDebugPublishAt = 0; this.frameDelta = 1000 / 60;
+    this.damageTaken = 0; this.deathSequenceStarted = false; this.parries = 0; this.wordUses = { '멎는다': 0, '되돌린다': 0, '잇는다': 0, '당긴다': 0, '새긴다': 0, '밀어낸다': 0 };
+    this.tutorialIndex = 0; this.tutorialSteps = TUTORIAL.map((step) => ({ ...step })); this.tutorialHideAt = 0; this.firstHitAvailable = true; this.lastPursuitId = ''; this.pursuitCount = 0; this.regressionCharged = false; this.parryCounterUntil = 0; this.parryAimUntil = 0; this.parryStartedAt = 0; this.sentencePulseUntil = 0; this.sentenceFullAt = 0; this.sentenceReminderShown = false; this.perfectCounterUntil = 0; this.headwindGuardUntil = 0; this.cutPerfectCounterActive = false; this.lastDashAt = Number.NEGATIVE_INFINITY; this.echoHarvestWindowStartedAt = 0; this.echoHarvestWindowGain = 0; this.lastUpgradeToastAt = new Map(); this.lastActivatedUpgrade = undefined; this.lastActivatedUpgradeUntil = 0; this.lastActivatedResonance = undefined; this.lastActivatedResonanceUntil = 0; this.transientCombatObjects.clear(); this.bossTransitionUntil = 0; this.bossSignatureExecutions = new Set(); this.bossDeathEvents = 0; this.actTransitionStartedAt = 0; this.lastActTransitionDuration = 0; this.bufferedAction = undefined; this.currentTarget = undefined; this.comboTarget = undefined; this.heldAttackTarget = undefined; this.targetMarkerUntil = 0; this.targetDistance = 0; this.timeouts = []; this.rewindPreviewGhosts = [];
+    this.activeDaggerDebug = undefined; this.debugHitboxes = false; this.debugStatsVisible = false; this.debugScenarioIndex = 0; this.debugInvulnerable = false; this.watchdogHandle = undefined; this.lastHeartbeatAt = performance.now(); this.lastWatchdogReportAt = 0; this.watchdogMessage = 'normal'; this.watchdogStalled = false; this.lastAttackAt = 0; this.lastHitAt = 0; this.lastDebugPublishAt = 0; this.frameDelta = 1000 / 60; this.combatHeartbeats = { scene: 0, physics: 0, damageQueue: 0, timeControl: 0, audio: 0, bossAi: 0 };
   }
 
   private runDelayedCall(delay: number, callback: () => void): Phaser.Time.TimerEvent {
     const runId = this.runId;
     const scope = this.runProgress.captureScope();
-    return this.time.delayedCall(delay, () => { this.runSession.invoke(runId, () => { this.runProgress.invoke(scope, callback); }); });
+    const actScope = this.runAct.captureScope();
+    return this.time.delayedCall(delay, () => { this.runSession.invoke(runId, () => { this.runProgress.invoke(scope, () => { this.runAct.invoke(actScope, callback); }); }); });
   }
 
   private runTimeout(delay: number, callback: () => void): number {
     const runId = this.runId;
     const scope = this.runProgress.captureScope();
-    const handle = window.setTimeout(() => { this.runSession.invoke(runId, () => { this.runProgress.invoke(scope, callback); }); }, delay);
+    const actScope = this.runAct.captureScope();
+    const handle = window.setTimeout(() => { this.runSession.invoke(runId, () => { this.runProgress.invoke(scope, () => { this.runAct.invoke(actScope, callback); }); }); }, delay);
     this.timeouts.push(handle);
     return handle;
   }
@@ -363,9 +474,9 @@ export class GameScene extends Phaser.Scene {
     let context: InputContext = 'NONE';
     if (this.debugScenarioText?.visible) context = 'DEVELOPMENT';
     else if (this.flow.state === 'USER_PAUSED') context = 'PAUSE';
-    else if (this.flow.state === 'COMBAT') context = 'COMBAT';
-    else if (this.flow.state === 'REWARD_SELECT') context = 'REWARD';
-    else if (this.flow.state === 'RESULT') context = 'RESULT';
+    else if (this.flow.state === 'COMBAT' || this.flow.state === 'WAVE_COMBAT' || this.flow.state === 'BOSS_COMBAT') context = 'COMBAT';
+    else if (this.flow.state === 'REWARD_SELECT' || this.flow.state === 'BOSS_REWARD_SELECT') context = 'REWARD';
+    else if (this.flow.state === 'RESULT' || this.flow.state === 'RUN_OVER') context = 'RESULT';
     this.inputRouter.setContext(context);
   }
 
@@ -379,8 +490,13 @@ export class GameScene extends Phaser.Scene {
   }
 
   public override update(time: number, delta: number): void {
+    const realtimeNow = performance.now();
+    this.damageQueue.beginFrame(this.damageFrameId += 1);
+    this.combatHeartbeats.damageQueue = realtimeNow;
+    this.combatHeartbeats.timeControl = realtimeNow;
     this.frameDelta = Number.isFinite(delta) && delta > 0 ? delta : 1000 / 60;
-    this.lastHeartbeatAt = performance.now();
+    this.lastHeartbeatAt = realtimeNow;
+    this.combatHeartbeats.scene = realtimeNow;
     if (this.tutorialEnabled && this.tutorialHideAt > 0 && time >= this.tutorialHideAt) { this.services.ui.hideTutorial(); this.tutorialHideAt = 0; }
     if (import.meta.env.DEV && Phaser.Input.Keyboard.JustDown(this.keys.f2)) this.toggleHitboxDebug();
     if (import.meta.env.DEV && Phaser.Input.Keyboard.JustDown(this.keys.f3)) this.toggleStatsDebug();
@@ -402,8 +518,15 @@ export class GameScene extends Phaser.Scene {
     this.hero.constrainToArena();
     this.updateTargetMarker(time);
     this.heroShadow.setPosition(this.hero.x, this.hero.y + 9).setScale(this.hero.isDashing ? 1.5 : 1);
-    const runeAlpha = this.empowered ? 0.48 + Math.sin(time / 95) * 0.2 : 0;
+    const sentenceReady = this.sentence >= this.sentenceMax;
+    const runeAlpha = this.empowered
+      ? 0.48 + Math.sin(time / 95) * 0.2
+      : sentenceReady ? 0.18 + Math.sin(time / 160) * 0.08 : 0;
     this.heroRune?.setPosition(this.hero.x, this.hero.y - 7).setAlpha(runeAlpha).setScale(1 + Math.sin(time / 130) * 0.08);
+    if (sentenceReady && !this.empowered && !this.sentenceReminderShown && this.sentenceFullAt > 0 && time - this.sentenceFullAt >= 6000) {
+      this.sentenceReminderShown = true;
+      this.services.ui.showChainTrigger('F 강화 용언 준비', 900);
+    }
     if (x !== 0 || y !== 0) this.markTutorial('move');
     const attackEdge = this.attackInput.consume();
     const heldRepeat = this.services.save.settings.holdCutRepeat && this.attackInput.isHeld && !this.hero.isComboActive && !this.bufferedAction && time >= this.nextHeldComboAt;
@@ -411,9 +534,9 @@ export class GameScene extends Phaser.Scene {
     if ((Phaser.Input.Keyboard.JustDown(this.keys.k) && this.inputRouter.accepts('COMBAT', 'KeyK')) || (Phaser.Input.Keyboard.JustDown(this.keys.shift) && this.inputRouter.accepts('COMBAT', 'ShiftLeft'))) this.requestCombatAction('parry', x, y);
     if (Phaser.Input.Keyboard.JustDown(this.keys.space) && this.inputRouter.accepts('COMBAT', 'Space')) this.requestCombatAction('dash', x, y);
     if (Phaser.Input.Keyboard.JustDown(this.keys.f) && this.inputRouter.accepts('COMBAT', 'KeyF')) this.armEmpower();
-    if (Phaser.Input.Keyboard.JustDown(this.keys.q) && this.inputRouter.accepts('COMBAT', 'KeyQ')) this.requestCombatAction('stop', x, y);
-    if (Phaser.Input.Keyboard.JustDown(this.keys.e) && this.inputRouter.accepts('COMBAT', 'KeyE')) this.requestCombatAction('rewind', x, y);
-    if (Phaser.Input.Keyboard.JustDown(this.keys.r) && this.inputRouter.accepts('COMBAT', 'KeyR')) this.requestCombatAction('link', x, y);
+    if (Phaser.Input.Keyboard.JustDown(this.keys.q) && this.inputRouter.accepts('COMBAT', 'KeyQ')) this.requestCombatAction(this.wordLoadout.wordForSlot('Q'), x, y);
+    if (Phaser.Input.Keyboard.JustDown(this.keys.e) && this.inputRouter.accepts('COMBAT', 'KeyE')) this.requestCombatAction(this.wordLoadout.wordForSlot('E'), x, y);
+    if (Phaser.Input.Keyboard.JustDown(this.keys.r) && this.inputRouter.accepts('COMBAT', 'KeyR')) this.requestCombatAction(this.wordLoadout.wordForSlot('R'), x, y);
     this.processBufferedAction();
     if (this.legacyCombatMode) this.updateDefensiveSlash(time);
     else this.updateEchoBlade(time);
@@ -427,7 +550,13 @@ export class GameScene extends Phaser.Scene {
     this.recordState(time);
     for (const enemy of [...this.enemies]) {
       if (!enemy.active) continue;
+      const beforeAiCorrection = enemy.constrainToCombatBounds();
+      if (beforeAiCorrection.corrected) {
+        enemy.cancelAttackIntent(time + 420);
+        this.combatStats.boundaryCorrection(beforeAiCorrection.correctedTop);
+      }
       enemy.updateAI(time, this.hero);
+      if (enemy.kind === 'boss') this.combatHeartbeats.bossAi = realtimeNow;
       const correction = enemy.constrainToCombatBounds();
       if (correction.corrected) this.combatStats.boundaryCorrection(correction.correctedTop);
       // A clamped transient near an edge is expected. Count only entities that
@@ -440,6 +569,7 @@ export class GameScene extends Phaser.Scene {
     }
     this.checkMeleeCollisions(time);
     for (const enemy of this.enemies) if (enemy.active) enemy.commitGroundPosition();
+    this.combatHeartbeats.physics = performance.now();
     this.updateInkZones(time);
     this.updateRewindPreview(time);
     this.updateLinks(time);
@@ -459,7 +589,20 @@ export class GameScene extends Phaser.Scene {
       targetId: this.comboLock.targetId ?? this.heldAttackTarget?.id ?? this.currentTarget?.id,
       targetDistance: this.targetDistance,
       wave: this.waveDirector.snapshot(),
+      act: this.runAct.snapshot(),
+      runActFlow: {
+        currentBossDefinition: this.boss?.definition.bossId,
+        bossPhase: this.boss?.phaseSnapshot,
+        signaturePatternsExecuted: [...this.bossSignatureExecutions],
+        skippedBossPhases: this.boss?.phaseSnapshot.skippedPhaseCount ?? 0,
+        bossDeathEvents: this.bossDeathEvents,
+        actTransitionDurationMs: this.lastActTransitionDuration,
+        modifiers: modifierIdsForPause(this.activeActPatterns, this.runAct.current.modifiers),
+      },
       outcome: this.runOutcome.snapshot(),
+      damageQueue: this.damageQueue.snapshot(),
+      threatBudget: this.threatBudget.snapshot(this.time.now),
+      heartbeats: { ...this.combatHeartbeats },
       stats: this.combatStats.snapshot(),
       enemies: [...this.enemies].filter((enemy) => enemy.active).map((enemy) => ({ id: enemy.id, kind: enemy.kind, health: enemy.health, x: enemy.x, y: enemy.y, removing: enemy.removing, stopped: enemy.isStopped, linked: enemy.linked, echo: enemy.isEchoMarked })),
       upgrades: this.upgrades.entries().map(({ id, stacks }) => ({ id, stacks, preview: this.upgrades.preview(id) })),
@@ -510,6 +653,9 @@ export class GameScene extends Phaser.Scene {
         const target = keyboardMode ? this.acquireSoftTarget(BALANCE.words.linkSelectionRadius, BALANCE.words.linkSelectionRadius) : undefined;
         return this.castLink(target?.candidate.x ?? aim.x, target?.candidate.y ?? aim.y, keyboardMode ? this.enemyForSelection(target) : undefined);
       }
+      case 'pull': return this.castPull(aim.x, aim.y);
+      case 'mark': return this.castMark();
+      case 'push': return this.castPush(direction.x, direction.y);
     }
   }
 
@@ -577,12 +723,47 @@ export class GameScene extends Phaser.Scene {
     return clampPointToBounds(x, y, COMBAT_BOUNDS, 10);
   }
 
+  private enterWave(index: number): void {
+    const wave = this.runAct.current.waves[index];
+    if (!wave) return;
+    const presentation = this.modifierIntroductions.presentationFor(wave.patterns, activeModifiersForWave(this.runAct.current, index));
+    if (!presentation) {
+      if (this.flow.baseState !== 'WAVE_COMBAT' && !this.transitionFlow('WAVE_COMBAT')) return;
+      this.spawnWave(index);
+      return;
+    }
+    if (!this.transitionFlow('MODIFIER_INTRO')) return;
+    if (presentation.detailed) {
+      this.services.save.modifierTutorialsSeen = this.modifierIntroductions.seenIds();
+      this.services.persist();
+    }
+    this.timeControl.acquire('SCENE_TRANSITION', this.timeOwner);
+    this.hero.controlsLocked = true;
+    this.clearCombatInput();
+    this.services.ui.showModifierIntro(presentation, () => {
+      if (!this.sys.isActive() || this.flow.baseState !== 'MODIFIER_INTRO') return;
+      this.timeControl.release('SCENE_TRANSITION', this.timeOwner);
+      this.hero.controlsLocked = false;
+      this.clearCombatInput();
+      if (!this.transitionFlow('WAVE_COMBAT')) return;
+      this.services.ui.showHud();
+      this.spawnWave(index);
+    });
+  }
+
   private spawnWave(index: number): void {
+    this.threatBudget.reset();
     this.runProgress.setWave(this.runId, this.runProgress.act.generation, index);
+    if (!this.runAct.beginWave(index)) return;
     this.firstHitAvailable = true;
     this.stopReadyAt = this.time.now; this.rewindReadyAt = this.time.now; this.linkReadyAt = this.time.now;
+    for (const id of Object.keys(this.wordReadyAt) as WordId[]) this.setReadyAtForWord(id, this.time.now);
     if (index === 0) this.firstWaveSpawnOrdinal = 0;
-    const batches = BALANCE.waveSpawns[index]; if (!batches) return;
+    const wave = this.runAct.current.waves[index]; if (!wave) return;
+    const batches = wave.batches;
+    this.activeActPatterns = new Set(wave.patterns);
+    this.activeEndlessModifiers = activeModifiersForWave(this.runAct.current, index);
+    const patternGeneration = ++this.actPatternGeneration;
     const generation = ++this.waveSpawnGeneration;
     this.currentWaveBatches = batches;
     this.nextBatchIndex = 0;
@@ -592,6 +773,7 @@ export class GameScene extends Phaser.Scene {
     const total = batches.reduce((count, batch) => count + batch.length, 0);
     this.waveDirector.startWave(total, performance.now());
     this.spawnNextMiniWave(generation);
+    this.scheduleActPatterns(patternGeneration);
   }
 
   private spawnNextMiniWave(generation: number): void {
@@ -608,49 +790,108 @@ export class GameScene extends Phaser.Scene {
         this.activeBatchPendingSpawns = Math.max(0, this.activeBatchPendingSpawns - 1);
         const position = positions[itemIndex] ?? { x: 120, y: 130 };
         const enemy = this.spawnEnemy(kind, position.x, position.y, true);
-        if (this.waveIndex === 0) enemy.delayAttackUntil(this.encounterStartedAt + BALANCE.pacing.firstWaveAttackGrace + this.firstWaveSpawnOrdinal++ * BALANCE.pacing.firstWaveAttackStagger);
+        const actThreeGrace = this.runAct.current.index >= 3 ? 1250 : 0;
+        if (this.waveIndex === 0 || actThreeGrace > 0) enemy.delayAttackUntil(this.encounterStartedAt + Math.max(BALANCE.pacing.firstWaveAttackGrace, actThreeGrace) + this.firstWaveSpawnOrdinal++ * BALANCE.pacing.firstWaveAttackStagger);
         this.waveDirector.registerSpawn(enemy.id, performance.now());
       });
     });
   }
 
   private spawnPositions(count: number): { x: number; y: number }[] {
-    if (this.waveIndex === 0 && this.nextBatchIndex === 1) {
+    if (this.runAct.current.index <= 2 && this.waveIndex === 0 && this.nextBatchIndex === 1) {
       const teachingSlots = [{ x: this.hero.x + 86, y: this.hero.y + 12 }, { x: this.hero.x - 86, y: this.hero.y - 12 }];
       return teachingSlots.slice(0, count).map((slot) => clampPointToBounds(slot.x, slot.y, COMBAT_BOUNDS, 28));
     }
     const slots = [{ x: 102, y: 112 }, { x: 858, y: 118 }, { x: 105, y: 458 }, { x: 855, y: 455 }, { x: 480, y: 94 }, { x: 480, y: 478 }, { x: 244, y: 102 }, { x: 716, y: 466 }];
-    return slots.filter((slot) => Phaser.Math.Distance.Between(slot.x, slot.y, this.hero.x, this.hero.y) >= 170).slice(0, count).sort(() => Math.random() - 0.5);
+    const minimumDistance = this.runAct.current.index >= 3 ? 220 : 170;
+    return slots.filter((slot) => Phaser.Math.Distance.Between(slot.x, slot.y, this.hero.x, this.hero.y) >= minimumDistance).slice(0, count).sort(() => Math.random() - 0.5);
   }
 
   private enemyCallbacks(): EnemyCallbacks {
     const runId = this.runId;
     return {
       shoot: (source, x, y, angle, speed, damage, texture) => { this.runSession.invoke(runId, () => this.spawnProjectile(source, x, y, angle, speed, damage, texture)); },
-      melee: (enemy, damage) => { this.runSession.invoke(runId, () => this.hitHero(damage, enemy.x, enemy.y, enemy.kind === 'boss' ? 'boss' : 'melee')); },
+      melee: (enemy, damage) => { this.runSession.invoke(runId, () => this.hitHero(damage * Number(enemy.getData('damageMultiplier') ?? 1), enemy.x, enemy.y, enemy.kind === 'boss' ? 'boss' : 'melee', { attackerId: enemy.id, attackerDisplayName: enemy.kind === 'boss' ? this.boss?.definition.displayName ?? '보스' : enemyDisplayName(enemy.kind), attackId: enemy.meleeAttackId, patternName: enemy.kind === 'boss' ? `${this.boss?.definition.displayName ?? '보스'} 근접 공격` : `${enemyDisplayName(enemy.kind)} · ${attackDisplayName(enemy.meleeAttackId, '근접 공격')}`, parryable: enemy.meleeParryable })); },
       died: (enemy, source) => { this.runSession.invoke(runId, () => this.onEnemyDied(enemy, source)); },
       cue: (cue) => { this.runSession.invoke(runId, () => this.services.audio.play(cue === 'warning' ? 'warning' : 'parryOpen')); },
-      requestAttack: () => {
+      requestAttack: (enemy) => {
         if (!this.runSession.isCurrent(runId)) return false;
-        if (this.time.now < this.enemyAttackReservedUntil) return false;
-        this.enemyAttackReservedUntil = this.time.now + BALANCE.pacing.attackReservation;
-        return true;
+        const tier: ThreatTier = enemy.kind === 'chaser' && this.runAct.current.index >= 3 ? 'tracking' : enemy.kind === 'elite' || enemy.kind === 'boss' ? 'high' : enemy.kind === 'ink' ? 'large-telegraph' : enemy.kind === 'archer' ? 'medium' : 'low';
+        const durationMs = enemy.kind === 'ink' ? 780 : enemy.kind === 'elite' || enemy.kind === 'boss' ? 720 : 580;
+        return this.threatBudget.request({ id: `enemy:${enemy.id}`, tier, now: this.time.now, durationMs, dangerousLimit: this.runAct.current.index >= 4 ? 2 : 1, minimumTierGapMs: tier === 'tracking' ? 720 : undefined });
       },
     };
   }
 
   private spawnEnemy(kind: EnemyKind, x: number, y: number, waveTracked = false): Enemy {
     const safe = clampGroundPointToBounds(x, y, enemyGroundExtents(kind), COMBAT_BOUNDS);
-    const enemy = new Enemy(this, safe.x, safe.y, kind, this.enemyCallbacks());
+    const enemy = new Enemy(this, safe.x, safe.y, kind, this.enemyCallbacks(), this.runAct.current.healthMultiplier);
     enemy.setData('waveTracked', waveTracked);
     enemy.setData('runId', this.runId);
+    enemy.setData('actId', this.runAct.current.id);
+    enemy.setData('damageMultiplier', this.runAct.current.damageMultiplier);
     this.enemySpawnTimes.set(enemy.id, { kind, at: performance.now() });
     this.enemies.add(enemy); enemy.spawn(); return enemy;
   }
 
-  private spawnProjectile(source: Enemy, x: number, y: number, angle: number, speed: number, damage: number, texture?: string): void {
-    const projectile = new Projectile(this, x, y, angle, speed, damage, texture, source.id);
+  private spawnProjectile(source: Enemy, x: number, y: number, angle: number, speed: number, damage: number, texture?: string, echoGeneration = 0): void {
+    const scaledDamage = damage * Number(source.getData('damageMultiplier') ?? 1);
+    const projectile = new Projectile(this, x, y, angle, speed, scaledDamage, texture, source.id);
+    projectile.setData('actId', this.runAct.current.id);
+    projectile.setData('echoGeneration', echoGeneration);
     this.projectiles.add(projectile);
+    const echoEnabled = this.activeActPatterns.has('ink-echo-projectile') || this.activeEndlessModifiers.includes('projectile-echo');
+    if (echoEnabled && echoGeneration === 0 && this.echoProjectileSequence++ % 3 === 0) {
+      const marker = this.add.circle(x, y, 10, 0x6f4a82, .08).setStrokeStyle(2, 0xa578ae, .62).setDepth(DEPTH.telegraph);
+      this.transientCombatObjects.add(marker);
+      this.tweens.add({ targets: marker, scale: 1.8, alpha: 0, duration: 720, onComplete: () => { marker.destroy(); this.transientCombatObjects.delete(marker); } });
+      this.runDelayedCall(720, () => {
+        if (!source.active || source.removing || this.flow.baseState !== 'WAVE_COMBAT' && this.flow.baseState !== 'BOSS_COMBAT') return;
+        this.spawnProjectile(source, x, y, angle, speed * .82, damage * .65, texture, 1);
+      });
+    }
+  }
+
+  private scheduleActPatterns(generation: number): void {
+    const has = (pattern: ActPatternId): boolean => this.activeActPatterns.has(pattern) || this.activeActPatterns.has('mixed-archive');
+    if (has('stitch-pair') || this.activeEndlessModifiers.includes('stitched-armor')) this.runDelayedCall(1350, () => {
+      if (generation !== this.actPatternGeneration || !this.flow.allowsCombatInput) return;
+      const candidates = [...this.enemies].filter((enemy) => enemy.active && enemy.spawned && !enemy.removing && enemy.kind !== 'boss').slice(0, 4);
+      for (let index = 0; index + 1 < candidates.length; index += 2) {
+        const first = candidates[index]; const second = candidates[index + 1]; if (!first || !second) continue;
+        first.setData('stitchedPartnerId', second.id); second.setData('stitchedPartnerId', first.id);
+        this.stitchedPairs.set(first.id, second.id); this.stitchedPairs.set(second.id, first.id);
+        this.showCombatLabel((first.x + second.x) / 2, (first.y + second.y) / 2 - 30, '봉합 쌍', 0xc1849d);
+      }
+    });
+    if (has('past-position') || this.activeEndlessModifiers.includes('time-rift')) {
+      const mixedProfile = mixedModifierProfile(this.activeActPatterns.has('mixed-archive') || this.runAct.current.index === 3 && this.waveIndex === 1);
+      const schedulePastStrike = (): void => {
+        if (generation !== this.actPatternGeneration || !this.flow.allowsCombatInput) return;
+        if (!this.threatBudget.request({ id: 'modifier:past-position', tier: 'modifier', now: this.time.now, durationMs: 1250 })) {
+          this.runDelayedCall(320, schedulePastStrike); return;
+        }
+        const record = this.rewind.getRange(this.time.now, 1500)[0];
+        const sourceX = record?.x ?? this.hero.x; const sourceY = record?.y ?? this.hero.y;
+        const safe = clampPointToBounds(sourceX, sourceY, COMBAT_BOUNDS, 56); const x = safe.x; const y = safe.y;
+        const telegraph = this.add.circle(x, y - 6, 52, 0x76284f, .16).setStrokeStyle(4, 0xf08a75, .92).setDepth(DEPTH.telegraph);
+        const glyph = this.add.text(x, y - 8, '削\n0.9', { align: 'center', fontFamily: 'serif', fontSize: '18px', color: '#f2b0c5', stroke: '#32111e', strokeThickness: 5 }).setOrigin(.5).setDepth(DEPTH.telegraph);
+        this.transientCombatObjects.add(telegraph); this.transientCombatObjects.add(glyph);
+        this.tweens.add({ targets: [telegraph, glyph], scaleX: 1.18, scaleY: 1.18, duration: 850 });
+        this.runDelayedCall(300, () => { if (glyph.active) glyph.setText('削\n0.6'); });
+        this.runDelayedCall(600, () => { if (glyph.active) glyph.setText('削\n0.3'); telegraph.setAlpha(.28); });
+        this.runDelayedCall(900, () => {
+          telegraph.destroy(); glyph.destroy(); this.transientCombatObjects.delete(telegraph); this.transientCombatObjects.delete(glyph);
+          this.createInkZone(x, y, 52, 1500, 'erasure', 10 * mixedProfile.damageMultiplier, '과거 교정', '과거 교정');
+          this.runDelayedCall(3600 / mixedProfile.frequencyMultiplier, schedulePastStrike);
+        });
+      };
+      this.runDelayedCall(mixedProfile.openingGraceMs, schedulePastStrike);
+    }
+    if (this.activeEndlessModifiers.includes('ink-floor')) this.runDelayedCall(1800, () => {
+      if (generation !== this.actPatternGeneration || !this.flow.allowsCombatInput) return;
+      this.createInkZone(Phaser.Math.Between(180, 780), Phaser.Math.Between(145, 430), 48, 2200);
+    });
   }
 
   private weaponCandidates() {
@@ -690,11 +931,15 @@ export class GameScene extends Phaser.Scene {
     for (const item of selected) {
       const enemy = [...this.enemies].find((candidate) => candidate.id === item.id && candidate.active && !candidate.removing);
       if (!enemy || !this.attackRegistry.claim(attackId, enemy.id)) continue;
+      // DamageQueue callbacks may synchronously finish and destroy this target
+      // before the next statement. Capture the pre-hit state while the entity
+      // still owns a Scene rather than dereferencing a destroyed GameObject.
+      const harvestedState = enemy.isStopped || enemy.linked;
       const angle = Phaser.Math.Angle.Between(this.hero.x, this.hero.y, enemy.x, enemy.y);
       const dealt = this.damageEnemy(enemy, profile.damage, angle, false, false, 'attack', 'attack');
       if (dealt <= 0) continue;
       totalDamage += dealt; this.combatStats.echoBladeHit(dealt); this.damageNumber(enemy.x, enemy.y - 38, dealt, 0x8bd8ca, true, '잔향 ');
-      if (enemy.isStopped || enemy.linked) this.applyEchoHarvest(time);
+      if (harvestedState) this.applyEchoHarvest(time);
       if (this.resonanceRuntime.registerMoonRingHit(this.upgrades.hasResonance('moon-ring'))) this.triggerMoonRingResonance();
     }
     if (totalDamage > 0) {
@@ -760,12 +1005,19 @@ export class GameScene extends Phaser.Scene {
       .sort((first, second) => distanceToEllipse({ x: attack.originX, y: attack.originY }, first.hurtbox) - distanceToEllipse({ x: attack.originX, y: attack.originY }, second.hurtbox))
       .slice(0, profile.maximumTargets);
     let totalDamage = 0;
+    let directCutDamage = 0;
     let hitCount = 0;
     let counterCutActivated = false;
     for (const enemy of candidates) {
       if (!this.attackRegistry.claim(attack.attackId, enemy.id)) continue;
-      const states = { stopped: enemy.isStopped, linked: enemy.linked, echo: enemy.isEchoMarked, exposed: enemy.vulnerableUntil > this.time.now };
+      const compressed = this.wordStatuses.has(enemy.id, 'COMPRESSED', this.time.now) || this.wordStatuses.has(enemy.id, 'PULLED', this.time.now);
+      const marked = this.wordStatuses.has(enemy.id, 'MARKED', this.time.now);
+      const displaced = this.wordStatuses.has(enemy.id, 'DISPLACED', this.time.now);
+      const states = { stopped: enemy.isStopped, linked: enemy.linked, echo: enemy.isEchoMarked, exposed: enemy.vulnerableUntil > this.time.now, compressed, marked, displaced };
       let damage = profile.damage * cutDamageMultiplier(states, profile);
+      if (compressed) damage += profile.damage * .42;
+      if (marked) damage += profile.damage * .24;
+      if (displaced) damage += profile.damage * .16;
       if (counterActive && (states.stopped || states.linked)) damage += perfectCounter.ruptureBonus;
       if (counterActive && this.upgrades.hasResonance('counter-cut') && !states.stopped && !states.linked) damage += 10;
       const fang = this.upgrades.getStack('dragon-fang'); if (fang > 0 && Math.random() < Math.min(0.55, fang * 0.22)) damage *= 1.75;
@@ -775,11 +1027,18 @@ export class GameScene extends Phaser.Scene {
       damage *= 1 + pursuit * this.pursuitCount * 0.08;
       const dealt = this.damageEnemy(enemy, damage, attack.angle, false, false, 'attack', 'attack', 'cut');
       if (dealt <= 0) continue;
-      totalDamage += dealt; hitCount += 1; this.combatStats.cutHit(dealt, states); this.damageNumber(enemy.x, enemy.y - 52, dealt, states.stopped || states.linked ? 0x9cf1df : 0xf1d7a8, false, states.stopped ? '절단 파열 ' : states.linked ? '연결 절단 ' : '절단 ');
+      const hasReactionState = states.stopped || states.linked || states.echo || states.exposed || compressed || marked || displaced;
+      const directPart = hasReactionState ? Math.min(dealt, profile.damage) : dealt;
+      const reactionPart = Math.max(0, dealt - directPart);
+      directCutDamage += directPart;
+      if (reactionPart > 0) this.combatStats.reactionDamage(states.stopped ? 'cut-stopped' : states.linked ? 'cut-linked' : marked ? 'cut-marked' : 'cut-displaced', reactionPart);
+      const cutLabel = states.stopped ? '절단 파열 ' : states.linked ? '연결 절단 ' : compressed ? '압축 절단 ' : marked ? '각인 절단 ' : displaced ? '충돌 절단 ' : '절단 ';
+      totalDamage += dealt; hitCount += 1; this.combatStats.cutHit(dealt, states); this.damageNumber(enemy.x, enemy.y - 52, dealt, hasReactionState ? 0x9cf1df : 0xf1d7a8, false, cutLabel);
       const body = enemy.body as Phaser.Physics.Arcade.Body; body.velocity.add(new Phaser.Math.Vector2(Math.cos(attack.angle), Math.sin(attack.angle)).scale(profile.knockback));
       if (states.stopped) this.resolveCutStopped(enemy, attack.angle);
       if (states.linked) this.resolveCutLinked(enemy, attack.angle);
       if (states.echo) this.resolveCutEcho(enemy, attack.angle, dealt);
+      if (compressed) this.resolveCutCompressed(enemy, attack.angle);
       if (states.exposed) this.showCombatLabel(enemy.x, enemy.y - 68, '반격 절단', 0xb9f5e9);
       if (counterActive) this.recordUpgradeContribution('perfect-counter', { activationCount: 0, damage: Math.min(dealt, perfectCounter.ruptureBonus), hits: 1 }, true);
       if (counterActive && this.upgrades.hasResonance('counter-cut')) {
@@ -794,12 +1053,12 @@ export class GameScene extends Phaser.Scene {
       const cutSentence = this.upgrades.getStack('cut-sentence');
       if ((states.stopped || states.linked) && cutSentence > 0 && enemy.active) {
         const bonus = this.damageEnemy(enemy, cutSentenceBonus(states.stopped, states.linked, cutSentence), attack.angle, false, true, undefined, 'attack');
-        if (bonus > 0) { totalDamage += bonus; this.recordUpgradeContribution('cut-sentence', { activationCount: 1, damage: bonus, affectedTargets: 1, hits: 1 }, true); this.showCombatLabel(enemy.x, enemy.y - 76, '절단 문장', 0x8ff1df); }
+        if (bonus > 0) { totalDamage += bonus; this.combatStats.reactionDamage(states.stopped ? 'cut-stopped' : 'cut-linked', bonus); this.recordUpgradeContribution('cut-sentence', { activationCount: 1, damage: bonus, affectedTargets: 1, hits: 1 }, true); this.showCombatLabel(enemy.x, enemy.y - 76, '절단 문장', 0x8ff1df); }
       }
       const brokenSentence = this.upgrades.getStack('broken-sentence');
       if (states.stopped && brokenSentence > 0 && enemy.active) {
         const bonus = this.damageEnemy(enemy, 12 * brokenSentence, attack.angle, false, true, undefined, 'stop');
-        if (bonus > 0) { totalDamage += bonus; this.recordUpgradeContribution('broken-sentence', { damage: bonus }); }
+        if (bonus > 0) { totalDamage += bonus; this.combatStats.reactionDamage('cut-stopped', bonus); this.recordUpgradeContribution('broken-sentence', { damage: bonus }); }
       }
       const rhythm = this.upgrades.getStack('dragon-rhythm');
       if ((states.stopped || states.linked || states.echo || states.exposed) && rhythm > 0) {
@@ -817,7 +1076,7 @@ export class GameScene extends Phaser.Scene {
     }
     this.attacks.push({ time: this.time.now, x: attack.originX, y: attack.originY, angle: attack.angle, kind: 'cut', damage: totalDamage });
     if (totalDamage > 0) {
-      this.combatStats.attackHit(hitCount); this.combatStats.agencyMilestone('manualHit', this.elapsedSeconds()); this.combatStats.agencyDamage('basicJ', totalDamage);
+      this.combatStats.attackHit(hitCount); this.combatStats.agencyMilestone('manualHit', this.elapsedSeconds()); this.combatStats.agencyDamage('basicJ', directCutDamage);
       this.gainSentence(profile.sentenceGain); this.services.audio.play('cutHit'); this.timeControl.requestHitstop(this.timeOwner, this.services.save.settings.reducedMotion ? 24 : profile.hitstop); this.cameraKick(0.0018, 55);
     }
     this.cutPerfectCounterActive = false;
@@ -871,6 +1130,14 @@ export class GameScene extends Phaser.Scene {
       this.tweens.add({ targets: slash, alpha: 0, duration: 150, onComplete: () => slash.destroy() });
       if (primary.active && !primary.removing) this.damageEnemy(primary, damage * BALANCE.hero.cut.echoReplayRatio, angle, false, true, undefined, 'rewind');
     });
+  }
+
+  private resolveCutCompressed(primary: Enemy, angle: number): void {
+    this.wordStatuses.consume(primary.id, 'PULLED'); this.wordStatuses.consume(primary.id, 'COMPRESSED');
+    for (const enemy of [...this.enemies]) {
+      if (enemy === primary || !enemy.active || enemy.removing || distanceSq(primary.x, primary.y, enemy.x, enemy.y) > 62 ** 2) continue;
+      this.damageEnemy(enemy, 8, angle, false, true, undefined, 'word', 'none', { handler: `cut-compressed:${primary.id}:${enemy.id}`, baseSource: 'cut', skillId: 'cut-compressed', damageKind: 'reaction', flags: ['echoDerived', 'cannotTriggerShare', 'cannotTriggerCard', 'cannotTriggerResonance'], onApplied: (dealt) => this.combatStats.reactionDamage('cut-displaced', dealt) });
+    }
   }
 
   private updateDefensiveSlash(time: number): void {
@@ -1159,7 +1426,7 @@ export class GameScene extends Phaser.Scene {
     const heroBefore = { x: this.hero.x, y: this.hero.y };
     const perfectBreath = this.upgrades.getStack('perfect-breath');
     const perfect = this.time.now - this.parryStartedAt <= BALANCE.hero.perfectParryWindow;
-    this.combatStats.parrySuccess(perfect);
+    this.combatStats.parrySuccess(perfect, projectile ? 'projectile' : 'melee');
     this.parries += 1; this.gainSentence(parrySentenceReward(BALANCE.sentence.parryGain, perfectBreath) + (perfect ? BALANCE.sentence.perfectParryBonus : 0));
     this.parryCounterUntil = this.time.now + BALANCE.hero.parryCounterWindow;
     this.services.audio.play(perfect ? 'perfectParry' : 'parry');
@@ -1203,12 +1470,22 @@ export class GameScene extends Phaser.Scene {
 
   private armEmpower(): void {
     if (this.empowered || this.sentence < this.sentenceMax) return;
-    this.empowered = true; this.sentence = 0; this.combatStats.empower(); this.services.audio.play('upgrade'); this.hero.setTint(0x86ead8);
+    // Sentence is committed only after the empowered word produces a real
+    // combat effect. Keeping it here makes failed target checks fully refundable.
+    this.empowered = true; this.combatStats.empower(); this.services.audio.play('upgrade'); this.hero.setTint(0x86ead8);
+    this.sentenceReminderShown = true;
+    this.services.ui.showChainTrigger('다음 Q / E / R 강화', 850);
     this.runeBurst(this.hero.x, this.hero.y - 12, 12);
     this.runDelayedCall(220, () => { if (this.hero.active) this.hero.clearTint(); });
   }
 
   private canCast(readyAt: number): boolean { return this.flow.allowsCombatInput && this.time.now >= readyAt && this.wordInputAt !== this.game.loop.frame; }
+  private readyAtForWord(word: WordId): number { return word === 'stop' ? this.stopReadyAt : word === 'rewind' ? this.rewindReadyAt : word === 'link' ? this.linkReadyAt : this.wordReadyAt[word]; }
+  private setReadyAtForWord(word: WordId, readyAt: number): void { this.wordReadyAt[word] = readyAt; if (word === 'stop') this.stopReadyAt = readyAt; else if (word === 'rewind') this.rewindReadyAt = readyAt; else if (word === 'link') this.linkReadyAt = readyAt; }
+  private applyWordStatus(enemy: Enemy, id: Parameters<WordStatusRuntime['apply']>[1]['id'], sourceWordId: WordId, duration: number, stacks = 1): void {
+    this.wordStatuses.apply(enemy.id, { id, sourceWordId, duration, now: this.time.now, stacks, sourceEntityId: 'hero', runId: this.runId, actId: this.runAct.current.id, visualKey: `status-${id.toLowerCase()}`, consumedBy: ['cut', 'reaction'], canSpread: id === 'MARKED' || id === 'LINKED', canTriggerReaction: true });
+    this.combatStats.statusApplied(id);
+  }
   private wordCooldown(base: number): number {
     const sealed = sealedSentenceStats(this.upgrades.getStack('sealed-sentence'));
     const cooldown = base * (1 - sealed.cooldownReduction);
@@ -1216,15 +1493,56 @@ export class GameScene extends Phaser.Scene {
     if (reduction > 0) this.recordUpgradeContribution('sealed-sentence', { activationCount: 1, cooldownMs: reduction });
     return cooldown;
   }
-  private beginWordCast(): boolean {
+  private beginWordCast(): WordCastContext {
     const amplifierEnhanced = this.upgrades.getStack('echo-amplifier') > 0 && this.time.now <= this.echoAmplifierUntil;
     const empoweredByF = this.empowered;
-    this.wordEmpoweredByF = empoweredByF;
     const enhanced = empoweredByF || amplifierEnhanced;
     const overcharge = overchargedWordProfile(this.upgrades.getStack('sentence-overcharge'), empoweredByF);
-    this.wordOverchargeMultiplier = overcharge.multiplier; this.wordOverchargeDurationBonus = overcharge.durationBonus;
     if (amplifierEnhanced) this.echoAmplifierUntil = 0;
-    this.empowered = false; this.wordInputAt = this.game.loop.frame; return enhanced;
+    this.empowered = false; this.wordInputAt = this.game.loop.frame;
+    return { enhanced, empoweredByF, overchargeMultiplier: overcharge.multiplier, overchargeDurationBonus: overcharge.durationBonus };
+  }
+
+  private completeEmpoweredWord(
+    word: WordId,
+    cast: WordCastContext,
+    success: boolean,
+    values: { damage?: number; healing?: number; affectedTargets?: number } = {},
+    failureReason: EmpowerFailureReason,
+  ): void {
+    if (!cast.empoweredByF) return;
+    if (!success) {
+      this.empowered = true;
+      this.sentence = this.sentenceMax;
+      this.combatStats.empoweredWordFailure(word, failureReason);
+      if (this.upgrades.getStack('sentence-overcharge') > 0) {
+        this.recordUpgradeContribution('sentence-overcharge', { failedConditions: 1 });
+      }
+      this.showCombatLabel(this.hero.x, this.hero.y - 56, '강화 유지 · 유효 효과 없음', 0xb8c8c2);
+      return;
+    }
+    this.sentence = 0;
+    this.sentenceFullAt = 0;
+    this.sentenceReminderShown = false;
+    this.combatStats.empoweredWord(word);
+    if (this.upgrades.getStack('sentence-overcharge') > 0) {
+      this.recordUpgradeContribution('sentence-overcharge', {
+        activationCount: 1,
+        damage: values.damage ?? 0,
+        healing: values.healing ?? 0,
+        affectedTargets: values.affectedTargets ?? 0,
+      }, true);
+      this.showCombatLabel(this.hero.x, this.hero.y - 56, '문장 과충전', 0xb7f1d9);
+    }
+  }
+
+  private noteEmpoweredWordFailure(word: WordId, reason: EmpowerFailureReason): void {
+    if (!this.empowered) return;
+    this.combatStats.empoweredWordFailure(word, reason);
+    if (this.upgrades.getStack('sentence-overcharge') > 0) {
+      this.recordUpgradeContribution('sentence-overcharge', { failedConditions: 1 });
+    }
+    this.showCombatLabel(this.hero.x, this.hero.y - 56, '강화 유지 · 유효 효과 없음', 0xb8c8c2);
   }
 
   private skillAreaHitsEnemy(x: number, y: number, radius: number, enemy: Enemy): boolean {
@@ -1238,8 +1556,10 @@ export class GameScene extends Phaser.Scene {
   private castStop(x: number, y: number): boolean {
     const activeLinked = [...this.linkedTargets].filter((enemy) => enemy.active && enemy.linked);
     if (!this.canCast(this.stopReadyAt)) return false;
-    const enhanced = this.beginWordCast(); const overchargeMultiplier = this.wordOverchargeMultiplier; const overchargeDurationBonus = this.wordOverchargeDurationBonus; this.stopReadyAt = this.time.now + this.wordCooldown(BALANCE.words.stopCooldown); this.wordUses['멎는다'] += 1; if (this.wordEmpoweredByF) this.combatStats.empoweredWord('stop'); this.markTutorial('stop');
-    const chain = this.registerWordUse('stop', { successful: true, hasLinkedTargets: activeLinked.length > 0 });
+    const cast = this.beginWordCast();
+    const { enhanced, overchargeMultiplier, overchargeDurationBonus } = cast;
+    this.stopReadyAt = this.time.now + this.wordCooldown(BALANCE.words.stopCooldown);
+    this.wordUses['멎는다'] = (this.wordUses['멎는다'] ?? 0) + 1; this.markTutorial('stop');
     this.hero.castPose(); this.services.audio.play('stop'); this.showWordTypography('멎는다', x, y);
     const circle = this.add.circle(x, y, BALANCE.words.stopRadius, 0x55c4b1, 0.08).setStrokeStyle(3, 0x76d8c7, 0.74).setDepth(DEPTH.telegraph).setScale(0.2);
     this.tweens.add({ targets: circle, scale: 1, duration: 180 });
@@ -1249,6 +1569,7 @@ export class GameScene extends Phaser.Scene {
       const stoppedEnemyIds: string[] = [];
       for (const enemy of [...this.enemies]) if (enemy.active && (enhanced || this.skillAreaHitsEnemy(x, y, BALANCE.words.stopRadius, enemy))) {
         enemy.freeze(until + (enhanced ? 500 : 0), enemy.kind === 'boss');
+        this.applyWordStatus(enemy, 'STOPPED', 'stop', until - this.time.now + (enhanced ? 500 : 0));
         stoppedEnemyIds.push(enemy.id);
         damaged += this.damageEnemy(enemy, BALANCE.words.stopDamage * (enhanced ? 1.35 : 1) * overchargeMultiplier, Phaser.Math.Angle.Between(x, y, enemy.x, enemy.y), false, false, 'word', 'stop', 'word');
       }
@@ -1256,16 +1577,28 @@ export class GameScene extends Phaser.Scene {
         this.combatStats.agencyDamage('stop', damaged); this.gainWordHitSentence(BALANCE.sentence.wordHitGain);
         if (overchargeMultiplier > 1) this.recordUpgradeContribution('sentence-overcharge', { activationCount: 1, damage: damaged * (1 - 1 / overchargeMultiplier), affectedTargets: stoppedEnemyIds.length }, true);
       }
-      let projectileIndex = 0;
+      let projectileIndex = 0; let stoppedProjectiles = 0;
       for (const projectile of this.projectiles) {
         if (enhanced || this.skillAreaHitsProjectile(x, y, BALANCE.words.stopRadius, projectile)) {
           projectile.freeze(until + (enhanced ? 500 : 0));
           projectile.setData('stopWordToken', until);
+          stoppedProjectiles += 1;
           if (enhanced && projectileIndex++ % 3 === 0) this.runDelayedCall(280, () => this.explodeStoppedProjectile(projectile));
         }
       }
+      const successful = empoweredWordEffectIsValid({ damage: damaged, statusApplications: stoppedEnemyIds.length + stoppedProjectiles });
+      const chain = successful ? this.registerWordUse('stop', { successful: true, hasLinkedTargets: activeLinked.length > 0 }) : undefined;
+      if (!successful) {
+        this.stopReadyAt = this.time.now;
+        this.combatStats.invalidWord('stop');
+      }
+      this.completeEmpoweredWord('stop', cast, successful, {
+        damage: damaged * Math.max(0, 1 - 1 / overchargeMultiplier),
+        affectedTargets: stoppedEnemyIds.length + stoppedProjectiles,
+      }, 'no-stop-effect');
       if (this.upgrades.getStack('stop-resonance') > 0 || this.upgrades.hasResonance('time-undertow')) this.runDelayedCall(until - this.time.now + 10, () => this.applyStopEndEffects(stoppedEnemyIds, until));
       if (chain === 'chain-stop') this.applyChainStop(activeLinked);
+      else if (chain) this.applyWordReaction(chain, stoppedEnemyIds.map((id) => [...this.enemies].find((enemy) => enemy.id === id)).filter((enemy): enemy is Enemy => enemy !== undefined));
       this.tweens.add({ targets: circle, alpha: 0, duration: 220, onComplete: () => circle.destroy() });
     });
     return true;
@@ -1284,10 +1617,12 @@ export class GameScene extends Phaser.Scene {
     const hasRecordedDamage = this.damageHistory.hasRecentDamage(activeLinked.map((enemy) => enemy.id), this.time.now, BALANCE.chain.damageHistoryDuration);
     const chainContext = { hasFrozenProjectiles: frozenProjectiles.length > 0, hasStoppedTargets: stoppedTargets.length > 0, hasLinkedTargets: activeLinked.length > 0, hasRecordedDamage };
     if (!this.canCast(this.rewindReadyAt)) return false;
-    const enhanced = this.beginWordCast(); this.rewindReadyAt = this.time.now + this.wordCooldown(BALANCE.words.rewindCooldown); this.wordUses['되돌린다'] += 1; if (this.wordEmpoweredByF) this.combatStats.empoweredWord('rewind'); this.markTutorial('rewind');
+    const cast = this.beginWordCast(); const { enhanced, overchargeMultiplier } = cast;
+    this.rewindReadyAt = this.time.now + this.wordCooldown(BALANCE.words.rewindCooldown); this.wordUses['되돌린다'] = (this.wordUses['되돌린다'] ?? 0) + 1; this.markTutorial('rewind');
     const chain = this.registerWordUse('rewind', { successful: true, ...chainContext });
     if (chain === 'backflow') this.applyBackflow(frozenProjectiles, stoppedTargets);
     if (chain === 'damage-regression') this.applyDamageRegression(activeLinked);
+    if (chain && chain !== 'backflow' && chain !== 'damage-regression') this.applyWordReaction(chain, [...this.enemies].filter((enemy) => enemy.active && !enemy.removing));
     const before = { x: this.hero.x, y: this.hero.y, health: this.hero.health };
     const targetState = records[0];
     this.hero.cancelAttackRecovery();
@@ -1296,10 +1631,16 @@ export class GameScene extends Phaser.Scene {
       const marker = this.add.image(targetState.x, targetState.y, 'hero-idle').setOrigin(0.5, 1).setScale(0.4).setFlipX(Math.cos(targetState.facing) < 0).setTint(0x68cbe5).setAlpha(0.42).setDepth(DEPTH.rewind);
       this.tweens.add({ targets: marker, alpha: 0, scaleX: 0.44, scaleY: 0.44, duration: 520, onComplete: () => marker.destroy() });
     }
-    const echoDamage = this.rewindEchoBurst(before.x, before.y, enhanced);
+    const echoDamage = this.rewindEchoBurst(before.x, before.y, enhanced, overchargeMultiplier);
     if (echoDamage > 0) this.showCombatLabel(before.x, before.y - 58, `잔상 피해 ${Math.round(echoDamage)}`, 0x72cfe8);
     if (records.length === 0) {
       this.runDelayedCall(160, () => { this.hero.rewinding = false; this.echoFinisherUntil = this.time.now + BALANCE.hero.finisher.echoDuration; });
+      const successful = empoweredWordEffectIsValid({ damage: echoDamage, statusApplications: chain ? 1 : 0 });
+      if (!successful) this.rewindReadyAt = this.time.now;
+      this.completeEmpoweredWord('rewind', cast, successful, {
+        damage: echoDamage * Math.max(0, 1 - 1 / overchargeMultiplier),
+        affectedTargets: echoDamage > 0 ? 1 : 0,
+      }, 'no-rewind-effect');
       return true;
     }
     const reverse = [...records].reverse(); const echoTrail: Phaser.GameObjects.Image[] = [];
@@ -1312,6 +1653,7 @@ export class GameScene extends Phaser.Scene {
       }
     }, onComplete: () => {
       this.hero.rewinding = false; const oldest = reverse.at(-1); if (oldest) { this.hero.setVelocity(oldest.velocityX, oldest.velocityY); this.hero.restoreHealth(oldest.health); }
+      let recoveredForEmpower = 0; let movedForEmpower = 0;
       if (oldest) {
         let recovered = Math.max(0, oldest.health - before.health);
         const breath = rewindBreathHealing(recovered, this.upgrades.getStack('rewind-breath'));
@@ -1320,6 +1662,7 @@ export class GameScene extends Phaser.Scene {
           recovered += actualBonus; this.recordUpgradeContribution('rewind-breath', { activationCount: 1, healing: actualBonus }, true);
         }
         const moved = Phaser.Math.Distance.Between(before.x, before.y, oldest.x, oldest.y);
+        recoveredForEmpower = recovered; movedForEmpower = moved;
         if (recovered > 0.5) { this.damageNumber(this.hero.x, this.hero.y - 62, recovered, 0x75e6f3, false, '체력 +'); this.combatStats.rewindRecovered(recovered); }
         if (moved > 12) this.showCombatLabel(this.hero.x, this.hero.y - 45, '위치 복구', 0x79cfe3);
         if (this.boss?.active && this.boss.phase === 2 && (recovered > 0.5 || moved > 72)) {
@@ -1330,12 +1673,19 @@ export class GameScene extends Phaser.Scene {
       this.echoFinisherUntil = this.time.now + BALANCE.hero.finisher.echoDuration;
       const echoTarget = [...this.enemies].find((enemy) => enemy.id === this.lastDirectTargetId && enemy.active && !enemy.removing) ?? this.nearestEnemy(this.hero.x, this.hero.y);
       echoTarget?.markEcho(this.echoFinisherUntil);
+      if (echoTarget) this.applyWordStatus(echoTarget, 'REWOUND', 'rewind', BALANCE.hero.finisher.echoDuration);
       if (this.upgrades.getStack('regression-blade') > 0) this.regressionCharged = true;
+      const successful = empoweredWordEffectIsValid({ damage: echoDamage, healing: recoveredForEmpower, movedDistance: movedForEmpower, statusApplications: chain ? 1 : 0 });
+      if (!successful) this.rewindReadyAt = this.time.now;
+      this.completeEmpoweredWord('rewind', cast, successful, {
+        damage: echoDamage * Math.max(0, 1 - 1 / overchargeMultiplier),
+        affectedTargets: echoDamage > 0 ? 1 : 0,
+      }, 'no-rewind-effect');
     }});
     return true;
   }
 
-  private rewindEchoBurst(x: number, y: number, enhanced: boolean): number {
+  private rewindEchoBurst(x: number, y: number, enhanced: boolean, overchargeMultiplier = 1): number {
     const radius = BALANCE.words.rewindDamageRadius * (enhanced ? 1.18 : 1);
     const angle = this.hero.facing;
     const rangeRing = this.add.circle(x, y - 8, radius, 0x3c9ec2, 0.04).setStrokeStyle(2, 0x75dff0, 0.42).setDepth(DEPTH.word).setScale(0.55);
@@ -1344,10 +1694,9 @@ export class GameScene extends Phaser.Scene {
     slash.beginPath().arc(x, y - 10, radius, angle - 0.88, angle + 0.88).strokePath();
     this.tweens.add({ targets: slash, alpha: 0, scaleX: 1.12, scaleY: 1.12, duration: 280, onComplete: () => slash.destroy() });
     let damage = 0;
-    for (const enemy of [...this.enemies]) if (enemy.active && distanceToEllipse({ x, y }, enemy.hurtbox) <= radius) damage += this.damageEnemy(enemy, BALANCE.words.rewindDamage * (enhanced ? 1.35 : 1) * this.wordOverchargeMultiplier, Phaser.Math.Angle.Between(x, y, enemy.x, enemy.y), false, false, 'word', 'rewind', 'word');
+    for (const enemy of [...this.enemies]) if (enemy.active && distanceToEllipse({ x, y }, enemy.hurtbox) <= radius) damage += this.damageEnemy(enemy, BALANCE.words.rewindDamage * (enhanced ? 1.35 : 1) * overchargeMultiplier, Phaser.Math.Angle.Between(x, y, enemy.x, enemy.y), false, false, 'word', 'rewind', 'word');
     if (damage > 0) {
       this.combatStats.agencyDamage('rewind', damage); this.combatStats.rewindEchoDamage(damage); this.gainWordHitSentence(BALANCE.sentence.wordHitGain);
-      if (this.wordOverchargeMultiplier > 1) this.recordUpgradeContribution('sentence-overcharge', { activationCount: 1, damage: damage * (1 - 1 / this.wordOverchargeMultiplier) }, true);
     }
     return damage;
   }
@@ -1427,37 +1776,129 @@ export class GameScene extends Phaser.Scene {
     }
     const enhancedPreview = this.empowered;
     const selected = candidates.slice(0, enhancedPreview ? BALANCE.words.empoweredLinkTargets : BALANCE.words.baseLinkTargets);
-    if (selected.length < 1) { this.combatStats.invalidWord('link'); return true; }
+    if (selected.length < 1) { this.combatStats.invalidWord('link'); this.noteEmpoweredWordFailure('link', 'no-link-target'); return true; }
     if (!this.canCast(this.linkReadyAt)) return false;
-    const enhanced = this.beginWordCast(); this.linkReadyAt = this.time.now + this.wordCooldown(BALANCE.words.linkCooldown); this.wordUses['잇는다'] += 1; if (this.wordEmpoweredByF) this.combatStats.empoweredWord('link'); this.markTutorial('link');
+    const cast = this.beginWordCast(); const { enhanced, overchargeMultiplier, overchargeDurationBonus } = cast;
+    this.linkReadyAt = this.time.now + this.wordCooldown(BALANCE.words.linkCooldown); this.wordUses['잇는다'] = (this.wordUses['잇는다'] ?? 0) + 1; this.markTutorial('link');
     this.services.audio.play('link'); this.hero.castPose(); this.showWordTypography('잇는다', x, y);
     this.showLinkPreview(selected);
     this.clearLinks();
     let directDamage = 0;
-    selected.forEach((enemy) => { directDamage += this.damageEnemy(enemy, BALANCE.words.linkDamage * (selected.length === 1 ? BALANCE.words.singleLinkDamageMultiplier : 1) * (enhanced ? 1.35 : 1) * this.wordOverchargeMultiplier, Phaser.Math.Angle.Between(this.hero.x, this.hero.y, enemy.x, enemy.y), false, false, 'word', 'link', 'word'); });
+    selected.forEach((enemy) => { directDamage += this.damageEnemy(enemy, BALANCE.words.linkDamage * (selected.length === 1 ? BALANCE.words.singleLinkDamageMultiplier : 1) * (enhanced ? 1.35 : 1) * overchargeMultiplier, Phaser.Math.Angle.Between(this.hero.x, this.hero.y, enemy.x, enemy.y), false, false, 'word', 'link', 'word'); });
     if (directDamage > 0) {
       this.combatStats.agencyDamage('link', directDamage); this.gainWordHitSentence(BALANCE.sentence.wordHitGain);
-      if (this.wordOverchargeMultiplier > 1) this.recordUpgradeContribution('sentence-overcharge', { activationCount: 1, damage: directDamage * (1 - 1 / this.wordOverchargeMultiplier), affectedTargets: selected.length }, true);
     }
-    const expires = this.time.now + BALANCE.words.linkDuration + (enhanced ? 1300 : 0) + this.wordOverchargeDurationBonus;
+    const expires = this.time.now + BALANCE.words.linkDuration + (enhanced ? 1300 : 0) + overchargeDurationBonus;
     const generation = ++this.linkGeneration;
     this.linkShareRatio = linkShareRatio(enhanced);
     if (selected.length === 1 && this.upgrades.getStack('isolation-chain') > 0) this.recordUpgradeContribution('isolation-chain', { activationCount: 1, affectedTargets: 1 }, true);
     selected.forEach((enemy) => {
       enemy.linked = true; enemy.linkedUntil = expires; enemy.setData('linkContagionGeneration', 0); this.linkedTargets.add(enemy);
+      this.applyWordStatus(enemy, selected.length === 1 ? 'ISOLATED' : 'LINKED', 'link', expires - this.time.now);
       const marker = this.add.text(enemy.x, enemy.y - (enemy.kind === 'boss' ? 78 : 48), selected.length === 1 ? '孤' : '連', { fontFamily: 'Malgun Gothic, serif', fontSize: enemy.kind === 'boss' ? '19px' : '15px', color: '#a1f3df', stroke: '#09201d', strokeThickness: 4 }).setOrigin(0.5).setDepth(DEPTH.word);
       this.linkMarkers.set(enemy, marker);
       const preview = this.add.circle(enemy.x, enemy.y - 8, enemy.kind === 'boss' ? 34 : 23, 0x58c9b6, 0.04).setStrokeStyle(2, 0xa3f5e4, 0.72).setDepth(DEPTH.word).setScale(0.72);
       this.tweens.add({ targets: preview, scale: 1.18, alpha: 0, duration: 190, onComplete: () => preview.destroy() });
     });
     this.showCombatLabel(selected[0]?.x ?? this.hero.x, (selected[0]?.y ?? this.hero.y) - 62, selected.length === 1 ? '고립 연결 1/3 · 피해 +18%' : `연결 ${selected.length}/${enhanced ? BALANCE.words.empoweredLinkTargets : BALANCE.words.baseLinkTargets}`, 0x9fe9dc);
-    this.registerWordUse('link', { successful: true, hasLinkedTargets: selected.length > 0 });
+    const linkReaction = this.registerWordUse('link', { successful: true, hasLinkedTargets: selected.length > 0, relevantTargetCount: selected.length });
+    if (linkReaction && linkReaction !== 'chain-stop' && linkReaction !== 'damage-regression') this.applyWordReaction(linkReaction, selected);
+    this.completeEmpoweredWord('link', cast, empoweredWordEffectIsValid({ damage: directDamage, statusApplications: selected.length, durationApplications: selected.length }), {
+      damage: directDamage * Math.max(0, 1 - 1 / overchargeMultiplier),
+      affectedTargets: selected.length,
+    }, 'no-link-target');
     this.runDelayedCall(expires - this.time.now, () => {
       if (generation !== this.linkGeneration) return;
       if (enhanced) for (const enemy of [...this.linkedTargets]) if (enemy.active) this.damageEnemy(enemy, 22, 0, false, true, undefined, 'link');
       this.clearLinks();
     });
     return true;
+  }
+
+  private castPull(x: number, y: number): boolean {
+    const definition = wordDefinition('pull'); if (!this.canCast(this.readyAtForWord('pull'))) return false;
+    const cast = this.beginWordCast(); const gravity = gravityInscriptionProfile(this.upgrades.getStack('gravity-inscription')); const radius = (cast.enhanced ? 190 : 155) * gravity.rangeMultiplier;
+    const center = clampPointToBounds(x, y, COMBAT_BOUNDS, radius * .25);
+    const targets = [...this.enemies].filter((enemy) => enemy.active && !enemy.removing && this.skillAreaHitsEnemy(center.x, center.y, radius, enemy));
+    const projectiles = [...this.projectiles].filter((projectile) => projectile.active && projectile.enemyOwned && this.skillAreaHitsProjectile(center.x, center.y, radius, projectile));
+    if (targets.length === 0 && projectiles.length === 0) { this.combatStats.invalidWord('pull'); this.setReadyAtForWord('pull', this.time.now); this.completeEmpoweredWord('pull', cast, false, {}, 'no-target'); return true; }
+    this.setReadyAtForWord('pull', this.time.now + this.wordCooldown(definition.cooldown)); this.wordUses['당긴다'] = (this.wordUses['당긴다'] ?? 0) + 1; this.markTutorial('pull'); this.hero.castPose(); this.services.audio.play('link'); this.showWordTypography('당긴다', center.x, center.y);
+    const spiral = this.add.circle(center.x, center.y, radius, 0x4aa897, .05).setStrokeStyle(4, 0x8be5d4, .72).setDepth(DEPTH.word).setScale(1.15); this.tweens.add({ targets: spiral, scale: .2, alpha: 0, duration: 430, onComplete: () => spiral.destroy() });
+    let damage = 0;
+    for (const enemy of targets) { const angle = Phaser.Math.Angle.Between(enemy.x, enemy.y, center.x, center.y); const distance = Phaser.Math.Distance.Between(enemy.x, enemy.y, center.x, center.y); const moved = Math.min(cast.enhanced ? 70 : 46, Math.max(0, distance - 34)); enemy.setGroundPosition(enemy.x + Math.cos(angle) * moved, enemy.y + Math.sin(angle) * moved); enemy.constrainToCombatBounds(); damage += this.damageEnemy(enemy, definition.baseDamage * cast.overchargeMultiplier, angle, false, false, 'word', 'word', 'word', { handler: `word:pull:${enemy.id}`, baseSource: 'word', skillId: 'pull' }); this.applyWordStatus(enemy, 'PULLED', 'pull', 3000); if (distance < 105) this.applyWordStatus(enemy, 'COMPRESSED', 'pull', 3000); }
+    const captureCount = Math.min(projectiles.length, cast.enhanced ? projectiles.length : this.upgrades.getStack('captured-projectile') > 0 ? 4 : 0);
+    for (const projectile of projectiles) { projectile.freeze(this.time.now + (cast.enhanced ? 850 : 260 + gravity.durationBonus)); projectile.setData('capturedByPull', true); }
+    if (gravity.damage > 0 || this.upgrades.hasResonance('compression-seal')) this.runDelayedCall(420 + gravity.durationBonus, () => {
+      let bonusDamage = 0; let affected = 0;
+      for (const enemy of targets) {
+        if (!enemy.active || enemy.removing) continue;
+        if (gravity.damage > 0) bonusDamage += this.damageEnemy(enemy, gravity.damage, Phaser.Math.Angle.Between(center.x, center.y, enemy.x, enemy.y), false, true, undefined, 'word', 'none', { handler: `gravity-inscription:${enemy.id}`, baseSource: 'word', skillId: 'gravity-inscription', cardId: 'gravity-inscription', damageKind: 'card-derived', flags: ['cardDerived', 'cannotTriggerCard', 'cannotTriggerShare', 'cannotTriggerResonance'] });
+        if (this.upgrades.hasResonance('compression-seal')) { enemy.freeze(this.time.now + 700, enemy.kind === 'boss'); this.applyWordStatus(enemy, 'STOPPED', 'stop', 700); affected += 1; }
+      }
+      if (gravity.damage > 0) this.recordUpgradeContribution('gravity-inscription', { activationCount: 1, damage: bonusDamage, affectedTargets: targets.length, hits: targets.length }, bonusDamage > 0);
+      if (this.upgrades.hasResonance('compression-seal')) this.recordResonanceContribution('compression-seal', { activationCount: affected > 0 ? 1 : 0, damage: 0, affectedTargets: affected, failedConditions: affected > 0 ? 0 : 1 });
+    });
+    if (captureCount > 0) this.runDelayedCall(480, () => {
+      let reflected = 0;
+      for (const projectile of projectiles.slice(0, captureCount)) { if (!projectile.active || projectile.reflected) continue; const target = this.nearestEnemy(projectile.x, projectile.y); if (!target) continue; projectile.reflect(target.x, target.y, projectile.originalDamage * .7, true); reflected += 1; }
+      this.recordUpgradeContribution('captured-projectile', { activationCount: reflected > 0 ? 1 : 0, reflectedProjectiles: reflected, affectedTargets: reflected, failedConditions: reflected > 0 ? 0 : 1 }, reflected > 0);
+    });
+    this.combatStats.agencyDamage('pull', damage); this.gainWordHitSentence(BALANCE.sentence.wordHitGain); const chain = this.registerWordUse('pull', { successful: true, relevantTargetCount: targets.length }); if (chain) this.applyWordReaction(chain, targets); this.completeEmpoweredWord('pull', cast, true, { damage, affectedTargets: targets.length + projectiles.length }, 'no-target'); return true;
+  }
+
+  private castMark(): boolean {
+    const definition = wordDefinition('mark'); if (!this.canCast(this.readyAtForWord('mark'))) return false;
+    const targets = [...this.enemies].filter((enemy) => enemy.active && !enemy.removing).sort((a, b) => distanceSq(this.hero.x, this.hero.y, a.x, a.y) - distanceSq(this.hero.x, this.hero.y, b.x, b.y));
+    if (targets.length === 0) { this.combatStats.invalidWord('mark'); this.noteEmpoweredWordFailure('mark', 'no-target'); return true; }
+    const cast = this.beginWordCast(); const selected = targets.slice(0, cast.enhanced ? 3 : 1); this.setReadyAtForWord('mark', this.time.now + this.wordCooldown(definition.cooldown)); this.wordUses['새긴다'] = (this.wordUses['새긴다'] ?? 0) + 1; this.markTutorial('mark'); this.hero.castPose(); this.services.audio.play('stop');
+    let damage = 0; for (const enemy of selected) { damage += this.damageEnemy(enemy, definition.baseDamage * cast.overchargeMultiplier, Phaser.Math.Angle.Between(this.hero.x, this.hero.y, enemy.x, enemy.y), false, false, 'word', 'word', 'word', { handler: `word:mark:${enemy.id}`, baseSource: 'word', skillId: 'mark' }); this.applyWordStatus(enemy, 'MARKED', 'mark', cast.enhanced ? 7500 : 6000); const seal = this.add.text(enemy.x, enemy.y - 56, '刻', { fontFamily: 'serif', fontSize: '22px', color: '#a8f4df', stroke: '#32152d', strokeThickness: 5 }).setOrigin(.5).setDepth(DEPTH.word); this.tweens.add({ targets: seal, scale: 1.35, alpha: .5, duration: 320, yoyo: true, onComplete: () => this.runDelayedCall(700, () => seal.destroy()) }); }
+    this.showWordTypography('새긴다', selected[0]!.x, selected[0]!.y - 70); this.combatStats.agencyDamage('mark', damage); this.gainWordHitSentence(BALANCE.sentence.wordHitGain); const chain = this.registerWordUse('mark', { successful: true, relevantTargetCount: selected.length }); if (chain) this.applyWordReaction(chain, selected); this.completeEmpoweredWord('mark', cast, true, { damage, affectedTargets: selected.length }, 'no-target'); return true;
+  }
+
+  private castPush(directionX: number, directionY: number): boolean {
+    const definition = wordDefinition('push'); if (!this.canCast(this.readyAtForWord('push'))) return false;
+    const cast = this.beginWordCast(); const angle = Math.atan2(directionY || Math.sin(this.hero.facing), directionX || Math.cos(this.hero.facing)); const range = cast.enhanced ? 190 : 145; const halfAngle = cast.enhanced ? Math.PI : 1.35;
+    const targets = [...this.enemies].filter((enemy) => enemy.active && !enemy.removing && sectorHitsEllipse({ x: this.hero.x, y: this.hero.y, angle, range, halfAngle }, enemy.hurtbox));
+    const projectiles = [...this.projectiles].filter((projectile) => projectile.active && projectile.enemyOwned && Phaser.Math.Distance.Between(this.hero.x, this.hero.y, projectile.x, projectile.y) <= range);
+    if (targets.length === 0 && projectiles.length === 0) { this.combatStats.invalidWord('push'); this.completeEmpoweredWord('push', cast, false, {}, 'no-target'); return true; }
+    this.setReadyAtForWord('push', this.time.now + this.wordCooldown(definition.cooldown)); this.wordUses['밀어낸다'] = (this.wordUses['밀어낸다'] ?? 0) + 1; this.markTutorial('push'); this.hero.castPose(); this.services.audio.play('parry'); this.showWordTypography('밀어낸다', this.hero.x + Math.cos(angle) * 54, this.hero.y + Math.sin(angle) * 54);
+    const fan = this.add.graphics().setDepth(DEPTH.word).lineStyle(8, 0x9ae8d4, .78).beginPath().arc(this.hero.x, this.hero.y, range, angle - halfAngle, angle + halfAngle).strokePath(); this.tweens.add({ targets: fan, alpha: 0, scaleX: 1.1, scaleY: 1.1, duration: 240, onComplete: () => fan.destroy() });
+    const ripple = recoilRippleProfile(this.upgrades.getStack('recoil-ripple'));
+    let damage = 0; let rippleDamage = 0; let collisions = 0; for (const enemy of targets) { const away = Phaser.Math.Angle.Between(this.hero.x, this.hero.y, enemy.x, enemy.y); damage += this.damageEnemy(enemy, definition.baseDamage * cast.overchargeMultiplier, away, false, false, 'word', 'word', 'word', { handler: `word:push:${enemy.id}`, baseSource: 'word', skillId: 'push' }); if (enemy.kind !== 'boss') { const beforeX = enemy.x; const beforeY = enemy.y; const distance = cast.enhanced ? 64 : 42; enemy.setGroundPosition(enemy.x + Math.cos(away) * distance, enemy.y + Math.sin(away) * distance); enemy.constrainToCombatBounds(); const collided = Phaser.Math.Distance.Between(beforeX, beforeY, enemy.x, enemy.y) < distance * .8 || targets.some((other) => other !== enemy && other.active && distanceSq(enemy.x, enemy.y, other.x, other.y) <= 42 ** 2); if (collided && ripple.damage > 0) { collisions += 1; for (const other of [...this.enemies]) if (other.active && !other.removing && distanceSq(enemy.x, enemy.y, other.x, other.y) <= ripple.radius ** 2) rippleDamage += this.damageEnemy(other, ripple.damage, away, false, true, undefined, 'word', 'none', { handler: `recoil-ripple:${enemy.id}:${other.id}`, baseSource: 'word', skillId: 'recoil-ripple', cardId: 'recoil-ripple', damageKind: 'card-derived', flags: ['cardDerived', 'cannotTriggerCard', 'cannotTriggerShare', 'cannotTriggerResonance'] }); } } else enemy.vulnerableUntil = Math.max(enemy.vulnerableUntil, this.time.now + 800); this.applyWordStatus(enemy, 'DISPLACED', 'push', 2800); }
+    if (ripple.damage > 0) this.recordUpgradeContribution('recoil-ripple', { activationCount: collisions, damage: rippleDamage, affectedTargets: collisions, hits: collisions, failedConditions: collisions > 0 ? 0 : 1 }, rippleDamage > 0);
+    const veil = headwindVeilProfile(this.upgrades.getStack('headwind-veil')); if (veil.duration > 0) { this.headwindGuardUntil = this.time.now + veil.duration; this.recordUpgradeContribution('headwind-veil', { activationCount: 1 }, true); }
+    for (const projectile of projectiles) { const target = this.nearestEnemy(projectile.x, projectile.y); if (target) projectile.reflect(target.x, target.y); }
+    this.combatStats.agencyDamage('push', damage); this.gainWordHitSentence(BALANCE.sentence.wordHitGain); const chain = this.registerWordUse('push', { successful: true, hasStoppedTargets: targets.some((enemy) => enemy.isStopped), relevantTargetCount: targets.length }); if (chain) {
+      this.applyWordReaction(chain, targets);
+      if (chain === 'compressed-burst' && this.upgrades.hasResonance('reversal-burst')) {
+        let resonanceDamage = 0;
+        for (const enemy of targets) resonanceDamage += this.damageEnemy(enemy, 8, angle, false, true, undefined, 'word', 'none', {
+          handler: `resonance:reversal-burst:${enemy.id}`, baseSource: 'word', skillId: 'compressed-burst', resonanceId: 'reversal-burst', damageKind: 'resonance-derived', flags: ['resonanceDerived', 'cannotTriggerResonance', 'cannotTriggerShare', 'cannotTriggerCard'],
+        });
+        this.recordResonanceContribution('reversal-burst', { activationCount: 1, damage: resonanceDamage, reflectedProjectiles: projectiles.length, affectedTargets: targets.length, hits: targets.length, exclusiveDamage: true });
+        this.showCombatLabel(this.hero.x, this.hero.y - 66, '공명 · 반전 폭발', 0xa6e9df);
+      }
+    } this.completeEmpoweredWord('push', cast, true, { damage, affectedTargets: targets.length + projectiles.length }, 'no-target'); return true;
+  }
+
+  private applyWordReaction(reaction: WordChainId, preferred: readonly Enemy[]): void {
+    const definition = reactionDefinition(reaction);
+    const targets = preferred.filter((enemy) => enemy.active && !enemy.removing).slice(0, 4);
+    const fallback = targets.length === 0 ? [...this.enemies].filter((enemy) => enemy.active && !enemy.removing).slice(0, 1) : targets;
+    let damage = 0;
+    for (const enemy of fallback) {
+      const amount = reaction === 'compressed-burst' ? 24 : reaction === 'sealed-inscription' || reaction === 'mark-regression' ? 20 : 14;
+      damage += this.damageEnemy(enemy, amount, Phaser.Math.Angle.Between(this.hero.x, this.hero.y, enemy.x, enemy.y), false, true, undefined, 'word', 'none', { handler: `reaction:${reaction}:${enemy.id}`, baseSource: 'word', skillId: reaction, damageKind: 'reaction', flags: ['echoDerived', 'cannotTriggerShare', 'cannotTriggerCard', 'cannotTriggerResonance'] });
+      if (reaction === 'compressed-stop' || reaction === 'sealed-inscription') { enemy.freeze(this.time.now + 900, enemy.kind === 'boss'); this.applyWordStatus(enemy, 'STOPPED', 'stop', 900); }
+      if (reaction === 'binding' || reaction === 'recoil-chain') { enemy.linked = true; enemy.linkedUntil = this.time.now + 3200; this.linkedTargets.add(enemy); this.applyWordStatus(enemy, 'LINKED', 'link', 3200); }
+      if (reaction === 'mark-spread') this.applyWordStatus(enemy, 'MARKED', 'mark', 4200);
+      if (reaction === 'compressed-burst' && enemy.kind !== 'boss') { const away = Phaser.Math.Angle.Between(this.hero.x, this.hero.y, enemy.x, enemy.y); enemy.setGroundPosition(enemy.x + Math.cos(away) * 34, enemy.y + Math.sin(away) * 34); enemy.constrainToCombatBounds(); }
+      for (const status of definition?.stateConsumption ?? []) this.wordStatuses.consume(enemy.id, status);
+    }
+    if (reaction === 'stopped-shatter') for (const projectile of [...this.projectiles]) { if (!projectile.active || !projectile.enemyOwned || projectile.frozenUntil <= this.time.now) continue; const target = this.nearestEnemy(projectile.x, projectile.y); if (target) projectile.reflect(target.x, target.y, projectile.originalDamage * .72, true); }
+    if (damage > 0) { this.combatStats.addChainDamage(reaction, damage); this.combatStats.reactionDamage(reaction, damage); }
+    const reactionName = definition?.displayName ?? reaction;
+    this.showWordTypography(reactionName, this.hero.x, this.hero.y - 70, true);
   }
 
   private applyStopEndEffects(stoppedEnemyIds: readonly string[], token: number): void {
@@ -1521,7 +1962,7 @@ export class GameScene extends Phaser.Scene {
 
   private registerWordUse(word: WordId, context: Parameters<WordChainSystem['use']>[2]): WordChainId | undefined {
     this.combatStats.word(word);
-    this.combatStats.agencyMilestone(word, this.elapsedSeconds());
+    if (word === 'stop' || word === 'rewind' || word === 'link') this.combatStats.agencyMilestone(word, this.elapsedSeconds());
     const result = this.wordChain.use(word, this.time.now, context);
     if (result.attemptedChain) this.combatStats.chainAttempt(result.attemptedChain, result.usedFallback);
     if (result.chain) {
@@ -1537,8 +1978,8 @@ export class GameScene extends Phaser.Scene {
       }
       const amplifier = this.upgrades.getStack('echo-amplifier');
       if (amplifier > 0) this.echoAmplifierUntil = this.time.now + 5000 * amplifier;
-      const name: Record<WordChainId, string> = { 'chain-stop': '연쇄 정지', backflow: '역류', 'damage-regression': '피해 회귀' };
-      this.services.audio.play(result.chain === 'chain-stop' ? 'chainStop' : result.chain === 'backflow' ? 'backflow' : 'damageRegression'); this.services.ui.showChainTrigger(name[result.chain], BALANCE.chain.labelDuration);
+      const name = result.reactionName ?? result.chain;
+      this.services.audio.play(result.chain === 'chain-stop' ? 'chainStop' : result.chain === 'backflow' ? 'backflow' : result.chain === 'damage-regression' ? 'damageRegression' : 'chainStop'); this.services.ui.showChainTrigger(name, BALANCE.chain.labelDuration);
     }
     return result.chain;
   }
@@ -1548,6 +1989,7 @@ export class GameScene extends Phaser.Scene {
     this.stopReadyAt = Math.max(this.time.now, this.stopReadyAt - milliseconds);
     this.rewindReadyAt = Math.max(this.time.now, this.rewindReadyAt - milliseconds);
     this.linkReadyAt = Math.max(this.time.now, this.linkReadyAt - milliseconds);
+    for (const id of ['pull', 'mark', 'push'] as WordId[]) this.wordReadyAt[id] = Math.max(this.time.now, this.wordReadyAt[id] - milliseconds);
   }
 
   private rewardBossMechanic(label: string): void {
@@ -1560,7 +2002,10 @@ export class GameScene extends Phaser.Scene {
   }
 
   private applyChainStop(linked: readonly Enemy[]): void {
-    const active = linked.filter((enemy) => enemy.active && enemy.linked); if (active.length === 0) return;
+    const linkedActive = linked.filter((enemy) => enemy.active && enemy.linked);
+    const fallback = this.nearestEnemy(this.hero.x, this.hero.y);
+    const active = linkedActive.length > 0 ? linkedActive : fallback ? [fallback] : [];
+    if (active.length === 0) return;
     const until = this.time.now + BALANCE.chain.linkStopDuration;
     for (const enemy of active) {
       enemy.freeze(until, enemy.kind === 'boss');
@@ -1585,7 +2030,8 @@ export class GameScene extends Phaser.Scene {
       projectile.reflect(original.x, original.y, projectile.originalDamage * BALANCE.chain.backflowDamageRatio, true);
       reflected += 1;
     }
-    if (reflected === 0) for (const enemy of stoppedTargets) {
+    const fallbackTargets = stoppedTargets.length > 0 ? stoppedTargets : this.nearestEnemy(this.hero.x, this.hero.y) ? [this.nearestEnemy(this.hero.x, this.hero.y)!] : [];
+    if (reflected === 0) for (const enemy of fallbackTargets) {
       if (!enemy.active) continue;
       const dealt = this.damageEnemy(enemy, BALANCE.chain.minimumBackflowDamage, Phaser.Math.Angle.Between(this.hero.x, this.hero.y, enemy.x, enemy.y), false, true, undefined, 'rewind');
       this.combatStats.addChainDamage('backflow', dealt); this.damageNumber(enemy.x, enemy.y - 48, dealt, 0x7edcf2, true, '역류 ');
@@ -1593,23 +2039,74 @@ export class GameScene extends Phaser.Scene {
   }
 
   private applyDamageRegression(linked: readonly Enemy[]): void {
-    const active = linked.filter((enemy) => enemy.active && enemy.linked);
+    const linkedActive = linked.filter((enemy) => enemy.active && enemy.linked);
+    const fallback = this.nearestEnemy(this.hero.x, this.hero.y);
+    const active = linkedActive.length > 0 ? linkedActive : fallback ? [fallback] : [];
     const anchor = active[0];
     active.forEach((enemy, index) => {
       const recorded = this.damageHistory.recentDamage(enemy.id, this.time.now, BALANCE.chain.damageHistoryDuration);
       const amount = Math.max(BALANCE.chain.minimumRegressionDamage, recorded * BALANCE.chain.damageRegressionRatio);
       this.runDelayedCall(index * 70, () => {
         if (!enemy.active) return;
-        const dealt = enemy.takeDamage(amount, Phaser.Math.Angle.Between(this.hero.x, this.hero.y, enemy.x, enemy.y), false, 'regression');
-        if (dealt > 0) { this.combatStats.addChainDamage('damage-regression', dealt); this.damageNumber(enemy.x, enemy.y - 42, dealt, 0x70c6ea, true, '회귀 '); this.runeBurst(enemy.x, enemy.y - 6, 5); }
+        this.damageEnemy(enemy, amount, Phaser.Math.Angle.Between(this.hero.x, this.hero.y, enemy.x, enemy.y), false, true, undefined, 'regression', 'none', {
+          handler: 'chain:damage-regression', baseSource: 'word', skillId: 'damage-regression', damageKind: 'regression',
+          flags: ['echoDerived', 'cannotTriggerShare', 'cannotTriggerCard', 'cannotTriggerResonance'],
+          onApplied: (dealt) => { if (dealt > 0) { this.combatStats.addChainDamage('damage-regression', dealt); this.damageNumber(enemy.x, enemy.y - 42, dealt, 0x70c6ea, true, '회귀 '); this.runeBurst(enemy.x, enemy.y - 6, 5); } },
+        });
         if (anchor && anchor !== enemy && anchor.active) this.linkPulse(enemy, anchor, 0x64bfe1);
       });
     });
   }
 
-  private damageEnemy(enemy: Enemy, amount: number, sourceAngle: number, parried = false, propagated = false, historyKind?: RecordedDamageKind, deathSource?: EnemyDeathSource, upgradeTrigger: 'cut' | 'word' | 'none' = 'none'): number {
+  private damageEnemy(enemy: Enemy, amount: number, sourceAngle: number, parried = false, propagated = false, historyKind?: RecordedDamageKind, deathSource?: EnemyDeathSource, upgradeTrigger: 'cut' | 'word' | 'none' = 'none', context: DamageDispatchContext = {}): number {
+    if (!enemy.active || enemy.health <= 0) return 0;
+    const baseSource = context.baseSource ?? (parried || deathSource === 'parry' || deathSource === 'projectile-reflect' ? 'parry' : historyKind === 'word' ? 'word' : historyKind === 'attack' || upgradeTrigger === 'cut' ? 'cut' : 'other');
+    const damageKind = context.damageKind ?? (propagated ? 'derived' : 'direct');
+    const handler = context.handler ?? `${context.cardId ?? context.resonanceId ?? context.skillId ?? deathSource ?? historyKind ?? upgradeTrigger}:${damageKind}`;
+    return this.damageQueue.submit({
+      runId: this.runId,
+      actId: this.runAct.current.id,
+      frameId: this.damageFrameId,
+      sourceEntityId: context.sourceEntityId ?? 'hero',
+      targetEntityId: enemy.id,
+      baseSource,
+      skillId: context.skillId ?? (upgradeTrigger === 'cut' ? 'cut' : historyKind),
+      cardId: context.cardId,
+      resonanceId: context.resonanceId,
+      modifierSourceIds: context.modifierSourceIds,
+      damageKind,
+      handler,
+      flags: context.flags ?? (propagated ? ['shared', 'cannotTriggerShare'] : ['direct']),
+    }, amount, () => this.applyDamageEnemyNow(enemy, amount, sourceAngle, parried, propagated, historyKind, deathSource, upgradeTrigger, context), context.onApplied);
+  }
+
+  private applyDamageEnemyNow(enemy: Enemy, amount: number, sourceAngle: number, parried: boolean, propagated: boolean, historyKind: RecordedDamageKind | undefined, deathSource: EnemyDeathSource | undefined, upgradeTrigger: 'cut' | 'word' | 'none', context: DamageDispatchContext): number {
     if (!enemy.active || enemy.health <= 0) return 0;
     let resolvedAmount = amount;
+    const stitchPartnerId = this.stitchedPairs.get(enemy.id);
+    const stitchPartner = stitchPartnerId ? [...this.enemies].find((candidate) => candidate.id === stitchPartnerId && candidate.active && !candidate.removing) : undefined;
+    if (!propagated && stitchPartner) {
+      if (upgradeTrigger === 'cut' || deathSource === 'link') {
+        this.stitchedPairs.delete(enemy.id); this.stitchedPairs.delete(stitchPartner.id);
+        enemy.setData('stitchedPartnerId', undefined); stitchPartner.setData('stitchedPartnerId', undefined);
+        resolvedAmount *= 1.18; this.showCombatLabel((enemy.x + stitchPartner.x) / 2, (enemy.y + stitchPartner.y) / 2 - 34, '봉합 절단', 0xd68aa5);
+      } else {
+        const shared = Math.min(stitchPartner.health, Math.max(0, resolvedAmount * .2));
+        if (shared > 0) {
+          this.damageEnemy(stitchPartner, shared, sourceAngle, false, true, undefined, deathSource ?? 'other', 'none', {
+            handler: `stitch-share:${enemy.id}`,
+            sourceEntityId: enemy.id,
+            baseSource: context.baseSource,
+            skillId: context.skillId,
+            modifierSourceIds: ['stitch-pair'],
+            damageKind: 'shared',
+            flags: ['shared', 'cannotTriggerShare', 'cannotTriggerCard', 'cannotTriggerResonance'],
+            onApplied: (dealt) => { if (dealt > 0) this.damageNumber(stitchPartner.x, stitchPartner.y - 42, dealt, 0xcf8ba1, true, '봉합 '); },
+          });
+          resolvedAmount *= .8;
+        }
+      }
+    }
     const inscription = counterInscriptionProfile(this.upgrades.getStack('counter-inscription'));
     if (!propagated && upgradeTrigger !== 'none' && inscription.damage > 0 && this.time.now <= Number(enemy.getData('counterInscriptionUntil') ?? 0)) {
       enemy.setData('counterInscriptionUntil', 0); resolvedAmount += inscription.damage;
@@ -1643,14 +2140,34 @@ export class GameScene extends Phaser.Scene {
         }
       }
     }
+    if (!propagated && totalDealt > 0 && enemy.active && context.skillId !== 'mark-explosion') this.advanceMark(enemy, sourceAngle);
     return totalDealt;
+  }
+
+  private advanceMark(enemy: Enemy, sourceAngle: number): void {
+    const marked = this.wordStatuses.get(enemy.id, 'MARKED', this.time.now); if (!marked) return;
+    const profile = deepMarkProfile(this.upgrades.getStack('deep-mark'));
+    const nextStacks = marked.stacks + 1;
+    if (nextStacks < profile.maximumStacks) { this.applyWordStatus(enemy, 'MARKED', 'mark', Math.max(400, marked.expiresAt - this.time.now)); return; }
+    this.wordStatuses.consume(enemy.id, 'MARKED');
+    const baseDamage = profile.explosionDamage;
+    this.damageEnemy(enemy, baseDamage, sourceAngle, false, true, undefined, 'word', 'none', {
+      handler: `mark-explosion:${enemy.id}`, baseSource: 'word', skillId: 'mark-explosion', cardId: this.upgrades.getStack('deep-mark') > 0 ? 'deep-mark' : undefined, damageKind: 'reaction', flags: ['cardDerived', 'cannotTriggerCard', 'cannotTriggerShare', 'cannotTriggerResonance'],
+      onApplied: (dealt) => { if (dealt <= 0) return; this.combatStats.reactionDamage('cut-marked', dealt); if (this.upgrades.getStack('deep-mark') > 0) this.recordUpgradeContribution('deep-mark', { activationCount: 1, damage: Math.min(dealt, profile.explosionDamage - 24), affectedTargets: 1, hits: 1 }, true); this.damageNumber(enemy.x, enemy.y - 58, dealt, 0xa7ecd1, true, '각인 폭발 '); },
+    });
+    if (this.upgrades.hasResonance('mark-chain') && enemy.linked) {
+      const linked = [...this.linkedTargets].filter((target) => target !== enemy && target.active && !target.removing).slice(0, 2);
+      for (const target of linked) this.applyWordStatus(target, 'MARKED', 'mark', 2600, 1);
+      this.recordResonanceContribution('mark-chain', { activationCount: linked.length > 0 ? 1 : 0, affectedTargets: linked.length, failedConditions: linked.length > 0 ? 0 : 1 });
+    }
   }
 
   private onEnemyDied(enemy: Enemy, source: EnemyDeathSource): void {
     if (Number(enemy.getData('runId')) !== this.runId) return;
+    const wasMarked = this.wordStatuses.has(enemy.id, 'MARKED', this.time.now);
     const wasIsolated = enemy.linked && [...this.linkedTargets].filter((target) => target.active && target.linked).length === 1;
     const completedPhaseThreeLink = enemy.kind === 'minion' && enemy.linked && this.boss?.active === true && this.boss.phase === 3 && this.boss.linked;
-    this.enemies.delete(enemy); this.linkedTargets.delete(enemy); this.linkMarkers.get(enemy)?.destroy(); this.linkMarkers.delete(enemy);
+    this.enemies.delete(enemy); this.linkedTargets.delete(enemy); this.linkMarkers.get(enemy)?.destroy(); this.linkMarkers.delete(enemy); this.wordStatuses.removeEntity(enemy.id);
     if (enemy.getData('waveTracked') === true) this.waveDirector.registerDeath(enemy.id, source, performance.now());
     const spawned = this.enemySpawnTimes.get(enemy.id);
     if (spawned) {
@@ -1669,37 +2186,62 @@ export class GameScene extends Phaser.Scene {
       const burst = this.add.circle(enemy.x, enemy.y, 18, 0x55c8b1, 0.16).setStrokeStyle(4, 0x9af3df, 0.88).setDepth(DEPTH.word);
       this.tweens.add({ targets: burst, radius, alpha: 0, duration: 260, onComplete: () => burst.destroy() });
       this.runeBurst(enemy.x, enemy.y, 8 + stacks * 3);
-      let explosionDamage = 0; let baseExplosionDamage = 0; let isolationDamage = 0; let isolationTargets = 0;
+      let queuedExplosionPackets = 0;
       for (const target of [...this.enemies]) {
         if (distanceSq(enemy.x, enemy.y, target.x, target.y) >= radius ** 2) continue;
         const angle = Phaser.Math.Angle.Between(enemy.x, enemy.y, target.x, target.y);
-        const baseDealt = this.damageEnemy(target, baseDamage, angle, false, true, undefined, 'link');
-        explosionDamage += baseDealt;
-        baseExplosionDamage += baseDealt;
+        queuedExplosionPackets += 1;
+        this.damageEnemy(target, baseDamage, angle, false, true, undefined, 'link', 'none', {
+          handler: `link-death-explosion:${enemy.id}`,
+          sourceEntityId: enemy.id,
+          baseSource: 'word',
+          skillId: 'link-death-explosion',
+          damageKind: 'shared',
+          flags: ['shared', 'cannotTriggerShare', 'cannotTriggerCard', 'cannotTriggerResonance'],
+          onApplied: (dealt) => {
+            if (dealt <= 0) return;
+            this.combatStats.linkExplosionDamage(dealt); this.combatStats.agencyDamage('link', dealt);
+            this.damageNumber(target.x, target.y - 48, dealt, 0x8ee6d5, true, '연결 폭발 ');
+          },
+        });
         if (isolation.explosionBonus <= 0 || !target.active || target.removing) continue;
-        const bonus = this.damageEnemy(target, isolation.explosionBonus, angle, false, true, undefined, 'link');
-        explosionDamage += bonus;
-        isolationDamage += bonus;
-        if (bonus > 0) isolationTargets += 1;
+        this.damageEnemy(target, isolation.explosionBonus, angle, false, true, undefined, 'link', 'none', {
+          handler: `isolation-death-explosion:${enemy.id}`,
+          sourceEntityId: enemy.id,
+          baseSource: 'word',
+          skillId: 'isolation-chain',
+          cardId: 'isolation-chain',
+          damageKind: 'card-derived',
+          flags: ['cardDerived', 'cannotTriggerShare', 'cannotTriggerCard', 'cannotTriggerResonance'],
+          onApplied: (dealt) => {
+            if (dealt <= 0) return;
+            this.combatStats.linkExplosionDamage(dealt);
+            this.recordUpgradeContribution('isolation-chain', { activationCount: 0, damage: dealt, affectedTargets: 1, hits: 1, exclusiveDamage: true });
+          },
+        });
       }
-      if (explosionDamage > 0) { this.combatStats.linkExplosionDamage(explosionDamage); this.showCombatLabel(enemy.x, enemy.y - 40, `연결 폭발 ${Math.round(explosionDamage)}`, 0x8ee6d5); }
-      if (baseExplosionDamage > 0) this.combatStats.agencyDamage('link', baseExplosionDamage);
       if (isolationStacks > 0) this.recordUpgradeContribution('isolation-chain', {
         activationCount: 1,
-        damage: isolationDamage,
         generated: 1,
-        affectedTargets: isolationTargets,
-        hits: isolationTargets,
-        failedConditions: isolationTargets > 0 ? 0 : 1,
-        exclusiveDamage: true,
+        failedConditions: queuedExplosionPackets > 0 ? 0 : 1,
       }, true);
+      if (queuedExplosionPackets > 0) this.showCombatLabel(enemy.x, enemy.y - 40, '연결 폭발', 0x8ee6d5);
       if (this.upgrades.getStack('inscription-spread') > 0) {
         const nearest = this.nearestEnemy(enemy.x, enemy.y); if (nearest) { nearest.linked = true; nearest.linkedUntil = this.time.now + 2000; this.linkedTargets.add(nearest); }
       }
       this.spreadLinkContagion(enemy);
     }
+    if (wasMarked) this.spreadContagiousMark(enemy);
     if (completedPhaseThreeLink) this.rewardBossMechanic('이어진 핵 노출');
     if (enemy === this.boss) { this.runSession.clearBoss(this.runId, true); this.boss = undefined; this.beginBossDefeated(enemy); }
+  }
+
+  private spreadContagiousMark(source: Enemy): void {
+    if (this.upgrades.getStack('contagious-mark') <= 0) return;
+    const targets = [...this.enemies].filter((enemy) => enemy.active && !enemy.removing && distanceSq(source.x, source.y, enemy.x, enemy.y) <= 190 ** 2)
+      .sort((a, b) => distanceSq(source.x, source.y, a.x, a.y) - distanceSq(source.x, source.y, b.x, b.y)).slice(0, 2);
+    for (const target of targets) this.applyWordStatus(target, 'MARKED', 'mark', 3200);
+    this.recordUpgradeContribution('contagious-mark', { activationCount: targets.length > 0 ? 1 : 0, generated: targets.length, affectedTargets: targets.length, failedConditions: targets.length > 0 ? 0 : 1 }, targets.length > 0);
   }
 
   private spreadLinkContagion(source: Enemy): void {
@@ -1718,7 +2260,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private updateWaveLifecycle(): void {
-    if (this.flow.baseState !== 'COMBAT' || this.boss?.active) return;
+    if (this.flow.baseState !== 'WAVE_COMBAT' || this.boss?.active) return;
     if (this.waveDirector.snapshot().waveState === 'IDLE') return;
     const directorBefore = this.waveDirector.snapshot();
     if (this.activeBatchPendingSpawns === 0 && directorBefore.livingEnemyIds.length === 0 && directorBefore.pendingSpawnCount > 0 && this.nextBatchIndex < this.currentWaveBatches.length) {
@@ -1757,8 +2299,8 @@ export class GameScene extends Phaser.Scene {
   }
 
   private completeWave(): void {
-    if (this.flow.baseState !== 'COMBAT' || this.boss?.active) return;
-    if (!this.transitionFlow('ROUND_CLEAR')) return;
+    if (this.flow.baseState !== 'WAVE_COMBAT' || this.boss?.active) return;
+    if (!this.transitionFlow('WAVE_CLEAR')) return;
     this.clearTransientCombatObjects();
     const encounter = (['wave-1', 'wave-2', 'wave-3'] as const)[this.waveIndex];
     if (encounter) this.combatStats.setEncounterTime(encounter, Math.max(0, (this.time.now - this.encounterStartedAt) / 1000));
@@ -1768,17 +2310,27 @@ export class GameScene extends Phaser.Scene {
     const restored = Math.max(0, Math.min(this.hero.maxHealth - healthBefore, recovery));
     if (restored > 0) { this.hero.heal(restored); this.damageNumber(this.hero.x, this.hero.y - 58, restored, 0x8de5d3, false, '+회복 '); }
     if (this.waveIndex === 0) this.combatStats.firstRound(Math.max(0, (this.time.now - this.encounterStartedAt) / 1000), healthBefore, this.hero.health);
-    this.wordChain.reset(); this.timeControl.acquire('REWARD_SCREEN', this.timeOwner);
+    this.wordChain.reset();
     for (const projectile of this.projectiles) projectile.destroy(); this.projectiles.clear();
     this.inkZones.forEach((zone) => zone.circle.destroy()); this.inkZones = [];
     for (const enemy of this.enemies) enemy.cancelAttackIntent(this.time.now + 1000);
     this.runTimeout(BALANCE.pacing.waveCompleteDelay, () => {
-      if (!this.sys.isActive() || this.flow.baseState !== 'ROUND_CLEAR') return;
+      if (!this.sys.isActive() || this.flow.baseState !== 'WAVE_CLEAR') return;
+      const completedWave = this.runAct.current.waves[this.waveIndex];
+      if (completedWave && !completedWave.reward) {
+        this.waveIndex += 1;
+        if (this.waveIndex < this.runAct.current.waves.length) this.enterWave(this.waveIndex);
+        else this.startBoss();
+        return;
+      }
+      this.timeControl.acquire('REWARD_SCREEN', this.timeOwner);
       if (this.transitionFlow('REWARD_REVEAL')) this.showUpgradeChoices();
     });
   }
 
-  private showUpgradeChoices(forcedChoices?: ReturnType<UpgradeSystem['choices']>): void {
+  private showUpgradeChoices(forcedChoices?: ReturnType<UpgradeSystem['choices']>, bossReward = false): void {
+    const revealState: BaseGameFlowState = bossReward ? 'BOSS_REWARD_REVEAL' : 'REWARD_REVEAL';
+    const selectState: BaseGameFlowState = bossReward ? 'BOSS_REWARD_SELECT' : 'REWARD_SELECT';
     const snapshot = this.combatStats.snapshot();
     const selectionContext = {
       parryUses: snapshot.parryAttempts,
@@ -1786,12 +2338,13 @@ export class GameScene extends Phaser.Scene {
       echoDamage: snapshot.echoBlade.damage,
       cutUses: snapshot.cut.uses,
       healthRatio: this.hero.health / Math.max(1, this.hero.maxHealth),
+      equippedWordIds: this.wordLoadout.finalize(),
     };
-    const choices = forcedChoices ?? (this.waveIndex === 0 ? this.upgrades.firstChoices() : this.upgrades.choices(3, Math.random, selectionContext));
+    const choices = forcedChoices ?? (bossReward ? this.upgrades.bossChoices(Math.random, selectionContext) : this.waveIndex === 0 && this.runAct.current.index === 1 ? this.upgrades.firstChoices(Math.random, selectionContext) : this.upgrades.choices(3, Math.random, selectionContext));
     this.services.ui.showUpgradeChoice(choices, this.upgrades.rerollsLeft, (id) => {
       if (!this.flow.allowsRewardInput) return;
       const resonancesBefore = new Set(this.upgrades.activeResonances());
-      if (!this.upgrades.add(id)) { this.transitionFlow('REWARD_REVEAL'); this.showUpgradeChoices(); return; }
+      if (!this.upgrades.add(id)) { this.transitionFlow(revealState); this.showUpgradeChoices(undefined, bossReward); return; }
       this.upgrades.recordSelection(id);
       const chosen = choices.find((choice) => choice.id === id); if (chosen) {
         const stacks = this.upgrades.getStack(id);
@@ -1801,29 +2354,38 @@ export class GameScene extends Phaser.Scene {
       if (completed.length > 0) this.runTimeout(480, () => {
         const resonance = resonanceById(completed[0] ?? ''); if (resonance) this.services.ui.showChainTrigger(`공명 완성 · ${resonance.name}`, 1200);
       });
+      if (bossReward) {
+        this.timeControl.release('REWARD_SCREEN', this.timeOwner);
+        this.beginNextAct();
+        return;
+      }
       this.waveIndex += 1;
-      if (this.waveIndex < 3) {
-        this.transitionFlow('COMBAT'); this.timeControl.release('REWARD_SCREEN', this.timeOwner); this.spawnWave(this.waveIndex);
+      if (this.waveIndex < this.runAct.current.waves.length) {
+        this.timeControl.release('REWARD_SCREEN', this.timeOwner); this.services.ui.showHud(); this.enterWave(this.waveIndex);
       } else {
         this.startBoss(); this.timeControl.release('REWARD_SCREEN', this.timeOwner);
       }
     }, () => {
       if (!this.flow.allowsRewardInput || this.upgrades.rerollsLeft <= 0) return;
       const rerolled = this.upgrades.reroll(Math.random, selectionContext); if (!rerolled) return;
-      this.transitionFlow('REWARD_REVEAL'); this.showUpgradeChoices(rerolled);
+      this.transitionFlow(revealState); this.showUpgradeChoices(rerolled, bossReward);
     }, {
       revealDelayMs: BALANCE.pacing.rewardRevealDelay,
       acceptsKey: (event) => this.inputRouter.accepts('REWARD', event.code, event.repeat),
-      onReady: () => { if (this.flow.baseState === 'REWARD_REVEAL') this.transitionFlow('REWARD_SELECT'); },
+      onReady: () => { if (this.flow.baseState === revealState) this.transitionFlow(selectState); },
       previewChoice: (id) => this.upgrades.preview(id),
+      eyebrow: bossReward ? '보스의 문장이 풀려난다' : undefined,
+      title: bossReward ? '보스 기록 계승' : undefined,
+      kind: bossReward ? 'boss' : 'wave',
     });
   }
 
   private startBoss(): void {
-    if (this.flow.baseState !== 'BOSS_TRANSITION' && !this.transitionFlow('BOSS_TRANSITION')) return;
+    if (this.flow.baseState !== 'BOSS_INTRO' && !this.transitionFlow('BOSS_INTRO')) return;
     this.waveDirector.reset();
     this.encounterStartedAt = this.time.now;
     this.bossPhaseStartedAt = this.time.now;
+    this.bossSignatureExecutions.clear();
     this.stopReadyAt = this.time.now;
     this.rewindReadyAt = this.time.now; this.linkReadyAt = this.time.now;
     this.sentence = Math.max(this.sentence, BALANCE.boss.phaseSentenceMinimum);
@@ -1832,28 +2394,34 @@ export class GameScene extends Phaser.Scene {
       const restored = BALANCE.boss.entryMinimumHealth - this.hero.health;
       this.hero.heal(restored); this.damageNumber(this.hero.x, this.hero.y - 58, restored, 0x8de5d3, false, '+');
     }
-    this.showWordTypography('기록 포식자', 480, 150, true);
+    this.showWordTypography(this.runAct.current.bossName, 480, 150, true);
     const bossRunId = this.runId;
     const callbacks: BossCallbacks = {
       ...this.enemyCallbacks(),
       phaseChanged: (phase) => { this.runSession.invoke(bossRunId, () => this.bossPhaseChanged(phase)); },
+      signatureExecuted: (phase, signaturePattern) => {
+        this.runSession.invoke(bossRunId, () => {
+          if (String(this.boss?.getData('actId')) !== this.runAct.current.id) return;
+          this.bossSignatureExecutions.add(this.runAct.current.bossId + ':' + phase + ':' + signaturePattern);
+        });
+      },
       summon: (count) => { this.runSession.invoke(bossRunId, () => this.summonMinions(count)); },
-      inkZone: (x, y, radius, duration) => { this.runSession.invoke(bossRunId, () => this.createInkZone(x, y, radius, duration)); },
+      inkZone: (x, y, radius, duration, style = 'ink') => { this.runSession.invoke(bossRunId, () => this.createInkZone(x, y, radius, duration, style)); },
     };
-    this.boss = new Boss(this, 480, 125, callbacks); this.boss.setData('runId', this.runId); this.enemies.add(this.boss); this.boss.spawn();
-    this.runSession.activateBoss(this.runId, this.boss.id, this.boss.health, this.boss.maxHealth);
+    this.boss = new Boss(this, 480, 125, callbacks, this.runAct.current.bossId, this.runAct.current.healthMultiplier); this.boss.setData('runId', this.runId); this.boss.setData('actId', this.runAct.current.id); this.boss.setData('damageMultiplier', this.runAct.current.damageMultiplier); this.enemies.add(this.boss); this.boss.spawn();
+    this.runSession.activateBoss(this.runId, this.boss.id, this.boss.phaseHealth, this.boss.phaseMaxHealth);
     this.bossTransitionUntil = this.time.now + 1000; this.hero.invulnerableUntil = Math.max(this.hero.invulnerableUntil, this.bossTransitionUntil + 100);
     this.boss.cancelAttackIntent(this.bossTransitionUntil); this.separateHeroFromBoss();
     this.runDelayedCall(1000, () => {
-      if (!this.sys.isActive() || this.flow.baseState !== 'BOSS_TRANSITION') return;
+      if (!this.sys.isActive() || this.flow.baseState !== 'BOSS_INTRO') return;
       this.bossPhaseStartedAt = this.time.now;
-      this.timeControl.release('BOSS_TRANSITION', this.timeOwner); this.transitionFlow('COMBAT');
+      this.timeControl.release('BOSS_TRANSITION', this.timeOwner); this.transitionFlow('BOSS_COMBAT');
     });
   }
 
   private bossPhaseChanged(phase: number): void {
     if (!this.boss?.active || Number(this.boss.getData('runId')) !== this.runId) return;
-    this.runSession.updateBoss(this.runId, { phase: phase as 1 | 2 | 3, health: this.boss.health, maxHealth: this.boss.maxHealth });
+    this.runSession.updateBoss(this.runId, { phase: phase as 1 | 2 | 3, health: this.boss.phaseHealth, maxHealth: this.boss.phaseMaxHealth });
     if (!this.transitionFlow('BOSS_TRANSITION')) return;
     const previousPhase = Math.max(1, phase - 1) as 1 | 2;
     this.combatStats.setBossPhaseTime(previousPhase, Math.max(0, (this.time.now - this.bossPhaseStartedAt) / 1000));
@@ -1871,11 +2439,12 @@ export class GameScene extends Phaser.Scene {
     this.services.audio.play('phase'); this.cameraKick(0.012, 260);
     if (!this.services.save.settings.reducedMotion) { this.cameras.main.zoomTo(1.08, 280); this.runDelayedCall(520, () => this.cameras.main.zoomTo(1, 420)); }
     this.runeBurst(480, 155, 14);
-    this.showWordTypography(phase === 2 ? '제2형 · 먹물의 기억' : '제3형 · 이어진 굶주림', 480, 170, true);
+    const phaseDefinition = this.boss.definition.phaseDefinitions[phase - 1];
+    this.showWordTypography(phaseDefinition?.displayName ?? ('제' + phase + '형'), 480, 170, true);
     this.runDelayedCall(BALANCE.boss.phaseTransition, () => {
       if (!this.sys.isActive() || this.flow.baseState !== 'BOSS_TRANSITION') return;
       this.bossPhaseStartedAt = this.time.now;
-      this.timeControl.release('BOSS_TRANSITION', this.timeOwner); this.transitionFlow('COMBAT');
+      this.timeControl.release('BOSS_TRANSITION', this.timeOwner); this.transitionFlow('BOSS_COMBAT');
     });
   }
 
@@ -1883,17 +2452,24 @@ export class GameScene extends Phaser.Scene {
     const positions = this.spawnPositions(count).slice(0, count); positions.forEach((position) => this.spawnEnemy('minion', position.x, position.y));
   }
 
-  private createInkZone(x: number, y: number, radius: number, duration: number): void {
-    const circle = this.add.circle(x, y, radius, 0x2f1517, 0.34).setStrokeStyle(4, 0xef914f, 0.78).setDepth(DEPTH.floor).setScale(0.15).setData('unparryable', true);
+  private createInkZone(x: number, y: number, radius: number, duration: number, style: 'ink' | 'erasure' = 'ink', damage = 10, patternName = style === 'erasure' ? '과거 교정' : '먹물 장판', modifier?: string): void {
+    const safe = clampPointToBounds(x, y, COMBAT_BOUNDS, radius + 4); x = safe.x; y = safe.y;
+    const fill = style === 'erasure' ? 0x45152f : 0x2f1517;
+    const stroke = style === 'erasure' ? 0xd05d8c : 0xef914f;
+    const circle = this.add.circle(x, y, radius, fill, 0.34).setStrokeStyle(4, stroke, 0.82).setDepth(DEPTH.floor).setScale(0.15).setData('unparryable', true);
     this.tweens.add({ targets: circle, scale: 1, duration: 520 });
-    this.inkZones.push({ circle, expiresAt: this.time.now + duration, nextDamageAt: this.time.now + 650, radius });
+    this.inkZones.push({ circle, expiresAt: this.time.now + duration, nextDamageAt: this.time.now + 650, radius, damage, style, patternName, modifier });
   }
 
   private updateInkZones(time: number): void {
     this.inkZones = this.inkZones.filter((zone) => {
       if (time >= zone.expiresAt) { zone.circle.destroy(); return false; }
-      zone.circle.setAlpha(0.28 + Math.sin(time / 170) * 0.08);
-      if (time >= zone.nextDamageAt && distanceSq(zone.circle.x, zone.circle.y, this.hero.hurtbox.x, this.hero.hurtbox.y) < zone.radius ** 2) { this.hitHero(10, zone.circle.x, zone.circle.y, 'ink'); zone.nextDamageAt = time + 900; }
+      const remaining = zone.expiresAt - time;
+      const pulse = remaining < 520 ? Math.sin(time / 45) * 0.14 : Math.sin(time / 170) * 0.08;
+      zone.circle.setAlpha(0.28 + pulse).setScale(remaining < 520 ? 0.92 + Math.sin(time / 55) * 0.05 : 1);
+      if (time >= zone.nextDamageAt && distanceSq(zone.circle.x, zone.circle.y, this.hero.hurtbox.x, this.hero.hurtbox.y) < zone.radius ** 2) {
+        this.hitHero(zone.damage, zone.circle.x, zone.circle.y, 'ink', { attackerId: 'environment', attackId: `zone:${zone.patternName}`, patternName: zone.patternName, modifier: zone.modifier, parryable: false }); zone.nextDamageAt = time + 900;
+      }
       return true;
     });
   }
@@ -1906,7 +2482,7 @@ export class GameScene extends Phaser.Scene {
       if (hit) {
         const parry = this.parryResolver.resolve(this.hero.isParrying, { attackId: projectile.attackId, parryable: projectile.parryable, overlapsHurtbox: true });
         if (parry.cancelDamage) { if (parry.grantReward) this.parrySuccess(undefined, projectile); }
-        else { this.hitHero(projectile.damage, projectile.x, projectile.y, 'projectile'); projectile.destroy(); }
+        else { const sourceEnemy = [...this.enemies].find((enemy) => enemy.id === projectile.sourceId); this.hitHero(projectile.damage, projectile.x, projectile.y, 'projectile', { attackerId: projectile.sourceId ?? 'unknown-projectile', attackerDisplayName: sourceEnemy ? enemyDisplayName(sourceEnemy.kind) : '기록 탄환', attackId: projectile.attackId, patternName: projectile.texture.key === 'projectile-ink' ? '먹물 탄환' : '기록 탄환', modifier: this.activeActPatterns.has('ink-echo-projectile') ? '먹물 잔향탄' : undefined, parryable: projectile.parryable }); projectile.destroy(); }
       } else if (distance < 39 && !projectile.getData('nearMiss')) { projectile.setData('nearMiss', true); this.gainSentence(BALANCE.sentence.nearMissGain); }
     } else {
       for (const enemy of [...this.enemies]) if (enemy.active && !enemy.removing && sweptCircleHitsEllipse(projectile.previousPosition, projectile, projectile.collisionCircle.radius, enemy.hurtbox)) {
@@ -1940,7 +2516,7 @@ export class GameScene extends Phaser.Scene {
       // and creates a deep overlap that can pin movement on following frames.
       enemy.cancelAttackIntent(time + 120);
       if (parry.cancelDamage) { if (parry.grantReward) this.parrySuccess(enemy); }
-      else this.hitHero(Number(enemy.getData('meleeDamage') ?? BALANCE.enemies[enemy.kind === 'minion' ? 'chaser' : enemy.kind].damage), enemy.x, enemy.y, enemy.kind === 'boss' ? 'boss' : 'melee');
+      else this.hitHero(Number(enemy.getData('meleeDamage') ?? BALANCE.enemies[enemy.kind === 'minion' ? 'chaser' : enemy.kind].damage), enemy.x, enemy.y, enemy.kind === 'boss' ? 'boss' : 'melee', { attackerId: enemy.id, attackerDisplayName: enemy.kind === 'boss' ? this.boss?.definition.displayName ?? '보스' : enemyDisplayName(enemy.kind), attackId: enemy.meleeAttackId, patternName: enemy.kind === 'boss' ? `${this.boss?.definition.displayName ?? '보스'} 돌진` : `${enemyDisplayName(enemy.kind)} · 돌진`, parryable: enemy.meleeParryable });
     }
   }
 
@@ -1960,11 +2536,16 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
-  private hitHero(baseDamage: number, sourceX: number, sourceY: number, source: DamageSource = 'other'): void {
-    if (this.runOutcome.outcome === 'VICTORY' || this.flow.baseState === 'BOSS_DEFEATED') return;
+  private hitHero(baseDamage: number, sourceX: number, sourceY: number, source: DamageSource = 'other', context: HeroDamageContext = { attackerId: 'unknown', attackId: 'unknown', patternName: '알 수 없는 피해', parryable: false }): void {
+    if (this.flow.baseState === 'ACT_CLEAR' || this.flow.baseState === 'BOSS_REWARD' || this.flow.baseState === 'ACT_TRANSITION' || this.flow.baseState === 'RUN_OVER' || this.flow.baseState === 'RESULT') return;
     if (this.qaMode || this.debugInvulnerable || this.time.now < this.bossTransitionUntil) return;
     let damage = baseDamage;
-    if (this.tutorialEnabled && this.tutorialIndex < TUTORIAL.length) damage *= 0.45;
+    if (this.tutorialEnabled && this.tutorialIndex < this.tutorialSteps.length) damage *= 0.45;
+    if (this.time.now < this.headwindGuardUntil) {
+      const veil = headwindVeilProfile(this.upgrades.getStack('headwind-veil'));
+      const beforeVeil = damage; damage *= Math.max(.45, 1 - veil.reduction);
+      this.recordUpgradeContribution('headwind-veil', { preventedDamage: beforeVeil - damage }, beforeVeil > damage);
+    }
     const cloak = this.upgrades.getStack('ink-cloak');
     if (this.firstHitAvailable && cloak > 0) {
       const beforeCloak = damage; damage *= Math.max(0.4, 1 - cloak * 0.35); this.firstHitAvailable = false;
@@ -1974,9 +2555,20 @@ export class GameScene extends Phaser.Scene {
     }
     const dealt = this.hero.takeDamage(damage, sourceX, sourceY); if (dealt <= 0) return;
     this.lastHitAt = performance.now();
-    this.damageTaken += dealt; this.combatStats.damageTaken(source, dealt); this.services.audio.play('hurt'); this.cameraKick(0.006, 110); this.showDamageVignette(dealt);
+    this.damageTaken += dealt; this.combatStats.damageTaken(source, dealt);
+    this.combatStats.playerDamage({ time: this.time.now, attackerId: context.attackerId, attackerDisplayName: context.attackerDisplayName ?? (context.attackerId === 'environment' ? '환경' : '알 수 없는 공격자'), attackId: context.attackId, patternName: context.patternName, modifier: context.modifier, amount: dealt, act: this.runAct.current.index, wave: this.boss?.active ? `Boss P${this.boss.phase}` : this.runAct.current.waves[this.waveIndex]?.label ?? `Wave ${this.waveIndex + 1}`, x: this.hero.x, y: this.hero.y, parryable: context.parryable });
+    this.services.audio.play('hurt'); this.cameraKick(0.006, 110); this.showDamageVignette(dealt);
     if (this.hero.health > 0 && this.hero.health <= this.hero.maxHealth * 0.22) this.services.audio.play('critical');
-    if (this.hero.health <= 0) this.finishRun(false);
+    if (this.hero.health <= 0) this.beginDeathSequence();
+  }
+
+  private beginDeathSequence(): void {
+    if (this.deathSequenceStarted) return;
+    this.deathSequenceStarted = true; this.hero.controlsLocked = true; this.clearCombatInput();
+    const last = this.combatStats.snapshot().recentPlayerDamage.at(-1);
+    if (last) this.showCombatLabel(this.hero.x, this.hero.y - 72, `마지막 피해 · ${last.patternName} ${Math.round(last.amount)}`, 0xf09a78);
+    this.timeControl.acquire('DEATH_SLOWMO', this.timeOwner);
+    this.runTimeout(720, () => { this.timeControl.release('DEATH_SLOWMO', this.timeOwner); this.finishRun(false); });
   }
 
   private recordState(time: number): void {
@@ -1997,6 +2589,20 @@ export class GameScene extends Phaser.Scene {
       if (!active.includes(enemy)) { marker.destroy(); this.linkMarkers.delete(enemy); continue; }
       marker.setText(`${active.length === 1 ? '孤' : '連'}\n${Math.max(0, (enemy.linkedUntil - time) / 1000).toFixed(1)}`)
         .setPosition(enemy.x, enemy.y - (enemy.kind === 'boss' ? 78 : 48)).setAlpha(0.72 + Math.sin(time / 120 + enemy.x) * 0.22).setScale(1 + Math.sin(time / 150 + enemy.y) * 0.08);
+    }
+    const drawnStitches = new Set<string>();
+    for (const [firstId, secondId] of this.stitchedPairs) {
+      const key = [firstId, secondId].sort().join(':'); if (drawnStitches.has(key)) continue; drawnStitches.add(key);
+      const first = [...this.enemies].find((enemy) => enemy.id === firstId && enemy.active && !enemy.removing);
+      const second = [...this.enemies].find((enemy) => enemy.id === secondId && enemy.active && !enemy.removing);
+      if (!first || !second) { this.stitchedPairs.delete(firstId); this.stitchedPairs.delete(secondId); continue; }
+      this.linkGraphics?.lineStyle(4, 0x301923, .88).beginPath().moveTo(first.x, first.y - 14).lineTo(second.x, second.y - 14).strokePath();
+      this.linkGraphics?.lineStyle(1, 0xc06f8d, .82).beginPath();
+      for (let step = 0; step <= 10; step += 1) {
+        const ratio = step / 10; const x = Phaser.Math.Linear(first.x, second.x, ratio); const y = Phaser.Math.Linear(first.y - 14, second.y - 14, ratio) + (step % 2 ? 4 : -4);
+        if (step === 0) this.linkGraphics?.moveTo(x, y); else this.linkGraphics?.lineTo(x, y);
+      }
+      this.linkGraphics?.strokePath();
     }
     this.linkedTargets = new Set(active); if (active.length < 2) return;
     for (let index = 0; index < active.length; index += 1) {
@@ -2061,7 +2667,14 @@ export class GameScene extends Phaser.Scene {
   private gainSentence(amount: number): void {
     const wasFull = this.sentence >= this.sentenceMax;
     this.sentence = Math.min(this.sentenceMax, this.sentence + amount);
-    if (!wasFull && this.sentence >= this.sentenceMax) { this.combatStats.agencyMilestone('empowerReady', this.elapsedSeconds()); this.services.audio.play('sentenceFull'); this.sentencePulseUntil = this.time.now + 1200; }
+    if (!wasFull && this.sentence >= this.sentenceMax) {
+      this.combatStats.agencyMilestone('empowerReady', this.elapsedSeconds());
+      this.services.audio.play('sentenceFull');
+      this.sentencePulseUntil = this.time.now + 1800;
+      this.sentenceFullAt = this.time.now;
+      this.sentenceReminderShown = false;
+      this.services.ui.showChainTrigger('F 강화 용언 준비', 1000);
+    }
   }
 
   private gainWordHitSentence(amount: number): void {
@@ -2191,7 +2804,7 @@ export class GameScene extends Phaser.Scene {
     if (!import.meta.env.DEV) return;
     this.watchdogHandle = window.setInterval(() => {
       const now = performance.now();
-      if (this.flow.state !== 'COMBAT' || document.hidden || this.timeControl.isHardPaused) return;
+      if (!this.flow.isCombatBaseState || document.hidden || this.timeControl.isHardPaused) return;
       const gap = now - this.lastHeartbeatAt;
       if (gap < 1500) { if (this.watchdogStalled) { this.watchdogStalled = false; this.watchdogMessage = 'recovered'; } return; }
       if (this.watchdogStalled || now - this.lastWatchdogReportAt < 1500) return;
@@ -2227,6 +2840,9 @@ export class GameScene extends Phaser.Scene {
       timers: (clock._active?.length ?? 0) + (clock._pendingInsertion?.length ?? 0) + this.timeouts.length,
       input: this.inputRouter.snapshot(),
       watchdog: this.watchdogMessage,
+      damageQueue: this.damageQueue.snapshot(),
+      threatBudget: this.threatBudget.snapshot(this.time.now),
+      heartbeats: { ...this.combatHeartbeats },
       wave: this.waveDirector.snapshot(),
       outcome: this.runOutcome.snapshot(),
       run: this.runSession.snapshot(),
@@ -2286,6 +2902,10 @@ export class GameScene extends Phaser.Scene {
       const stats = this.combatStats.snapshot();
       const audio = this.services.audio.diagnostics();
       const progress = this.runProgress.snapshot();
+      const actRun = this.runAct.snapshot();
+      const bossPhase = this.boss?.phaseSnapshot;
+      const damageQueue = this.damageQueue.snapshot();
+      const threatBudget = this.threatBudget.snapshot(this.time.now);
       const diagnostic = this.diagnosticSnapshot() as {
         flow: string; sceneActive: boolean; scenePaused: boolean; phaserTimeScale: number; physicsPaused: boolean;
         physicsTimeScale: number; tweenTimeScale: number; animationTimeScale: number; activePauseTokens: readonly string[];
@@ -2301,11 +2921,17 @@ export class GameScene extends Phaser.Scene {
         `Tokens ${diagnostic.activePauseTokens.join(', ') || 'none'} · ${diagnostic.watchdog}`,
         `Flow ${diagnostic.lastTransition.from} → ${diagnostic.lastTransition.to} · Hitstop ${Math.round(diagnostic.lastHitstopStartedAt ?? 0)}/${Math.round(diagnostic.lastHitstopEndedAt ?? 0)}`,
         `Last attack/hit ${Math.round(diagnostic.lastAttackAt)}/${Math.round(diagnostic.lastHitAt)}`,
+        `DamageQueue ${damageQueue.queueLength} · frame ${damageQueue.processedThisFrame}/256 · depth ${damageQueue.maximumDepthSeen}/6 · blocked ${damageQueue.blockedEvents}`,
+        `DamageRoot ${damageQueue.lastRootEventId ?? '-'} · lineage ${damageQueue.lastRootLineage.length} · recursion ${damageQueue.blockedByReason['duplicate-handler'] + damageQueue.blockedByReason['maximum-depth']}`,
+        `Threat ${threatBudget.active.map((entry) => entry.tier).join(',') || 'none'} · denied ${threatBudget.denied}`,
         `적 ${diagnostic.enemies} · 탄환 ${diagnostic.projectiles} · 파티클 ${diagnostic.particles} · 타이머 ${diagnostic.timers}`,
         `Wave ${diagnostic.wave.waveState} · spawn ${diagnostic.wave.spawnSequenceComplete ? 'DONE' : 'WAIT'} · pending ${diagnostic.wave.pendingSpawnCount}`,
         `Run ${diagnostic.run.runId} · Boss ${diagnostic.run.boss.active ? `${diagnostic.run.boss.id} P${diagnostic.run.boss.phase}` : 'none'} · stale callbacks ${diagnostic.run.staleCallbacksBlocked}`,
         `Act ${progress.act.actNumber} · Wave ${progress.act.waveIndex + 1} · generation ${progress.act.generation} · stale act callbacks ${progress.staleScopeCallbacksBlocked}`,
-        `Audio ${audio.contextState} · M/SFX/UI/C ${audio.master.toFixed(2)}/${audio.effects.toFixed(2)}/${audio.ui.toFixed(2)}/${audio.combat.toFixed(2)} · voices ${audio.activeVoices}`,
+        `RunAct ${actRun.current.id} · boss ${actRun.bossesDefeated} · modifiers ${actRun.current.modifiers.join(',') || 'none'} · blocked ${actRun.staleActCallbacksBlocked}`,
+        `BossDef ${this.boss?.definition.bossId ?? '-'} · P${bossPhase?.phaseId ?? '-'} ${Math.round(bossPhase?.phaseHealth ?? 0)}/${Math.round(bossPhase?.phaseMaxHealth ?? 0)} · signature ${bossPhase?.signaturePatternExecuted ? 'YES' : 'NO'} · skip ${bossPhase?.skippedPhaseCount ?? 0}`,
+        `Act 전환 ${Math.round(this.lastActTransitionDuration)}ms · 보스 사망 event ${this.bossDeathEvents} · Modifier ${modifierIdsForPause(this.activeActPatterns, this.runAct.current.modifiers).join(' / ') || '없음'}`,
+        `Audio ${audio.contextState} · M/SFX/UI/C ${audio.master.toFixed(2)}/${audio.effects.toFixed(2)}/${audio.ui.toFixed(2)}/${audio.combat.toFixed(2)} · limiter ${audio.limiterActive ? 'ON' : 'OFF'} · voices ${audio.activeVoices}`,
         `Living ${diagnostic.wave.livingEnemyIds.length} [${diagnostic.wave.livingEnemyIds.join(', ')}]`,
         `Round ${diagnostic.wave.lastRoundEvaluation} · 전환 ${diagnostic.wave.transitionCount}`,
         `마지막 사망 ${diagnostic.wave.lastDeathEvent?.source ?? '-'} · 결과 ${diagnostic.outcome.outcome ?? '-'} x${diagnostic.outcome.resultTransitions}`,
@@ -2314,11 +2940,14 @@ export class GameScene extends Phaser.Scene {
         `절단 탄환 ${stats.cut.projectilesCut} · TTK ${ttk || '-'}`,
         `타격 ${stats.attackHits}/${stats.attackAttempts} · 근접 빗나감 ${stats.nearbyMisses}`,
         `패링 ${stats.parrySuccesses}/${stats.parryAttempts} · 대시 ${stats.dashes}`,
+        `패링 분리 일반/완벽/탄환/근접/피해 ${stats.parryBreakdown.normalParries}/${stats.perfectParries}/${stats.parryBreakdown.projectileReflections}/${stats.parryBreakdown.meleeCounters}/${stats.parryBreakdown.damage.toFixed(0)}`,
         `패링 위치 Δ ${stats.lastParryPosition?.extraDistance.toFixed(3) ?? '0.000'} · max ${stats.maximumParryExtraDistance.toFixed(3)}`,
         `타깃 없음 ${stats.noTargetSelections} · 거리 밖 ${stats.outOfRangeSelections}`,
         `콤보 타깃 변경 ${stats.comboTargetChanges} · 상단 보정 ${stats.upperBoundaryCorrections}`,
         `경계 이탈 ${stats.enemiesOutsideBounds} · 예고 밖 피격 ${stats.telegraphOutsideHits}`,
         `Q/E/R ${stats.wordUses.stop}/${stats.wordUses.rewind}/${stats.wordUses.link} · 연쇄 성공/시도 ${Object.values(stats.chainCounts).reduce((sum, value) => sum + value, 0)}/${Object.values(stats.chainAttempts).reduce((sum, value) => sum + value, 0)} · fallback ${Object.values(stats.chainFallbacks).reduce((sum, value) => sum + value, 0)} · F ${stats.empowerUses}`,
+        `피해 원천 잔향/J/패링/언령/기타 ${stats.damageAttribution.echoBlade.toFixed(0)}/${stats.damageAttribution.cut.toFixed(0)}/${stats.damageAttribution.parry.toFixed(0)}/${stats.damageAttribution.word.toFixed(0)}/${stats.damageAttribution.other.toFixed(0)} · events ${stats.damageEventCount} · stale ${stats.staleDamageEventsRejected}`,
+        `F 실패 Q/E/R ${Object.values(stats.empoweredWordFailures.stop).reduce((sum, value) => sum + (value ?? 0), 0)}/${Object.values(stats.empoweredWordFailures.rewind).reduce((sum, value) => sum + (value ?? 0), 0)}/${Object.values(stats.empoweredWordFailures.link).reduce((sum, value) => sum + (value ?? 0), 0)}`,
         `E 회복/잔상 ${stats.rewindContribution.healthRecovered.toFixed(0)}/${stats.rewindContribution.echoDamage.toFixed(0)} · R 공유/고립/폭발 ${stats.linkContribution.sharedDamage.toFixed(0)}/${stats.linkContribution.isolatedBonusDamage.toFixed(0)}/${stats.linkContribution.explosionDamage.toFixed(0)}`,
         `첫 J/Q/E/R ${stats.agency.firstAt.manualHit?.toFixed(1) ?? '-'}/${stats.agency.firstAt.stop?.toFixed(1) ?? '-'}/${stats.agency.firstAt.rewind?.toFixed(1) ?? '-'}/${stats.agency.firstAt.link?.toFixed(1) ?? '-'}s`,
         `첫 연쇄/강화3타/F준비 ${stats.agency.firstAt.chain?.toFixed(1) ?? '-'}/${stats.agency.firstAt.enhancedThird?.toFixed(1) ?? '-'}/${stats.agency.firstAt.empowerReady?.toFixed(1) ?? '-'}s`,
@@ -2332,7 +2961,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private showDebugScenarioMenu(): void {
-    if (!import.meta.env.DEV || this.debugScenarioText?.visible || this.flow.baseState !== 'COMBAT') return;
+    if (!import.meta.env.DEV || this.debugScenarioText?.visible || !this.flow.isCombatBaseState) return;
     this.timeControl.acquire('SCENE_TRANSITION', 'debug-menu'); this.clearCombatInput(); this.inputRouter.setContext('DEVELOPMENT');
     this.debugScenarioText = this.add.text(480, 270, '', { fontFamily: 'Malgun Gothic, Consolas, monospace', fontSize: '13px', color: '#dcebe7', backgroundColor: '#041012f2', padding: { x: 22, y: 14 }, lineSpacing: 4, align: 'left' }).setOrigin(0.5).setDepth(DEPTH.debug);
     this.renderDebugScenarioMenu();
@@ -2350,7 +2979,8 @@ export class GameScene extends Phaser.Scene {
       'I · 위/아래 근접 패링', 'J · 패링 불가 장판', 'K · 10분/20회 안정성 시뮬레이션',
       'L · stale enemy 소프트락 복구', 'M · J 절단 표적',
       'N · 잔향 빌드 + 월환 공명', 'O · 절단·패링 빌드 + 반격 절문',
-      'P · 언령 빌드 + 회귀 사슬', 'Q · 시간 역조 공명', 'R · 오디오 버스 진단', 'S · 카드 기여 통계 초기화',
+      'P · 언령 빌드 + 회귀 사슬', 'Q · 시간 역조 공명', 'R · 오디오 버스 진단', 'S · 카드 기여 통계 초기화', 'T · Endless Run 사망 결과',
+      'U · Act1 Boss Phase3 Freeze Regression', 'V · 기존 언령 프리셋', 'W · 당긴다/잇는다/밀어낸다', 'X · 새긴다/멎는다/되돌린다', 'Y · 신규 언령 3종',
     ];
   }
 
@@ -2425,10 +3055,65 @@ export class GameScene extends Phaser.Scene {
       this.runTimeout(380, () => this.services.audio.playDiagnostic('damageRegression'));
       const audio = this.services.audio.diagnostics();
       this.showWordTypography(`오디오 M${Math.round(audio.master * 100)} SFX${Math.round(audio.effects * 100)} C${Math.round(audio.combat * 100)}`, 480, 154, true);
-    } else {
+    } else if (index === 18) {
       this.upgrades.resetRuntimeMetrics(); this.combatStats.resetUpgradeContributions(); this.resonanceRuntime.reset();
       this.showWordTypography('카드 기여 통계 초기화', 480, 154, true);
+    } else if (index === 19) {
+      this.finishRun(false);
+    } else if (index === 20) {
+      this.debugResetUpgradeBuild(); this.debugInvulnerable = true;
+      this.debugGrantUpgrades([['fragment-recovery', 2], ['rewind-breath', 2], ['counter-inscription', 2], ['isolation-chain', 2], ['link-overload', 2]]);
+      this.debugBossPhase(3);
+      const pureReport = simulateDamageFreezeRegression(1000);
+      console.info('[RUN-ACT-05R2 pure freeze regression]', pureReport);
+      this.runTimeout(4100, () => {
+        if (!this.boss?.active) return;
+        const victims: Enemy[] = [];
+        for (let slot = 0; slot < 6; slot += 1) {
+          const angle = slot * Math.PI / 3;
+          const minion = this.spawnEnemy('minion', this.boss.x + Math.cos(angle) * 66, this.boss.y + Math.sin(angle) * 54);
+          minion.health = 5000; minion.linked = true; minion.linkedUntil = this.time.now + 60_000; this.linkedTargets.add(minion); victims.push(minion);
+        }
+        this.boss.linked = true; this.boss.linkedUntil = this.time.now + 60_000; this.linkedTargets.add(this.boss);
+        for (let direction = 0; direction < 8; direction += 1) {
+          const angle = direction * Math.PI / 4;
+          const projectile = new Projectile(this, this.hero.x + Math.cos(angle) * 125, this.hero.y + Math.sin(angle) * 125, angle + Math.PI, 0, 8, 'projectile-ink', this.boss.id);
+          projectile.freeze(this.time.now + 60_000); this.projectiles.add(projectile);
+        }
+        let roots = 0;
+        const drive = (): void => {
+          for (let packet = 0; packet < 40 && roots < 1000; packet += 1, roots += 1) {
+            const target = victims[roots % victims.length]; if (!target?.active) continue;
+            this.damageEnemy(target, .5, roots * .17, false, false, 'attack', 'attack', 'cut', { handler: `freeze-root-${roots}`, skillId: 'freeze-regression-cut', baseSource: 'cut' });
+          }
+          this.timeControl.requestHitstop(this.timeOwner, 48);
+          if (roots < 1000) { this.runTimeout(16, drive); return; }
+          victims.forEach((enemy) => { if (enemy.active) enemy.health = 1; });
+          const first = victims.find((enemy) => enemy.active);
+          if (first) this.damageEnemy(first, 8, 0, false, false, 'attack', 'attack', 'cut', { handler: 'freeze-death-root', skillId: 'freeze-regression-cut', baseSource: 'cut' });
+          this.runTimeout(180, () => {
+            const snapshot = this.damageQueue.snapshot();
+            console.info('[RUN-ACT-05R2 live freeze regression]', snapshot);
+            this.showWordTypography(snapshot.queueLength === 0 && !this.timeControl.hasReason('HITSTOP') ? 'P0 회귀 통과' : 'P0 진단 확인', 480, 154, true);
+          });
+        };
+        drive();
+      });
+      this.showWordTypography('Act1 Boss Phase3 Freeze Regression', 480, 154, true);
+    } else if (index === 21) {
+      this.debugEquipWords(['stop', 'rewind', 'link']); this.spawnEnemy('elite', this.hero.x + 110, this.hero.y); this.qaReadyWords();
+    } else if (index === 22) {
+      this.debugEquipWords(['pull', 'link', 'push']); this.debugGrantUpgrades([['gravity-inscription', 2], ['captured-projectile', 1], ['recoil-ripple', 2]]); for (let i = 0; i < 3; i += 1) this.spawnEnemy(i === 2 ? 'archer' : 'chaser', this.hero.x + 86 + i * 28, this.hero.y - 44 + i * 42); this.qaReadyWords();
+    } else if (index === 23) {
+      this.debugEquipWords(['mark', 'stop', 'rewind']); this.debugGrantUpgrades([['deep-mark', 2], ['contagious-mark', 1], ['stop-resonance', 2]]); this.spawnEnemy('elite', this.hero.x + 110, this.hero.y); this.qaReadyWords();
+    } else if (index === 24) {
+      this.debugEquipWords(['pull', 'mark', 'push']); this.debugGrantUpgrades([['gravity-inscription', 1], ['captured-projectile', 1], ['deep-mark', 1], ['recoil-ripple', 1]]); for (let i = 0; i < 3; i += 1) this.spawnEnemy(i === 0 ? 'elite' : 'chaser', this.hero.x + 82 + i * 35, this.hero.y - 52 + i * 50); this.qaReadyWords();
     }
+  }
+
+  private debugEquipWords(words: [WordId, WordId, WordId]): void {
+    this.wordLoadout.replace(words); this.combatStats.setEquippedWords(words); this.wordChain.reset();
+    this.showWordTypography(words.map(wordDisplayName).join(' · '), 480, 154, true);
   }
 
   private debugGrantUpgrades(entries: ReadonlyArray<readonly [UpgradeId, number]>): void {
@@ -2454,7 +3139,12 @@ export class GameScene extends Phaser.Scene {
 
   private debugBossPhase(phase: 1 | 2 | 3): void {
     this.startBoss();
-    if (phase > 1) this.runDelayedCall(650, () => this.boss?.debugSetPhase(phase)); this.qaReadyWords();
+    // BOSS_INTRO owns the first second. QA phase jumps must wait for it and
+    // for the previous transition lock, otherwise the flow controller quite
+    // correctly rejects BOSS_INTRO -> BOSS_TRANSITION.
+    if (phase >= 2) this.runDelayedCall(1250, () => this.boss?.debugSetPhase(2));
+    if (phase >= 3) this.runDelayedCall(2700, () => this.boss?.debugSetPhase(3));
+    this.qaReadyWords();
   }
 
   private resolveEntitySeparation(delta: number): void {
@@ -2508,34 +3198,58 @@ export class GameScene extends Phaser.Scene {
 
   private markTutorial(action: string): void {
     if (!this.tutorialEnabled) return;
-    const current = TUTORIAL[this.tutorialIndex]; if (!current || current.action !== action) return;
+    const current = this.tutorialSteps[this.tutorialIndex]; if (!current || current.action !== action) return;
     this.tutorialIndex += 1;
     if (action === 'parry' || action === 'stop' || action === 'rewind') this.sentence = this.sentenceMax;
-    const next = TUTORIAL[this.tutorialIndex];
+    const next = this.tutorialSteps[this.tutorialIndex];
     if (next) { this.services.ui.showTutorial(next.text); this.tutorialHideAt = this.time.now + 5000; }
     else { this.services.ui.hideTutorial(); this.services.save.tutorialSeen = true; this.services.persist(); }
   }
 
   private updateHud(time: number): void {
+    this.combatHeartbeats.audio = performance.now();
     const liveBoss = this.boss?.active && !this.boss.removing && Number(this.boss.getData('runId')) === this.runId ? this.boss : undefined;
-    if (liveBoss) this.runSession.updateBoss(this.runId, { health: liveBoss.health, maxHealth: liveBoss.maxHealth, phase: liveBoss.phase as 1 | 2 | 3 });
+    if (liveBoss) this.runSession.updateBoss(this.runId, { health: liveBoss.phaseHealth, maxHealth: liveBoss.phaseMaxHealth, phase: liveBoss.phase as 1 | 2 | 3 });
     const boss = this.runSession.shouldShowBossHud(this.runId, this.flow.baseState, liveBoss?.id) ? liveBoss : undefined;
     const chain = this.wordChain.snapshot(time);
+    const chainFrozenProjectiles = chain?.opener === 'stop'
+      ? [...this.projectiles].filter((projectile) => projectile.active && projectile.enemyOwned && !projectile.reflected && projectile.frozenUntil > time).length
+      : 0;
+    const chainStoppedTargets = chain?.opener === 'stop'
+      ? [...this.enemies].filter((enemy) => enemy.active && !enemy.removing && enemy.isStopped).length
+      : 0;
+    const chainContextLabel = chain?.opener === 'stop' ? `정지 탄환 ${chainFrozenProjectiles} · 정지 적 ${chainStoppedTargets}`
+      : chain?.opener === 'link' ? `연결 대상 ${this.wordStatuses.count('LINKED', time) + this.wordStatuses.count('ISOLATED', time)}`
+        : chain?.opener === 'pull' ? `압축 대상 ${this.wordStatuses.count('COMPRESSED', time)}`
+          : chain?.opener === 'mark' ? `각인 대상 ${this.wordStatuses.count('MARKED', time)}`
+            : chain?.opener === 'push' ? `밀려난 대상 ${this.wordStatuses.count('DISPLACED', time)}` : undefined;
     const rewindRecords = this.rewind.getRange(time, BALANCE.words.rewindDuration);
     const rewindTarget = rewindRecords[0];
+    const actSnapshot = this.runAct.snapshot();
+    const waveLabel = liveBoss ? 'Boss' : this.runAct.current.waves[this.waveIndex]?.label ?? '전환';
+    const modifierIds = [...new Set([
+      ...[...this.activeActPatterns].filter((id) => id !== 'archive-baseline'),
+      ...this.activeEndlessModifiers,
+    ])];
+    const modifierItems = modifierIds.map((id) => { const definition = modifierDefinition(id); return { name: definition?.displayName ?? modifierLabel(id), icon: definition?.icon ?? '異' }; });
     this.services.ui.updateHud({
       health: this.hero.health, maxHealth: this.hero.maxHealth, sentence: this.sentence, sentenceMax: this.sentenceMax,
-      score: this.score, stage: liveBoss ? '최종전투 · 기록 포식자' : WAVE_LABELS[this.waveIndex] ?? '잔향의 방',
+      score: this.score, stage: waveLabel,
+      actIndex: this.runAct.current.index, actName: this.runAct.current.name, waveLabel, bossesDefeated: actSnapshot.bossesDefeated, modifiers: modifierItems,
       stopCooldown: Math.max(0, (this.stopReadyAt - time) / 1000), rewindCooldown: Math.max(0, (this.rewindReadyAt - time) / 1000), linkCooldown: Math.max(0, (this.linkReadyAt - time) / 1000), empowered: this.empowered,
       canStop: time >= this.stopReadyAt,
       canRewind: time >= this.rewindReadyAt,
       canLink: time >= this.linkReadyAt && (this.services.save.settings.controlMode === 'mouse' || this.hasWordTarget(Number.POSITIVE_INFINITY)),
+      wordSlots: (['Q', 'E', 'R'] as WordSlot[]).map((slot) => { const wordId = this.wordLoadout.wordForSlot(slot); const readyAt = this.readyAtForWord(wordId); return { slot, wordId, name: wordDisplayName(wordId), cooldown: Math.max(0, (readyAt - time) / 1000), canUse: time >= readyAt && (wordId !== 'link' && wordId !== 'mark' || this.hasWordTarget(Number.POSITIVE_INFINITY)) }; }),
       rewindPreviewHealth: rewindTarget?.health,
       sentencePulse: time < this.sentencePulseUntil,
       controlMode: this.services.save.settings.controlMode,
       chainOpener: chain?.opener, chainRemaining: chain ? Math.max(0, (chain.expiresAt - time) / 1000) : undefined,
       chainProgress: chain ? Math.max(0, (chain.expiresAt - time) / BALANCE.chain.window) : undefined,
       chainNext: chain?.nextWords,
+      chainFrozenProjectiles,
+      chainStoppedTargets,
+      chainContextLabel,
       cutCooldown: this.weaponCooldowns.cutRemaining(time) / 1000,
       echoBladeRange: this.currentEchoBladeProfile().range,
       echoBladeInterval: this.currentEchoBladeProfile().interval / 1000,
@@ -2544,13 +3258,14 @@ export class GameScene extends Phaser.Scene {
         const definition = upgradeById(id); return { id, name: definition?.name ?? id, stacks, effect: definition ? upgradeDescription(definition, stacks) : '', icon: definition?.icon.glyph ?? '言', color: definition?.icon.color ?? '#89d8c8', active: this.lastActivatedUpgrade === id && time <= this.lastActivatedUpgradeUntil };
       }),
       resonances: this.upgrades.activeResonances().map((id) => { const resonance = resonanceById(id); return { name: resonance?.name ?? id, icon: resonance?.icon.glyph ?? '鳴', effect: resonance?.description ?? '', active: this.lastActivatedResonance === id && time <= this.lastActivatedResonanceUntil }; }),
-      bossHealth: boss?.health, bossMaxHealth: boss?.maxHealth, bossPhase: boss?.phase,
-      bossGuide: boss ? ['','멎는다 · 탄환을 멈춰 되받아쳐라','되돌린다 · 지연 공격을 역행하라','잇는다 · 소환체와 포식자를 이어라'][boss.phase] : undefined,
+      bossHealth: boss?.phaseHealth, bossMaxHealth: boss?.phaseMaxHealth, bossPhase: boss?.phase,
+      bossGuide: boss?.definition.phaseDefinitions[boss.phase - 1]?.guide,
+      bossName: boss ? boss.definition.displayName : undefined,
     });
   }
 
   private togglePause(): void {
-    if (this.flow.baseState === 'RESULT' || this.flow.baseState === 'BOSS_DEFEATED' || this.flow.baseState === 'ROUND_CLEAR' || this.flow.baseState === 'REWARD_REVEAL' || this.flow.baseState === 'REWARD_SELECT') return;
+    if (this.flow.baseState === 'RUN_START' || this.flow.baseState === 'RESULT' || this.flow.baseState === 'RUN_OVER' || this.flow.baseState === 'ACT_CLEAR' || this.flow.baseState === 'BOSS_REWARD' || this.flow.baseState === 'BOSS_REWARD_REVEAL' || this.flow.baseState === 'BOSS_REWARD_SELECT' || this.flow.baseState === 'ACT_TRANSITION' || this.flow.baseState === 'ACT_INTRO' || this.flow.baseState === 'MODIFIER_INTRO' || this.flow.baseState === 'WAVE_CLEAR' || this.flow.baseState === 'BOSS_DEFEATED' || this.flow.baseState === 'ROUND_CLEAR' || this.flow.baseState === 'REWARD_REVEAL' || this.flow.baseState === 'REWARD_SELECT') return;
     if (this.flow.isUserPaused) {
       this.flow.setUserPaused(false, performance.now()); this.timeControl.release('USER_PAUSE', this.timeOwner);
       this.services.ui.hidePause(); this.clearCombatInput(); this.syncInputContext(); return;
@@ -2558,7 +3273,12 @@ export class GameScene extends Phaser.Scene {
     this.flow.setUserPaused(true, performance.now()); this.timeControl.acquire('USER_PAUSE', this.timeOwner); this.clearCombatInput(); this.syncInputContext();
     this.services.ui.showPause(() => {
       this.flow.setUserPaused(false, performance.now()); this.timeControl.release('USER_PAUSE', this.timeOwner); this.clearCombatInput(); this.syncInputContext();
-    }, () => { this.scene.stop(); this.scene.start('MenuScene'); }, [
+    }, () => {
+      this.flow.setUserPaused(false, performance.now()); this.timeControl.release('USER_PAUSE', this.timeOwner);
+      this.clearCombatInput(); this.finishRun(false);
+    }, [
+      `Act ${this.runAct.current.index} · ${this.runAct.current.name}`,
+      `Modifier · ${modifierIdsForPause(this.activeActPatterns, this.runAct.current.modifiers).join(' · ') || '없음'}`,
       ...this.upgrades.entries().map(({ id, stacks }) => {
         const definition = upgradeById(id); const contribution = this.upgrades.runtimeSnapshot().contributions[id];
         return definition ? `${definition.icon.glyph} ${definition.name} ×${stacks} — ${upgradeDescription(definition, stacks)} · 발동 ${contribution?.activationCount ?? 0} · 기여 피해 ${Math.round(contribution?.damageContribution ?? 0)} · 회복 ${Math.round(contribution?.healingContribution ?? 0)}` : id;
@@ -2568,8 +3288,9 @@ export class GameScene extends Phaser.Scene {
   }
 
   private beginBossDefeated(defeatedBoss: Enemy): void {
-    if (!this.runOutcome.claim('VICTORY')) return;
+    if (this.flow.baseState === 'BOSS_DEFEATED' || this.flow.baseState === 'ACT_CLEAR' || this.flow.baseState === 'BOSS_REWARD_REVEAL' || this.flow.baseState === 'BOSS_REWARD_SELECT' || this.flow.baseState === 'ACT_TRANSITION') return;
     if (!this.transitionFlow('BOSS_DEFEATED')) return;
+    this.bossDeathEvents += 1;
     this.clearTransientCombatObjects();
     this.combatStats.setBossPhaseTime(3, Math.max(0, (this.time.now - this.bossPhaseStartedAt) / 1000));
     this.combatStats.setEncounterTime('boss', Math.max(0, (this.time.now - this.encounterStartedAt) / 1000));
@@ -2586,16 +3307,66 @@ export class GameScene extends Phaser.Scene {
     this.runDelayedCall(BALANCE.pacing.bossDefeatDuration, () => {
       if (!this.sys.isActive() || this.flow.baseState !== 'BOSS_DEFEATED') return;
       if (!this.services.save.settings.reducedMotion) this.cameras.main.zoomTo(1, 260);
+      this.runAct.completeBoss(this.time.now, this.damageTaken);
+      this.score += 2600 + this.runAct.current.index * 350;
+      const minimumHealth = this.hero.maxHealth * .45;
+      const recovery = Math.max(this.hero.maxHealth * .25, minimumHealth - this.hero.health);
+      const restored = Math.max(0, Math.min(this.hero.maxHealth - this.hero.health, recovery));
+      if (restored > 0) { this.hero.heal(restored); this.damageNumber(this.hero.x, this.hero.y - 58, restored, 0x8de5d3, false, '+보스 회복 '); }
       this.timeControl.release('BOSS_DEFEATED', this.timeOwner);
-      this.finishRun(true);
+      this.timeControl.acquire('REWARD_SCREEN', this.timeOwner);
+      if (!this.transitionFlow('ACT_CLEAR')) return;
+      const act = this.runAct.current;
+      const resonances = this.upgrades.activeResonances().map((id) => resonanceById(id)?.name ?? id);
+      this.services.ui.showActClear({
+        index: act.index,
+        name: act.name,
+        recovery: restored,
+        bossesDefeated: this.runAct.snapshot().bossesDefeated,
+        upgrades: this.upgrades.summary(),
+        resonances,
+      }, () => {
+        if (!this.sys.isActive() || this.flow.baseState !== 'ACT_CLEAR') return;
+        if (!this.transitionFlow('BOSS_REWARD_REVEAL')) return;
+        this.showUpgradeChoices(undefined, true);
+      });
+    });
+  }
+
+  private beginNextAct(): void {
+    if (!this.transitionFlow('ACT_TRANSITION')) return;
+    this.actTransitionStartedAt = performance.now();
+    this.timeControl.acquire('SCENE_TRANSITION', this.timeOwner);
+    this.clearCombatInput(); this.hero.controlsLocked = true; this.wordChain.reset(); this.clearLinks(); this.clearTransientCombatObjects();
+    this.actPatternGeneration += 1; this.waveSpawnGeneration += 1; this.waveDirector.reset();
+    for (const projectile of this.projectiles) projectile.destroy(); this.projectiles.clear();
+    for (const enemy of [...this.enemies]) { enemy.destroy(); this.enemies.delete(enemy); }
+    this.inkZones.forEach((zone) => zone.circle.destroy()); this.inkZones = []; this.stitchedPairs.clear();
+    this.currentTarget = undefined; this.comboTarget = undefined; this.heldAttackTarget = undefined; this.targetMarkerUntil = 0; this.boss = undefined;
+    this.runSession.clearBoss(this.runId, true);
+    const next = this.runAct.advanceAct(this.time.now, this.damageTaken);
+    this.runProgress.beginAct(this.runId, { actNumber: next.index, actId: next.id, actName: next.name, themeId: next.theme, enemySetId: next.enemySetId, bossId: next.bossId, modifiers: next.modifiers });
+    this.waveIndex = 0; this.firstWaveSpawnOrdinal = 0; this.stopReadyAt = this.time.now; this.rewindReadyAt = this.time.now; this.linkReadyAt = this.time.now;
+    this.hero.setGroundPosition(480, 300); this.hero.setVelocity(0); this.hero.health = Math.min(this.hero.health, this.hero.maxHealth);
+    this.arenaContainer?.destroy(true); this.atmosphere?.destroy();
+    this.arenaContainer = next.theme === 'echo-room' || next.theme === 'endless-echo' ? createArchiveArena(this) : createInkArchiveArena(this, next.index >= 3 ? next.index : 0);
+    this.createAtmosphere();
+    const resonanceNames = this.upgrades.activeResonances().map((id) => resonanceById(id)?.name ?? id);
+    if (!this.transitionFlow('ACT_INTRO')) return;
+    const actModifierLabels = modifierLabelsForAct(next.waves.flatMap((wave) => wave.patterns), next.modifiers);
+    this.services.ui.showActTransition({ index: next.index, name: next.name, summary: next.summary, modifiers: actModifierLabels, upgrades: this.upgrades.summary(), resonances: resonanceNames }, () => {
+      if (!this.sys.isActive() || this.flow.baseState !== 'ACT_INTRO') return;
+      this.lastActTransitionDuration = Math.max(0, performance.now() - this.actTransitionStartedAt);
+      this.services.ui.showHud(); this.timeControl.release('SCENE_TRANSITION', this.timeOwner);
+      this.hero.controlsLocked = false; this.clearCombatInput(); this.enterWave(0);
     });
   }
 
   private finishRun(victory: boolean): void {
     const outcome = victory ? 'VICTORY' : 'DEFEAT';
     if (!this.runOutcome.claim(outcome)) return;
-    if (this.flow.baseState === 'RESULT') return;
-    if (!this.transitionFlow('RESULT')) return;
+    if (this.flow.baseState === 'RESULT' || this.flow.baseState === 'RUN_OVER') return;
+    if (!this.transitionFlow('RUN_OVER')) return;
     if (!this.runOutcome.consumeResultTransition(outcome)) return;
     this.clearTransientCombatObjects();
     this.runSession.clearBoss(this.runId, victory);
@@ -2603,7 +3374,8 @@ export class GameScene extends Phaser.Scene {
     this.timeControl.acquire('RESULT', this.timeOwner); this.hero.controlsLocked = true;
     this.debugGraphics?.setVisible(false); this.debugStatsText?.setVisible(false); this.debugScenarioText?.setVisible(false);
     const elapsed = Math.max(1, (this.time.now - this.startTime) / 1000); if (victory) this.score += Math.max(0, 1200 - Math.floor(elapsed));
-    const progressStage = victory ? 7 : this.boss?.active ? 3 + this.boss.phase : Math.min(3, this.waveIndex + 1);
+    const actSnapshot = this.runAct.snapshot();
+    const progressStage = Math.min(7, this.boss?.active ? 3 + this.boss.phase : Math.min(3, this.waveIndex + 1));
     const rank = rankFor(this.score, this.damageTaken, elapsed, progressStage, victory);
     const previousBest = this.services.save.bestScore; const previousStage = this.services.save.bestStage;
     const newBest = this.score > previousBest; const milestones: string[] = [];
@@ -2611,14 +3383,17 @@ export class GameScene extends Phaser.Scene {
     if (progressStage > previousStage) { this.services.save.bestStage = progressStage; milestones.push('최고 진행 단계 갱신'); }
     if (progressStage >= 4 && !this.services.save.bossReached) { this.services.save.bossReached = true; milestones.push('첫 보스 도달'); }
     if (victory && !this.services.save.cleared) { this.services.save.cleared = true; milestones.push('첫 클리어'); }
+    if (actSnapshot.highestAct > this.services.save.highestAct) { this.services.save.highestAct = actSnapshot.highestAct; milestones.push(`최고 Act ${actSnapshot.highestAct}`); }
+    if (actSnapshot.bossesDefeated > this.services.save.mostBossesDefeated) { this.services.save.mostBossesDefeated = actSnapshot.bossesDefeated; milestones.push('최다 보스 처치 갱신'); }
+    if (elapsed > this.services.save.longestSurvivalSeconds) { this.services.save.longestSurvivalSeconds = elapsed; milestones.push('최장 생존 기록 갱신'); }
     this.services.persist();
     this.services.audio.play(victory ? 'victory' : 'defeat');
-    const progressLabel = ['기록 없음', '제1전투', '제2전투', '제3전투', '보스 제1형', '보스 제2형', '보스 제3형', '클리어'][progressStage] ?? '잔향의 방';
+    const progressLabel = `Act ${actSnapshot.highestAct} · ${actSnapshot.current.name}`;
     this.combatStats.setUpgrades(this.upgrades.entries());
     const details = this.combatStats.snapshot(); const chainSuccesses = Object.values(details.chainCounts).reduce((sum, value) => sum + value, 0);
-    const stats: ResultStats = { victory, score: this.score, time: elapsed, damageTaken: this.damageTaken, parries: this.parries, wordUses: { ...this.wordUses }, upgrades: this.upgrades.summary(), rank, progressStage, progressLabel, previousBest, scoreDelta: this.score - previousBest, newBest, milestones, empowerUses: details.empowerUses, chainSuccesses, details, upgradeRuntime: this.upgrades.runtimeSnapshot() };
+    const stats: ResultStats = { victory, score: this.score, time: elapsed, damageTaken: this.damageTaken, parries: this.parries, wordUses: { ...this.wordUses }, upgrades: this.upgrades.summary(), rank, progressStage, progressLabel, previousBest, scoreDelta: this.score - previousBest, newBest, milestones, empowerUses: details.empowerUses, chainSuccesses, details, upgradeRuntime: this.upgrades.runtimeSnapshot(), reachedAct: actSnapshot.highestAct, completedActs: actSnapshot.completedActs, bossesDefeated: actSnapshot.bossesDefeated, actResults: actSnapshot.results };
     this.runTimeout(500, () => {
-      if (!this.sys.isActive() || this.flow.baseState !== 'RESULT') return;
+      if (!this.sys.isActive() || this.flow.baseState !== 'RUN_OVER') return;
       this.services.ui.showResult(stats, () => {
         this.timeControl.releaseOwner(this.timeOwner);
         this.scene.restart();
@@ -2630,14 +3405,27 @@ export class GameScene extends Phaser.Scene {
   }
 
   private createAtmosphere(): void {
-    this.add.particles(0, 0, 'rune-pixel', { x: { min: 45, max: 915 }, y: { min: 70, max: 500 }, speed: { min: 1, max: 6 }, angle: { min: 210, max: 330 }, lifespan: 4800, alpha: { start: 0.12, end: 0 }, quantity: 1, frequency: 420 }).setDepth(DEPTH.floor);
+    this.atmosphere?.destroy();
+    this.modifierEnvironment?.destroy(); this.modifierEnvironment = undefined;
+    const inkTheme = this.runAct.current.theme === 'ink-archive' || this.runAct.current.theme === 'endless-ink';
+    this.atmosphere = this.add.particles(0, 0, 'rune-pixel', { x: { min: 45, max: 915 }, y: { min: 70, max: 500 }, speed: { min: 1, max: inkTheme ? 9 : 6 }, angle: inkTheme ? { min: 250, max: 290 } : { min: 210, max: 330 }, lifespan: 4800, tint: inkTheme ? 0x8d659a : 0x79cbb9, alpha: { start: inkTheme ? 0.16 : 0.12, end: 0 }, quantity: 1, frequency: inkTheme ? 310 : 420 }).setDepth(DEPTH.floor);
+    if (this.runAct.current.index >= 3) {
+      const graphics = this.add.graphics().setDepth(DEPTH.floor + .1); this.modifierEnvironment = graphics;
+      if (this.runAct.current.modifiers.includes('time-rift')) {
+        graphics.lineStyle(2, 0x65527c, .22);
+        for (let index = 0; index < 7; index += 1) { const x = 90 + index * 130; graphics.beginPath().moveTo(x, 85).lineTo(x + 34, 180).lineTo(x - 8, 285).lineTo(x + 48, 430).strokePath(); }
+      }
+      if (this.runAct.current.modifiers.includes('stitched-armor')) {
+        graphics.lineStyle(3, 0x8a526f, .2);
+        for (let x = 58; x < 910; x += 72) { graphics.lineBetween(x, 64, x + 24, 78); graphics.lineBetween(x + 12, 57, x + 9, 86); graphics.lineBetween(x, 474, x + 24, 460); }
+      }
+    }
   }
 
   private qaAdvance(): void {
     if (!this.flow.allowsCombatInput) return;
     if (this.boss?.active) {
-      const targetHealth = this.boss.phase === 1 ? this.boss.maxHealth * 0.6 : this.boss.phase === 2 ? this.boss.maxHealth * 0.3 : 0;
-      this.damageEnemy(this.boss, Math.max(1, this.boss.health - targetHealth), 0, false, false, undefined, 'qa');
+      this.damageEnemy(this.boss, this.boss.phaseHealth + 1, 0, false, false, undefined, 'qa');
       return;
     }
     for (const enemy of [...this.enemies]) this.damageEnemy(enemy, enemy.health + 1, 0, true, false, undefined, 'qa');
@@ -2645,6 +3433,7 @@ export class GameScene extends Phaser.Scene {
 
   private qaReadyWords(): void {
     this.sentence = this.sentenceMax; this.stopReadyAt = 0; this.rewindReadyAt = 0; this.linkReadyAt = 0; this.empowered = false; this.wordChain.reset();
+    for (const id of ['pull', 'mark', 'push'] as WordId[]) this.wordReadyAt[id] = 0;
     this.gainFinisherCharge('qa', this.finisherCharges.maxCharges);
   }
 
@@ -2663,8 +3452,8 @@ export class GameScene extends Phaser.Scene {
     delete this.game.canvas.dataset.eonmaekDebug;
     this.timeouts.forEach((handle) => window.clearTimeout(handle)); this.timeouts = [];
     if (this.watchdogHandle !== undefined) window.clearInterval(this.watchdogHandle); this.watchdogHandle = undefined;
-    this.timeControl?.dispose(false); this.inputRouter.clear(); this.parryResolver.reset();
+    this.timeControl?.dispose(false); this.damageQueue.reset(); this.inputRouter.clear(); this.parryResolver.reset();
     this.game.canvas.style.cursor = ''; this.wordChain.reset(); this.damageHistory.reset(); this.targeting.clear(); this.attackRegistry.reset(); this.attackInput.reset();
-    this.clearLinks(); this.linkGraphics?.destroy(); this.rewindGraphics?.destroy(); this.rewindPreviewGhosts.forEach((ghost) => ghost.destroy()); this.rewindPreviewGhosts = []; this.heroRune?.destroy(); this.targetMarker?.destroy(); this.debugGraphics?.destroy(); this.debugStatsText?.destroy(); this.debugScenarioText?.destroy(); this.inkZones.forEach((zone) => zone.circle.destroy());
+    this.clearLinks(); this.linkGraphics?.destroy(); this.rewindGraphics?.destroy(); this.rewindPreviewGhosts.forEach((ghost) => ghost.destroy()); this.rewindPreviewGhosts = []; this.heroRune?.destroy(); this.targetMarker?.destroy(); this.debugGraphics?.destroy(); this.debugStatsText?.destroy(); this.debugScenarioText?.destroy(); this.inkZones.forEach((zone) => zone.circle.destroy()); this.atmosphere?.destroy(); this.modifierEnvironment?.destroy(); this.arenaContainer?.destroy(true); this.stitchedPairs.clear();
   }
 }

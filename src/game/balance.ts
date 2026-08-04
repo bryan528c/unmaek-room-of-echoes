@@ -146,7 +146,7 @@ export const BALANCE = {
     markerDuration: 420,
   },
   chain: {
-    window: 4000,
+    window: 4300,
     perfectParryExtension: 600,
     linkStopDuration: 900,
     backflowDamageRatio: 0.72,

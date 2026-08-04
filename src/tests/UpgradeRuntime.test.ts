@@ -12,12 +12,16 @@ import {
   rewindBreathHealing,
   ruptureStepProfile,
   stopResonanceProfile,
+  gravityInscriptionProfile,
+  deepMarkProfile,
+  recoilRippleProfile,
+  headwindVeilProfile,
 } from '../game/systems/UpgradeRuntime';
 import { UpgradeSystem } from '../game/systems/UpgradeSystem';
 
 describe('UPGRADE-04 runtime', () => {
-  it('활성 카드 18개 모두 효과 핸들러와 실제 수치 기반 설명을 가진다', () => {
-    expect(ACTIVE_UPGRADES).toHaveLength(18);
+  it('활성 카드 24개 모두 효과 핸들러와 실제 수치 기반 설명을 가진다', () => {
+    expect(ACTIVE_UPGRADES).toHaveLength(24);
     expect(ACTIVE_UPGRADES.filter((upgrade) => upgrade.behaviorChange).length / ACTIVE_UPGRADES.length).toBeGreaterThanOrEqual(.6);
     for (const upgrade of ACTIVE_UPGRADES) {
       expect(ACTIVE_EFFECT_HANDLERS.has(upgrade.id), upgrade.id).toBe(true);
@@ -55,10 +59,22 @@ describe('UPGRADE-04 runtime', () => {
     expect(ruptureStepProfile(2, 1800)).toMatchObject({ active: true, damage: 20, range: 142 });
     expect(ruptureStepProfile(2, 1801).active).toBe(false);
     expect(stopResonanceProfile(2)).toEqual({ damage: 18, radius: 76, slowDuration: 650 });
+    expect(gravityInscriptionProfile(2)).toEqual({ rangeMultiplier: 1.28, durationBonus: 360, damage: 16 });
+    expect(deepMarkProfile(2)).toEqual({ maximumStacks: 5, explosionDamage: 44 });
+    expect(recoilRippleProfile(2)).toEqual({ damage: 18, radius: 68 });
+    expect(headwindVeilProfile(2)).toEqual({ reduction: .28, duration: 1300 });
+    const wordCards = ['gravity-inscription', 'captured-projectile', 'deep-mark', 'contagious-mark', 'recoil-ripple', 'headwind-veil'] as const;
+    for (const id of wordCards) {
+      const definition = ACTIVE_UPGRADES.find((upgrade) => upgrade.id === id);
+      expect(definition, id).toBeDefined();
+      expect(definition?.requiredWordIds?.length, id).toBeGreaterThan(0);
+      expect(definition?.behaviorChange, id).toBe(true);
+      expect(upgradeDescription(definition!, definition!.maxStacks), id).not.toContain('undefined');
+    }
   });
 
-  it('네 공명은 두 필요 카드가 모두 있을 때만 한 번 활성화된다', () => {
-    expect(RESONANCES).toHaveLength(4);
+  it('일곱 공명은 두 필요 카드가 모두 있을 때만 한 번 활성화된다', () => {
+    expect(RESONANCES).toHaveLength(7);
     for (const resonance of RESONANCES) {
       expect(RESONANCE_EFFECT_HANDLERS.has(resonance.id)).toBe(true);
       const run = new UpgradeSystem();

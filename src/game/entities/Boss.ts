@@ -1,12 +1,14 @@
 import Phaser from 'phaser';
 import { BALANCE } from '../balance';
 import { Enemy, type EnemyCallbacks } from './Enemy';
-import { bossPhaseForHealth } from '../systems/CombatRules';
+import { BossPhaseIntegrity, getBossDefinition, type BossDefinition, type BossId, type BossPhaseId, type BossPhaseSnapshot } from '../systems/BossDefinitions';
+import type { EnemyDeathSource } from '../systems/CombatLifecycle';
 
 export interface BossCallbacks extends EnemyCallbacks {
   phaseChanged: (phase: number) => void;
+  signatureExecuted: (phase: BossPhaseId, signaturePattern: string) => void;
   summon: (count: number) => void;
-  inkZone: (x: number, y: number, radius: number, duration: number) => void;
+  inkZone: (x: number, y: number, radius: number, duration: number, style?: 'ink' | 'erasure') => void;
 }
 
 export class Boss extends Enemy {
@@ -14,10 +16,18 @@ export class Boss extends Enemy {
   private patternIndex = 0;
   private phaseTransitionUntil = 0;
   private readonly bossCallbacks: BossCallbacks;
+  private readonly archetype: BossArchetype;
+  private readonly bossDefinitionValue: BossDefinition;
+  private readonly phaseIntegrity: BossPhaseIntegrity;
 
-  public constructor(scene: Phaser.Scene, x: number, y: number, callbacks: BossCallbacks) {
-    super(scene, x, y, 'boss', callbacks);
+  public constructor(scene: Phaser.Scene, x: number, y: number, callbacks: BossCallbacks, archetype: BossArchetype = 'record-devourer', healthMultiplier = 1) {
+    super(scene, x, y, 'boss', callbacks, healthMultiplier);
     this.bossCallbacks = callbacks;
+    this.archetype = archetype;
+    this.bossDefinitionValue = getBossDefinition(archetype);
+    this.phaseIntegrity = new BossPhaseIntegrity(this.bossDefinitionValue, this.maxHealth, scene.time.now);
+    this.health = this.phaseIntegrity.snapshot().phaseHealth;
+    this.setTexture(this.bossDefinitionValue.silhouetteKey);
     this.setScale(1.22);
     const body = this.body as Phaser.Physics.Arcade.Body;
     const diameter = BALANCE.collision.movementRadius.boss * 2;
@@ -26,8 +36,7 @@ export class Boss extends Enemy {
 
   public override updateAI(time: number, hero: Phaser.Physics.Arcade.Sprite): void {
     if (!this.active || !this.spawned) return;
-    const desiredPhase = bossPhaseForHealth(this.health, this.maxHealth);
-    if (desiredPhase > this.phase) this.transition(desiredPhase);
+    if (time >= this.phaseTransitionUntil && this.phaseIntegrity.snapshot().transitionLocked) this.phaseIntegrity.unlockTransition();
     if (time < this.phaseTransitionUntil) { this.setVelocity(0); return; }
     if (time < this.frozenUntil) { this.setVelocity(0); this.setTint(0x62b9aa); return; }
     const slowed = time < this.slowUntil;
@@ -41,16 +50,36 @@ export class Boss extends Enemy {
       else this.setVelocity(0);
       return;
     }
-    if (this.phase === 1) this.phaseOne(hero);
+    if (this.archetype === 'record-editor') {
+      if (this.phase === 1) this.editorPhaseOne(hero);
+      else if (this.phase === 2) this.editorPhaseTwo(hero);
+      else this.editorPhaseThree(hero);
+    } else if (this.phase === 1) this.phaseOne(hero);
     else if (this.phase === 2) this.phaseTwo(hero);
     else this.phaseThree(hero);
   }
 
-  private transition(phase: number): void {
+  public override takeDamage(amount: number, sourceAngle: number, parried = false, deathSource: EnemyDeathSource = 'other'): number {
+    if (!this.active || this.health <= 0 && this.phaseIntegrity.snapshot().defeated) return 0;
+    this.lastDamageSource = deathSource;
+    const result = this.phaseIntegrity.applyDamage(this.resolveIncomingDamage(amount, sourceAngle, parried), this.scene.time.now);
+    if (result.appliedDamage > 0) this.flashDamage();
+    this.health = this.phaseIntegrity.snapshot().phaseHealth;
+    if (result.bossDefeated) {
+      this.health = 0;
+      this.die(deathSource);
+    } else if (result.nextPhase) this.transition(result.nextPhase);
+    return result.appliedDamage;
+  }
+
+  private transition(phase: BossPhaseId): void {
+    if (!this.phaseIntegrity.beginNextPhase(phase, this.scene.time.now)) return;
     this.phase = phase;
+    this.health = this.phaseIntegrity.snapshot().phaseHealth;
     this.phaseTransitionUntil = this.scene.time.now + BALANCE.boss.phaseTransition;
     this.actionLockedUntil = this.phaseTransitionUntil;
     this.nextActionAt = this.phaseTransitionUntil + BALANCE.boss.phaseOpeningDelay;
+    this.patternIndex = 0;
     this.setVelocity(0).setTint(0xa0f4e5);
     this.scene.tweens.add({ targets: this, scaleX: 1.48, scaleY: 1.48, duration: 330, yoyo: true });
     this.bossCallbacks.phaseChanged(phase);
@@ -59,7 +88,8 @@ export class Boss extends Enemy {
 
   private phaseOne(hero: Phaser.Physics.Arcade.Sprite): void {
     this.patternIndex += 1;
-    if (this.patternIndex % 2 === 1) {
+    if (this.patternIndex % 2 === 0) {
+      this.markSignaturePattern();
       this.telegraphDash(hero, BALANCE.enemies.boss.damage, 620, 410);
       this.nextActionAt = this.scene.time.now + 1800;
       return;
@@ -70,6 +100,7 @@ export class Boss extends Enemy {
     const generation = this.attackIntentGeneration;
     this.scene.time.delayedCall(680, () => {
       if (!this.active || generation !== this.attackIntentGeneration || this.scene.time.now < this.phaseTransitionUntil) return;
+      this.markSignaturePattern();
       for (let index = -2; index <= 2; index += 1) this.callbacks.shoot(this, this.x, this.y - 18, angle + index * 0.12, 245, 15, 'projectile-boss');
     });
     this.nextActionAt = this.scene.time.now + 1850;
@@ -89,7 +120,7 @@ export class Boss extends Enemy {
     ];
     const generation = this.attackIntentGeneration;
     spots.forEach((spot, index) => this.scene.time.delayedCall(index * 220, () => {
-      if (this.active && generation === this.attackIntentGeneration && this.scene.time.now >= this.phaseTransitionUntil) this.bossCallbacks.inkZone(spot.x, spot.y, 62, 3500);
+      if (this.active && generation === this.attackIntentGeneration && this.scene.time.now >= this.phaseTransitionUntil) { this.markSignaturePattern(); this.bossCallbacks.inkZone(spot.x, spot.y, 62, 3500); }
     }));
     this.scene.time.delayedCall(650, () => {
       if (!this.active || generation !== this.attackIntentGeneration || this.scene.time.now < this.phaseTransitionUntil) return;
@@ -100,9 +131,10 @@ export class Boss extends Enemy {
 
   private phaseThree(hero: Phaser.Physics.Arcade.Sprite): void {
     this.patternIndex += 1;
-    if (this.patternIndex % 4 === 0) this.bossCallbacks.summon(2);
+    if (this.patternIndex === 1 || this.patternIndex % 4 === 0) this.bossCallbacks.summon(this.patternIndex === 1 ? 3 : 2);
     if (this.patternIndex % 2 === 0) {
       this.telegraphDash(hero, 28, 520, 475);
+      this.scene.time.delayedCall(520, () => { if (this.active && this.phase === 3) this.markSignaturePattern(); });
       this.nextActionAt = this.scene.time.now + 1250;
       return;
     }
@@ -112,13 +144,73 @@ export class Boss extends Enemy {
     const generation = this.attackIntentGeneration;
     this.scene.time.delayedCall(480, () => {
       if (!this.active || generation !== this.attackIntentGeneration || this.scene.time.now < this.phaseTransitionUntil) return;
+      this.markSignaturePattern();
       for (let index = -3; index <= 3; index += 1) this.callbacks.shoot(this, this.x, this.y - 14, angle + index * 0.17, 270 - Math.abs(index) * 12, 17, 'projectile-boss');
     });
     this.nextActionAt = this.scene.time.now + 1350;
   }
 
-  public debugSetPhase(phase: 1 | 2 | 3): void {
-    if (phase <= this.phase) return;
-    this.transition(phase);
+  private editorPhaseOne(hero: Phaser.Physics.Arcade.Sprite): void {
+    this.patternIndex += 1;
+    const angle = Phaser.Math.Angle.Between(this.x, this.y, hero.x, hero.y);
+    this.setVelocity(0); this.actionLockedUntil = this.scene.time.now + 820;
+    this.showAim(angle, 680, 0xb44861, 700);
+    const generation = this.attackIntentGeneration;
+    this.scene.time.delayedCall(650, () => {
+      if (!this.active || generation !== this.attackIntentGeneration || this.scene.time.now < this.phaseTransitionUntil) return;
+      this.markSignaturePattern();
+      for (let index = -2; index <= 2; index += 1) this.callbacks.shoot(this, this.x, this.y - 18, angle + index * .18, 220, 14, 'projectile-boss');
+    });
+    this.nextActionAt = this.scene.time.now + 1750;
   }
+
+  private editorPhaseTwo(hero: Phaser.Physics.Arcade.Sprite): void {
+    this.patternIndex += 1;
+    this.setVelocity(0); this.actionLockedUntil = this.scene.time.now + 1250;
+    const delayed = [
+      { x: hero.x, y: hero.y },
+      { x: Phaser.Math.Clamp(hero.x + Phaser.Math.Between(-95, 95), 92, 868), y: Phaser.Math.Clamp(hero.y + Phaser.Math.Between(-70, 70), 105, 478) },
+      { x: Phaser.Math.Clamp(hero.x + Phaser.Math.Between(-140, 140), 92, 868), y: Phaser.Math.Clamp(hero.y + Phaser.Math.Between(-105, 105), 105, 478) },
+    ];
+    const generation = this.attackIntentGeneration;
+    delayed.forEach((spot, index) => this.scene.time.delayedCall(index * 230, () => {
+      if (this.active && generation === this.attackIntentGeneration && this.scene.time.now >= this.phaseTransitionUntil) { this.markSignaturePattern(); this.bossCallbacks.inkZone(spot.x, spot.y, 54, 2600, 'erasure'); }
+    }));
+    this.nextActionAt = this.scene.time.now + 2100;
+  }
+
+  private editorPhaseThree(hero: Phaser.Physics.Arcade.Sprite): void {
+    this.patternIndex += 1;
+    if (this.patternIndex % 3 === 0) this.bossCallbacks.summon(3);
+    const angle = Phaser.Math.Angle.Between(this.x, this.y, hero.x, hero.y);
+    this.setVelocity(0); this.actionLockedUntil = this.scene.time.now + 780;
+    this.showAim(angle, 620, 0xa53d68, 650);
+    const generation = this.attackIntentGeneration;
+    this.scene.time.delayedCall(590, () => {
+      if (!this.active || generation !== this.attackIntentGeneration || this.scene.time.now < this.phaseTransitionUntil) return;
+      this.markSignaturePattern();
+      for (let index = -4; index <= 4; index += 1) this.callbacks.shoot(this, this.x, this.y - 16, angle + index * .14, 250 - Math.abs(index) * 10, 16, 'projectile-ink');
+    });
+    this.nextActionAt = this.scene.time.now + 1450;
+  }
+
+  public debugSetPhase(phase: 1 | 2 | 3): void {
+    if (phase !== this.phase + 1) return;
+    this.phaseIntegrity.markSignatureExecuted();
+    const current = this.phaseIntegrity.snapshot().phaseHealth;
+    this.takeDamage(current, 0, false, 'other');
+  }
+
+  private markSignaturePattern(): void {
+    if (!this.phaseIntegrity.markSignatureExecuted()) return;
+    const phase = this.phaseIntegrity.phaseDefinition();
+    this.bossCallbacks.signatureExecuted(phase.id, phase.signaturePattern);
+  }
+
+  public get definition(): BossDefinition { return this.bossDefinitionValue; }
+  public get phaseSnapshot(): BossPhaseSnapshot { return this.phaseIntegrity.snapshot(); }
+  public get phaseHealth(): number { return this.phaseIntegrity.snapshot().phaseHealth; }
+  public get phaseMaxHealth(): number { return this.phaseIntegrity.snapshot().phaseMaxHealth; }
 }
+
+export type BossArchetype = BossId;

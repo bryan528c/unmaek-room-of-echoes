@@ -1,7 +1,7 @@
 import type { GameSettings } from './SaveSystem';
 
 export type SoundName = 'slash' | 'slash1' | 'slash2' | 'slash3' | 'guardSlash' | 'echoBlade' | 'cut' | 'cutHit' | 'finisher' | 'hit' | 'dash' | 'warning' | 'parryOpen' | 'parry' | 'perfectParry' | 'sealGain' | 'bossVulnerable' | 'sentenceFull' | 'stop' | 'rewind' | 'link' | 'chain' | 'chainStop' | 'backflow' | 'damageRegression' | 'upgrade' | 'hurt' | 'critical' | 'phase' | 'victory' | 'defeat';
-export type AudioBus = 'ui' | 'combat' | 'music';
+export type AudioBus = 'ui' | 'combat' | 'music' | 'ambience';
 
 export interface AudioDiagnosticsSnapshot {
   contextState: AudioContextState | 'uninitialized';
@@ -11,11 +11,14 @@ export interface AudioDiagnosticsSnapshot {
   ui: number;
   combat: number;
   music: number;
+  ambience: number;
+  peakMeters: Readonly<Record<AudioBus, number>>;
   activeVoices: number;
+  limiterActive: boolean;
 }
 
 const UI_SOUNDS = new Set<SoundName>(['upgrade', 'sentenceFull', 'sealGain']);
-const BUS_GAIN: Readonly<Record<AudioBus, number>> = { ui: 0.86, combat: 1, music: 0.72 };
+const BUS_GAIN: Readonly<Record<AudioBus, number>> = { ui: 0.86, combat: 1, music: 0.72, ambience: 0.58 };
 export function soundBus(name: SoundName): AudioBus { return UI_SOUNDS.has(name) ? 'ui' : 'combat'; }
 
 const NOTES: Record<SoundName, readonly [number, number, OscillatorType, number]> = {
@@ -35,8 +38,13 @@ export class AudioSystem {
   private uiGain?: GainNode;
   private combatGain?: GainNode;
   private musicGain?: GainNode;
+  private ambienceGain?: GainNode;
+  private limiter?: DynamicsCompressorNode;
   private muted = false;
   private activeVoices = 0;
+  private readonly peakMeters: Record<AudioBus, { value: number; at: number }> = {
+    ui: { value: 0, at: 0 }, combat: { value: 0, at: 0 }, music: { value: 0, at: 0 }, ambience: { value: 0, at: 0 },
+  };
   private readonly lastPlayed = new Map<SoundName, number>();
 
   public constructor(private settings: GameSettings) {}
@@ -45,9 +53,11 @@ export class AudioSystem {
     if (!this.context) {
       this.context = new AudioContext();
       this.masterGain = this.context.createGain(); this.effectsGain = this.context.createGain();
-      this.uiGain = this.context.createGain(); this.combatGain = this.context.createGain(); this.musicGain = this.context.createGain();
+      this.uiGain = this.context.createGain(); this.combatGain = this.context.createGain(); this.musicGain = this.context.createGain(); this.ambienceGain = this.context.createGain();
+      this.limiter = this.context.createDynamicsCompressor();
+      this.limiter.threshold.value = -8; this.limiter.knee.value = 8; this.limiter.ratio.value = 8; this.limiter.attack.value = .003; this.limiter.release.value = .15;
       this.uiGain.connect(this.effectsGain); this.combatGain.connect(this.effectsGain);
-      this.effectsGain.connect(this.masterGain); this.musicGain.connect(this.masterGain); this.masterGain.connect(this.context.destination);
+      this.effectsGain.connect(this.masterGain); this.musicGain.connect(this.masterGain); this.ambienceGain.connect(this.masterGain); this.masterGain.connect(this.limiter).connect(this.context.destination);
       this.applyGainSettings();
     }
     if (this.context.state === 'suspended') void this.context.resume().catch(() => undefined);
@@ -59,6 +69,12 @@ export class AudioSystem {
   public get contextState(): AudioContextState | 'uninitialized' { return this.context?.state ?? 'uninitialized'; }
 
   public diagnostics(): AudioDiagnosticsSnapshot {
+    const now = performance.now();
+    const peakMeters = Object.fromEntries((Object.keys(this.peakMeters) as AudioBus[]).map((bus) => {
+      const sample = this.peakMeters[bus];
+      const decayed = sample.value * Math.exp(-Math.max(0, now - sample.at) / 650);
+      return [bus, decayed];
+    })) as Record<AudioBus, number>;
     return {
       contextState: this.contextState,
       muted: this.muted,
@@ -67,7 +83,10 @@ export class AudioSystem {
       ui: BUS_GAIN.ui,
       combat: BUS_GAIN.combat,
       music: BUS_GAIN.music,
+      ambience: BUS_GAIN.ambience,
+      peakMeters,
       activeVoices: this.activeVoices,
+      limiterActive: this.limiter !== undefined,
     };
   }
 
@@ -95,6 +114,7 @@ export class AudioSystem {
     if (target === 'ui') { this.play('upgrade'); return; }
     if (target === 'combat') { this.play('parry'); return; }
     if (target === 'music') { this.unlock(); this.playTone(174, 246, 'sine', 0.42, 'music', 0.1); return; }
+    if (target === 'ambience') { this.unlock(); this.playTone(92, 138, 'sine', 0.65, 'ambience', 0.08); return; }
     this.play(target);
   }
 
@@ -109,7 +129,9 @@ export class AudioSystem {
     gain.gain.exponentialRampToValueAtTime(Math.max(0.0002, volume), now + 0.012);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + length);
     const destination = bus === 'ui' ? this.uiGain : bus === 'music' ? this.musicGain : this.combatGain;
-    oscillator.connect(gain).connect(destination ?? this.effectsGain ?? ctx.destination);
+    const peak = this.peakMeters[bus]; peak.value = Math.max(peak.value, volume * BUS_GAIN[bus]); peak.at = performance.now();
+    const resolvedDestination = bus === 'ambience' ? this.ambienceGain : destination;
+    oscillator.connect(gain).connect(resolvedDestination ?? this.effectsGain ?? ctx.destination);
     this.activeVoices += 1;
     oscillator.addEventListener('ended', () => {
       this.activeVoices = Math.max(0, this.activeVoices - 1);
@@ -125,5 +147,6 @@ export class AudioSystem {
     this.uiGain?.gain.setTargetAtTime(BUS_GAIN.ui, now, 0.015);
     this.combatGain?.gain.setTargetAtTime(BUS_GAIN.combat, now, 0.015);
     this.musicGain?.gain.setTargetAtTime(BUS_GAIN.music, now, 0.015);
+    this.ambienceGain?.gain.setTargetAtTime(BUS_GAIN.ambience, now, 0.015);
   }
 }

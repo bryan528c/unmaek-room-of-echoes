@@ -74,7 +74,7 @@ export class RunSessionController {
 
   public shouldShowBossHud(runId: RunId, flowState: string, liveBossId?: string): boolean {
     return this.isCurrent(runId)
-      && flowState === 'COMBAT'
+      && flowState === 'BOSS_COMBAT'
       && this.bossState.active
       && this.bossState.id !== undefined
       && this.bossState.id === liveBossId;

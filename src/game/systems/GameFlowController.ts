@@ -1,11 +1,23 @@
 export type BaseGameFlowState =
+  | 'RUN_START'
+  | 'ACT_INTRO'
+  | 'WAVE_COMBAT'
+  | 'WAVE_CLEAR'
   | 'COMBAT'
   | 'ROUND_CLEAR'
   | 'REWARD_REVEAL'
   | 'REWARD_SELECT'
   | 'BOSS_TRANSITION'
+  | 'BOSS_INTRO'
+  | 'BOSS_COMBAT'
   | 'BOSS_DEFEATED'
+  | 'ACT_CLEAR'
+  | 'BOSS_REWARD'
+  | 'BOSS_REWARD_REVEAL'
+  | 'BOSS_REWARD_SELECT'
   | 'ACT_TRANSITION'
+  | 'MODIFIER_INTRO'
+  | 'RUN_OVER'
   | 'RESULT';
 
 export type GameFlowState = BaseGameFlowState | 'USER_PAUSED' | 'TAB_HIDDEN';
@@ -17,14 +29,26 @@ export interface FlowTransition {
 }
 
 const ALLOWED: Readonly<Record<BaseGameFlowState, readonly BaseGameFlowState[]>> = {
+  RUN_START: ['ACT_INTRO', 'WAVE_COMBAT', 'RESULT', 'RUN_OVER'],
+  ACT_INTRO: ['MODIFIER_INTRO', 'WAVE_COMBAT', 'RESULT', 'RUN_OVER'],
+  WAVE_COMBAT: ['WAVE_CLEAR', 'BOSS_INTRO', 'BOSS_TRANSITION', 'RESULT', 'RUN_OVER'],
+  WAVE_CLEAR: ['REWARD_REVEAL', 'MODIFIER_INTRO', 'WAVE_COMBAT', 'BOSS_INTRO', 'RESULT', 'RUN_OVER'],
   COMBAT: ['ROUND_CLEAR', 'BOSS_TRANSITION', 'BOSS_DEFEATED', 'ACT_TRANSITION', 'RESULT'],
   ROUND_CLEAR: ['REWARD_REVEAL', 'RESULT'],
   REWARD_REVEAL: ['REWARD_SELECT', 'RESULT'],
-  REWARD_SELECT: ['REWARD_REVEAL', 'COMBAT', 'BOSS_TRANSITION', 'RESULT'],
-  BOSS_TRANSITION: ['COMBAT', 'RESULT'],
-  BOSS_DEFEATED: ['RESULT'],
-  ACT_TRANSITION: ['COMBAT', 'RESULT'],
-  RESULT: ['COMBAT'],
+  REWARD_SELECT: ['REWARD_REVEAL', 'COMBAT', 'MODIFIER_INTRO', 'WAVE_COMBAT', 'BOSS_TRANSITION', 'BOSS_INTRO', 'ACT_TRANSITION', 'RESULT', 'RUN_OVER'],
+  BOSS_TRANSITION: ['COMBAT', 'BOSS_COMBAT', 'ACT_CLEAR', 'RESULT', 'RUN_OVER'],
+  BOSS_INTRO: ['BOSS_COMBAT', 'RESULT', 'RUN_OVER'],
+  BOSS_COMBAT: ['BOSS_TRANSITION', 'BOSS_DEFEATED', 'RESULT', 'RUN_OVER'],
+  BOSS_DEFEATED: ['RESULT', 'ACT_CLEAR'],
+  ACT_CLEAR: ['BOSS_REWARD_REVEAL', 'RESULT', 'RUN_OVER'],
+  BOSS_REWARD: ['BOSS_REWARD_REVEAL', 'ACT_TRANSITION', 'RESULT', 'RUN_OVER'],
+  BOSS_REWARD_REVEAL: ['BOSS_REWARD_SELECT', 'RESULT', 'RUN_OVER'],
+  BOSS_REWARD_SELECT: ['BOSS_REWARD_REVEAL', 'ACT_TRANSITION', 'RESULT', 'RUN_OVER'],
+  ACT_TRANSITION: ['ACT_INTRO', 'RESULT', 'RUN_OVER'],
+  MODIFIER_INTRO: ['WAVE_COMBAT', 'RESULT', 'RUN_OVER'],
+  RUN_OVER: ['RUN_START', 'RESULT'],
+  RESULT: ['COMBAT', 'RUN_START', 'WAVE_COMBAT'],
 };
 
 export class GameFlowController {
@@ -52,10 +76,11 @@ export class GameFlowController {
   public get lastTransition(): FlowTransition { return { ...this.transitionValue }; }
   public get isTabHidden(): boolean { return this.tabHidden; }
   public get isUserPaused(): boolean { return this.userPaused; }
-  public get allowsCombatInput(): boolean { return this.state === 'COMBAT'; }
-  public get allowsRewardInput(): boolean { return this.state === 'REWARD_SELECT'; }
-  public get allowsResultInput(): boolean { return this.state === 'RESULT'; }
-  public get allowsCombatSimulation(): boolean { return this.state === 'COMBAT'; }
+  public get allowsCombatInput(): boolean { return this.state === 'COMBAT' || this.state === 'WAVE_COMBAT' || this.state === 'BOSS_COMBAT'; }
+  public get allowsRewardInput(): boolean { return this.state === 'REWARD_SELECT' || this.state === 'BOSS_REWARD_SELECT'; }
+  public get allowsResultInput(): boolean { return this.state === 'RESULT' || this.state === 'RUN_OVER'; }
+  public get allowsCombatSimulation(): boolean { return this.state === 'COMBAT' || this.state === 'WAVE_COMBAT' || this.state === 'BOSS_COMBAT'; }
+  public get isCombatBaseState(): boolean { return this.base === 'COMBAT' || this.base === 'WAVE_COMBAT' || this.base === 'BOSS_COMBAT'; }
 
   public transition(next: BaseGameFlowState, now = 0): boolean {
     if (next === this.base) return true;

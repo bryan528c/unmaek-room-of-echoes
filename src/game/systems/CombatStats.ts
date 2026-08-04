@@ -1,11 +1,58 @@
 import type { ResonanceId, UpgradeId } from '../data/upgrades';
 import type { EnemyKind } from '../balance';
 import type { WordChainId, WordId } from './WordChainSystem';
+import { WORD_IDS, WORD_REACTIONS, type WordStateId } from './WordSystem';
 import type { FinisherChargeSource, FinisherStatus } from './CombatCoreSystem';
 
 export type DamageSource = 'melee' | 'projectile' | 'ink' | 'boss' | 'other';
-export type AgencyDamageSource = 'basicJ' | 'enhancedJ' | 'stop' | 'rewind' | 'link' | 'chain' | 'automatic';
+export type AgencyDamageSource = 'basicJ' | 'enhancedJ' | 'stop' | 'rewind' | 'link' | 'pull' | 'mark' | 'push' | 'chain' | 'automatic';
 export type AgencyMilestone = 'manualHit' | 'stop' | 'rewind' | 'link' | 'chain' | 'enhancedThird' | 'empowerReady';
+export type BaseDamageSource = 'echoBlade' | 'cut' | 'parry' | 'word' | 'other';
+export type EmpowerFailureReason = 'no-target' | 'no-stop-effect' | 'no-rewind-effect' | 'no-link-target' | 'stale-scope';
+
+export interface PlayerDamageRecord {
+  time: number;
+  attackerId: string;
+  attackerDisplayName?: string;
+  attackId: string;
+  patternName: string;
+  modifier?: string;
+  amount: number;
+  act: number;
+  wave: string;
+  x: number;
+  y: number;
+  parryable: boolean;
+}
+
+export interface CombatDamageEvent {
+  baseSource: BaseDamageSource;
+  sourceEntityId?: string;
+  skillId?: string;
+  modifierSourceIds?: readonly string[];
+  resonanceId?: ResonanceId;
+  amount: number;
+  runId: number;
+  actId: string;
+  recursiveDepth?: number;
+}
+
+export interface EmpoweredWordEffectResult {
+  damage?: number;
+  healing?: number;
+  statusApplications?: number;
+  movedDistance?: number;
+  durationApplications?: number;
+}
+
+/** A charged F-word is committed only after at least one observable effect. */
+export const empoweredWordEffectIsValid = (result: EmpoweredWordEffectResult): boolean => (
+  (result.damage ?? 0) > 0
+  || (result.healing ?? 0) > 0
+  || (result.statusApplications ?? 0) > 0
+  || (result.movedDistance ?? 0) > 1
+  || (result.durationApplications ?? 0) > 0
+);
 
 /**
  * Canonical per-upgrade/per-resonance contribution record.
@@ -95,6 +142,12 @@ export interface CombatStatsSnapshot {
   parryAttempts: number;
   parrySuccesses: number;
   perfectParries: number;
+  parryBreakdown: {
+    normalParries: number;
+    projectileReflections: number;
+    meleeCounters: number;
+    damage: number;
+  };
   dashes: number;
   wordUses: Record<WordId, number>;
   empowerUses: number;
@@ -106,6 +159,7 @@ export interface CombatStatsSnapshot {
   autoTargetChanges: number;
   manualTargetChanges: number;
   damageTakenByType: Record<DamageSource, number>;
+  recentPlayerDamage: PlayerDamageRecord[];
   bossPhaseTimes: Partial<Record<1 | 2 | 3, number>>;
   upgrades: Array<{ id: UpgradeId; stacks: number }>;
   lastComboDamage: number;
@@ -136,6 +190,7 @@ export interface CombatStatsSnapshot {
   upgradeContributions: Partial<Record<UpgradeId, CombatContributionRecord>>;
   resonanceContributions: Partial<Record<ResonanceId, CombatContributionRecord>>;
   invalidWordUses: Record<WordId, number>;
+  empoweredWordFailures: Record<WordId, Partial<Record<EmpowerFailureReason, number>>>;
   encounterTimes: Partial<Record<'wave-1' | 'wave-2' | 'wave-3' | 'boss', number>>;
   agency: {
     firstAt: Partial<Record<AgencyMilestone, number>>;
@@ -144,10 +199,18 @@ export interface CombatStatsSnapshot {
     damage: Record<AgencyDamageSource, number>;
     firstRound?: { duration: number; healthBeforeRecovery: number; healthAfterRecovery: number };
   };
-  damageAttribution: { echoBlade: number; cutParry: number; word: number; upgradeResonance: number };
+  damageAttribution: Record<BaseDamageSource, number>;
+  damageEventCount: number;
+  staleDamageEventsRejected: number;
+  reactionDamage: Record<WordChainId | 'cut-stopped' | 'cut-linked' | 'cut-marked' | 'cut-displaced', number>;
+  statusApplications: Record<WordStateId, number>;
+  equippedWords: WordId[];
 }
 
-const blankChains = (): Record<WordChainId, number> => ({ 'chain-stop': 0, backflow: 0, 'damage-regression': 0 });
+const blankChains = (): Record<WordChainId, number> => Object.fromEntries(WORD_REACTIONS.map((item) => [item.id, 0])) as Record<WordChainId, number>;
+const blankWords = (): Record<WordId, number> => Object.fromEntries(WORD_IDS.map((id) => [id, 0])) as Record<WordId, number>;
+const blankStatuses = (): Record<WordStateId, number> => Object.fromEntries((['STOPPED','ECHO','REWOUND','LINKED','ISOLATED','PULLED','COMPRESSED','MARKED','DISPLACED','EXPOSED','CUTTABLE'] as WordStateId[]).map((id) => [id, 0])) as Record<WordStateId, number>;
+const blankReactions = (): CombatStatsSnapshot['reactionDamage'] => ({ ...blankChains(), 'cut-stopped': 0, 'cut-linked': 0, 'cut-marked': 0, 'cut-displaced': 0 });
 
 const contributionValue = (value: number | undefined): number => Number.isFinite(value) ? Math.max(0, value ?? 0) : 0;
 
@@ -217,7 +280,13 @@ export class CombatStats {
   public enemyOutsideBounds(): void { this.data.enemiesOutsideBounds += 1; }
   public telegraphOutsideHit(): void { this.data.telegraphOutsideHits += 1; }
   public parryAttempt(): void { this.data.parryAttempts += 1; }
-  public parrySuccess(perfect: boolean): void { this.data.parrySuccesses += 1; if (perfect) this.data.perfectParries += 1; }
+  public parrySuccess(perfect: boolean, kind: 'projectile' | 'melee' = 'melee'): void {
+    this.data.parrySuccesses += 1;
+    if (perfect) this.data.perfectParries += 1;
+    else this.data.parryBreakdown.normalParries += 1;
+    if (kind === 'projectile') this.data.parryBreakdown.projectileReflections += 1;
+    else this.data.parryBreakdown.meleeCounters += 1;
+  }
   public dash(): void { this.data.dashes += 1; }
   public word(word: WordId): void { this.data.wordUses[word] += 1; }
   public empower(): void { this.data.empowerUses += 1; }
@@ -230,6 +299,9 @@ export class CombatStats {
     this.data.agency.damage.chain += value;
     this.data.damageAttribution.word += value;
   }
+  public reactionDamage(reaction: keyof CombatStatsSnapshot['reactionDamage'], amount: number): void { this.data.reactionDamage[reaction] += contributionValue(amount); }
+  public statusApplied(status: WordStateId, count = 1): void { this.data.statusApplications[status] += contributionValue(count); }
+  public setEquippedWords(words: readonly WordId[]): void { this.data.equippedWords = [...words]; }
   public targetChanged(manual: boolean): void { if (manual) this.data.manualTargetChanges += 1; else this.data.autoTargetChanges += 1; }
   public damageTaken(source: DamageSource, amount: number): void { this.data.damageTakenByType[source] += Math.max(0, amount); }
   public setBossPhaseTime(phase: 1 | 2 | 3, seconds: number): void { this.data.bossPhaseTimes[phase] = Math.max(0, seconds); }
@@ -293,22 +365,48 @@ export class CombatStats {
     const gained = Math.max(0, amount); this.data.finisher.chargesGained += gained; this.data.finisher.gainedBySource[source] += gained;
   }
   public invalidWord(word: WordId): void { this.data.invalidWordUses[word] += 1; }
+  public empoweredWordFailure(word: WordId, reason: EmpowerFailureReason): void {
+    const failures = this.data.empoweredWordFailures[word];
+    failures[reason] = (failures[reason] ?? 0) + 1;
+  }
   public setEncounterTime(encounter: 'wave-1' | 'wave-2' | 'wave-3' | 'boss', seconds: number): void { this.data.encounterTimes[encounter] = Math.max(0, seconds); }
   public agencyMilestone(name: AgencyMilestone, seconds: number): void { if (this.data.agency.firstAt[name] === undefined) this.data.agency.firstAt[name] = Math.max(0, seconds); }
   public agencyDamage(source: AgencyDamageSource, amount: number): void {
     const value = contributionValue(amount); this.data.agency.damage[source] += value;
     if (source === 'automatic') this.data.damageAttribution.echoBlade += value;
-    else if (source === 'basicJ' || source === 'enhancedJ') this.data.damageAttribution.cutParry += value;
+    else if (source === 'basicJ' || source === 'enhancedJ') this.data.damageAttribution.cut += value;
     else this.data.damageAttribution.word += value;
   }
   /** Records parry/reflection damage that has no legacy agency damage source. */
-  public parryDamage(amount: number): void { this.data.damageAttribution.cutParry += contributionValue(amount); }
+  public parryDamage(amount: number): void {
+    const value = contributionValue(amount);
+    this.data.damageAttribution.parry += value;
+    this.data.parryBreakdown.damage += value;
+  }
+  public playerDamage(record: PlayerDamageRecord): void {
+    this.data.recentPlayerDamage.push({ ...record, amount: contributionValue(record.amount) });
+    if (this.data.recentPlayerDamage.length > 3) this.data.recentPlayerDamage.splice(0, this.data.recentPlayerDamage.length - 3);
+  }
   /**
    * Records standalone card/resonance damage only. Damage already reported via
    * `agencyDamage` remains attributed to that originating combat action so the
    * four result-screen buckets stay mutually exclusive.
    */
-  public attributedUpgradeDamage(amount: number): void { this.data.damageAttribution.upgradeResonance += contributionValue(amount); }
+  public attributedUpgradeDamage(_amount: number): void {
+    // UPGRADE-04R2: card/resonance damage is an overlapping contribution axis.
+    // It must not be inserted into the mutually-exclusive base damage buckets.
+  }
+  public damageEvent(event: CombatDamageEvent, expectedRunId = event.runId, expectedActId = event.actId): boolean {
+    if (event.runId !== expectedRunId || event.actId !== expectedActId) {
+      this.data.staleDamageEventsRejected += 1;
+      return false;
+    }
+    if ((event.recursiveDepth ?? 0) > 1) return false;
+    const amount = contributionValue(event.amount);
+    this.data.damageAttribution[event.baseSource] += amount;
+    this.data.damageEventCount += 1;
+    return true;
+  }
   public firstRound(duration: number, healthBeforeRecovery: number, healthAfterRecovery: number): void { this.data.agency.firstRound = { duration: Math.max(0, duration), healthBeforeRecovery, healthAfterRecovery }; }
   public snapshot(): CombatStatsSnapshot { return structuredClone(this.data); }
 
@@ -317,9 +415,10 @@ export class CombatStats {
       jInputs: 0, attackAttempts: 0, attackHits: 0, combosStarted: 0, combosCompleted: 0, comboFinishes: 0,
       nearbyMisses: 0, comboTargetChanges: 0, noTargetSelections: 0, outOfRangeSelections: 0,
       upperBoundaryCorrections: 0, enemiesOutsideBounds: 0, telegraphOutsideHits: 0,
-      parryAttempts: 0, parrySuccesses: 0, perfectParries: 0, dashes: 0,
-      wordUses: { stop: 0, rewind: 0, link: 0 }, empowerUses: 0, empoweredWordUses: { stop: 0, rewind: 0, link: 0 }, chainCounts: blankChains(), chainAttempts: blankChains(), chainFallbacks: blankChains(), chainDamage: blankChains(),
-      autoTargetChanges: 0, manualTargetChanges: 0, damageTakenByType: { melee: 0, projectile: 0, ink: 0, boss: 0, other: 0 },
+      parryAttempts: 0, parrySuccesses: 0, perfectParries: 0,
+      parryBreakdown: { normalParries: 0, projectileReflections: 0, meleeCounters: 0, damage: 0 }, dashes: 0,
+      wordUses: blankWords(), empowerUses: 0, empoweredWordUses: blankWords(), chainCounts: blankChains(), chainAttempts: blankChains(), chainFallbacks: blankChains(), chainDamage: blankChains(),
+      autoTargetChanges: 0, manualTargetChanges: 0, damageTakenByType: { melee: 0, projectile: 0, ink: 0, boss: 0, other: 0 }, recentPlayerDamage: [],
       bossPhaseTimes: {}, upgrades: [],
       lastComboDamage: 0, maximumComboDamage: 0, ttkByKind: {}, maximumParryExtraDistance: 0, resultTransitions: 0,
       defensiveSlash: { attempts: 0, hits: 0, damage: 0 },
@@ -334,9 +433,15 @@ export class CombatStats {
       linkContribution: { sharedDamage: 0, isolatedBonusDamage: 0, explosionDamage: 0 },
       rewindContribution: { healthRecovered: 0, echoDamage: 0 },
       upgradeContributions: {}, resonanceContributions: {},
-      invalidWordUses: { stop: 0, rewind: 0, link: 0 }, encounterTimes: {},
-      agency: { firstAt: {}, rejectedChargeInputs: 0, rejectedTargetInputs: 0, damage: { basicJ: 0, enhancedJ: 0, stop: 0, rewind: 0, link: 0, chain: 0, automatic: 0 } },
-      damageAttribution: { echoBlade: 0, cutParry: 0, word: 0, upgradeResonance: 0 },
+      invalidWordUses: blankWords(),
+      empoweredWordFailures: Object.fromEntries(WORD_IDS.map((id) => [id, {}])) as Record<WordId, Partial<Record<EmpowerFailureReason, number>>>, encounterTimes: {},
+      agency: { firstAt: {}, rejectedChargeInputs: 0, rejectedTargetInputs: 0, damage: { basicJ: 0, enhancedJ: 0, stop: 0, rewind: 0, link: 0, pull: 0, mark: 0, push: 0, chain: 0, automatic: 0 } },
+      damageAttribution: { echoBlade: 0, cut: 0, parry: 0, word: 0, other: 0 },
+      damageEventCount: 0,
+      staleDamageEventsRejected: 0,
+      reactionDamage: blankReactions(),
+      statusApplications: blankStatuses(),
+      equippedWords: [...WORD_IDS.slice(0, 3)],
     };
   }
 }

@@ -4,6 +4,7 @@ export type TimePauseReason =
   | 'TAB_HIDDEN'
   | 'BOSS_TRANSITION'
   | 'BOSS_DEFEATED'
+  | 'DEATH_SLOWMO'
   | 'HITSTOP'
   | 'SCENE_TRANSITION'
   | 'RESULT';
@@ -168,6 +169,7 @@ export class TimeControlService {
     const hardPaused = [...reasons].some((reason) => HARD_REASONS.has(reason));
     const bossTransition = reasons.has('BOSS_TRANSITION');
     const bossDefeated = reasons.has('BOSS_DEFEATED');
+    const deathSlowmo = reasons.has('DEATH_SLOWMO') && !hardPaused;
     const cinematicPause = bossTransition || bossDefeated;
     const hitstop = reasons.has('HITSTOP') && !hardPaused && !cinematicPause;
     // Arcade World.timeScale is inverse (0.5 is double speed), so applying the
@@ -175,10 +177,10 @@ export class TimeControlService {
     // real-time hitstop pauses Arcade Physics instead; World.update then returns
     // before accumulating elapsed time, preventing a catch-up burst on resume.
     const nextPaused = hardPaused || cinematicPause || hitstop;
-    const nextGameTimeScale = hardPaused ? 0 : hitstop ? 0.08 : 1;
-    const nextPhysicsScale = 1;
-    const nextTweenScale = hardPaused ? 0 : hitstop ? 0.18 : 1;
-    const nextAnimationScale = hardPaused ? 0 : hitstop ? 0.18 : 1;
+    const nextGameTimeScale = hardPaused ? 0 : hitstop ? 0.08 : deathSlowmo ? 0.28 : 1;
+    const nextPhysicsScale = deathSlowmo ? 0.28 : 1;
+    const nextTweenScale = hardPaused ? 0 : hitstop ? 0.18 : deathSlowmo ? 0.35 : 1;
+    const nextAnimationScale = hardPaused ? 0 : hitstop ? 0.18 : deathSlowmo ? 0.35 : 1;
 
     if (nextGameTimeScale !== this.gameTimeScale) { this.gameTimeScale = nextGameTimeScale; this.adapter.setGameTimeScale(nextGameTimeScale); }
     if (nextPhysicsScale !== this.physicsScale) { this.physicsScale = nextPhysicsScale; this.adapter.setPhysicsScale(nextPhysicsScale); }

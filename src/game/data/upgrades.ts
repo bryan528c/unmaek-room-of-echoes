@@ -1,10 +1,13 @@
 export type UpgradeRarity = '일반' | '희귀' | '전설';
 export type UpgradeCategory = 'echo-blade' | 'cut-parry' | 'word' | 'survival' | 'generic';
 export type UpgradeStackMode = 'additive' | 'unique';
+import type { WordId } from '../systems/WordSystem';
+
 export type UpgradeTriggerType =
   | 'echo-hit' | 'cut-hit' | 'dash-cut' | 'parry' | 'perfect-parry'
   | 'stop-end' | 'rewind' | 'link-death' | 'word-chain' | 'word-hit'
-  | 'empowered-word' | 'first-hit' | 'reflected-projectile';
+  | 'empowered-word' | 'first-hit' | 'reflected-projectile'
+  | 'pull-end' | 'mark-explosion' | 'collision' | 'push-guard';
 
 export type UpgradeId =
   | 'afterimage-slash' | 'dragon-fang' | 'broken-sentence' | 'regression-blade'
@@ -15,9 +18,12 @@ export type UpgradeId =
   | 'dual-moon-echo' | 'wide-orbit' | 'cut-sentence' | 'backflow-blade'
   | 'returning-scar' | 'isolation-chain'
   | 'perfect-counter' | 'counter-inscription' | 'link-contagion' | 'rewind-breath'
-  | 'echo-harvest' | 'sentence-overcharge' | 'rupture-step';
+  | 'echo-harvest' | 'sentence-overcharge' | 'rupture-step'
+  | 'gravity-inscription' | 'captured-projectile' | 'deep-mark'
+  | 'contagious-mark' | 'recoil-ripple' | 'headwind-veil';
 
-export type ResonanceId = 'moon-ring' | 'time-undertow' | 'counter-cut' | 'regression-chain';
+export type ResonanceId = 'moon-ring' | 'time-undertow' | 'counter-cut' | 'regression-chain'
+  | 'compression-seal' | 'mark-chain' | 'reversal-burst';
 
 export interface UpgradeIcon {
   glyph: string;
@@ -49,6 +55,7 @@ export interface UpgradeDefinition {
   behaviorChange: boolean;
   active: boolean;
   survival?: boolean;
+  requiredWordIds?: readonly WordId[];
   auditNote?: string;
 }
 
@@ -91,6 +98,12 @@ function text(input: Pick<UpgradeDefinition, 'id' | 'baseValues' | 'maxStacks'>,
     case 'rupture-step': return `대시 후 ${(n('window') / 1000).toFixed(1)}초 내 J 절단이 전방 파동 피해 ${n('damage') * stack}를 추가한다.`;
     case 'sealed-sentence': return `언령 재사용 대기시간 -${Math.round(n('cooldownReduction') * stack * 100)}%, 언령 적중 문장력 +${Math.round(n('gainBonus') * stack * 100)}%.`;
     case 'fragment-recovery': return `반사 탄환 적중 시 체력 ${n('heal') * stack} 회복.`;
+    case 'gravity-inscription': return `당긴다 범위 +${Math.round(n('range') * stack * 100)}%, 지속 +${Math.round(n('duration') * stack)}ms. 종료 시 압축 파동 피해 ${n('damage') * stack}.`;
+    case 'captured-projectile': return `당긴다가 포획한 탄환을 최대 ${n('count') * stack}개까지 적에게 방출한다.`;
+    case 'deep-mark': return `각인 최대 스택 +${n('stacks') * stack}, 각인 폭발 피해 +${n('damage') * stack}.`;
+    case 'contagious-mark': return `각인 대상 사망 시 가까운 적 ${n('targets')}명에게 ${Math.round(n('duration'))}ms 각인을 전염한다.`;
+    case 'recoil-ripple': return `밀려난 적의 충돌 시 파동 피해 ${n('damage') * stack}, 반경 ${n('radius')}.`;
+    case 'headwind-veil': return `밀어낸다 후 ${Math.round(n('duration'))}ms 동안 받는 피해 -${Math.round(n('reduction') * stack * 100)}%.`;
     case 'afterimage-slash': return `비활성: 파열의 발걸음으로 통합됨.`;
     case 'dragon-fang': return `비활성: 반복 절단 치명타는 상태 절단 역할과 충돌함.`;
     case 'broken-sentence': return `비활성: 절단 문장으로 통합됨.`;
@@ -134,6 +147,9 @@ export const RESONANCES: readonly ResonanceDefinition[] = [
   { id: 'time-undertow', name: '시간 역조', requiredUpgradeIds: ['backflow-blade', 'stop-resonance'], description: '멎는다 종료 시 정지 탄환 일부가 원래 발사자에게 한 번 역류한다.', icon: { glyph: '逆', color: '#73d6e8' } },
   { id: 'counter-cut', name: '반격 절문', requiredUpgradeIds: ['perfect-counter', 'cut-sentence'], description: '완벽 패링 직후 절단은 상태가 없어도 작은 비문 파열을 일으킨다.', icon: { glyph: '斷', color: '#b4f3db' } },
   { id: 'regression-chain', name: '회귀 사슬', requiredUpgradeIds: ['returning-scar', 'isolation-chain'], description: '되돌린다 잔상 절단이 고립 연결에 강해지고 다중 연결에는 일부 공유된다.', icon: { glyph: '廻', color: '#68cde2' } },
+  { id: 'compression-seal', name: '압축 인장', requiredUpgradeIds: ['gravity-inscription', 'stop-resonance'], description: '당긴다 종료 시 압축 대상에 짧은 정지 파동이 발생한다.', icon: { glyph: '壓', color: '#8edfd4' } },
+  { id: 'mark-chain', name: '각인 사슬', requiredUpgradeIds: ['deep-mark', 'link-contagion'], description: '연결된 대상 사이로 각인 스택이 한 번 공유된다.', icon: { glyph: '刻', color: '#a1e8ce' } },
+  { id: 'reversal-burst', name: '반전 폭발', requiredUpgradeIds: ['captured-projectile', 'recoil-ripple'], description: '압축 폭발 시 포획 탄환과 충돌 파동이 함께 방출된다.', icon: { glyph: '反', color: '#88d8e9' } },
 ] as const;
 
 export const UPGRADES: readonly UpgradeDefinition[] = [
@@ -155,6 +171,12 @@ export const UPGRADES: readonly UpgradeDefinition[] = [
   active({ id: 'rupture-step', name: '파열의 발걸음', category: 'cut-parry', tags: ['dash', 'cut', 'wave'], rarity: '희귀', maxStacks: 2, relatedKey: 'Space → J', baseValues: { window: 1800, damage: 10, range: 142 }, triggerTypes: ['dash-cut'], icon: { glyph: '步', color: '#9ae5d1' }, behaviorChange: true }),
   active({ id: 'sealed-sentence', name: '봉인된 문장', category: 'generic', tags: ['resource', 'word', 'cooldown'], rarity: '일반', maxStacks: 3, relatedKey: 'Q · E · R', baseValues: { cooldownReduction: .06, gainBonus: .15 }, triggerTypes: ['word-hit'], icon: { glyph: '封', color: '#9ac8bd' }, behaviorChange: false }),
   active({ id: 'fragment-recovery', name: '파편 회수', category: 'survival', tags: ['projectile', 'survival', 'healing'], rarity: '희귀', maxStacks: 2, relatedKey: 'K · Q', survival: true, baseValues: { heal: 4 }, triggerTypes: ['reflected-projectile'], icon: { glyph: '片', color: '#82cfc0' }, behaviorChange: true }),
+  active({ id: 'gravity-inscription', name: '중력 비문', category: 'word', tags: ['word', 'pull', 'compressed'], rarity: '희귀', maxStacks: 2, relatedKey: '당긴다', requiredWordIds: ['pull'], baseValues: { range: .14, duration: 180, damage: 8 }, triggerTypes: ['pull-end'], synergyIds: ['compression-seal'], icon: { glyph: '引', color: '#82d8d1' }, behaviorChange: true }),
+  active({ id: 'captured-projectile', name: '포획된 탄환', category: 'word', tags: ['word', 'pull', 'projectile'], rarity: '전설', maxStacks: 1, relatedKey: '당긴다', requiredWordIds: ['pull'], baseValues: { count: 4, damageRatio: .7 }, triggerTypes: ['pull-end', 'reflected-projectile'], synergyIds: ['reversal-burst'], icon: { glyph: '捕', color: '#7bd7e7' }, behaviorChange: true }),
+  active({ id: 'deep-mark', name: '깊은 각인', category: 'word', tags: ['word', 'mark', 'burst'], rarity: '희귀', maxStacks: 2, relatedKey: '새긴다', requiredWordIds: ['mark'], baseValues: { stacks: 1, damage: 10 }, triggerTypes: ['mark-explosion'], synergyIds: ['mark-chain'], icon: { glyph: '深', color: '#9fe1c9' }, behaviorChange: true }),
+  active({ id: 'contagious-mark', name: '전염 각인', category: 'word', tags: ['word', 'mark', 'spread'], rarity: '희귀', maxStacks: 1, relatedKey: '새긴다', requiredWordIds: ['mark'], baseValues: { targets: 2, duration: 3200 }, triggerTypes: ['mark-explosion', 'link-death'], icon: { glyph: '染', color: '#a4dfc2' }, behaviorChange: true }),
+  active({ id: 'recoil-ripple', name: '반동 파문', category: 'word', tags: ['word', 'push', 'collision'], rarity: '희귀', maxStacks: 2, relatedKey: '밀어낸다', requiredWordIds: ['push'], baseValues: { damage: 9, radius: 68 }, triggerTypes: ['collision'], synergyIds: ['reversal-burst'], icon: { glyph: '震', color: '#93d9e8' }, behaviorChange: true }),
+  active({ id: 'headwind-veil', name: '역풍 장막', category: 'survival', tags: ['word', 'push', 'survival'], rarity: '일반', maxStacks: 2, relatedKey: '밀어낸다', requiredWordIds: ['push'], survival: true, baseValues: { reduction: .14, duration: 1300 }, triggerTypes: ['push-guard', 'reflected-projectile'], icon: { glyph: '幕', color: '#91cbd8' }, behaviorChange: true }),
 
   inactive({ id: 'afterimage-slash', name: '잔상 베기', category: 'cut-parry', tags: ['blade', 'dash'], rarity: '희귀', maxStacks: 2, relatedKey: 'Space', baseValues: { damageRatio: .45, perStack: .18 }, auditNote: '파열의 발걸음으로 통합' }),
   inactive({ id: 'dragon-fang', name: '용의 이빨', category: 'cut-parry', tags: ['blade'], rarity: '희귀', maxStacks: 3, relatedKey: 'J', baseValues: { chance: .22, multiplier: 1.75 }, auditNote: '상태 절단의 역할을 흐리는 무조건 치명타' }),

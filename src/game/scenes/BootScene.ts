@@ -66,6 +66,18 @@ export class BootScene extends Phaser.Scene {
     g.fillStyle(0xee674b).fillCircle(36, 25, 5).fillCircle(60, 25, 5).fillRect(34, 50, 28, 6);
     g.fillStyle(0x5fc5b4, 0.8).fillTriangle(25, 77, 48, 94, 72, 75).fillCircle(48, 61, 9); g.fillStyle(0x071012).fillCircle(48, 61, 4);
     g.generateTexture('enemy-boss', 96, 108); g.destroy();
+
+    // 기록 편집자: 포식자의 덩어리형 몸체와 달리 분리된 기록판,
+    // 펜촉, 교정선을 사용해 중간 충실도 단계에서도 실루엣을 구분한다.
+    const editor = this.make.graphics({ x: 0, y: 0 });
+    editor.fillStyle(0x0d0b12).fillRoundedRect(17, 12, 62, 22, 4).fillRoundedRect(8, 40, 80, 20, 3).fillRoundedRect(20, 68, 58, 20, 3);
+    editor.fillStyle(0x35233f, .94).fillRect(22, 17, 52, 12).fillRect(14, 45, 68, 10).fillRect(26, 73, 46, 10);
+    editor.lineStyle(3, 0xc74955, .9).lineBetween(8, 35, 87, 18).lineBetween(10, 66, 86, 47).lineBetween(21, 94, 76, 74);
+    editor.lineStyle(2, 0xd57a91, .65).strokeRect(17, 12, 62, 22).strokeRect(8, 40, 80, 20).strokeRect(20, 68, 58, 20);
+    editor.fillStyle(0xd75655).fillCircle(33, 26, 4).fillCircle(63, 26, 4);
+    editor.fillStyle(0x70d6c4, .9).fillCircle(48, 54, 10); editor.fillStyle(0x091315).fillCircle(48, 54, 4);
+    editor.fillStyle(0x130e19).fillTriangle(38, 88, 58, 88, 48, 108); editor.lineStyle(3, 0xbda1be).lineBetween(48, 87, 48, 104);
+    editor.generateTexture('enemy-boss-editor', 96, 108); editor.destroy();
   }
 
   private makeProjectiles(): void {

@@ -39,3 +39,51 @@ export function createArchiveArena(scene: Phaser.Scene, dim = false): Phaser.Gam
   container.add(vignette);
   return container;
 }
+
+export function createInkArchiveArena(scene: Phaser.Scene, endlessAct = 0): Phaser.GameObjects.Container {
+  const container = scene.add.container(0, 0).setDepth(0);
+  const graphics = scene.add.graphics();
+  graphics.fillStyle(endlessAct > 0 ? 0x100b18 : 0x0d0b15).fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+  graphics.fillStyle(0x171421).fillRoundedRect(12, 18, 936, 510, 18);
+  graphics.lineStyle(4, 0x4d3555, .85).strokeRoundedRect(12, 18, 936, 510, 18);
+  // Collapsed vertical shelving gives this arena a different silhouette from
+  // the brick-like inheritance room while preserving a quiet combat center.
+  for (let side = 0; side < 2; side += 1) for (let index = 0; index < 7; index += 1) {
+    const x = side === 0 ? 24 + index * 18 : 918 - index * 18;
+    const top = 45 + (index % 3) * 19;
+    graphics.fillStyle(index % 2 ? 0x29202f : 0x211b2b, .92).fillRect(x, top, 12, 438 - index * 12);
+    graphics.lineStyle(1, 0x6a476f, .3).lineBetween(x + 3, top + 14, x + 9, 450 - index * 7);
+  }
+  graphics.fillStyle(0x291a34, .34);
+  for (let index = 0; index < 10; index += 1) {
+    const x = 145 + (index * 137) % 690; const y = 82 + (index * 89) % 355;
+    graphics.fillEllipse(x, y, 45 + index % 4 * 14, 14 + index % 3 * 5);
+  }
+  graphics.lineStyle(2, 0x76527d, .24);
+  for (let index = 0; index < 9; index += 1) {
+    const x = 120 + index * 88;
+    graphics.lineBetween(x, 38, x + (index % 2 ? 34 : -22), 122 + index % 3 * 28);
+    graphics.lineBetween(x + 12, 420 - index % 2 * 35, x - 15, 515);
+  }
+  container.add(graphics);
+
+  const glyphs = ['刪', '校', '綴', '裂', '墨', '稿'];
+  glyphs.forEach((glyph, index) => container.add(scene.add.text(160 + index * 126, index % 2 ? 435 : 82, glyph, {
+    fontFamily: 'serif', fontSize: `${22 + (index % 2) * 5}px`, color: '#8e6a98',
+  }).setAlpha(.22).setRotation(index % 2 ? -.12 : .09)));
+  for (let index = 0; index < 24; index += 1) {
+    const x = 70 + (index * 157) % 835; const y = 66 + (index * 113) % 420;
+    const paper = scene.add.rectangle(x, y, 8 + index % 4 * 6, 24 + index % 3 * 8, 0xd3c4c1, .08)
+      .setRotation((index % 7 - 3) * .2);
+    container.add(paper);
+  }
+  if (endlessAct > 0) {
+    const seal = scene.add.text(480, 270, `ACT ${endlessAct}`, { fontFamily: 'Georgia, serif', fontSize: '58px', color: '#76527d' })
+      .setOrigin(.5).setAlpha(.08).setRotation(-.08);
+    container.add(seal);
+  }
+  const vignette = scene.add.graphics();
+  for (let index = 0; index < 8; index += 1) vignette.lineStyle(24, 0x030206, .04 + index * .012).strokeRoundedRect(12 + index * 8, 12 + index * 6, 936 - index * 16, 516 - index * 12, 30);
+  container.add(vignette);
+  return container;
+}
