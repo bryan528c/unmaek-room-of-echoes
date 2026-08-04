@@ -1,4 +1,6 @@
-export type BossId = 'record-devourer' | 'record-editor';
+import { bossDisplayName, bossPhaseDisplayName, resolveBossPhaseState, runtimeTextureKey } from '../runtime/SubmissionRuntime';
+
+export type BossId = 'record-devourer' | 'record-editor' | 'resonance_goral' | 'diffraction_pangolin' | 'channel_otter_mother';
 export type BossPhaseId = 1 | 2 | 3;
 
 export interface BossPhaseDefinition {
@@ -24,6 +26,36 @@ export interface BossDefinition {
 }
 
 const DEFINITIONS: Readonly<Record<BossId, BossDefinition>> = {
+  resonance_goral: {
+    bossId: 'resonance_goral', displayName: bossDisplayName('resonance_goral'),
+    silhouetteKey: runtimeTextureKey(resolveBossPhaseState('resonance_goral', 1).assetFile), paletteKey: 'devourer',
+    telegraphStyle: 'devour', defeatSequence: 'release-records', rewardTable: 'act-boss',
+    phaseDefinitions: [
+      { id: 1, displayName: bossPhaseDisplayName('resonance_goral', 1), signaturePattern: 'devouring-volley', guide: '영역 경고를 보고 직선 사격과 돌진을 흘려낸다.', healthScale: .34, minimumActiveMs: 1800 },
+      { id: 2, displayName: bossPhaseDisplayName('resonance_goral', 2), signaturePattern: 'ink-memory', guide: '반향이 열린 동안 원형 위험 지대를 피해 반격한다.', healthScale: .33, minimumActiveMs: 2200 },
+      { id: 3, displayName: bossPhaseDisplayName('resonance_goral', 3), signaturePattern: 'linked-hunger', guide: '길 복구가 끝날 때까지 소환체와 산양을 분리한다.', healthScale: .33, minimumActiveMs: 4200 },
+    ],
+  },
+  diffraction_pangolin: {
+    bossId: 'diffraction_pangolin', displayName: bossDisplayName('diffraction_pangolin'),
+    silhouetteKey: runtimeTextureKey(resolveBossPhaseState('diffraction_pangolin', 1).assetFile), paletteKey: 'editor',
+    telegraphStyle: 'correction', defeatSequence: 'assemble-pages', rewardTable: 'act-boss',
+    phaseDefinitions: [
+      { id: 1, displayName: bossPhaseDisplayName('diffraction_pangolin', 1), signaturePattern: 'correction-lines', guide: '기존 교정선과 돌진 예고를 보고 측면으로 흘려낸다.', healthScale: .38, minimumActiveMs: 2000 },
+      { id: 2, displayName: bossPhaseDisplayName('diffraction_pangolin', 2), signaturePattern: 'past-erasure', guide: '기존 원형 위험 지대와 과거 위치 공격 사이를 비운다.', healthScale: .40, minimumActiveMs: 2600 },
+      { id: 3, displayName: bossPhaseDisplayName('diffraction_pangolin', 3), signaturePattern: 'archive-reassembly', guide: '기존 소환체를 정리하며 회절비늘 천산갑을 분리한다.', healthScale: .42, minimumActiveMs: 4200 },
+    ],
+  },
+  channel_otter_mother: {
+    bossId: 'channel_otter_mother', displayName: bossDisplayName('channel_otter_mother'),
+    silhouetteKey: runtimeTextureKey(resolveBossPhaseState('channel_otter_mother', 1).assetFile), paletteKey: 'devourer',
+    telegraphStyle: 'devour', defeatSequence: 'release-records', rewardTable: 'act-boss',
+    phaseDefinitions: [
+      { id: 1, displayName: bossPhaseDisplayName('channel_otter_mother', 1), signaturePattern: 'devouring-volley', guide: '기존 직선 탄환과 돌진 예고를 보고 수로의 빈 공간으로 흘린다.', healthScale: .34, minimumActiveMs: 1800 },
+      { id: 2, displayName: bossPhaseDisplayName('channel_otter_mother', 2), signaturePattern: 'ink-memory', guide: '기존 원형 Telegraph 사이에서 수류막이 열린 때를 노린다.', healthScale: .33, minimumActiveMs: 2200 },
+      { id: 3, displayName: bossPhaseDisplayName('channel_otter_mother', 3), signaturePattern: 'linked-hunger', guide: '기존 spawn 지점의 흐름턱 게를 정리하며 수달어미를 분리한다.', healthScale: .33, minimumActiveMs: 4200 },
+    ],
+  },
   'record-devourer': {
     bossId: 'record-devourer', displayName: '기록 포식자', silhouetteKey: 'enemy-boss', paletteKey: 'devourer',
     telegraphStyle: 'devour', defeatSequence: 'release-records', rewardTable: 'act-boss',

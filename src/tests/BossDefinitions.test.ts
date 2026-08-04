@@ -21,6 +21,38 @@ describe('BossDefinition and phase integrity', () => {
     expect(() => getBossDefinition('missing-boss')).toThrow(/Unknown bossId/);
   });
 
+  it('maps the Act 2 pangolin onto the existing editor phase grammar', () => {
+    const pangolin = getBossDefinition('diffraction_pangolin');
+    const editor = getBossDefinition('record-editor');
+    expect(pangolin.displayName).toBe('회절비늘 천산갑');
+    expect(pangolin.paletteKey).toBe('editor');
+    expect(pangolin.phaseDefinitions.map((phase) => phase.signaturePattern)).toEqual(
+      editor.phaseDefinitions.map((phase) => phase.signaturePattern),
+    );
+    expect(pangolin.phaseDefinitions.map((phase) => phase.healthScale)).toEqual(
+      editor.phaseDefinitions.map((phase) => phase.healthScale),
+    );
+    expect(pangolin.phaseDefinitions.map((phase) => phase.minimumActiveMs)).toEqual(
+      editor.phaseDefinitions.map((phase) => phase.minimumActiveMs),
+    );
+  });
+
+  it('maps the Act 3 otter mother onto the existing devourer phase grammar', () => {
+    const otter = getBossDefinition('channel_otter_mother');
+    const devourer = getBossDefinition('record-devourer');
+    expect(otter.displayName).toBe('유로맥 수달어미');
+    expect(otter.paletteKey).toBe('devourer');
+    expect(otter.phaseDefinitions.map((phase) => phase.signaturePattern)).toEqual(
+      devourer.phaseDefinitions.map((phase) => phase.signaturePattern),
+    );
+    expect(otter.phaseDefinitions.map((phase) => phase.healthScale)).toEqual(
+      devourer.phaseDefinitions.map((phase) => phase.healthScale),
+    );
+    expect(otter.phaseDefinitions.map((phase) => phase.minimumActiveMs)).toEqual(
+      devourer.phaseDefinitions.map((phase) => phase.minimumActiveMs),
+    );
+  });
+
   it('holds at one HP until the representative pattern executes', () => {
     const integrity = new BossPhaseIntegrity(getBossDefinition('record-devourer'), 900, 0);
     const result = integrity.applyDamage(99_999);

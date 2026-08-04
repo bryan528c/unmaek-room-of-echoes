@@ -14,6 +14,7 @@ export const DEPTH = {
   target: 170,
   characterBase: 200,
   rewind: 190,
+  foreground: 745,
   melee: 760,
   projectile: 780,
   word: 800,

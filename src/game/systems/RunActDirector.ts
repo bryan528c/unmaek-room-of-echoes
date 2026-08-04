@@ -1,10 +1,12 @@
 import type { EnemyKind } from '../balance';
 import type { RunId } from './RunSessionController';
+import type { BossId } from './BossDefinitions';
+import { actDisplayName, bossDisplayName, creatureDisplayName } from '../runtime/SubmissionRuntime';
 
 export type ActThemeId = 'echo-room' | 'ink-archive' | 'endless-echo' | 'endless-ink';
 export type ActPatternId = 'archive-baseline' | 'ink-echo-projectile' | 'stitch-pair' | 'past-position' | 'mixed-archive';
 export type EndlessModifierId = 'projectile-echo' | 'stitched-armor' | 'time-rift' | 'linked-swarm' | 'parry-vulnerable' | 'ink-floor' | 'empowered-elites' | 'accelerated-record';
-export type ActBossId = 'record-devourer' | 'record-editor';
+export type ActBossId = BossId;
 
 export interface ActWaveDefinition {
   label: string;
@@ -62,16 +64,22 @@ export interface RunActSnapshot {
 }
 
 const actOneWaves: readonly ActWaveDefinition[] = [
-  { label: '제1전투 · 잿빛 추적자', batches: [['chaser', 'chaser'], ['chaser', 'archer']], patterns: ['archive-baseline'], reward: true },
-  { label: '제2전투 · 먹빛 사선', batches: [['archer', 'ink'], ['archer', 'ink', 'chaser']], patterns: ['archive-baseline'], reward: true },
-  { label: '제3전투 · 봉합된 문장', batches: [['elite', 'chaser'], ['archer', 'ink', 'chaser']], patterns: ['archive-baseline'], reward: true },
+  { label: `${creatureDisplayName('rewind_lizard')} · ${creatureDisplayName('deflect_bat')}`, batches: [['chaser', 'chaser'], ['chaser', 'archer']], patterns: ['archive-baseline'], reward: true },
+  { label: `${creatureDisplayName('deflect_bat')} · ${creatureDisplayName('mineral_spider')}`, batches: [['archer', 'ink'], ['archer', 'ink', 'chaser']], patterns: ['archive-baseline'], reward: true },
+  { label: `${creatureDisplayName('mineral_spider')} · ${creatureDisplayName('rewind_lizard')}`, batches: [['ink', 'chaser'], ['archer', 'ink', 'chaser']], patterns: ['archive-baseline'], reward: true },
 ];
 
 const actTwoWaves: readonly ActWaveDefinition[] = [
-  { label: '먹빛 기록고 · 잔향탄', batches: [['archer', 'ink'], ['archer', 'archer', 'ink']], patterns: ['ink-echo-projectile'], reward: true },
-  { label: '먹빛 기록고 · 봉합 쌍', batches: [['chaser', 'chaser'], ['elite', 'chaser']], patterns: ['stitch-pair'], reward: true },
-  { label: '먹빛 기록고 · 과거 교정', batches: [['ink', 'archer'], ['ink', 'archer', 'chaser']], patterns: ['past-position'], reward: true },
-  { label: '먹빛 기록고 · 편집 실험', batches: [['elite', 'archer'], ['elite', 'ink', 'chaser']], patterns: ['mixed-archive', 'ink-echo-projectile', 'stitch-pair', 'past-position'], reward: true },
+  { label: `${creatureDisplayName('resonance_civet')} · ${creatureDisplayName('pleated_frog')}`, batches: [['archer', 'chaser'], ['archer', 'archer', 'chaser']], patterns: ['ink-echo-projectile'], reward: true },
+  { label: `${creatureDisplayName('resonance_civet')} · ${creatureDisplayName('pleated_frog')}`, batches: [['chaser', 'chaser'], ['archer', 'chaser']], patterns: ['stitch-pair'], reward: true },
+  { label: `${creatureDisplayName('pleated_frog')} · ${creatureDisplayName('resonance_civet')}`, batches: [['chaser', 'archer'], ['chaser', 'archer', 'chaser']], patterns: ['past-position'], reward: true },
+  { label: `${creatureDisplayName('resonance_civet')} · ${creatureDisplayName('pleated_frog')}`, batches: [['chaser', 'archer'], ['chaser', 'archer', 'chaser']], patterns: ['mixed-archive', 'ink-echo-projectile', 'stitch-pair', 'past-position'], reward: true },
+];
+
+const actThreeWaves: readonly ActWaveDefinition[] = [
+  { label: `${creatureDisplayName('flowjaw_crab')} · ${creatureDisplayName('pulsebarbel_catfish')}`, batches: [['archer', 'elite'], ['elite', 'archer', 'elite']], patterns: ['archive-baseline'], reward: true },
+  { label: `${creatureDisplayName('flowjaw_crab')} · ${creatureDisplayName('pulsebarbel_catfish')}`, batches: [['elite', 'elite'], ['elite', 'archer']], patterns: ['stitch-pair'], reward: true },
+  { label: `${creatureDisplayName('pulsebarbel_catfish')} · ${creatureDisplayName('flowjaw_crab')}`, batches: [['elite', 'archer', 'elite'], ['elite', 'archer', 'archer']], patterns: ['past-position', 'mixed-archive'], reward: true },
 ];
 
 const modifiers: readonly EndlessModifierId[] = [
@@ -87,12 +95,16 @@ const endlessModifiers = (actIndex: number): readonly EndlessModifierId[] => {
 
 export const actDefinition = (actIndex: number): ActDefinition => {
   if (actIndex <= 1) return {
-    index: 1, id: 'act-1-echo-room', name: '계승실', theme: 'echo-room', enemySetId: 'archive-ruins',
-    bossId: 'record-devourer', bossName: '기록 포식자', summary: '기록의 기초 · Q/E/R 응용', waves: actOneWaves, modifiers: [], healthMultiplier: 1, damageMultiplier: 1,
+    index: 1, id: 'act-1-west-cliffs', name: actDisplayName(1), theme: 'echo-room', enemySetId: 'submission-act1',
+    bossId: 'resonance_goral', bossName: bossDisplayName('resonance_goral'), summary: '서벽의 반향과 끊어진 길을 지나 반향단으로 향한다.', waves: actOneWaves, modifiers: [], healthMultiplier: 1, damageMultiplier: 1,
   };
   if (actIndex === 2) return {
-    index: 2, id: 'act-2-ink-archive', name: '먹빛 기록고', theme: 'ink-archive', enemySetId: 'ink-editorial',
-    bossId: 'record-editor', bossName: '기록 편집자', summary: '잔향탄 · 봉합 · 과거 위치 공격', waves: actTwoWaves, modifiers: [], healthMultiplier: 1.08, damageMultiplier: 1.05,
+    index: 2, id: 'act-2-sinkhole-lowland', name: actDisplayName(2), theme: 'ink-archive', enemySetId: 'submission-act2',
+    bossId: 'diffraction_pangolin', bossName: bossDisplayName('diffraction_pangolin'), summary: '천갱의 저지림을 지나 뿌리 고리 분지로 향한다.', waves: actTwoWaves, modifiers: [], healthMultiplier: 1.08, damageMultiplier: 1.05,
+  };
+  if (actIndex === 3) return {
+    index: 3, id: 'act-3-central-waterway', name: actDisplayName(3), theme: 'echo-room', enemySetId: 'submission-act3',
+    bossId: 'channel_otter_mother', bossName: bossDisplayName('channel_otter_mother'), summary: '중앙 습지와 지하 수로를 지나 우각호의 자갈섬으로 향한다.', waves: actThreeWaves, modifiers: endlessModifiers(3), healthMultiplier: 1.08 * 1.1, damageMultiplier: 1.05 * 1.06,
   };
   const scaleIndex = actIndex - 2;
   const useInk = actIndex % 2 === 0;

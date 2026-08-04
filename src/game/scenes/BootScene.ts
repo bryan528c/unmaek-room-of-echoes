@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { runtimeAssetAudit, runtimeAssetEntries } from '../runtime/SubmissionRuntimeAssets';
 import { createCroppedTextures, createHeroFallback } from '../utils/assetCrop';
 
 export class BootScene extends Phaser.Scene {
@@ -8,6 +9,11 @@ export class BootScene extends Phaser.Scene {
 
   public preload(): void {
     this.load.image('hero-concept', './assets/hero-concept.png');
+    const audit = runtimeAssetAudit();
+    if (audit.missing.length || audit.unreferenced.length || audit.disallowed.length) {
+      throw new Error(`[BootScene] Submission runtime allowlist audit failed: ${JSON.stringify(audit)}`);
+    }
+    for (const asset of runtimeAssetEntries()) this.load.image(asset.key, asset.url);
     this.load.once(Phaser.Loader.Events.FILE_LOAD_ERROR, () => { this.heroLoadFailed = true; });
   }
 

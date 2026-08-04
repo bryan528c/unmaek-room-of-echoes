@@ -41,6 +41,20 @@ import { backflowBladeDamage, cutDamageMultiplier, cutHitsTarget, cutSentenceBon
 import { angleDelta, distanceSq, rankFor } from '../utils/math';
 import { createArchiveArena, createInkArchiveArena } from '../utils/arena';
 import type { ResultStats } from '../../ui/OverlayUI';
+import { SubmissionMapRuntime } from '../runtime/SubmissionMapRuntime';
+import { isSubmissionActIntegrated } from '../runtime/RuntimeIntegrationGate';
+import {
+  backgroundCueCreatureIdsForAct,
+  bossPhaseDisplayName,
+  creatureIdForEnemyKind,
+  resolveCreatureMetadata,
+  resolveCreatureState,
+  runtimeSpriteOrigin,
+  runtimeTextureKey,
+  sourcePointToGame,
+  submissionMapId,
+  SUBMISSION_GAME_SCALE,
+} from '../runtime/SubmissionRuntime';
 
 interface InkZone { circle: Phaser.GameObjects.Arc; expiresAt: number; nextDamageAt: number; radius: number; damage: number; style: 'ink' | 'erasure'; patternName: string; modifier?: string }
 interface RecordedAttack { time: number; x: number; y: number; angle: number; kind: 'guard' | 'finisher' | 'legacy' | 'echo-blade' | 'cut'; damage: number }
@@ -134,6 +148,9 @@ export class GameScene extends Phaser.Scene {
   private modifierIntroductions = new ModifierIntroductionTracker();
   private runId: RunId = 0;
   private arenaContainer?: Phaser.GameObjects.Container;
+  private submissionMap?: SubmissionMapRuntime;
+  private backgroundCues = new Set<Phaser.GameObjects.Image>();
+  private heroMapSafePoint = { x: 480, y: 300 };
   private atmosphere?: Phaser.GameObjects.Particles.ParticleEmitter;
   private modifierEnvironment?: Phaser.GameObjects.Graphics;
   private activeActPatterns = new Set<ActPatternId>();
@@ -293,13 +310,12 @@ export class GameScene extends Phaser.Scene {
       const act = this.runAct.current;
       if (act.index > 1) this.runProgress.beginAct(this.runId, { actNumber: act.index, actId: act.id, actName: act.name, themeId: act.theme, enemySetId: act.enemySetId, bossId: act.bossId, modifiers: act.modifiers });
     }
-    const initialAct = this.runAct.current;
-    this.arenaContainer = initialAct.theme === 'echo-room' || initialAct.theme === 'endless-echo'
-      ? createArchiveArena(this)
-      : createInkArchiveArena(this, initialAct.index >= 3 ? initialAct.index : 0);
+    this.activateActArena('general', false);
     this.createAtmosphere();
-    this.heroShadow = this.add.ellipse(480, 304, 38, 12, 0x020506, 0.55).setDepth(DEPTH.shadow);
-    this.hero = new Hero(this, 480, 300);
+    const playerSpawn = this.submissionMap?.playerSpawn ?? { x: 480, y: 300 };
+    this.heroMapSafePoint = { ...playerSpawn };
+    this.heroShadow = this.add.ellipse(playerSpawn.x, playerSpawn.y + 4, 38, 12, 0x020506, 0.55).setDepth(DEPTH.shadow);
+    this.hero = new Hero(this, playerSpawn.x, playerSpawn.y);
     this.linkGraphics = this.add.graphics().setDepth(DEPTH.word);
     this.rewindGraphics = this.add.graphics().setDepth(DEPTH.rewind);
     this.rewindPreviewGhosts = Array.from({ length: 3 }, () => this.add.image(this.hero.x, this.hero.y, 'hero-move')
@@ -320,7 +336,8 @@ export class GameScene extends Phaser.Scene {
       hero: { x: this.hero.x, y: this.hero.y, comboActive: this.hero.isComboActive, comboStep: this.hero.comboStep, direction: this.hero.attackDirection, health: this.hero.health, finisherCharges: this.finisherCharges.charges },
       targetId: this.comboLock.targetId ?? this.heldAttackTarget?.id ?? this.currentTarget?.id,
       targetDistance: this.targetDistance,
-      enemies: [...this.enemies].filter((enemy) => enemy.active).map((enemy) => ({ id: enemy.id, kind: enemy.kind, x: enemy.x, y: enemy.y, health: enemy.health, insideBounds: groundFootprintInsideBounds(enemy.groundPoint, enemyGroundExtents(enemy.kind), COMBAT_BOUNDS) })),
+      enemies: [...this.enemies].filter((enemy) => enemy.active).map((enemy) => ({ id: enemy.id, kind: enemy.kind, creatureId: enemy.creatureId, x: enemy.x, y: enemy.y, health: enemy.health, insideBounds: groundFootprintInsideBounds(enemy.groundPoint, enemyGroundExtents(enemy.kind), COMBAT_BOUNDS) })),
+      submissionRuntime: { mapId: this.submissionMap?.definition.id, mapName: this.submissionMap?.displayName, backgroundCueCount: this.backgroundCues.size, hazard: this.submissionMap?.hasHazardMask ?? false },
       wave: this.waveDirector.snapshot(),
       runActFlow: {
         currentBossDefinition: this.boss?.definition.bossId,
@@ -379,6 +396,7 @@ export class GameScene extends Phaser.Scene {
     // cleared automatically even though display-list children are destroyed.
     this.boss = undefined;
     this.enemies = new Set(); this.projectiles = new Set(); this.inkZones = []; this.linkedTargets = new Set(); this.linkMarkers = new Map(); this.linkShareRatio = BALANCE.words.linkShare; this.linkGeneration = 0;
+    this.submissionMap = undefined; this.backgroundCues = new Set(); this.heroMapSafePoint = { x: 480, y: 300 };
     this.upgrades = this.runProgress.upgrades; this.rewind = new RewindBuffer(BALANCE.words.rewindDuration); this.targeting = new TargetingSystem(BALANCE.targeting); this.wordChain = new WordChainSystem(BALANCE.chain.window); this.wordLoadout = new WordLoadoutState(DEFAULT_WORD_LOADOUT); this.wordStatuses = new WordStatusRuntime(); this.wordReadyAt = { stop: 0, rewind: 0, link: 0, pull: 0, mark: 0, push: 0 }; this.damageHistory = new DamageHistory(BALANCE.chain.damageHistoryRetention); this.combatStats = this.runProgress.combatStats; this.attackRegistry = new AttackHitRegistry(); this.attackInput = new RisingEdgeInput(); this.comboLock = new SoftTargetLock(); this.flow = new GameFlowController('RUN_START', import.meta.env.DEV ? (message) => console.warn(`[GameFlow] ${message}`) : undefined, performance.now()); this.inputRouter = new InputRouter(); this.parryResolver = new ParryResolver(); this.finisherCharges = new FinisherChargeSystem(BALANCE.hero.finisher.maximumCharges); this.weaponCooldowns = new WeaponCooldowns(); this.weaponCooldowns.reset(0); this.resonanceRuntime = new ResonanceRuntime(); this.waveDirector = new WaveDirector(BALANCE.pacing.roundClearStability, BALANCE.pacing.staleEnemyRecovery); this.threatBudget = new ThreatBudget(); this.runOutcome = new RunOutcomeController(); this.attacks = [];
     this.waveIndex = 0; this.waveSpawnGeneration = 0; this.enemySpawnTimes = new Map(); this.enemyFirstDamageAt = new Map(); this.currentComboDamage = 0; this.nextDefensiveSlashAt = 0; this.defensiveSlashEnabled = false; this.nextHeldComboAt = 0; this.firstWaveSpawnOrdinal = 0; this.defensiveSlashSequence = 100000; this.echoBladeSequence = 200000; this.lastDirectTargetId = undefined; this.echoFinisherUntil = 0; this.echoAmplifierUntil = 0; this.bossMechanicRewardUntil = 0; this.encounterStartedAt = 0; this.bossPhaseStartedAt = 0; this.currentWaveBatches = []; this.nextBatchIndex = 0; this.activeBatchPendingSpawns = 0; this.miniWaveReadyAt = 0; this.parryAnchorUntil = 0; this.lastWaveDiagnosticAt = 0; this.score = 0; this.activeActPatterns = new Set(); this.activeEndlessModifiers = []; this.actPatternGeneration = 0; this.echoProjectileSequence = 0; this.stitchedPairs = new Map(); this.arenaContainer = undefined; this.modifierEnvironment = undefined; this.modifierIntroductions = new ModifierIntroductionTracker(this.services.save.modifierTutorialsSeen);
     this.sentence = 0; this.empowered = false; this.stopReadyAt = 0; this.rewindReadyAt = 0; this.linkReadyAt = 0;
@@ -550,6 +568,10 @@ export class GameScene extends Phaser.Scene {
     this.recordState(time);
     for (const enemy of [...this.enemies]) {
       if (!enemy.active) continue;
+      // A nonlethal boss retreat owns its exit tween. Running the normal
+      // bounds repair here would cancel that tween through cancelAttackIntent
+      // as soon as the boss crosses the arena edge, preventing ACT clear.
+      if (enemy.removing) continue;
       const beforeAiCorrection = enemy.constrainToCombatBounds();
       if (beforeAiCorrection.corrected) {
         enemy.cancelAttackIntent(time + 420);
@@ -565,7 +587,11 @@ export class GameScene extends Phaser.Scene {
     }
     for (const projectile of [...this.projectiles]) {
       if (!projectile.active) { this.projectiles.delete(projectile); continue; }
-      projectile.update(time); this.checkProjectileCollision(projectile); if (projectile.active) projectile.commitPosition();
+      projectile.update(time);
+      if (this.submissionMap && (!this.submissionMap.isWalkable(projectile) || this.submissionMap.isHazard(projectile))) {
+        projectile.destroy(); this.projectiles.delete(projectile); continue;
+      }
+      this.checkProjectileCollision(projectile); if (projectile.active) projectile.commitPosition();
     }
     this.checkMeleeCollisions(time);
     for (const enemy of this.enemies) if (enemy.active) enemy.commitGroundPosition();
@@ -604,7 +630,8 @@ export class GameScene extends Phaser.Scene {
       threatBudget: this.threatBudget.snapshot(this.time.now),
       heartbeats: { ...this.combatHeartbeats },
       stats: this.combatStats.snapshot(),
-      enemies: [...this.enemies].filter((enemy) => enemy.active).map((enemy) => ({ id: enemy.id, kind: enemy.kind, health: enemy.health, x: enemy.x, y: enemy.y, removing: enemy.removing, stopped: enemy.isStopped, linked: enemy.linked, echo: enemy.isEchoMarked })),
+      enemies: [...this.enemies].filter((enemy) => enemy.active).map((enemy) => ({ id: enemy.id, kind: enemy.kind, creatureId: enemy.creatureId, health: enemy.health, x: enemy.x, y: enemy.y, removing: enemy.removing, stopped: enemy.isStopped, linked: enemy.linked, echo: enemy.isEchoMarked, groundPoint: enemy.groundPoint, hurtbox: enemy.hurtbox, attackAnchor: enemy.attackAnchor, flipX: enemy.flipX, rotation: enemy.rotation, runtimeState: enemy.runtimeState, runtimeAssetFile: enemy.runtimeAssetFile, runtimeOverlayActive: enemy.runtimeOverlayActive })),
+      submissionRuntime: { mapId: this.submissionMap?.definition.id, mapName: this.submissionMap?.displayName, backgroundCueCount: this.backgroundCues.size, hazard: this.submissionMap?.hasHazardMask ?? false },
       upgrades: this.upgrades.entries().map(({ id, stacks }) => ({ id, stacks, preview: this.upgrades.preview(id) })),
       upgradeRuntime: this.upgrades.runtimeSnapshot(),
       time: this.timeControl.snapshot(),
@@ -783,7 +810,7 @@ export class GameScene extends Phaser.Scene {
     this.nextBatchIndex += 1;
     this.activeBatchPendingSpawns = batch.length;
     this.miniWaveReadyAt = 0;
-    const positions = this.spawnPositions(batch.length);
+    const positions = this.spawnPositions(batch);
     batch.forEach((kind, itemIndex) => {
       this.runDelayedCall(itemIndex * BALANCE.pacing.waveSpawnInterval, () => {
         if (generation !== this.waveSpawnGeneration) return;
@@ -797,7 +824,10 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
-  private spawnPositions(count: number): { x: number; y: number }[] {
+  private spawnPositions(batch: readonly EnemyKind[]): { x: number; y: number }[] {
+    const count = batch.length;
+    const runtimeSlots = this.submissionMap?.enemySpawnSlots;
+    if (runtimeSlots?.length) return batch.map((_kind, index) => ({ ...runtimeSlots[index % runtimeSlots.length]! }));
     if (this.runAct.current.index <= 2 && this.waveIndex === 0 && this.nextBatchIndex === 1) {
       const teachingSlots = [{ x: this.hero.x + 86, y: this.hero.y + 12 }, { x: this.hero.x - 86, y: this.hero.y - 12 }];
       return teachingSlots.slice(0, count).map((slot) => clampPointToBounds(slot.x, slot.y, COMBAT_BOUNDS, 28));
@@ -811,7 +841,7 @@ export class GameScene extends Phaser.Scene {
     const runId = this.runId;
     return {
       shoot: (source, x, y, angle, speed, damage, texture) => { this.runSession.invoke(runId, () => this.spawnProjectile(source, x, y, angle, speed, damage, texture)); },
-      melee: (enemy, damage) => { this.runSession.invoke(runId, () => this.hitHero(damage * Number(enemy.getData('damageMultiplier') ?? 1), enemy.x, enemy.y, enemy.kind === 'boss' ? 'boss' : 'melee', { attackerId: enemy.id, attackerDisplayName: enemy.kind === 'boss' ? this.boss?.definition.displayName ?? '보스' : enemyDisplayName(enemy.kind), attackId: enemy.meleeAttackId, patternName: enemy.kind === 'boss' ? `${this.boss?.definition.displayName ?? '보스'} 근접 공격` : `${enemyDisplayName(enemy.kind)} · ${attackDisplayName(enemy.meleeAttackId, '근접 공격')}`, parryable: enemy.meleeParryable })); },
+      melee: (enemy, damage) => { this.runSession.invoke(runId, () => this.hitHero(damage * Number(enemy.getData('damageMultiplier') ?? 1), enemy.x, enemy.y, enemy.kind === 'boss' ? 'boss' : 'melee', { attackerId: enemy.id, attackerDisplayName: enemy.kind === 'boss' ? this.boss?.definition.displayName ?? '보스' : enemy.displayName, attackId: enemy.meleeAttackId, patternName: enemy.kind === 'boss' ? `${this.boss?.definition.displayName ?? '보스'} 근접 공격` : `${enemy.displayName} · ${attackDisplayName(enemy.meleeAttackId, '근접 공격')}`, parryable: enemy.meleeParryable })); },
       died: (enemy, source) => { this.runSession.invoke(runId, () => this.onEnemyDied(enemy, source)); },
       cue: (cue) => { this.runSession.invoke(runId, () => this.services.audio.play(cue === 'warning' ? 'warning' : 'parryOpen')); },
       requestAttack: (enemy) => {
@@ -825,7 +855,8 @@ export class GameScene extends Phaser.Scene {
 
   private spawnEnemy(kind: EnemyKind, x: number, y: number, waveTracked = false): Enemy {
     const safe = clampGroundPointToBounds(x, y, enemyGroundExtents(kind), COMBAT_BOUNDS);
-    const enemy = new Enemy(this, safe.x, safe.y, kind, this.enemyCallbacks(), this.runAct.current.healthMultiplier);
+    const creatureId = isSubmissionActIntegrated(this.runAct.current.index) ? creatureIdForEnemyKind(this.runAct.current.index, kind) : undefined;
+    const enemy = new Enemy(this, safe.x, safe.y, kind, this.enemyCallbacks(), this.runAct.current.healthMultiplier, creatureId);
     enemy.setData('waveTracked', waveTracked);
     enemy.setData('runId', this.runId);
     enemy.setData('actId', this.runAct.current.id);
@@ -2382,6 +2413,8 @@ export class GameScene extends Phaser.Scene {
 
   private startBoss(): void {
     if (this.flow.baseState !== 'BOSS_INTRO' && !this.transitionFlow('BOSS_INTRO')) return;
+    this.activateActArena('boss', true);
+    this.createAtmosphere();
     this.waveDirector.reset();
     this.encounterStartedAt = this.time.now;
     this.bossPhaseStartedAt = this.time.now;
@@ -2406,15 +2439,17 @@ export class GameScene extends Phaser.Scene {
         });
       },
       summon: (count) => { this.runSession.invoke(bossRunId, () => this.summonMinions(count)); },
-      inkZone: (x, y, radius, duration, style = 'ink') => { this.runSession.invoke(bossRunId, () => this.createInkZone(x, y, radius, duration, style)); },
+      inkZone: (x, y, radius, duration, style = 'ink') => { this.runSession.invoke(bossRunId, () => { const safe = this.runtimeEncounterPoint({ x, y }, this.hero.groundPoint); this.createInkZone(safe.x, safe.y, radius, duration, style); }); },
     };
-    this.boss = new Boss(this, 480, 125, callbacks, this.runAct.current.bossId, this.runAct.current.healthMultiplier); this.boss.setData('runId', this.runId); this.boss.setData('actId', this.runAct.current.id); this.boss.setData('damageMultiplier', this.runAct.current.damageMultiplier); this.enemies.add(this.boss); this.boss.spawn();
+    const bossSpawn = this.submissionMap?.bossSpawn ?? { x: 480, y: 125 };
+    this.boss = new Boss(this, bossSpawn.x, bossSpawn.y, callbacks, this.runAct.current.bossId, this.runAct.current.healthMultiplier); this.boss.setData('runId', this.runId); this.boss.setData('actId', this.runAct.current.id); this.boss.setData('damageMultiplier', this.runAct.current.damageMultiplier); this.enemies.add(this.boss); this.boss.spawn();
     this.runSession.activateBoss(this.runId, this.boss.id, this.boss.phaseHealth, this.boss.phaseMaxHealth);
     this.bossTransitionUntil = this.time.now + 1000; this.hero.invulnerableUntil = Math.max(this.hero.invulnerableUntil, this.bossTransitionUntil + 100);
     this.boss.cancelAttackIntent(this.bossTransitionUntil); this.separateHeroFromBoss();
     this.runDelayedCall(1000, () => {
       if (!this.sys.isActive() || this.flow.baseState !== 'BOSS_INTRO') return;
       this.bossPhaseStartedAt = this.time.now;
+      this.boss?.beginCombatPresentation();
       this.timeControl.release('BOSS_TRANSITION', this.timeOwner); this.transitionFlow('BOSS_COMBAT');
     });
   }
@@ -2449,7 +2484,8 @@ export class GameScene extends Phaser.Scene {
   }
 
   private summonMinions(count: number): void {
-    const positions = this.spawnPositions(count).slice(0, count); positions.forEach((position) => this.spawnEnemy('minion', position.x, position.y));
+    const kind: EnemyKind = isSubmissionActIntegrated(this.runAct.current.index) && this.runAct.current.index === 3 ? 'elite' : 'minion';
+    const positions = this.spawnPositions(Array.from({ length: count }, () => kind)).slice(0, count); positions.forEach((position) => this.spawnEnemy(kind, position.x, position.y));
   }
 
   private createInkZone(x: number, y: number, radius: number, duration: number, style: 'ink' | 'erasure' = 'ink', damage = 10, patternName = style === 'erasure' ? '과거 교정' : '먹물 장판', modifier?: string): void {
@@ -2853,6 +2889,7 @@ export class GameScene extends Phaser.Scene {
     if (!import.meta.env.DEV) return;
     this.debugHitboxes = !this.debugHitboxes;
     this.debugGraphics?.setVisible(this.debugHitboxes);
+    this.submissionMap?.setDebugVisible(this.debugHitboxes);
     if (!this.debugHitboxes) this.debugGraphics?.clear();
   }
 
@@ -2882,10 +2919,12 @@ export class GameScene extends Phaser.Scene {
       for (const enemy of this.enemies) {
         graphics.fillStyle(0xffffff, 0.9).fillCircle(enemy.x, enemy.y, 2);
         circle(enemy.movementCircle, 0xe7c769); ellipse(enemy.hurtbox, 0xff8a67);
+        const attackAnchor = enemy.attackAnchor;
+        graphics.fillStyle(0xffd36a, 0.95).fillCircle(attackAnchor.x, attackAnchor.y, 2.5);
         const telegraph = enemy.activeTelegraph;
         if (telegraph && telegraph.until > time) {
-          graphics.lineStyle(2, 0xff563e, 0.86).lineBetween(enemy.x, enemy.y, enemy.x + Math.cos(telegraph.angle) * telegraph.length, enemy.y + Math.sin(telegraph.angle) * telegraph.length);
-          graphics.lineStyle(1, 0xff9470, 0.55).strokeCircle(enemy.x, enemy.y, telegraph.halfWidth);
+          graphics.lineStyle(2, 0xff563e, 0.86).lineBetween(attackAnchor.x, attackAnchor.y, attackAnchor.x + Math.cos(telegraph.angle) * telegraph.length, attackAnchor.y + Math.sin(telegraph.angle) * telegraph.length);
+          graphics.lineStyle(1, 0xff9470, 0.55).strokeCircle(attackAnchor.x, attackAnchor.y, telegraph.halfWidth);
         }
         if (enemy.attackActiveUntil > time) circle({ x: enemy.x, y: enemy.y, radius: enemy.meleeHitRadius }, 0xff3030);
       }
@@ -3186,6 +3225,7 @@ export class GameScene extends Phaser.Scene {
   private handlePostPhysicsUpdate(): void {
     if (!this.flow?.allowsCombatSimulation || this.timeControl?.isHardPaused || this.timeControl?.hasReason('HITSTOP')) return;
     this.resolveEntitySeparation(this.frameDelta);
+    this.enforceSubmissionMapContract();
     this.heroShadow?.setPosition(this.hero.x, this.hero.y + 9).setScale(this.hero.isDashing ? 1.5 : 1);
     this.heroRune?.setPosition(this.hero.x, this.hero.y - 7);
   }
@@ -3234,7 +3274,7 @@ export class GameScene extends Phaser.Scene {
     const modifierItems = modifierIds.map((id) => { const definition = modifierDefinition(id); return { name: definition?.displayName ?? modifierLabel(id), icon: definition?.icon ?? '異' }; });
     this.services.ui.updateHud({
       health: this.hero.health, maxHealth: this.hero.maxHealth, sentence: this.sentence, sentenceMax: this.sentenceMax,
-      score: this.score, stage: waveLabel,
+      score: this.score, stage: this.submissionMap ? `${this.submissionMap.displayName} · ${waveLabel}` : waveLabel,
       actIndex: this.runAct.current.index, actName: this.runAct.current.name, waveLabel, bossesDefeated: actSnapshot.bossesDefeated, modifiers: modifierItems,
       stopCooldown: Math.max(0, (this.stopReadyAt - time) / 1000), rewindCooldown: Math.max(0, (this.rewindReadyAt - time) / 1000), linkCooldown: Math.max(0, (this.linkReadyAt - time) / 1000), empowered: this.empowered,
       canStop: time >= this.stopReadyAt,
@@ -3261,6 +3301,7 @@ export class GameScene extends Phaser.Scene {
       bossHealth: boss?.phaseHealth, bossMaxHealth: boss?.phaseMaxHealth, bossPhase: boss?.phase,
       bossGuide: boss?.definition.phaseDefinitions[boss.phase - 1]?.guide,
       bossName: boss ? boss.definition.displayName : undefined,
+      bossPhaseName: boss?.creatureId ? bossPhaseDisplayName(boss.creatureId, boss.phase as 1 | 2 | 3) : undefined,
     });
   }
 
@@ -3301,7 +3342,7 @@ export class GameScene extends Phaser.Scene {
     for (const enemy of [...this.enemies]) { enemy.cancelAttackIntent(this.time.now + BALANCE.pacing.bossDefeatDuration); enemy.destroy(); this.enemies.delete(enemy); }
     this.clearLinks(); this.currentTarget = undefined; this.comboTarget = undefined; this.heldAttackTarget = undefined; this.targetMarkerUntil = 0;
     this.services.audio.play('phase'); this.cameraKick(0.006, 180);
-    this.runeBurst(defeatedBoss.x, defeatedBoss.y - 35, 24);
+    if (!defeatedBoss.nonlethalRetreat) this.runeBurst(defeatedBoss.x, defeatedBoss.y - 35, 24);
     this.showWordTypography('기록이 풀려난다', 480, 165, true);
     if (!this.services.save.settings.reducedMotion) this.cameras.main.zoomTo(1.055, 420);
     this.runDelayedCall(BALANCE.pacing.bossDefeatDuration, () => {
@@ -3347,9 +3388,9 @@ export class GameScene extends Phaser.Scene {
     const next = this.runAct.advanceAct(this.time.now, this.damageTaken);
     this.runProgress.beginAct(this.runId, { actNumber: next.index, actId: next.id, actName: next.name, themeId: next.theme, enemySetId: next.enemySetId, bossId: next.bossId, modifiers: next.modifiers });
     this.waveIndex = 0; this.firstWaveSpawnOrdinal = 0; this.stopReadyAt = this.time.now; this.rewindReadyAt = this.time.now; this.linkReadyAt = this.time.now;
-    this.hero.setGroundPosition(480, 300); this.hero.setVelocity(0); this.hero.health = Math.min(this.hero.health, this.hero.maxHealth);
-    this.arenaContainer?.destroy(true); this.atmosphere?.destroy();
-    this.arenaContainer = next.theme === 'echo-room' || next.theme === 'endless-echo' ? createArchiveArena(this) : createInkArchiveArena(this, next.index >= 3 ? next.index : 0);
+    this.hero.setVelocity(0); this.hero.health = Math.min(this.hero.health, this.hero.maxHealth);
+    this.atmosphere?.destroy();
+    this.activateActArena('general', true);
     this.createAtmosphere();
     const resonanceNames = this.upgrades.activeResonances().map((id) => resonanceById(id)?.name ?? id);
     if (!this.transitionFlow('ACT_INTRO')) return;
@@ -3404,6 +3445,84 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
+  private activateActArena(encounter: 'general' | 'boss', repositionPlayer: boolean): void {
+    this.arenaContainer?.destroy(true); this.arenaContainer = undefined;
+    this.submissionMap?.destroy(); this.submissionMap = undefined;
+    this.clearBackgroundCues();
+    const act = this.runAct.current;
+    const mapId = isSubmissionActIntegrated(act.index) ? submissionMapId(act.index, encounter) : undefined;
+    if (mapId) {
+      this.submissionMap = new SubmissionMapRuntime(this, mapId);
+      this.submissionMap.setDebugVisible(this.debugHitboxes);
+      if (encounter === 'general') this.spawnBackgroundCues();
+    } else {
+      this.arenaContainer = act.theme === 'echo-room' || act.theme === 'endless-echo'
+        ? createArchiveArena(this)
+        : createInkArchiveArena(this, act.index >= 3 ? act.index : 0);
+    }
+    const hero = this.hero as Hero | undefined;
+    if (repositionPlayer && hero?.active) {
+      const spawn = this.submissionMap?.playerSpawn ?? { x: 480, y: 300 };
+      hero.setGroundPosition(spawn.x, spawn.y).setVelocity(0);
+      hero.constrainToArena(); this.heroMapSafePoint = { ...hero.groundPoint };
+    }
+  }
+
+  private spawnBackgroundCues(): void {
+    const creatureIds = backgroundCueCreatureIdsForAct(this.runAct.current.index);
+    const sourcePositions = [{ x: 210, y: 170 }, { x: 640, y: 118 }, { x: 1080, y: 185 }];
+    creatureIds.forEach((creatureId) => {
+      const metadata = resolveCreatureMetadata(creatureId);
+      const fly = resolveCreatureState(creatureId, metadata.states.fly ? 'fly' : 'idle');
+      const evade = metadata.states.evade ? resolveCreatureState(creatureId, 'evade') : fly;
+      sourcePositions.forEach((source, index) => {
+        const point = sourcePointToGame(source); const origin = runtimeSpriteOrigin(creatureId, index % 2 === 1);
+        const cue = this.add.image(point.x, point.y, runtimeTextureKey(fly.assetFile)).setOrigin(origin.x, origin.y)
+          .setScale(SUBMISSION_GAME_SCALE * metadata.runtimeScale).setFlipX(index % 2 === 1).setDepth(DEPTH.characterBase + Math.floor(point.y));
+        this.backgroundCues.add(cue);
+        this.tweens.add({
+          targets: cue, x: point.x + (index % 2 === 0 ? 54 : -54), y: point.y - 12, duration: 2100 + index * 260,
+          ease: 'Sine.InOut', yoyo: true, repeat: -1,
+          onYoyo: () => { if (cue.active) cue.setTexture(runtimeTextureKey(evade.assetFile)); },
+          onRepeat: () => { if (cue.active) cue.setTexture(runtimeTextureKey(fly.assetFile)); },
+        });
+      });
+    });
+  }
+
+  private clearBackgroundCues(): void {
+    for (const cue of this.backgroundCues) { this.tweens?.killTweensOf(cue); cue.destroy(); }
+    this.backgroundCues.clear();
+  }
+
+  private runtimeEncounterPoint(point: Readonly<{ x: number; y: number }>, fallback: Readonly<{ x: number; y: number }>): Readonly<{ x: number; y: number }> {
+    const map = this.submissionMap; if (!map) return point;
+    const territoryPoint = map.constrainToBossTerritory(point);
+    if (map.isWalkable(territoryPoint) && !map.isHazard(territoryPoint)) return territoryPoint;
+    const fallbackPoint = map.constrainToBossTerritory(fallback);
+    return map.isWalkable(fallbackPoint) && !map.isHazard(fallbackPoint) ? fallbackPoint : fallback;
+  }
+
+  private enforceSubmissionMapContract(): void {
+    const map = this.submissionMap; if (!map) return;
+    const heroPoint = this.hero.groundPoint;
+    if (map.isWalkable(heroPoint) && !map.isHazard(heroPoint)) this.heroMapSafePoint = { ...heroPoint };
+    else { this.hero.setGroundPosition(this.heroMapSafePoint.x, this.heroMapSafePoint.y).setVelocity(0); this.hero.constrainToArena(); }
+    for (const enemy of this.enemies) {
+      if (!enemy.active || !enemy.spawned || enemy.removing) continue;
+      if (enemy.kind === 'boss') {
+        const territory = map.constrainToBossTerritory(enemy.groundPoint);
+        if (territory.corrected) enemy.setGroundPosition(territory.x, territory.y);
+      }
+      if (!map.isWalkable(enemy.groundPoint) || map.isHazard(enemy.groundPoint)) {
+        const previous = enemy.previousGroundPoint;
+        enemy.setGroundPosition(previous.x, previous.y).setVelocity(0);
+      }
+      enemy.constrainToCombatBounds();
+    }
+    map.updateForegroundOcclusion(this.hero.groundPoint);
+  }
+
   private createAtmosphere(): void {
     this.atmosphere?.destroy();
     this.modifierEnvironment?.destroy(); this.modifierEnvironment = undefined;
@@ -3454,6 +3573,6 @@ export class GameScene extends Phaser.Scene {
     if (this.watchdogHandle !== undefined) window.clearInterval(this.watchdogHandle); this.watchdogHandle = undefined;
     this.timeControl?.dispose(false); this.damageQueue.reset(); this.inputRouter.clear(); this.parryResolver.reset();
     this.game.canvas.style.cursor = ''; this.wordChain.reset(); this.damageHistory.reset(); this.targeting.clear(); this.attackRegistry.reset(); this.attackInput.reset();
-    this.clearLinks(); this.linkGraphics?.destroy(); this.rewindGraphics?.destroy(); this.rewindPreviewGhosts.forEach((ghost) => ghost.destroy()); this.rewindPreviewGhosts = []; this.heroRune?.destroy(); this.targetMarker?.destroy(); this.debugGraphics?.destroy(); this.debugStatsText?.destroy(); this.debugScenarioText?.destroy(); this.inkZones.forEach((zone) => zone.circle.destroy()); this.atmosphere?.destroy(); this.modifierEnvironment?.destroy(); this.arenaContainer?.destroy(true); this.stitchedPairs.clear();
+    this.clearLinks(); this.linkGraphics?.destroy(); this.rewindGraphics?.destroy(); this.rewindPreviewGhosts.forEach((ghost) => ghost.destroy()); this.rewindPreviewGhosts = []; this.heroRune?.destroy(); this.targetMarker?.destroy(); this.debugGraphics?.destroy(); this.debugStatsText?.destroy(); this.debugScenarioText?.destroy(); this.inkZones.forEach((zone) => zone.circle.destroy()); this.atmosphere?.destroy(); this.modifierEnvironment?.destroy(); this.arenaContainer?.destroy(true); this.submissionMap?.destroy(); this.submissionMap = undefined; this.clearBackgroundCues(); this.stitchedPairs.clear();
   }
 }

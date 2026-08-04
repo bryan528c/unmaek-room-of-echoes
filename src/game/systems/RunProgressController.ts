@@ -40,12 +40,12 @@ export interface RunProgressSnapshot {
 
 const initialAct = (generation = 0): ActState => ({
   actNumber: 1,
-  actId: 'act-1-echo-room',
-  actName: '계승실',
+  actId: 'act-1-west-cliffs',
+  actName: '서벽 절벽지대',
   waveIndex: 0,
   themeId: 'echo-room',
-  enemySetId: 'archive-ruins',
-  bossId: 'record-devourer',
+  enemySetId: 'submission-act1',
+  bossId: 'resonance_goral',
   modifiers: [],
   generation,
 });

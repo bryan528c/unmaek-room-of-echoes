@@ -7,26 +7,29 @@ describe('RunActDirector', () => {
     director.current.waves.forEach((_wave, index) => expect(director.beginWave(index)).toBe(true));
     director.completeBoss(180_000, 36);
     const act2 = director.advanceAct(184_000, 36);
-    expect(act2).toMatchObject({ index: 2, id: 'act-2-ink-archive', name: '먹빛 기록고', bossId: 'record-editor' });
+    expect(act2).toMatchObject({ index: 2, id: 'act-2-sinkhole-lowland', name: '천갱 저지림', bossId: 'diffraction_pangolin' });
     expect(act2.waves).toHaveLength(4);
+    expect(new Set(act2.waves.flatMap((wave) => wave.batches.flat()))).toEqual(new Set(['chaser', 'archer']));
     expect(new Set(act2.waves.flatMap((wave) => wave.patterns))).toEqual(new Set(['ink-echo-projectile', 'stitch-pair', 'past-position', 'mixed-archive']));
     expect(director.snapshot()).toMatchObject({ bossesDefeated: 1, completedActs: 1, highestAct: 2 });
   });
 
-  it('enters generated Endless Acts after the second boss with bounded scaling and announced modifiers', () => {
+  it('enters the official Act 3, then preserves the generated Endless flow after its boss', () => {
     const director = new RunActDirector(); director.beginRun(7);
     director.completeBoss(100_000, 20); director.advanceAct(104_000, 20);
     director.completeBoss(240_000, 45); const act3 = director.advanceAct(244_000, 45);
-    expect(act3.index).toBe(3); expect(act3.modifiers.length).toBeGreaterThanOrEqual(1);
-    expect(act3.name).toBe('끊기지 않는 기록');
-    expect(`Act ${act3.index} · ${act3.name}`).toBe('Act 3 · 끊기지 않는 기록');
+    expect(act3).toMatchObject({ index: 3, id: 'act-3-central-waterway', name: '중앙 습지와 지하 수로', bossId: 'channel_otter_mother' });
+    expect(new Set(act3.waves.flatMap((wave) => wave.batches.flat()))).toEqual(new Set(['elite', 'archer']));
+    expect(act3.modifiers.length).toBeGreaterThanOrEqual(1);
     expect(activeModifiersForWave(act3, 0)).toHaveLength(1);
     expect(activeModifiersForWave(act3, 1)).toEqual(act3.modifiers);
     expect(act3.waves.every((wave) => !wave.label.startsWith('Act '))).toBe(true);
     expect(act3.healthMultiplier).toBeGreaterThan(1); expect(act3.damageMultiplier).toBeGreaterThan(1);
+    director.completeBoss(380_000, 60); const act4 = director.advanceAct(384_000, 60);
+    expect(act4).toMatchObject({ index: 4, name: '끊기지 않는 기록' });
     expect(actDefinition(30).healthMultiplier).toBeLessThanOrEqual(2.35);
     expect(actDefinition(30).damageMultiplier).toBeLessThanOrEqual(1.85);
-    expect(director.snapshot()).toMatchObject({ bossesDefeated: 2, completedActs: 2, highestAct: 3 });
+    expect(director.snapshot()).toMatchObject({ bossesDefeated: 3, completedActs: 3, highestAct: 4 });
   });
 
   it('blocks old act callbacks without discarding run-wide boss and result records', () => {

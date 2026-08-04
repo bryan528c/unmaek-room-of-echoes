@@ -13,6 +13,8 @@ npm.cmd run dev
 
 테스트는 `npm.cmd run test`, 프로덕션 빌드는 `npm.cmd run build`입니다. 카드 제시 500 Run 검증은 `npm.cmd run simulate:upgrades`, 세 빌드 60초 고정 입력 비교는 `npm.cmd run simulate:builds`로 실행합니다.
 
+제출판 런타임 패키지는 `handoff/UNMAEK_SUBMISSION_RUNTIME_PACK_v1`을 기준으로 통합합니다.
+
 ## 조작
 
 - `WASD` / 방향키: 이동 및 메뉴 선택
@@ -20,7 +22,7 @@ npm.cmd run dev
 - `J`: 마지막 이동 방향으로 한 번의 넓은 `절단` (자동 추적·전진 없음)
 - `K` / `Shift`: 패링
 - `Space`: 대시
-- `Q / E / R`: 멎는다 / 되돌린다 / 잇는다 (문장력 비용 없이 독립 쿨다운)
+- `Q / E / R`: 6개 언령 중 새 Run 시작 시 장착한 3개 슬롯 사용 (기본 장착: 멎는다 / 되돌린다 / 잇는다, 문장력 비용 없이 독립 쿨다운)
 - `F`: 다음 언령 강화
 - `1 / 2 / 3`: 강화 카드 즉시 선택
 - `A / D` 또는 `← / →` + `Enter`: 강화 카드 포커스와 확정 (`R`: 다시 뽑기)

@@ -100,6 +100,7 @@ export interface HudState {
   bossPhase?: number;
   bossGuide?: string;
   bossName?: string;
+  bossPhaseName?: string;
   actIndex: number;
   actName: string;
   waveLabel: string;
@@ -203,7 +204,7 @@ export class OverlayUI {
         <div class="portrait-crop" aria-label="주인공 초상화"><img src="./assets/hero-concept.png" alt="검은 망토를 입은 소년의 얼굴" /></div>
         <p class="eyebrow">잊힌 언어를 잇는 자</p>
         <h1><small>言脈</small> 언맥 <span>잔향의 방</span></h1>
-        <p class="title-copy">멎고, 되돌리고, 이어라.<br />기록 포식자가 삼킨 마지막 문장을 되찾으라.</p>
+        <p class="title-copy">멎고, 되돌리고, 이어라.<br />서벽에서 지하 수로까지 끊긴 언맥을 다시 이으라.</p>
         <div class="menu-actions">
           <button class="rune-button primary" data-action="start"><span>새 기록 시작</span><kbd>Enter</kbd></button>
           <button class="rune-button" data-action="controls">조작법</button>
@@ -304,8 +305,8 @@ export class OverlayUI {
     const hud = document.createElement('section');
     hud.className = 'hud';
     hud.innerHTML = `<div class="health-panel"><div class="hero-mini"><img src="./assets/hero-concept.png" alt="" /></div><div><div class="hud-label">생명 <span data-health-text>100 / 100</span></div><div class="health-track"><i data-health-ghost></i><em data-health-rewind></em><b data-health></b></div></div></div>
-      <div class="stage-panel"><span data-stage>제1전투</span><small data-run-context>Act 1 · 계승실 · 보스 0</small><em data-modifiers></em><strong data-score>0</strong></div>
-      <div class="boss-panel hidden" data-boss><div><span data-boss-name>기록 포식자</span><em data-boss-phase>제1형</em></div><small data-boss-guide></small><div class="boss-track"><b data-boss-health></b></div></div>
+      <div class="stage-panel"><span data-stage>서벽 절벽지대</span><small data-run-context>Act 1 · 서벽 절벽지대 · 보스 0</small><em data-modifiers></em><strong data-score>0</strong></div>
+      <div class="boss-panel hidden" data-boss><div><span data-boss-name>반향각 산양</span><em data-boss-phase>영역 경고</em></div><small data-boss-guide></small><div class="boss-track"><b data-boss-health></b></div></div>
       <div class="word-hud">
         <div class="finisher-slot ready" data-cut><kbd>J</kbd><b data-cut-label>절단</b><small data-cut-status>준비 완료</small><span data-echo-status>잔향 칼날</span></div>
         <div class="word-slot" data-word="q"><kbd>Q</kbd><b>멎는다</b><span data-cooldown>비용 25</span></div>
@@ -394,9 +395,9 @@ export class OverlayUI {
     const boss = this.hud.querySelector<HTMLElement>('[data-boss]');
     if (boss && state.bossHealth !== undefined && state.bossMaxHealth !== undefined) {
       boss.classList.remove('hidden');
-      const name = boss.querySelector('[data-boss-name]'); if (name) name.textContent = state.bossName ?? '기록 포식자';
+      const name = boss.querySelector('[data-boss-name]'); if (name) name.textContent = state.bossName ?? '반향각 산양';
       const bar = boss.querySelector<HTMLElement>('[data-boss-health]'); if (bar) bar.style.width = `${Math.max(0, state.bossHealth / state.bossMaxHealth) * 100}%`;
-      const phase = boss.querySelector('[data-boss-phase]'); if (phase) phase.textContent = `제${state.bossPhase ?? 1}형`;
+      const phase = boss.querySelector('[data-boss-phase]'); if (phase) phase.textContent = state.bossPhaseName ?? `제${state.bossPhase ?? 1}형`;
       const guide = boss.querySelector('[data-boss-guide]'); if (guide) guide.textContent = state.bossGuide ?? '';
     } else boss?.classList.add('hidden');
     const owned = this.hud.querySelector<HTMLElement>('[data-owned-upgrades]');
@@ -529,7 +530,7 @@ export class OverlayUI {
   public showModifierIntro(modifier: ModifierPresentation, continueRun: () => void): void {
     this.clear();
     const screen = document.createElement('section'); screen.className = `screen modifier-intro-screen ${modifier.detailed ? 'detailed' : 'compact'}`;
-    screen.innerHTML = `<div class="modifier-intro-card"><i>${modifier.icon}</i><div><p>${modifier.detailed ? '먹빛 기록고 규칙' : '기록 변칙'}</p><h2>${modifier.name}</h2>${modifier.detailed ? `<span>${modifier.description}</span>` : ''}</div></div>`;
+    screen.innerHTML = `<div class="modifier-intro-card"><i>${modifier.icon}</i><div><p>${modifier.detailed ? '전투 변칙 규칙' : '기록 변칙'}</p><h2>${modifier.name}</h2>${modifier.detailed ? `<span>${modifier.description}</span>` : ''}</div></div>`;
     this.root.append(screen);
     this.rewardTimer = window.setTimeout(continueRun, modifier.durationMs);
   }
