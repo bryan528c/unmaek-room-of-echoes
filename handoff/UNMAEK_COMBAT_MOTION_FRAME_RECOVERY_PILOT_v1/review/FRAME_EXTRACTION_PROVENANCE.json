@@ -1,0 +1,2721 @@
+{
+  "totalFrames": 99,
+  "subjects": {
+    "pressure_swift": {
+      "generatedAtlas": "review/source_atlases/pressure_swift_generated_source_atlas_DO_NOT_USE_RUNTIME.png",
+      "generatedAtlasClassification": "GENERATED_SOURCE_ATLAS_DO_NOT_USE_RUNTIME",
+      "approvedRuntimeSources": [
+        "source_cache/runtime_pack_full/creatures/act1/pressure_swift/runtime/act1_pressure_swift_fly_side_01.png",
+        "source_cache/runtime_pack_full/creatures/act1/pressure_swift/runtime/act1_pressure_swift_evade_side_01.png"
+      ],
+      "canvas": [
+        36,
+        24
+      ],
+      "groundPoint": [
+        18,
+        20
+      ],
+      "sharedUniformScale": 0.08181818,
+      "paletteColorLimit": 20,
+      "frames": [
+        {
+          "sequence": "fly",
+          "frame": 1,
+          "path": "pressure_swift/fly/pressure_swift_fly_f01.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              150,
+              183
+            ],
+            "runtimePoseSize": [
+              12,
+              15
+            ],
+            "pasteXY": [
+              12,
+              5
+            ],
+            "alphaBBox": [
+              12,
+              5,
+              24,
+              20
+            ]
+          }
+        },
+        {
+          "sequence": "fly",
+          "frame": 2,
+          "path": "pressure_swift/fly/pressure_swift_fly_f02.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              152,
+              167
+            ],
+            "runtimePoseSize": [
+              12,
+              14
+            ],
+            "pasteXY": [
+              12,
+              6
+            ],
+            "alphaBBox": [
+              12,
+              6,
+              24,
+              20
+            ]
+          }
+        },
+        {
+          "sequence": "fly",
+          "frame": 3,
+          "path": "pressure_swift/fly/pressure_swift_fly_f03.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              155,
+              78
+            ],
+            "runtimePoseSize": [
+              13,
+              6
+            ],
+            "pasteXY": [
+              12,
+              14
+            ],
+            "alphaBBox": [
+              12,
+              14,
+              25,
+              20
+            ]
+          }
+        },
+        {
+          "sequence": "fly",
+          "frame": 4,
+          "path": "pressure_swift/fly/pressure_swift_fly_f04.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              153,
+              140
+            ],
+            "runtimePoseSize": [
+              13,
+              11
+            ],
+            "pasteXY": [
+              12,
+              9
+            ],
+            "alphaBBox": [
+              12,
+              9,
+              23,
+              20
+            ]
+          }
+        },
+        {
+          "sequence": "fly",
+          "frame": 5,
+          "path": "pressure_swift/fly/pressure_swift_fly_f05.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              152,
+              146
+            ],
+            "runtimePoseSize": [
+              12,
+              12
+            ],
+            "pasteXY": [
+              12,
+              8
+            ],
+            "alphaBBox": [
+              12,
+              8,
+              24,
+              20
+            ]
+          }
+        },
+        {
+          "sequence": "fly",
+          "frame": 6,
+          "path": "pressure_swift/fly/pressure_swift_fly_f06.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              149,
+              157
+            ],
+            "runtimePoseSize": [
+              12,
+              13
+            ],
+            "pasteXY": [
+              12,
+              7
+            ],
+            "alphaBBox": [
+              12,
+              7,
+              23,
+              20
+            ]
+          }
+        },
+        {
+          "sequence": "evade",
+          "frame": 1,
+          "path": "pressure_swift/evade/pressure_swift_evade_f01.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              131,
+              220
+            ],
+            "runtimePoseSize": [
+              11,
+              18
+            ],
+            "pasteXY": [
+              12,
+              2
+            ],
+            "alphaBBox": [
+              12,
+              2,
+              23,
+              20
+            ]
+          }
+        },
+        {
+          "sequence": "evade",
+          "frame": 2,
+          "path": "pressure_swift/evade/pressure_swift_evade_f02.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              160,
+              212
+            ],
+            "runtimePoseSize": [
+              13,
+              17
+            ],
+            "pasteXY": [
+              12,
+              3
+            ],
+            "alphaBBox": [
+              12,
+              3,
+              25,
+              20
+            ]
+          }
+        },
+        {
+          "sequence": "evade",
+          "frame": 3,
+          "path": "pressure_swift/evade/pressure_swift_evade_f03.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              148,
+              51
+            ],
+            "runtimePoseSize": [
+              12,
+              4
+            ],
+            "pasteXY": [
+              12,
+              16
+            ],
+            "alphaBBox": [
+              12,
+              16,
+              24,
+              20
+            ]
+          }
+        },
+        {
+          "sequence": "evade",
+          "frame": 4,
+          "path": "pressure_swift/evade/pressure_swift_evade_f04.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              145,
+              148
+            ],
+            "runtimePoseSize": [
+              12,
+              12
+            ],
+            "pasteXY": [
+              12,
+              8
+            ],
+            "alphaBBox": [
+              12,
+              8,
+              24,
+              20
+            ]
+          }
+        }
+      ],
+      "spriteSheets": [
+        "pressure_swift/sprite_sheets/pressure_swift_fly_sheet_candidate.png",
+        "pressure_swift/sprite_sheets/pressure_swift_evade_sheet_candidate.png"
+      ]
+    },
+    "deflect_bat": {
+      "generatedAtlas": "review/source_atlases/deflect_bat_generated_source_atlas_DO_NOT_USE_RUNTIME.png",
+      "generatedAtlasClassification": "GENERATED_SOURCE_ATLAS_DO_NOT_USE_RUNTIME",
+      "approvedRuntimeSources": [
+        "source_cache/runtime_pack_full/creatures/act1/deflect_bat/runtime/act1_deflect_bat_idle_side_01.png",
+        "source_cache/runtime_pack_full/creatures/act1/deflect_bat/runtime/act1_deflect_bat_move_side_01.png"
+      ],
+      "canvas": [
+        52,
+        36
+      ],
+      "groundPoint": [
+        26,
+        29
+      ],
+      "sharedUniformScale": 0.21259843,
+      "paletteColorLimit": 24,
+      "frames": [
+        {
+          "sequence": "idle",
+          "frame": 1,
+          "path": "deflect_bat/idle/deflect_bat_idle_f01.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              124,
+              96
+            ],
+            "runtimePoseSize": [
+              26,
+              20
+            ],
+            "pasteXY": [
+              13,
+              9
+            ],
+            "alphaBBox": [
+              13,
+              9,
+              39,
+              29
+            ]
+          }
+        },
+        {
+          "sequence": "idle",
+          "frame": 2,
+          "path": "deflect_bat/idle/deflect_bat_idle_f02.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              136,
+              120
+            ],
+            "runtimePoseSize": [
+              29,
+              26
+            ],
+            "pasteXY": [
+              12,
+              3
+            ],
+            "alphaBBox": [
+              12,
+              3,
+              41,
+              29
+            ]
+          }
+        },
+        {
+          "sequence": "idle",
+          "frame": 3,
+          "path": "deflect_bat/idle/deflect_bat_idle_f03.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              148,
+              103
+            ],
+            "runtimePoseSize": [
+              31,
+              22
+            ],
+            "pasteXY": [
+              10,
+              7
+            ],
+            "alphaBBox": [
+              10,
+              7,
+              41,
+              29
+            ]
+          }
+        },
+        {
+          "sequence": "idle",
+          "frame": 4,
+          "path": "deflect_bat/idle/deflect_bat_idle_f04.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              148,
+              107
+            ],
+            "runtimePoseSize": [
+              31,
+              23
+            ],
+            "pasteXY": [
+              10,
+              6
+            ],
+            "alphaBBox": [
+              11,
+              6,
+              41,
+              29
+            ]
+          }
+        },
+        {
+          "sequence": "move",
+          "frame": 1,
+          "path": "deflect_bat/move/deflect_bat_move_f01.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              114,
+              120
+            ],
+            "runtimePoseSize": [
+              24,
+              26
+            ],
+            "pasteXY": [
+              14,
+              3
+            ],
+            "alphaBBox": [
+              14,
+              3,
+              38,
+              29
+            ]
+          }
+        },
+        {
+          "sequence": "move",
+          "frame": 2,
+          "path": "deflect_bat/move/deflect_bat_move_f02.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              121,
+              117
+            ],
+            "runtimePoseSize": [
+              26,
+              25
+            ],
+            "pasteXY": [
+              13,
+              4
+            ],
+            "alphaBBox": [
+              13,
+              4,
+              39,
+              29
+            ]
+          }
+        },
+        {
+          "sequence": "move",
+          "frame": 3,
+          "path": "deflect_bat/move/deflect_bat_move_f03.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              153,
+              103
+            ],
+            "runtimePoseSize": [
+              33,
+              22
+            ],
+            "pasteXY": [
+              10,
+              7
+            ],
+            "alphaBBox": [
+              10,
+              7,
+              43,
+              29
+            ]
+          }
+        },
+        {
+          "sequence": "move",
+          "frame": 4,
+          "path": "deflect_bat/move/deflect_bat_move_f04.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              118,
+              97
+            ],
+            "runtimePoseSize": [
+              25,
+              21
+            ],
+            "pasteXY": [
+              14,
+              8
+            ],
+            "alphaBBox": [
+              14,
+              8,
+              39,
+              29
+            ]
+          }
+        },
+        {
+          "sequence": "move",
+          "frame": 5,
+          "path": "deflect_bat/move/deflect_bat_move_f05.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              115,
+              127
+            ],
+            "runtimePoseSize": [
+              24,
+              27
+            ],
+            "pasteXY": [
+              14,
+              2
+            ],
+            "alphaBBox": [
+              14,
+              2,
+              38,
+              29
+            ]
+          }
+        },
+        {
+          "sequence": "move",
+          "frame": 6,
+          "path": "deflect_bat/move/deflect_bat_move_f06.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              124,
+              101
+            ],
+            "runtimePoseSize": [
+              26,
+              21
+            ],
+            "pasteXY": [
+              13,
+              8
+            ],
+            "alphaBBox": [
+              13,
+              8,
+              39,
+              29
+            ]
+          }
+        },
+        {
+          "sequence": "prep",
+          "frame": 1,
+          "path": "deflect_bat/prep/deflect_bat_prep_f01.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              155,
+              87
+            ],
+            "runtimePoseSize": [
+              33,
+              18
+            ],
+            "pasteXY": [
+              10,
+              11
+            ],
+            "alphaBBox": [
+              10,
+              11,
+              43,
+              29
+            ]
+          }
+        },
+        {
+          "sequence": "prep",
+          "frame": 2,
+          "path": "deflect_bat/prep/deflect_bat_prep_f02.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              144,
+              108
+            ],
+            "runtimePoseSize": [
+              31,
+              23
+            ],
+            "pasteXY": [
+              10,
+              6
+            ],
+            "alphaBBox": [
+              10,
+              6,
+              41,
+              29
+            ]
+          }
+        },
+        {
+          "sequence": "prep",
+          "frame": 3,
+          "path": "deflect_bat/prep/deflect_bat_prep_f03.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              137,
+              88
+            ],
+            "runtimePoseSize": [
+              29,
+              19
+            ],
+            "pasteXY": [
+              12,
+              10
+            ],
+            "alphaBBox": [
+              12,
+              10,
+              41,
+              29
+            ]
+          }
+        },
+        {
+          "sequence": "attack",
+          "frame": 1,
+          "path": "deflect_bat/attack/deflect_bat_attack_f01.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              119,
+              98
+            ],
+            "runtimePoseSize": [
+              25,
+              21
+            ],
+            "pasteXY": [
+              14,
+              8
+            ],
+            "alphaBBox": [
+              14,
+              8,
+              39,
+              29
+            ]
+          }
+        },
+        {
+          "sequence": "attack",
+          "frame": 2,
+          "path": "deflect_bat/attack/deflect_bat_attack_f02.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              114,
+              98
+            ],
+            "runtimePoseSize": [
+              24,
+              21
+            ],
+            "pasteXY": [
+              14,
+              8
+            ],
+            "alphaBBox": [
+              14,
+              8,
+              38,
+              29
+            ]
+          }
+        },
+        {
+          "sequence": "attack",
+          "frame": 3,
+          "path": "deflect_bat/attack/deflect_bat_attack_f03.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              117,
+              107
+            ],
+            "runtimePoseSize": [
+              25,
+              23
+            ],
+            "pasteXY": [
+              14,
+              6
+            ],
+            "alphaBBox": [
+              14,
+              6,
+              39,
+              29
+            ]
+          }
+        },
+        {
+          "sequence": "attack",
+          "frame": 4,
+          "path": "deflect_bat/attack/deflect_bat_attack_f04.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              122,
+              107
+            ],
+            "runtimePoseSize": [
+              26,
+              23
+            ],
+            "pasteXY": [
+              13,
+              6
+            ],
+            "alphaBBox": [
+              13,
+              6,
+              39,
+              29
+            ]
+          }
+        },
+        {
+          "sequence": "hit_recover",
+          "frame": 1,
+          "path": "deflect_bat/hit_recover/deflect_bat_hit_recover_f01.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              126,
+              90
+            ],
+            "runtimePoseSize": [
+              27,
+              19
+            ],
+            "pasteXY": [
+              12,
+              10
+            ],
+            "alphaBBox": [
+              12,
+              10,
+              39,
+              29
+            ]
+          }
+        },
+        {
+          "sequence": "hit_recover",
+          "frame": 2,
+          "path": "deflect_bat/hit_recover/deflect_bat_hit_recover_f02.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              136,
+              120
+            ],
+            "runtimePoseSize": [
+              29,
+              26
+            ],
+            "pasteXY": [
+              12,
+              3
+            ],
+            "alphaBBox": [
+              12,
+              3,
+              41,
+              29
+            ]
+          }
+        },
+        {
+          "sequence": "hit_recover",
+          "frame": 3,
+          "path": "deflect_bat/hit_recover/deflect_bat_hit_recover_f03.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              125,
+              102
+            ],
+            "runtimePoseSize": [
+              27,
+              22
+            ],
+            "pasteXY": [
+              12,
+              7
+            ],
+            "alphaBBox": [
+              12,
+              7,
+              39,
+              29
+            ]
+          }
+        }
+      ],
+      "spriteSheets": [
+        "deflect_bat/sprite_sheets/deflect_bat_idle_sheet_candidate.png",
+        "deflect_bat/sprite_sheets/deflect_bat_move_sheet_candidate.png",
+        "deflect_bat/sprite_sheets/deflect_bat_prep_sheet_candidate.png",
+        "deflect_bat/sprite_sheets/deflect_bat_attack_sheet_candidate.png",
+        "deflect_bat/sprite_sheets/deflect_bat_hit_recover_sheet_candidate.png"
+      ]
+    },
+    "rewind_lizard": {
+      "generatedAtlas": "review/source_atlases/rewind_lizard_generated_source_atlas_DO_NOT_USE_RUNTIME.png",
+      "generatedAtlasClassification": "GENERATED_SOURCE_ATLAS_DO_NOT_USE_RUNTIME",
+      "approvedRuntimeSources": [
+        "source_cache/runtime_pack_full/creatures/act1/rewind_lizard/runtime/act1_rewind_lizard_idle_side_01.png",
+        "source_cache/runtime_pack_full/creatures/act1/rewind_lizard/runtime/act1_rewind_lizard_move_side_01.png"
+      ],
+      "canvas": [
+        72,
+        40
+      ],
+      "groundPoint": [
+        33,
+        34
+      ],
+      "sharedUniformScale": 0.23868313,
+      "paletteColorLimit": 24,
+      "frames": [
+        {
+          "sequence": "idle",
+          "frame": 1,
+          "path": "rewind_lizard/idle/rewind_lizard_idle_f01.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              185,
+              94
+            ],
+            "runtimePoseSize": [
+              44,
+              22
+            ],
+            "pasteXY": [
+              11,
+              12
+            ],
+            "alphaBBox": [
+              11,
+              12,
+              55,
+              34
+            ]
+          }
+        },
+        {
+          "sequence": "idle",
+          "frame": 2,
+          "path": "rewind_lizard/idle/rewind_lizard_idle_f02.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              185,
+              94
+            ],
+            "runtimePoseSize": [
+              44,
+              22
+            ],
+            "pasteXY": [
+              11,
+              12
+            ],
+            "alphaBBox": [
+              11,
+              12,
+              55,
+              34
+            ]
+          }
+        },
+        {
+          "sequence": "idle",
+          "frame": 3,
+          "path": "rewind_lizard/idle/rewind_lizard_idle_f03.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              188,
+              94
+            ],
+            "runtimePoseSize": [
+              45,
+              22
+            ],
+            "pasteXY": [
+              10,
+              12
+            ],
+            "alphaBBox": [
+              10,
+              12,
+              55,
+              34
+            ]
+          }
+        },
+        {
+          "sequence": "idle",
+          "frame": 4,
+          "path": "rewind_lizard/idle/rewind_lizard_idle_f04.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              159,
+              120
+            ],
+            "runtimePoseSize": [
+              38,
+              29
+            ],
+            "pasteXY": [
+              14,
+              5
+            ],
+            "alphaBBox": [
+              14,
+              5,
+              52,
+              34
+            ]
+          }
+        },
+        {
+          "sequence": "move",
+          "frame": 1,
+          "path": "rewind_lizard/move/rewind_lizard_move_f01.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              194,
+              91
+            ],
+            "runtimePoseSize": [
+              46,
+              22
+            ],
+            "pasteXY": [
+              10,
+              12
+            ],
+            "alphaBBox": [
+              10,
+              12,
+              56,
+              34
+            ]
+          }
+        },
+        {
+          "sequence": "move",
+          "frame": 2,
+          "path": "rewind_lizard/move/rewind_lizard_move_f02.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              194,
+              88
+            ],
+            "runtimePoseSize": [
+              46,
+              21
+            ],
+            "pasteXY": [
+              10,
+              13
+            ],
+            "alphaBBox": [
+              10,
+              13,
+              56,
+              34
+            ]
+          }
+        },
+        {
+          "sequence": "move",
+          "frame": 3,
+          "path": "rewind_lizard/move/rewind_lizard_move_f03.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              196,
+              89
+            ],
+            "runtimePoseSize": [
+              47,
+              21
+            ],
+            "pasteXY": [
+              10,
+              13
+            ],
+            "alphaBBox": [
+              10,
+              13,
+              57,
+              34
+            ]
+          }
+        },
+        {
+          "sequence": "move",
+          "frame": 4,
+          "path": "rewind_lizard/move/rewind_lizard_move_f04.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              192,
+              88
+            ],
+            "runtimePoseSize": [
+              46,
+              21
+            ],
+            "pasteXY": [
+              10,
+              13
+            ],
+            "alphaBBox": [
+              10,
+              13,
+              56,
+              34
+            ]
+          }
+        },
+        {
+          "sequence": "move",
+          "frame": 5,
+          "path": "rewind_lizard/move/rewind_lizard_move_f05.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              192,
+              95
+            ],
+            "runtimePoseSize": [
+              46,
+              23
+            ],
+            "pasteXY": [
+              10,
+              11
+            ],
+            "alphaBBox": [
+              10,
+              11,
+              56,
+              34
+            ]
+          }
+        },
+        {
+          "sequence": "move",
+          "frame": 6,
+          "path": "rewind_lizard/move/rewind_lizard_move_f06.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              194,
+              88
+            ],
+            "runtimePoseSize": [
+              46,
+              21
+            ],
+            "pasteXY": [
+              10,
+              13
+            ],
+            "alphaBBox": [
+              10,
+              13,
+              56,
+              34
+            ]
+          }
+        },
+        {
+          "sequence": "prep",
+          "frame": 1,
+          "path": "rewind_lizard/prep/rewind_lizard_prep_f01.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              185,
+              75
+            ],
+            "runtimePoseSize": [
+              44,
+              18
+            ],
+            "pasteXY": [
+              11,
+              16
+            ],
+            "alphaBBox": [
+              11,
+              16,
+              55,
+              34
+            ]
+          }
+        },
+        {
+          "sequence": "prep",
+          "frame": 2,
+          "path": "rewind_lizard/prep/rewind_lizard_prep_f02.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              167,
+              69
+            ],
+            "runtimePoseSize": [
+              40,
+              16
+            ],
+            "pasteXY": [
+              13,
+              18
+            ],
+            "alphaBBox": [
+              13,
+              18,
+              53,
+              34
+            ]
+          }
+        },
+        {
+          "sequence": "prep",
+          "frame": 3,
+          "path": "rewind_lizard/prep/rewind_lizard_prep_f03.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              175,
+              69
+            ],
+            "runtimePoseSize": [
+              42,
+              16
+            ],
+            "pasteXY": [
+              12,
+              18
+            ],
+            "alphaBBox": [
+              12,
+              18,
+              54,
+              34
+            ]
+          }
+        },
+        {
+          "sequence": "attack",
+          "frame": 1,
+          "path": "rewind_lizard/attack/rewind_lizard_attack_f01.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              222,
+              95
+            ],
+            "runtimePoseSize": [
+              53,
+              23
+            ],
+            "pasteXY": [
+              6,
+              11
+            ],
+            "alphaBBox": [
+              6,
+              11,
+              59,
+              34
+            ]
+          }
+        },
+        {
+          "sequence": "attack",
+          "frame": 2,
+          "path": "rewind_lizard/attack/rewind_lizard_attack_f02.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              243,
+              96
+            ],
+            "runtimePoseSize": [
+              58,
+              23
+            ],
+            "pasteXY": [
+              4,
+              11
+            ],
+            "alphaBBox": [
+              4,
+              11,
+              62,
+              34
+            ]
+          }
+        },
+        {
+          "sequence": "attack",
+          "frame": 3,
+          "path": "rewind_lizard/attack/rewind_lizard_attack_f03.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              197,
+              77
+            ],
+            "runtimePoseSize": [
+              47,
+              18
+            ],
+            "pasteXY": [
+              10,
+              16
+            ],
+            "alphaBBox": [
+              10,
+              16,
+              57,
+              34
+            ]
+          }
+        },
+        {
+          "sequence": "attack",
+          "frame": 4,
+          "path": "rewind_lizard/attack/rewind_lizard_attack_f04.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              174,
+              89
+            ],
+            "runtimePoseSize": [
+              42,
+              21
+            ],
+            "pasteXY": [
+              12,
+              13
+            ],
+            "alphaBBox": [
+              12,
+              13,
+              54,
+              34
+            ]
+          }
+        },
+        {
+          "sequence": "hit_recover",
+          "frame": 1,
+          "path": "rewind_lizard/hit_recover/rewind_lizard_hit_recover_f01.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              183,
+              74
+            ],
+            "runtimePoseSize": [
+              44,
+              18
+            ],
+            "pasteXY": [
+              11,
+              16
+            ],
+            "alphaBBox": [
+              11,
+              16,
+              55,
+              34
+            ]
+          }
+        },
+        {
+          "sequence": "hit_recover",
+          "frame": 2,
+          "path": "rewind_lizard/hit_recover/rewind_lizard_hit_recover_f02.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              168,
+              77
+            ],
+            "runtimePoseSize": [
+              40,
+              18
+            ],
+            "pasteXY": [
+              13,
+              16
+            ],
+            "alphaBBox": [
+              13,
+              16,
+              53,
+              34
+            ]
+          }
+        },
+        {
+          "sequence": "hit_recover",
+          "frame": 3,
+          "path": "rewind_lizard/hit_recover/rewind_lizard_hit_recover_f03.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              188,
+              87
+            ],
+            "runtimePoseSize": [
+              45,
+              21
+            ],
+            "pasteXY": [
+              10,
+              13
+            ],
+            "alphaBBox": [
+              10,
+              13,
+              55,
+              34
+            ]
+          }
+        }
+      ],
+      "spriteSheets": [
+        "rewind_lizard/sprite_sheets/rewind_lizard_idle_sheet_candidate.png",
+        "rewind_lizard/sprite_sheets/rewind_lizard_move_sheet_candidate.png",
+        "rewind_lizard/sprite_sheets/rewind_lizard_prep_sheet_candidate.png",
+        "rewind_lizard/sprite_sheets/rewind_lizard_attack_sheet_candidate.png",
+        "rewind_lizard/sprite_sheets/rewind_lizard_hit_recover_sheet_candidate.png"
+      ]
+    },
+    "mineral_spider": {
+      "generatedAtlas": "review/source_atlases/mineral_spider_generated_source_atlas_DO_NOT_USE_RUNTIME.png",
+      "generatedAtlasClassification": "GENERATED_SOURCE_ATLAS_DO_NOT_USE_RUNTIME",
+      "approvedRuntimeSources": [
+        "deliverables/UNMAEK_VISUAL_RECOVERY_RUNTIME_EXPORT_v1/creatures/act1/mineral_spider/runtime_corrected/act1_mineral_spider_alert_front_corrected_candidate_104x88.png",
+        "deliverables/UNMAEK_VISUAL_RECOVERY_RUNTIME_EXPORT_v1/creatures/act1/mineral_spider/runtime_corrected/act1_mineral_spider_attack_side_corrected_candidate_104x88.png",
+        "deliverables/UNMAEK_VISUAL_RECOVERY_RUNTIME_EXPORT_v1/creatures/act1/mineral_spider/runtime_corrected/act1_mineral_spider_deploy_side_corrected_candidate_104x88.png",
+        "deliverables/UNMAEK_VISUAL_RECOVERY_RUNTIME_EXPORT_v1/creatures/act1/mineral_spider/runtime_corrected/act1_mineral_spider_idle_front_corrected_candidate_104x88.png",
+        "deliverables/UNMAEK_VISUAL_RECOVERY_RUNTIME_EXPORT_v1/creatures/act1/mineral_spider/runtime_corrected/act1_mineral_spider_move_side_corrected_candidate_104x88.png",
+        "deliverables/UNMAEK_VISUAL_RECOVERY_RUNTIME_EXPORT_v1/creatures/act1/mineral_spider/runtime_corrected/act1_mineral_spider_retreat_side_corrected_candidate_104x88.png",
+        "deliverables/UNMAEK_VISUAL_RECOVERY_RUNTIME_EXPORT_v1/creatures/act1/mineral_spider/runtime_corrected/act1_mineral_spider_stunned_front_corrected_candidate_104x88.png"
+      ],
+      "canvas": [
+        104,
+        88
+      ],
+      "groundPoint": [
+        52,
+        72
+      ],
+      "sharedUniformScale": 0.38174274,
+      "paletteColorLimit": 32,
+      "frames": [
+        {
+          "sequence": "idle",
+          "frame": 1,
+          "path": "mineral_spider/idle/mineral_spider_idle_f01.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              157,
+              151
+            ],
+            "runtimePoseSize": [
+              60,
+              58
+            ],
+            "pasteXY": [
+              22,
+              14
+            ],
+            "alphaBBox": [
+              22,
+              14,
+              82,
+              72
+            ]
+          }
+        },
+        {
+          "sequence": "idle",
+          "frame": 2,
+          "path": "mineral_spider/idle/mineral_spider_idle_f02.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              163,
+              150
+            ],
+            "runtimePoseSize": [
+              62,
+              57
+            ],
+            "pasteXY": [
+              21,
+              15
+            ],
+            "alphaBBox": [
+              21,
+              15,
+              83,
+              72
+            ]
+          }
+        },
+        {
+          "sequence": "idle",
+          "frame": 3,
+          "path": "mineral_spider/idle/mineral_spider_idle_f03.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              160,
+              149
+            ],
+            "runtimePoseSize": [
+              61,
+              57
+            ],
+            "pasteXY": [
+              22,
+              15
+            ],
+            "alphaBBox": [
+              22,
+              15,
+              83,
+              72
+            ]
+          }
+        },
+        {
+          "sequence": "idle",
+          "frame": 4,
+          "path": "mineral_spider/idle/mineral_spider_idle_f04.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              162,
+              150
+            ],
+            "runtimePoseSize": [
+              62,
+              57
+            ],
+            "pasteXY": [
+              21,
+              15
+            ],
+            "alphaBBox": [
+              21,
+              15,
+              83,
+              72
+            ]
+          }
+        },
+        {
+          "sequence": "move",
+          "frame": 1,
+          "path": "mineral_spider/move/mineral_spider_move_f01.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              189,
+              105
+            ],
+            "runtimePoseSize": [
+              72,
+              40
+            ],
+            "pasteXY": [
+              16,
+              32
+            ],
+            "alphaBBox": [
+              16,
+              32,
+              88,
+              72
+            ]
+          }
+        },
+        {
+          "sequence": "move",
+          "frame": 2,
+          "path": "mineral_spider/move/mineral_spider_move_f02.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              187,
+              107
+            ],
+            "runtimePoseSize": [
+              71,
+              41
+            ],
+            "pasteXY": [
+              16,
+              31
+            ],
+            "alphaBBox": [
+              16,
+              31,
+              87,
+              72
+            ]
+          }
+        },
+        {
+          "sequence": "move",
+          "frame": 3,
+          "path": "mineral_spider/move/mineral_spider_move_f03.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              171,
+              110
+            ],
+            "runtimePoseSize": [
+              65,
+              42
+            ],
+            "pasteXY": [
+              20,
+              30
+            ],
+            "alphaBBox": [
+              20,
+              30,
+              85,
+              72
+            ]
+          }
+        },
+        {
+          "sequence": "move",
+          "frame": 4,
+          "path": "mineral_spider/move/mineral_spider_move_f04.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              198,
+              105
+            ],
+            "runtimePoseSize": [
+              76,
+              40
+            ],
+            "pasteXY": [
+              14,
+              32
+            ],
+            "alphaBBox": [
+              14,
+              32,
+              90,
+              72
+            ]
+          }
+        },
+        {
+          "sequence": "move",
+          "frame": 5,
+          "path": "mineral_spider/move/mineral_spider_move_f05.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              198,
+              110
+            ],
+            "runtimePoseSize": [
+              76,
+              42
+            ],
+            "pasteXY": [
+              14,
+              30
+            ],
+            "alphaBBox": [
+              14,
+              30,
+              90,
+              72
+            ]
+          }
+        },
+        {
+          "sequence": "move",
+          "frame": 6,
+          "path": "mineral_spider/move/mineral_spider_move_f06.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              190,
+              106
+            ],
+            "runtimePoseSize": [
+              73,
+              40
+            ],
+            "pasteXY": [
+              16,
+              32
+            ],
+            "alphaBBox": [
+              16,
+              32,
+              89,
+              72
+            ]
+          }
+        },
+        {
+          "sequence": "idle_to_alert",
+          "frame": 1,
+          "path": "mineral_spider/idle_to_alert/mineral_spider_idle_to_alert_f01.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              165,
+              140
+            ],
+            "runtimePoseSize": [
+              63,
+              53
+            ],
+            "pasteXY": [
+              20,
+              19
+            ],
+            "alphaBBox": [
+              20,
+              19,
+              83,
+              72
+            ]
+          }
+        },
+        {
+          "sequence": "idle_to_alert",
+          "frame": 2,
+          "path": "mineral_spider/idle_to_alert/mineral_spider_idle_to_alert_f02.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              173,
+              131
+            ],
+            "runtimePoseSize": [
+              66,
+              50
+            ],
+            "pasteXY": [
+              19,
+              22
+            ],
+            "alphaBBox": [
+              19,
+              22,
+              85,
+              72
+            ]
+          }
+        },
+        {
+          "sequence": "idle_to_alert",
+          "frame": 3,
+          "path": "mineral_spider/idle_to_alert/mineral_spider_idle_to_alert_f03.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              168,
+              121
+            ],
+            "runtimePoseSize": [
+              64,
+              46
+            ],
+            "pasteXY": [
+              20,
+              26
+            ],
+            "alphaBBox": [
+              20,
+              26,
+              84,
+              72
+            ]
+          }
+        },
+        {
+          "sequence": "alert_to_deploy",
+          "frame": 1,
+          "path": "mineral_spider/alert_to_deploy/mineral_spider_alert_to_deploy_f01.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              168,
+              119
+            ],
+            "runtimePoseSize": [
+              64,
+              45
+            ],
+            "pasteXY": [
+              20,
+              27
+            ],
+            "alphaBBox": [
+              20,
+              27,
+              84,
+              72
+            ]
+          }
+        },
+        {
+          "sequence": "alert_to_deploy",
+          "frame": 2,
+          "path": "mineral_spider/alert_to_deploy/mineral_spider_alert_to_deploy_f02.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              169,
+              119
+            ],
+            "runtimePoseSize": [
+              65,
+              45
+            ],
+            "pasteXY": [
+              20,
+              27
+            ],
+            "alphaBBox": [
+              20,
+              27,
+              85,
+              72
+            ]
+          }
+        },
+        {
+          "sequence": "alert_to_deploy",
+          "frame": 3,
+          "path": "mineral_spider/alert_to_deploy/mineral_spider_alert_to_deploy_f03.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              168,
+              116
+            ],
+            "runtimePoseSize": [
+              64,
+              44
+            ],
+            "pasteXY": [
+              20,
+              28
+            ],
+            "alphaBBox": [
+              20,
+              28,
+              84,
+              72
+            ]
+          }
+        },
+        {
+          "sequence": "deploy_to_attack",
+          "frame": 1,
+          "path": "mineral_spider/deploy_to_attack/mineral_spider_deploy_to_attack_f01.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              169,
+              101
+            ],
+            "runtimePoseSize": [
+              65,
+              39
+            ],
+            "pasteXY": [
+              20,
+              33
+            ],
+            "alphaBBox": [
+              20,
+              33,
+              85,
+              72
+            ]
+          }
+        },
+        {
+          "sequence": "deploy_to_attack",
+          "frame": 2,
+          "path": "mineral_spider/deploy_to_attack/mineral_spider_deploy_to_attack_f02.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              227,
+              108
+            ],
+            "runtimePoseSize": [
+              87,
+              41
+            ],
+            "pasteXY": [
+              8,
+              31
+            ],
+            "alphaBBox": [
+              8,
+              31,
+              95,
+              72
+            ]
+          }
+        },
+        {
+          "sequence": "deploy_to_attack",
+          "frame": 3,
+          "path": "mineral_spider/deploy_to_attack/mineral_spider_deploy_to_attack_f03.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              241,
+              108
+            ],
+            "runtimePoseSize": [
+              92,
+              41
+            ],
+            "pasteXY": [
+              6,
+              31
+            ],
+            "alphaBBox": [
+              6,
+              31,
+              98,
+              72
+            ]
+          }
+        },
+        {
+          "sequence": "deploy_to_attack",
+          "frame": 4,
+          "path": "mineral_spider/deploy_to_attack/mineral_spider_deploy_to_attack_f04.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              168,
+              109
+            ],
+            "runtimePoseSize": [
+              64,
+              42
+            ],
+            "pasteXY": [
+              20,
+              30
+            ],
+            "alphaBBox": [
+              20,
+              30,
+              84,
+              72
+            ]
+          }
+        },
+        {
+          "sequence": "attack_to_recover",
+          "frame": 1,
+          "path": "mineral_spider/attack_to_recover/mineral_spider_attack_to_recover_f01.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              170,
+              97
+            ],
+            "runtimePoseSize": [
+              65,
+              37
+            ],
+            "pasteXY": [
+              20,
+              35
+            ],
+            "alphaBBox": [
+              20,
+              35,
+              85,
+              72
+            ]
+          }
+        },
+        {
+          "sequence": "attack_to_recover",
+          "frame": 2,
+          "path": "mineral_spider/attack_to_recover/mineral_spider_attack_to_recover_f02.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              186,
+              94
+            ],
+            "runtimePoseSize": [
+              71,
+              36
+            ],
+            "pasteXY": [
+              16,
+              36
+            ],
+            "alphaBBox": [
+              16,
+              36,
+              87,
+              72
+            ]
+          }
+        },
+        {
+          "sequence": "attack_to_recover",
+          "frame": 3,
+          "path": "mineral_spider/attack_to_recover/mineral_spider_attack_to_recover_f03.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              197,
+              90
+            ],
+            "runtimePoseSize": [
+              75,
+              34
+            ],
+            "pasteXY": [
+              14,
+              38
+            ],
+            "alphaBBox": [
+              14,
+              38,
+              89,
+              72
+            ]
+          }
+        },
+        {
+          "sequence": "stunned_or_retreat",
+          "frame": 1,
+          "path": "mineral_spider/stunned_or_retreat/mineral_spider_stunned_or_retreat_f01.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              192,
+              65
+            ],
+            "runtimePoseSize": [
+              73,
+              25
+            ],
+            "pasteXY": [
+              16,
+              47
+            ],
+            "alphaBBox": [
+              16,
+              47,
+              89,
+              72
+            ]
+          }
+        },
+        {
+          "sequence": "stunned_or_retreat",
+          "frame": 2,
+          "path": "mineral_spider/stunned_or_retreat/mineral_spider_stunned_or_retreat_f02.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              187,
+              66
+            ],
+            "runtimePoseSize": [
+              71,
+              25
+            ],
+            "pasteXY": [
+              16,
+              47
+            ],
+            "alphaBBox": [
+              16,
+              47,
+              87,
+              72
+            ]
+          }
+        },
+        {
+          "sequence": "stunned_or_retreat",
+          "frame": 3,
+          "path": "mineral_spider/stunned_or_retreat/mineral_spider_stunned_or_retreat_f03.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              173,
+              83
+            ],
+            "runtimePoseSize": [
+              66,
+              32
+            ],
+            "pasteXY": [
+              19,
+              40
+            ],
+            "alphaBBox": [
+              19,
+              40,
+              85,
+              72
+            ]
+          }
+        }
+      ],
+      "spriteSheets": [
+        "mineral_spider/sprite_sheets/mineral_spider_idle_sheet_candidate.png",
+        "mineral_spider/sprite_sheets/mineral_spider_move_sheet_candidate.png",
+        "mineral_spider/sprite_sheets/mineral_spider_idle_to_alert_sheet_candidate.png",
+        "mineral_spider/sprite_sheets/mineral_spider_alert_to_deploy_sheet_candidate.png",
+        "mineral_spider/sprite_sheets/mineral_spider_deploy_to_attack_sheet_candidate.png",
+        "mineral_spider/sprite_sheets/mineral_spider_attack_to_recover_sheet_candidate.png",
+        "mineral_spider/sprite_sheets/mineral_spider_stunned_or_retreat_sheet_candidate.png"
+      ]
+    },
+    "resonance_goral": {
+      "generatedAtlas": "review/source_atlases/resonance_goral_generated_source_atlas_DO_NOT_USE_RUNTIME.png",
+      "generatedAtlasClassification": "GENERATED_SOURCE_ATLAS_DO_NOT_USE_RUNTIME",
+      "approvedRuntimeSources": [
+        "source_cache/runtime_pack_full/creatures/act1/resonance_goral/runtime/act1_resonance_goral_combat_fixed_01.png",
+        "source_cache/runtime_pack_full/creatures/act1/resonance_goral/runtime/act1_resonance_goral_idle_fixed_01.png",
+        "source_cache/runtime_pack_full/creatures/act1/resonance_goral/runtime/act1_resonance_goral_retreat_fixed_01.png",
+        "source_cache/runtime_pack_full/creatures/act1/resonance_goral/runtime/act1_resonance_goral_warning_fixed_01.png"
+      ],
+      "canvas": [
+        220,
+        175
+      ],
+      "groundPoint": [
+        110,
+        154
+      ],
+      "sharedUniformScale": 0.75918367,
+      "paletteColorLimit": 48,
+      "frames": [
+        {
+          "sequence": "idle",
+          "frame": 1,
+          "path": "resonance_goral/idle/resonance_goral_idle_f01.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              137,
+              163
+            ],
+            "runtimePoseSize": [
+              104,
+              124
+            ],
+            "pasteXY": [
+              58,
+              30
+            ],
+            "alphaBBox": [
+              58,
+              30,
+              162,
+              154
+            ]
+          }
+        },
+        {
+          "sequence": "idle",
+          "frame": 2,
+          "path": "resonance_goral/idle/resonance_goral_idle_f02.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              137,
+              163
+            ],
+            "runtimePoseSize": [
+              104,
+              124
+            ],
+            "pasteXY": [
+              58,
+              30
+            ],
+            "alphaBBox": [
+              58,
+              30,
+              162,
+              154
+            ]
+          }
+        },
+        {
+          "sequence": "idle",
+          "frame": 3,
+          "path": "resonance_goral/idle/resonance_goral_idle_f03.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              152,
+              164
+            ],
+            "runtimePoseSize": [
+              115,
+              125
+            ],
+            "pasteXY": [
+              52,
+              29
+            ],
+            "alphaBBox": [
+              52,
+              29,
+              167,
+              154
+            ]
+          }
+        },
+        {
+          "sequence": "idle",
+          "frame": 4,
+          "path": "resonance_goral/idle/resonance_goral_idle_f04.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              142,
+              163
+            ],
+            "runtimePoseSize": [
+              108,
+              124
+            ],
+            "pasteXY": [
+              56,
+              30
+            ],
+            "alphaBBox": [
+              56,
+              30,
+              164,
+              154
+            ]
+          }
+        },
+        {
+          "sequence": "warning",
+          "frame": 1,
+          "path": "resonance_goral/warning/resonance_goral_warning_f01.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              139,
+              152
+            ],
+            "runtimePoseSize": [
+              106,
+              115
+            ],
+            "pasteXY": [
+              57,
+              39
+            ],
+            "alphaBBox": [
+              57,
+              39,
+              163,
+              154
+            ]
+          }
+        },
+        {
+          "sequence": "warning",
+          "frame": 2,
+          "path": "resonance_goral/warning/resonance_goral_warning_f02.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              150,
+              155
+            ],
+            "runtimePoseSize": [
+              114,
+              118
+            ],
+            "pasteXY": [
+              53,
+              36
+            ],
+            "alphaBBox": [
+              53,
+              36,
+              167,
+              154
+            ]
+          }
+        },
+        {
+          "sequence": "warning",
+          "frame": 3,
+          "path": "resonance_goral/warning/resonance_goral_warning_f03.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              139,
+              151
+            ],
+            "runtimePoseSize": [
+              106,
+              115
+            ],
+            "pasteXY": [
+              57,
+              39
+            ],
+            "alphaBBox": [
+              57,
+              39,
+              163,
+              154
+            ]
+          }
+        },
+        {
+          "sequence": "combat_prep",
+          "frame": 1,
+          "path": "resonance_goral/combat_prep/resonance_goral_combat_prep_f01.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              150,
+              132
+            ],
+            "runtimePoseSize": [
+              114,
+              100
+            ],
+            "pasteXY": [
+              53,
+              54
+            ],
+            "alphaBBox": [
+              53,
+              54,
+              167,
+              154
+            ]
+          }
+        },
+        {
+          "sequence": "combat_prep",
+          "frame": 2,
+          "path": "resonance_goral/combat_prep/resonance_goral_combat_prep_f02.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              171,
+              131
+            ],
+            "runtimePoseSize": [
+              130,
+              99
+            ],
+            "pasteXY": [
+              45,
+              55
+            ],
+            "alphaBBox": [
+              45,
+              55,
+              175,
+              154
+            ]
+          }
+        },
+        {
+          "sequence": "combat_prep",
+          "frame": 3,
+          "path": "resonance_goral/combat_prep/resonance_goral_combat_prep_f03.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              176,
+              129
+            ],
+            "runtimePoseSize": [
+              134,
+              98
+            ],
+            "pasteXY": [
+              43,
+              56
+            ],
+            "alphaBBox": [
+              44,
+              56,
+              177,
+              154
+            ]
+          }
+        },
+        {
+          "sequence": "charge_attack",
+          "frame": 1,
+          "path": "resonance_goral/charge_attack/resonance_goral_charge_attack_f01.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              208,
+              126
+            ],
+            "runtimePoseSize": [
+              158,
+              96
+            ],
+            "pasteXY": [
+              31,
+              58
+            ],
+            "alphaBBox": [
+              31,
+              58,
+              189,
+              154
+            ]
+          }
+        },
+        {
+          "sequence": "charge_attack",
+          "frame": 2,
+          "path": "resonance_goral/charge_attack/resonance_goral_charge_attack_f02.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              232,
+              133
+            ],
+            "runtimePoseSize": [
+              176,
+              101
+            ],
+            "pasteXY": [
+              22,
+              53
+            ],
+            "alphaBBox": [
+              22,
+              53,
+              198,
+              154
+            ]
+          }
+        },
+        {
+          "sequence": "charge_attack",
+          "frame": 3,
+          "path": "resonance_goral/charge_attack/resonance_goral_charge_attack_f03.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              245,
+              122
+            ],
+            "runtimePoseSize": [
+              186,
+              93
+            ],
+            "pasteXY": [
+              17,
+              61
+            ],
+            "alphaBBox": [
+              17,
+              61,
+              203,
+              154
+            ]
+          }
+        },
+        {
+          "sequence": "charge_attack",
+          "frame": 4,
+          "path": "resonance_goral/charge_attack/resonance_goral_charge_attack_f04.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              244,
+              123
+            ],
+            "runtimePoseSize": [
+              185,
+              93
+            ],
+            "pasteXY": [
+              18,
+              61
+            ],
+            "alphaBBox": [
+              18,
+              61,
+              203,
+              154
+            ]
+          }
+        },
+        {
+          "sequence": "charge_attack",
+          "frame": 5,
+          "path": "resonance_goral/charge_attack/resonance_goral_charge_attack_f05.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              192,
+              127
+            ],
+            "runtimePoseSize": [
+              146,
+              96
+            ],
+            "pasteXY": [
+              37,
+              58
+            ],
+            "alphaBBox": [
+              37,
+              58,
+              183,
+              154
+            ]
+          }
+        },
+        {
+          "sequence": "hit_recover",
+          "frame": 1,
+          "path": "resonance_goral/hit_recover/resonance_goral_hit_recover_f01.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              152,
+              131
+            ],
+            "runtimePoseSize": [
+              115,
+              99
+            ],
+            "pasteXY": [
+              52,
+              55
+            ],
+            "alphaBBox": [
+              52,
+              55,
+              167,
+              154
+            ]
+          }
+        },
+        {
+          "sequence": "hit_recover",
+          "frame": 2,
+          "path": "resonance_goral/hit_recover/resonance_goral_hit_recover_f02.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              172,
+              138
+            ],
+            "runtimePoseSize": [
+              131,
+              105
+            ],
+            "pasteXY": [
+              44,
+              49
+            ],
+            "alphaBBox": [
+              44,
+              49,
+              175,
+              154
+            ]
+          }
+        },
+        {
+          "sequence": "hit_recover",
+          "frame": 3,
+          "path": "resonance_goral/hit_recover/resonance_goral_hit_recover_f03.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              150,
+              138
+            ],
+            "runtimePoseSize": [
+              114,
+              105
+            ],
+            "pasteXY": [
+              53,
+              49
+            ],
+            "alphaBBox": [
+              53,
+              49,
+              167,
+              154
+            ]
+          }
+        },
+        {
+          "sequence": "hit_recover",
+          "frame": 4,
+          "path": "resonance_goral/hit_recover/resonance_goral_hit_recover_f04.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              127,
+              137
+            ],
+            "runtimePoseSize": [
+              96,
+              104
+            ],
+            "pasteXY": [
+              62,
+              50
+            ],
+            "alphaBBox": [
+              62,
+              50,
+              158,
+              154
+            ]
+          }
+        },
+        {
+          "sequence": "retreat",
+          "frame": 1,
+          "path": "resonance_goral/retreat/resonance_goral_retreat_f01.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              157,
+              160
+            ],
+            "runtimePoseSize": [
+              119,
+              121
+            ],
+            "pasteXY": [
+              50,
+              33
+            ],
+            "alphaBBox": [
+              50,
+              33,
+              169,
+              154
+            ]
+          }
+        },
+        {
+          "sequence": "retreat",
+          "frame": 2,
+          "path": "resonance_goral/retreat/resonance_goral_retreat_f02.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              157,
+              161
+            ],
+            "runtimePoseSize": [
+              119,
+              122
+            ],
+            "pasteXY": [
+              50,
+              32
+            ],
+            "alphaBBox": [
+              50,
+              32,
+              169,
+              154
+            ]
+          }
+        },
+        {
+          "sequence": "retreat",
+          "frame": 3,
+          "path": "resonance_goral/retreat/resonance_goral_retreat_f03.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              145,
+              145
+            ],
+            "runtimePoseSize": [
+              110,
+              110
+            ],
+            "pasteXY": [
+              55,
+              44
+            ],
+            "alphaBBox": [
+              55,
+              44,
+              165,
+              154
+            ]
+          }
+        },
+        {
+          "sequence": "retreat",
+          "frame": 4,
+          "path": "resonance_goral/retreat/resonance_goral_retreat_f04.png",
+          "hold": null,
+          "placement": {
+            "sourcePoseSize": [
+              144,
+              159
+            ],
+            "runtimePoseSize": [
+              109,
+              121
+            ],
+            "pasteXY": [
+              56,
+              33
+            ],
+            "alphaBBox": [
+              56,
+              33,
+              165,
+              154
+            ]
+          }
+        }
+      ],
+      "spriteSheets": [
+        "resonance_goral/sprite_sheets/resonance_goral_idle_sheet_candidate.png",
+        "resonance_goral/sprite_sheets/resonance_goral_warning_sheet_candidate.png",
+        "resonance_goral/sprite_sheets/resonance_goral_combat_prep_sheet_candidate.png",
+        "resonance_goral/sprite_sheets/resonance_goral_charge_attack_sheet_candidate.png",
+        "resonance_goral/sprite_sheets/resonance_goral_hit_recover_sheet_candidate.png",
+        "resonance_goral/sprite_sheets/resonance_goral_retreat_sheet_candidate.png"
+      ]
+    }
+  }
+}

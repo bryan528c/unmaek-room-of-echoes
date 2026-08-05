@@ -1,0 +1,4634 @@
+{
+  "schemaVersion": 1,
+  "policy": "canonical gameplay anchors unchanged; visual offsets are staging candidates",
+  "subjects": [
+    {
+      "id": "pressure_swift",
+      "frames": [],
+      "note": "no attack anchor"
+    },
+    {
+      "id": "deflect_bat",
+      "directionMode": "flipX",
+      "frames": [
+        {
+          "sequence": "idle",
+          "frame": 1,
+          "file": "deflect_bat/idle/deflect_bat_idle_f01.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "mouth-organ",
+              "visibleAttackOrigin": {
+                "x": 15,
+                "y": 19
+              },
+              "canonicalGameplayAnchor": {
+                "x": 26,
+                "y": 14
+              },
+              "frameVisualOffset": {
+                "x": -11,
+                "y": 5
+              },
+              "flipXVisibleOrigin": {
+                "x": 37,
+                "y": 19
+              },
+              "flipXVisualOffset": {
+                "x": 11,
+                "y": 5
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "idle",
+          "frame": 2,
+          "file": "deflect_bat/idle/deflect_bat_idle_f02.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "mouth-organ",
+              "visibleAttackOrigin": {
+                "x": 14,
+                "y": 15
+              },
+              "canonicalGameplayAnchor": {
+                "x": 26,
+                "y": 14
+              },
+              "frameVisualOffset": {
+                "x": -12,
+                "y": 1
+              },
+              "flipXVisibleOrigin": {
+                "x": 38,
+                "y": 15
+              },
+              "flipXVisualOffset": {
+                "x": 12,
+                "y": 1
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "idle",
+          "frame": 3,
+          "file": "deflect_bat/idle/deflect_bat_idle_f03.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "mouth-organ",
+              "visibleAttackOrigin": {
+                "x": 12,
+                "y": 18
+              },
+              "canonicalGameplayAnchor": {
+                "x": 26,
+                "y": 14
+              },
+              "frameVisualOffset": {
+                "x": -14,
+                "y": 4
+              },
+              "flipXVisibleOrigin": {
+                "x": 40,
+                "y": 18
+              },
+              "flipXVisualOffset": {
+                "x": 14,
+                "y": 4
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "idle",
+          "frame": 4,
+          "file": "deflect_bat/idle/deflect_bat_idle_f04.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "mouth-organ",
+              "visibleAttackOrigin": {
+                "x": 13,
+                "y": 17
+              },
+              "canonicalGameplayAnchor": {
+                "x": 26,
+                "y": 14
+              },
+              "frameVisualOffset": {
+                "x": -13,
+                "y": 3
+              },
+              "flipXVisibleOrigin": {
+                "x": 39,
+                "y": 17
+              },
+              "flipXVisualOffset": {
+                "x": 13,
+                "y": 3
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "move",
+          "frame": 1,
+          "file": "deflect_bat/move/deflect_bat_move_f01.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "mouth-organ",
+              "visibleAttackOrigin": {
+                "x": 16,
+                "y": 15
+              },
+              "canonicalGameplayAnchor": {
+                "x": 26,
+                "y": 14
+              },
+              "frameVisualOffset": {
+                "x": -10,
+                "y": 1
+              },
+              "flipXVisibleOrigin": {
+                "x": 36,
+                "y": 15
+              },
+              "flipXVisualOffset": {
+                "x": 10,
+                "y": 1
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "move",
+          "frame": 2,
+          "file": "deflect_bat/move/deflect_bat_move_f02.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "mouth-organ",
+              "visibleAttackOrigin": {
+                "x": 15,
+                "y": 16
+              },
+              "canonicalGameplayAnchor": {
+                "x": 26,
+                "y": 14
+              },
+              "frameVisualOffset": {
+                "x": -11,
+                "y": 2
+              },
+              "flipXVisibleOrigin": {
+                "x": 37,
+                "y": 16
+              },
+              "flipXVisualOffset": {
+                "x": 11,
+                "y": 2
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "move",
+          "frame": 3,
+          "file": "deflect_bat/move/deflect_bat_move_f03.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "mouth-organ",
+              "visibleAttackOrigin": {
+                "x": 12,
+                "y": 18
+              },
+              "canonicalGameplayAnchor": {
+                "x": 26,
+                "y": 14
+              },
+              "frameVisualOffset": {
+                "x": -14,
+                "y": 4
+              },
+              "flipXVisibleOrigin": {
+                "x": 40,
+                "y": 18
+              },
+              "flipXVisualOffset": {
+                "x": 14,
+                "y": 4
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "move",
+          "frame": 4,
+          "file": "deflect_bat/move/deflect_bat_move_f04.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "mouth-organ",
+              "visibleAttackOrigin": {
+                "x": 16,
+                "y": 18
+              },
+              "canonicalGameplayAnchor": {
+                "x": 26,
+                "y": 14
+              },
+              "frameVisualOffset": {
+                "x": -10,
+                "y": 4
+              },
+              "flipXVisibleOrigin": {
+                "x": 36,
+                "y": 18
+              },
+              "flipXVisualOffset": {
+                "x": 10,
+                "y": 4
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "move",
+          "frame": 5,
+          "file": "deflect_bat/move/deflect_bat_move_f05.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "mouth-organ",
+              "visibleAttackOrigin": {
+                "x": 16,
+                "y": 15
+              },
+              "canonicalGameplayAnchor": {
+                "x": 26,
+                "y": 14
+              },
+              "frameVisualOffset": {
+                "x": -10,
+                "y": 1
+              },
+              "flipXVisibleOrigin": {
+                "x": 36,
+                "y": 15
+              },
+              "flipXVisualOffset": {
+                "x": 10,
+                "y": 1
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "move",
+          "frame": 6,
+          "file": "deflect_bat/move/deflect_bat_move_f06.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "mouth-organ",
+              "visibleAttackOrigin": {
+                "x": 15,
+                "y": 18
+              },
+              "canonicalGameplayAnchor": {
+                "x": 26,
+                "y": 14
+              },
+              "frameVisualOffset": {
+                "x": -11,
+                "y": 4
+              },
+              "flipXVisibleOrigin": {
+                "x": 37,
+                "y": 18
+              },
+              "flipXVisualOffset": {
+                "x": 11,
+                "y": 4
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "prep",
+          "frame": 1,
+          "file": "deflect_bat/prep/deflect_bat_prep_f01.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "mouth-organ",
+              "visibleAttackOrigin": {
+                "x": 12,
+                "y": 20
+              },
+              "canonicalGameplayAnchor": {
+                "x": 26,
+                "y": 14
+              },
+              "frameVisualOffset": {
+                "x": -14,
+                "y": 6
+              },
+              "flipXVisibleOrigin": {
+                "x": 40,
+                "y": 20
+              },
+              "flipXVisualOffset": {
+                "x": 14,
+                "y": 6
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "prep",
+          "frame": 2,
+          "file": "deflect_bat/prep/deflect_bat_prep_f02.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "mouth-organ",
+              "visibleAttackOrigin": {
+                "x": 12,
+                "y": 17
+              },
+              "canonicalGameplayAnchor": {
+                "x": 26,
+                "y": 14
+              },
+              "frameVisualOffset": {
+                "x": -14,
+                "y": 3
+              },
+              "flipXVisibleOrigin": {
+                "x": 40,
+                "y": 17
+              },
+              "flipXVisualOffset": {
+                "x": 14,
+                "y": 3
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "prep",
+          "frame": 3,
+          "file": "deflect_bat/prep/deflect_bat_prep_f03.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "mouth-organ",
+              "visibleAttackOrigin": {
+                "x": 14,
+                "y": 19
+              },
+              "canonicalGameplayAnchor": {
+                "x": 26,
+                "y": 14
+              },
+              "frameVisualOffset": {
+                "x": -12,
+                "y": 5
+              },
+              "flipXVisibleOrigin": {
+                "x": 38,
+                "y": 19
+              },
+              "flipXVisualOffset": {
+                "x": 12,
+                "y": 5
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "attack",
+          "frame": 1,
+          "file": "deflect_bat/attack/deflect_bat_attack_f01.png",
+          "applyToVfx": true,
+          "origins": [
+            {
+              "anchorId": "mouth-organ",
+              "visibleAttackOrigin": {
+                "x": 16,
+                "y": 18
+              },
+              "canonicalGameplayAnchor": {
+                "x": 26,
+                "y": 14
+              },
+              "frameVisualOffset": {
+                "x": -10,
+                "y": 4
+              },
+              "flipXVisibleOrigin": {
+                "x": 36,
+                "y": 18
+              },
+              "flipXVisualOffset": {
+                "x": 10,
+                "y": 4
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "attack",
+          "frame": 2,
+          "file": "deflect_bat/attack/deflect_bat_attack_f02.png",
+          "applyToVfx": true,
+          "origins": [
+            {
+              "anchorId": "mouth-organ",
+              "visibleAttackOrigin": {
+                "x": 16,
+                "y": 18
+              },
+              "canonicalGameplayAnchor": {
+                "x": 26,
+                "y": 14
+              },
+              "frameVisualOffset": {
+                "x": -10,
+                "y": 4
+              },
+              "flipXVisibleOrigin": {
+                "x": 36,
+                "y": 18
+              },
+              "flipXVisualOffset": {
+                "x": 10,
+                "y": 4
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "attack",
+          "frame": 3,
+          "file": "deflect_bat/attack/deflect_bat_attack_f03.png",
+          "applyToVfx": true,
+          "origins": [
+            {
+              "anchorId": "mouth-organ",
+              "visibleAttackOrigin": {
+                "x": 16,
+                "y": 17
+              },
+              "canonicalGameplayAnchor": {
+                "x": 26,
+                "y": 14
+              },
+              "frameVisualOffset": {
+                "x": -10,
+                "y": 3
+              },
+              "flipXVisibleOrigin": {
+                "x": 36,
+                "y": 17
+              },
+              "flipXVisualOffset": {
+                "x": 10,
+                "y": 3
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "attack",
+          "frame": 4,
+          "file": "deflect_bat/attack/deflect_bat_attack_f04.png",
+          "applyToVfx": true,
+          "origins": [
+            {
+              "anchorId": "mouth-organ",
+              "visibleAttackOrigin": {
+                "x": 15,
+                "y": 17
+              },
+              "canonicalGameplayAnchor": {
+                "x": 26,
+                "y": 14
+              },
+              "frameVisualOffset": {
+                "x": -11,
+                "y": 3
+              },
+              "flipXVisibleOrigin": {
+                "x": 37,
+                "y": 17
+              },
+              "flipXVisualOffset": {
+                "x": 11,
+                "y": 3
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "hit_recover",
+          "frame": 1,
+          "file": "deflect_bat/hit_recover/deflect_bat_hit_recover_f01.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "mouth-organ",
+              "visibleAttackOrigin": {
+                "x": 14,
+                "y": 19
+              },
+              "canonicalGameplayAnchor": {
+                "x": 26,
+                "y": 14
+              },
+              "frameVisualOffset": {
+                "x": -12,
+                "y": 5
+              },
+              "flipXVisibleOrigin": {
+                "x": 38,
+                "y": 19
+              },
+              "flipXVisualOffset": {
+                "x": 12,
+                "y": 5
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "hit_recover",
+          "frame": 2,
+          "file": "deflect_bat/hit_recover/deflect_bat_hit_recover_f02.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "mouth-organ",
+              "visibleAttackOrigin": {
+                "x": 14,
+                "y": 15
+              },
+              "canonicalGameplayAnchor": {
+                "x": 26,
+                "y": 14
+              },
+              "frameVisualOffset": {
+                "x": -12,
+                "y": 1
+              },
+              "flipXVisibleOrigin": {
+                "x": 38,
+                "y": 15
+              },
+              "flipXVisualOffset": {
+                "x": 12,
+                "y": 1
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "hit_recover",
+          "frame": 3,
+          "file": "deflect_bat/hit_recover/deflect_bat_hit_recover_f03.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "mouth-organ",
+              "visibleAttackOrigin": {
+                "x": 14,
+                "y": 18
+              },
+              "canonicalGameplayAnchor": {
+                "x": 26,
+                "y": 14
+              },
+              "frameVisualOffset": {
+                "x": -12,
+                "y": 4
+              },
+              "flipXVisibleOrigin": {
+                "x": 38,
+                "y": 18
+              },
+              "flipXVisualOffset": {
+                "x": 12,
+                "y": 4
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rewind_lizard",
+      "directionMode": "flipX",
+      "frames": [
+        {
+          "sequence": "idle",
+          "frame": 1,
+          "file": "rewind_lizard/idle/rewind_lizard_idle_f01.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "snout",
+              "visibleAttackOrigin": {
+                "x": 12,
+                "y": 23
+              },
+              "canonicalGameplayAnchor": {
+                "x": 9,
+                "y": 22
+              },
+              "frameVisualOffset": {
+                "x": 3,
+                "y": 1
+              },
+              "flipXVisibleOrigin": {
+                "x": 60,
+                "y": 23
+              },
+              "flipXVisualOffset": {
+                "x": -3,
+                "y": 1
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "idle",
+          "frame": 2,
+          "file": "rewind_lizard/idle/rewind_lizard_idle_f02.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "snout",
+              "visibleAttackOrigin": {
+                "x": 12,
+                "y": 23
+              },
+              "canonicalGameplayAnchor": {
+                "x": 9,
+                "y": 22
+              },
+              "frameVisualOffset": {
+                "x": 3,
+                "y": 1
+              },
+              "flipXVisibleOrigin": {
+                "x": 60,
+                "y": 23
+              },
+              "flipXVisualOffset": {
+                "x": -3,
+                "y": 1
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "idle",
+          "frame": 3,
+          "file": "rewind_lizard/idle/rewind_lizard_idle_f03.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "snout",
+              "visibleAttackOrigin": {
+                "x": 11,
+                "y": 23
+              },
+              "canonicalGameplayAnchor": {
+                "x": 9,
+                "y": 22
+              },
+              "frameVisualOffset": {
+                "x": 2,
+                "y": 1
+              },
+              "flipXVisibleOrigin": {
+                "x": 61,
+                "y": 23
+              },
+              "flipXVisualOffset": {
+                "x": -2,
+                "y": 1
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "idle",
+          "frame": 4,
+          "file": "rewind_lizard/idle/rewind_lizard_idle_f04.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "snout",
+              "visibleAttackOrigin": {
+                "x": 15,
+                "y": 19
+              },
+              "canonicalGameplayAnchor": {
+                "x": 9,
+                "y": 22
+              },
+              "frameVisualOffset": {
+                "x": 6,
+                "y": -3
+              },
+              "flipXVisibleOrigin": {
+                "x": 57,
+                "y": 19
+              },
+              "flipXVisualOffset": {
+                "x": -6,
+                "y": -3
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "move",
+          "frame": 1,
+          "file": "rewind_lizard/move/rewind_lizard_move_f01.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "snout",
+              "visibleAttackOrigin": {
+                "x": 11,
+                "y": 23
+              },
+              "canonicalGameplayAnchor": {
+                "x": 9,
+                "y": 22
+              },
+              "frameVisualOffset": {
+                "x": 2,
+                "y": 1
+              },
+              "flipXVisibleOrigin": {
+                "x": 61,
+                "y": 23
+              },
+              "flipXVisualOffset": {
+                "x": -2,
+                "y": 1
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "move",
+          "frame": 2,
+          "file": "rewind_lizard/move/rewind_lizard_move_f02.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "snout",
+              "visibleAttackOrigin": {
+                "x": 11,
+                "y": 23
+              },
+              "canonicalGameplayAnchor": {
+                "x": 9,
+                "y": 22
+              },
+              "frameVisualOffset": {
+                "x": 2,
+                "y": 1
+              },
+              "flipXVisibleOrigin": {
+                "x": 61,
+                "y": 23
+              },
+              "flipXVisualOffset": {
+                "x": -2,
+                "y": 1
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "move",
+          "frame": 3,
+          "file": "rewind_lizard/move/rewind_lizard_move_f03.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "snout",
+              "visibleAttackOrigin": {
+                "x": 11,
+                "y": 23
+              },
+              "canonicalGameplayAnchor": {
+                "x": 9,
+                "y": 22
+              },
+              "frameVisualOffset": {
+                "x": 2,
+                "y": 1
+              },
+              "flipXVisibleOrigin": {
+                "x": 61,
+                "y": 23
+              },
+              "flipXVisualOffset": {
+                "x": -2,
+                "y": 1
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "move",
+          "frame": 4,
+          "file": "rewind_lizard/move/rewind_lizard_move_f04.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "snout",
+              "visibleAttackOrigin": {
+                "x": 11,
+                "y": 23
+              },
+              "canonicalGameplayAnchor": {
+                "x": 9,
+                "y": 22
+              },
+              "frameVisualOffset": {
+                "x": 2,
+                "y": 1
+              },
+              "flipXVisibleOrigin": {
+                "x": 61,
+                "y": 23
+              },
+              "flipXVisualOffset": {
+                "x": -2,
+                "y": 1
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "move",
+          "frame": 5,
+          "file": "rewind_lizard/move/rewind_lizard_move_f05.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "snout",
+              "visibleAttackOrigin": {
+                "x": 11,
+                "y": 22
+              },
+              "canonicalGameplayAnchor": {
+                "x": 9,
+                "y": 22
+              },
+              "frameVisualOffset": {
+                "x": 2,
+                "y": 0
+              },
+              "flipXVisibleOrigin": {
+                "x": 61,
+                "y": 22
+              },
+              "flipXVisualOffset": {
+                "x": -2,
+                "y": 0
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "move",
+          "frame": 6,
+          "file": "rewind_lizard/move/rewind_lizard_move_f06.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "snout",
+              "visibleAttackOrigin": {
+                "x": 11,
+                "y": 23
+              },
+              "canonicalGameplayAnchor": {
+                "x": 9,
+                "y": 22
+              },
+              "frameVisualOffset": {
+                "x": 2,
+                "y": 1
+              },
+              "flipXVisibleOrigin": {
+                "x": 61,
+                "y": 23
+              },
+              "flipXVisualOffset": {
+                "x": -2,
+                "y": 1
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "prep",
+          "frame": 1,
+          "file": "rewind_lizard/prep/rewind_lizard_prep_f01.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "snout",
+              "visibleAttackOrigin": {
+                "x": 12,
+                "y": 25
+              },
+              "canonicalGameplayAnchor": {
+                "x": 9,
+                "y": 22
+              },
+              "frameVisualOffset": {
+                "x": 3,
+                "y": 3
+              },
+              "flipXVisibleOrigin": {
+                "x": 60,
+                "y": 25
+              },
+              "flipXVisualOffset": {
+                "x": -3,
+                "y": 3
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "prep",
+          "frame": 2,
+          "file": "rewind_lizard/prep/rewind_lizard_prep_f02.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "snout",
+              "visibleAttackOrigin": {
+                "x": 14,
+                "y": 26
+              },
+              "canonicalGameplayAnchor": {
+                "x": 9,
+                "y": 22
+              },
+              "frameVisualOffset": {
+                "x": 5,
+                "y": 4
+              },
+              "flipXVisibleOrigin": {
+                "x": 58,
+                "y": 26
+              },
+              "flipXVisualOffset": {
+                "x": -5,
+                "y": 4
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "prep",
+          "frame": 3,
+          "file": "rewind_lizard/prep/rewind_lizard_prep_f03.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "snout",
+              "visibleAttackOrigin": {
+                "x": 13,
+                "y": 26
+              },
+              "canonicalGameplayAnchor": {
+                "x": 9,
+                "y": 22
+              },
+              "frameVisualOffset": {
+                "x": 4,
+                "y": 4
+              },
+              "flipXVisibleOrigin": {
+                "x": 59,
+                "y": 26
+              },
+              "flipXVisualOffset": {
+                "x": -4,
+                "y": 4
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "attack",
+          "frame": 1,
+          "file": "rewind_lizard/attack/rewind_lizard_attack_f01.png",
+          "applyToVfx": true,
+          "origins": [
+            {
+              "anchorId": "snout",
+              "visibleAttackOrigin": {
+                "x": 7,
+                "y": 22
+              },
+              "canonicalGameplayAnchor": {
+                "x": 9,
+                "y": 22
+              },
+              "frameVisualOffset": {
+                "x": -2,
+                "y": 0
+              },
+              "flipXVisibleOrigin": {
+                "x": 65,
+                "y": 22
+              },
+              "flipXVisualOffset": {
+                "x": 2,
+                "y": 0
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "attack",
+          "frame": 2,
+          "file": "rewind_lizard/attack/rewind_lizard_attack_f02.png",
+          "applyToVfx": true,
+          "origins": [
+            {
+              "anchorId": "snout",
+              "visibleAttackOrigin": {
+                "x": 5,
+                "y": 22
+              },
+              "canonicalGameplayAnchor": {
+                "x": 9,
+                "y": 22
+              },
+              "frameVisualOffset": {
+                "x": -4,
+                "y": 0
+              },
+              "flipXVisibleOrigin": {
+                "x": 67,
+                "y": 22
+              },
+              "flipXVisualOffset": {
+                "x": 4,
+                "y": 0
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "attack",
+          "frame": 3,
+          "file": "rewind_lizard/attack/rewind_lizard_attack_f03.png",
+          "applyToVfx": true,
+          "origins": [
+            {
+              "anchorId": "snout",
+              "visibleAttackOrigin": {
+                "x": 11,
+                "y": 25
+              },
+              "canonicalGameplayAnchor": {
+                "x": 9,
+                "y": 22
+              },
+              "frameVisualOffset": {
+                "x": 2,
+                "y": 3
+              },
+              "flipXVisibleOrigin": {
+                "x": 61,
+                "y": 25
+              },
+              "flipXVisualOffset": {
+                "x": -2,
+                "y": 3
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "attack",
+          "frame": 4,
+          "file": "rewind_lizard/attack/rewind_lizard_attack_f04.png",
+          "applyToVfx": true,
+          "origins": [
+            {
+              "anchorId": "snout",
+              "visibleAttackOrigin": {
+                "x": 13,
+                "y": 23
+              },
+              "canonicalGameplayAnchor": {
+                "x": 9,
+                "y": 22
+              },
+              "frameVisualOffset": {
+                "x": 4,
+                "y": 1
+              },
+              "flipXVisibleOrigin": {
+                "x": 59,
+                "y": 23
+              },
+              "flipXVisualOffset": {
+                "x": -4,
+                "y": 1
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "hit_recover",
+          "frame": 1,
+          "file": "rewind_lizard/hit_recover/rewind_lizard_hit_recover_f01.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "snout",
+              "visibleAttackOrigin": {
+                "x": 12,
+                "y": 25
+              },
+              "canonicalGameplayAnchor": {
+                "x": 9,
+                "y": 22
+              },
+              "frameVisualOffset": {
+                "x": 3,
+                "y": 3
+              },
+              "flipXVisibleOrigin": {
+                "x": 60,
+                "y": 25
+              },
+              "flipXVisualOffset": {
+                "x": -3,
+                "y": 3
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "hit_recover",
+          "frame": 2,
+          "file": "rewind_lizard/hit_recover/rewind_lizard_hit_recover_f02.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "snout",
+              "visibleAttackOrigin": {
+                "x": 14,
+                "y": 25
+              },
+              "canonicalGameplayAnchor": {
+                "x": 9,
+                "y": 22
+              },
+              "frameVisualOffset": {
+                "x": 5,
+                "y": 3
+              },
+              "flipXVisibleOrigin": {
+                "x": 58,
+                "y": 25
+              },
+              "flipXVisualOffset": {
+                "x": -5,
+                "y": 3
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "hit_recover",
+          "frame": 3,
+          "file": "rewind_lizard/hit_recover/rewind_lizard_hit_recover_f03.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "snout",
+              "visibleAttackOrigin": {
+                "x": 11,
+                "y": 23
+              },
+              "canonicalGameplayAnchor": {
+                "x": 9,
+                "y": 22
+              },
+              "frameVisualOffset": {
+                "x": 2,
+                "y": 1
+              },
+              "flipXVisibleOrigin": {
+                "x": 61,
+                "y": 23
+              },
+              "flipXVisualOffset": {
+                "x": -2,
+                "y": 1
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mineral_spider",
+      "directionMode": "front-side",
+      "frames": [
+        {
+          "sequence": "idle",
+          "frame": 1,
+          "file": "mineral_spider/idle/mineral_spider_idle_f01.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "thread-spawn-a",
+              "visibleAttackOrigin": {
+                "x": 79,
+                "y": 33
+              },
+              "canonicalGameplayAnchor": {
+                "x": 37,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 42,
+                "y": -2
+              },
+              "flipXVisibleOrigin": {
+                "x": 25,
+                "y": 33
+              },
+              "flipXVisualOffset": {
+                "x": -42,
+                "y": -2
+              }
+            },
+            {
+              "anchorId": "thread-spawn-b",
+              "visibleAttackOrigin": {
+                "x": 79,
+                "y": 35
+              },
+              "canonicalGameplayAnchor": {
+                "x": 52,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 27,
+                "y": 0
+              },
+              "flipXVisibleOrigin": {
+                "x": 25,
+                "y": 35
+              },
+              "flipXVisualOffset": {
+                "x": -27,
+                "y": 0
+              }
+            },
+            {
+              "anchorId": "thread-spawn-c",
+              "visibleAttackOrigin": {
+                "x": 79,
+                "y": 37
+              },
+              "canonicalGameplayAnchor": {
+                "x": 67,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 12,
+                "y": 2
+              },
+              "flipXVisibleOrigin": {
+                "x": 25,
+                "y": 37
+              },
+              "flipXVisualOffset": {
+                "x": -12,
+                "y": 2
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "idle",
+          "frame": 2,
+          "file": "mineral_spider/idle/mineral_spider_idle_f02.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "thread-spawn-a",
+              "visibleAttackOrigin": {
+                "x": 80,
+                "y": 34
+              },
+              "canonicalGameplayAnchor": {
+                "x": 37,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 43,
+                "y": -1
+              },
+              "flipXVisibleOrigin": {
+                "x": 24,
+                "y": 34
+              },
+              "flipXVisualOffset": {
+                "x": -43,
+                "y": -1
+              }
+            },
+            {
+              "anchorId": "thread-spawn-b",
+              "visibleAttackOrigin": {
+                "x": 80,
+                "y": 36
+              },
+              "canonicalGameplayAnchor": {
+                "x": 52,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 28,
+                "y": 1
+              },
+              "flipXVisibleOrigin": {
+                "x": 24,
+                "y": 36
+              },
+              "flipXVisualOffset": {
+                "x": -28,
+                "y": 1
+              }
+            },
+            {
+              "anchorId": "thread-spawn-c",
+              "visibleAttackOrigin": {
+                "x": 80,
+                "y": 38
+              },
+              "canonicalGameplayAnchor": {
+                "x": 67,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 13,
+                "y": 3
+              },
+              "flipXVisibleOrigin": {
+                "x": 24,
+                "y": 38
+              },
+              "flipXVisualOffset": {
+                "x": -13,
+                "y": 3
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "idle",
+          "frame": 3,
+          "file": "mineral_spider/idle/mineral_spider_idle_f03.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "thread-spawn-a",
+              "visibleAttackOrigin": {
+                "x": 80,
+                "y": 34
+              },
+              "canonicalGameplayAnchor": {
+                "x": 37,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 43,
+                "y": -1
+              },
+              "flipXVisibleOrigin": {
+                "x": 24,
+                "y": 34
+              },
+              "flipXVisualOffset": {
+                "x": -43,
+                "y": -1
+              }
+            },
+            {
+              "anchorId": "thread-spawn-b",
+              "visibleAttackOrigin": {
+                "x": 80,
+                "y": 36
+              },
+              "canonicalGameplayAnchor": {
+                "x": 52,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 28,
+                "y": 1
+              },
+              "flipXVisibleOrigin": {
+                "x": 24,
+                "y": 36
+              },
+              "flipXVisualOffset": {
+                "x": -28,
+                "y": 1
+              }
+            },
+            {
+              "anchorId": "thread-spawn-c",
+              "visibleAttackOrigin": {
+                "x": 80,
+                "y": 38
+              },
+              "canonicalGameplayAnchor": {
+                "x": 67,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 13,
+                "y": 3
+              },
+              "flipXVisibleOrigin": {
+                "x": 24,
+                "y": 38
+              },
+              "flipXVisualOffset": {
+                "x": -13,
+                "y": 3
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "idle",
+          "frame": 4,
+          "file": "mineral_spider/idle/mineral_spider_idle_f04.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "thread-spawn-a",
+              "visibleAttackOrigin": {
+                "x": 80,
+                "y": 34
+              },
+              "canonicalGameplayAnchor": {
+                "x": 37,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 43,
+                "y": -1
+              },
+              "flipXVisibleOrigin": {
+                "x": 24,
+                "y": 34
+              },
+              "flipXVisualOffset": {
+                "x": -43,
+                "y": -1
+              }
+            },
+            {
+              "anchorId": "thread-spawn-b",
+              "visibleAttackOrigin": {
+                "x": 80,
+                "y": 36
+              },
+              "canonicalGameplayAnchor": {
+                "x": 52,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 28,
+                "y": 1
+              },
+              "flipXVisibleOrigin": {
+                "x": 24,
+                "y": 36
+              },
+              "flipXVisualOffset": {
+                "x": -28,
+                "y": 1
+              }
+            },
+            {
+              "anchorId": "thread-spawn-c",
+              "visibleAttackOrigin": {
+                "x": 80,
+                "y": 38
+              },
+              "canonicalGameplayAnchor": {
+                "x": 67,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 13,
+                "y": 3
+              },
+              "flipXVisibleOrigin": {
+                "x": 24,
+                "y": 38
+              },
+              "flipXVisualOffset": {
+                "x": -13,
+                "y": 3
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "move",
+          "frame": 1,
+          "file": "mineral_spider/move/mineral_spider_move_f01.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "thread-spawn-a",
+              "visibleAttackOrigin": {
+                "x": 85,
+                "y": 44
+              },
+              "canonicalGameplayAnchor": {
+                "x": 37,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 48,
+                "y": 9
+              },
+              "flipXVisibleOrigin": {
+                "x": 19,
+                "y": 44
+              },
+              "flipXVisualOffset": {
+                "x": -48,
+                "y": 9
+              }
+            },
+            {
+              "anchorId": "thread-spawn-b",
+              "visibleAttackOrigin": {
+                "x": 85,
+                "y": 46
+              },
+              "canonicalGameplayAnchor": {
+                "x": 52,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 33,
+                "y": 11
+              },
+              "flipXVisibleOrigin": {
+                "x": 19,
+                "y": 46
+              },
+              "flipXVisualOffset": {
+                "x": -33,
+                "y": 11
+              }
+            },
+            {
+              "anchorId": "thread-spawn-c",
+              "visibleAttackOrigin": {
+                "x": 85,
+                "y": 48
+              },
+              "canonicalGameplayAnchor": {
+                "x": 67,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 18,
+                "y": 13
+              },
+              "flipXVisibleOrigin": {
+                "x": 19,
+                "y": 48
+              },
+              "flipXVisualOffset": {
+                "x": -18,
+                "y": 13
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "move",
+          "frame": 2,
+          "file": "mineral_spider/move/mineral_spider_move_f02.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "thread-spawn-a",
+              "visibleAttackOrigin": {
+                "x": 84,
+                "y": 44
+              },
+              "canonicalGameplayAnchor": {
+                "x": 37,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 47,
+                "y": 9
+              },
+              "flipXVisibleOrigin": {
+                "x": 20,
+                "y": 44
+              },
+              "flipXVisualOffset": {
+                "x": -47,
+                "y": 9
+              }
+            },
+            {
+              "anchorId": "thread-spawn-b",
+              "visibleAttackOrigin": {
+                "x": 84,
+                "y": 46
+              },
+              "canonicalGameplayAnchor": {
+                "x": 52,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 32,
+                "y": 11
+              },
+              "flipXVisibleOrigin": {
+                "x": 20,
+                "y": 46
+              },
+              "flipXVisualOffset": {
+                "x": -32,
+                "y": 11
+              }
+            },
+            {
+              "anchorId": "thread-spawn-c",
+              "visibleAttackOrigin": {
+                "x": 84,
+                "y": 48
+              },
+              "canonicalGameplayAnchor": {
+                "x": 67,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 17,
+                "y": 13
+              },
+              "flipXVisibleOrigin": {
+                "x": 20,
+                "y": 48
+              },
+              "flipXVisualOffset": {
+                "x": -17,
+                "y": 13
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "move",
+          "frame": 3,
+          "file": "mineral_spider/move/mineral_spider_move_f03.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "thread-spawn-a",
+              "visibleAttackOrigin": {
+                "x": 82,
+                "y": 43
+              },
+              "canonicalGameplayAnchor": {
+                "x": 37,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 45,
+                "y": 8
+              },
+              "flipXVisibleOrigin": {
+                "x": 22,
+                "y": 43
+              },
+              "flipXVisualOffset": {
+                "x": -45,
+                "y": 8
+              }
+            },
+            {
+              "anchorId": "thread-spawn-b",
+              "visibleAttackOrigin": {
+                "x": 82,
+                "y": 45
+              },
+              "canonicalGameplayAnchor": {
+                "x": 52,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 30,
+                "y": 10
+              },
+              "flipXVisibleOrigin": {
+                "x": 22,
+                "y": 45
+              },
+              "flipXVisualOffset": {
+                "x": -30,
+                "y": 10
+              }
+            },
+            {
+              "anchorId": "thread-spawn-c",
+              "visibleAttackOrigin": {
+                "x": 82,
+                "y": 47
+              },
+              "canonicalGameplayAnchor": {
+                "x": 67,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 15,
+                "y": 12
+              },
+              "flipXVisibleOrigin": {
+                "x": 22,
+                "y": 47
+              },
+              "flipXVisualOffset": {
+                "x": -15,
+                "y": 12
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "move",
+          "frame": 4,
+          "file": "mineral_spider/move/mineral_spider_move_f04.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "thread-spawn-a",
+              "visibleAttackOrigin": {
+                "x": 87,
+                "y": 44
+              },
+              "canonicalGameplayAnchor": {
+                "x": 37,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 50,
+                "y": 9
+              },
+              "flipXVisibleOrigin": {
+                "x": 17,
+                "y": 44
+              },
+              "flipXVisualOffset": {
+                "x": -50,
+                "y": 9
+              }
+            },
+            {
+              "anchorId": "thread-spawn-b",
+              "visibleAttackOrigin": {
+                "x": 87,
+                "y": 46
+              },
+              "canonicalGameplayAnchor": {
+                "x": 52,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 35,
+                "y": 11
+              },
+              "flipXVisibleOrigin": {
+                "x": 17,
+                "y": 46
+              },
+              "flipXVisualOffset": {
+                "x": -35,
+                "y": 11
+              }
+            },
+            {
+              "anchorId": "thread-spawn-c",
+              "visibleAttackOrigin": {
+                "x": 87,
+                "y": 48
+              },
+              "canonicalGameplayAnchor": {
+                "x": 67,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 20,
+                "y": 13
+              },
+              "flipXVisibleOrigin": {
+                "x": 17,
+                "y": 48
+              },
+              "flipXVisualOffset": {
+                "x": -20,
+                "y": 13
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "move",
+          "frame": 5,
+          "file": "mineral_spider/move/mineral_spider_move_f05.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "thread-spawn-a",
+              "visibleAttackOrigin": {
+                "x": 87,
+                "y": 43
+              },
+              "canonicalGameplayAnchor": {
+                "x": 37,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 50,
+                "y": 8
+              },
+              "flipXVisibleOrigin": {
+                "x": 17,
+                "y": 43
+              },
+              "flipXVisualOffset": {
+                "x": -50,
+                "y": 8
+              }
+            },
+            {
+              "anchorId": "thread-spawn-b",
+              "visibleAttackOrigin": {
+                "x": 87,
+                "y": 45
+              },
+              "canonicalGameplayAnchor": {
+                "x": 52,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 35,
+                "y": 10
+              },
+              "flipXVisibleOrigin": {
+                "x": 17,
+                "y": 45
+              },
+              "flipXVisualOffset": {
+                "x": -35,
+                "y": 10
+              }
+            },
+            {
+              "anchorId": "thread-spawn-c",
+              "visibleAttackOrigin": {
+                "x": 87,
+                "y": 47
+              },
+              "canonicalGameplayAnchor": {
+                "x": 67,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 20,
+                "y": 12
+              },
+              "flipXVisibleOrigin": {
+                "x": 17,
+                "y": 47
+              },
+              "flipXVisualOffset": {
+                "x": -20,
+                "y": 12
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "move",
+          "frame": 6,
+          "file": "mineral_spider/move/mineral_spider_move_f06.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "thread-spawn-a",
+              "visibleAttackOrigin": {
+                "x": 86,
+                "y": 44
+              },
+              "canonicalGameplayAnchor": {
+                "x": 37,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 49,
+                "y": 9
+              },
+              "flipXVisibleOrigin": {
+                "x": 18,
+                "y": 44
+              },
+              "flipXVisualOffset": {
+                "x": -49,
+                "y": 9
+              }
+            },
+            {
+              "anchorId": "thread-spawn-b",
+              "visibleAttackOrigin": {
+                "x": 86,
+                "y": 46
+              },
+              "canonicalGameplayAnchor": {
+                "x": 52,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 34,
+                "y": 11
+              },
+              "flipXVisibleOrigin": {
+                "x": 18,
+                "y": 46
+              },
+              "flipXVisualOffset": {
+                "x": -34,
+                "y": 11
+              }
+            },
+            {
+              "anchorId": "thread-spawn-c",
+              "visibleAttackOrigin": {
+                "x": 86,
+                "y": 48
+              },
+              "canonicalGameplayAnchor": {
+                "x": 67,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 19,
+                "y": 13
+              },
+              "flipXVisibleOrigin": {
+                "x": 18,
+                "y": 48
+              },
+              "flipXVisualOffset": {
+                "x": -19,
+                "y": 13
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "idle_to_alert",
+          "frame": 1,
+          "file": "mineral_spider/idle_to_alert/mineral_spider_idle_to_alert_f01.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "thread-spawn-a",
+              "visibleAttackOrigin": {
+                "x": 80,
+                "y": 36
+              },
+              "canonicalGameplayAnchor": {
+                "x": 37,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 43,
+                "y": 1
+              },
+              "flipXVisibleOrigin": {
+                "x": 24,
+                "y": 36
+              },
+              "flipXVisualOffset": {
+                "x": -43,
+                "y": 1
+              }
+            },
+            {
+              "anchorId": "thread-spawn-b",
+              "visibleAttackOrigin": {
+                "x": 80,
+                "y": 38
+              },
+              "canonicalGameplayAnchor": {
+                "x": 52,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 28,
+                "y": 3
+              },
+              "flipXVisibleOrigin": {
+                "x": 24,
+                "y": 38
+              },
+              "flipXVisualOffset": {
+                "x": -28,
+                "y": 3
+              }
+            },
+            {
+              "anchorId": "thread-spawn-c",
+              "visibleAttackOrigin": {
+                "x": 80,
+                "y": 40
+              },
+              "canonicalGameplayAnchor": {
+                "x": 67,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 13,
+                "y": 5
+              },
+              "flipXVisibleOrigin": {
+                "x": 24,
+                "y": 40
+              },
+              "flipXVisualOffset": {
+                "x": -13,
+                "y": 5
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "idle_to_alert",
+          "frame": 2,
+          "file": "mineral_spider/idle_to_alert/mineral_spider_idle_to_alert_f02.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "thread-spawn-a",
+              "visibleAttackOrigin": {
+                "x": 82,
+                "y": 38
+              },
+              "canonicalGameplayAnchor": {
+                "x": 37,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 45,
+                "y": 3
+              },
+              "flipXVisibleOrigin": {
+                "x": 22,
+                "y": 38
+              },
+              "flipXVisualOffset": {
+                "x": -45,
+                "y": 3
+              }
+            },
+            {
+              "anchorId": "thread-spawn-b",
+              "visibleAttackOrigin": {
+                "x": 82,
+                "y": 40
+              },
+              "canonicalGameplayAnchor": {
+                "x": 52,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 30,
+                "y": 5
+              },
+              "flipXVisibleOrigin": {
+                "x": 22,
+                "y": 40
+              },
+              "flipXVisualOffset": {
+                "x": -30,
+                "y": 5
+              }
+            },
+            {
+              "anchorId": "thread-spawn-c",
+              "visibleAttackOrigin": {
+                "x": 82,
+                "y": 42
+              },
+              "canonicalGameplayAnchor": {
+                "x": 67,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 15,
+                "y": 7
+              },
+              "flipXVisibleOrigin": {
+                "x": 22,
+                "y": 42
+              },
+              "flipXVisualOffset": {
+                "x": -15,
+                "y": 7
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "idle_to_alert",
+          "frame": 3,
+          "file": "mineral_spider/idle_to_alert/mineral_spider_idle_to_alert_f03.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "thread-spawn-a",
+              "visibleAttackOrigin": {
+                "x": 81,
+                "y": 41
+              },
+              "canonicalGameplayAnchor": {
+                "x": 37,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 44,
+                "y": 6
+              },
+              "flipXVisibleOrigin": {
+                "x": 23,
+                "y": 41
+              },
+              "flipXVisualOffset": {
+                "x": -44,
+                "y": 6
+              }
+            },
+            {
+              "anchorId": "thread-spawn-b",
+              "visibleAttackOrigin": {
+                "x": 81,
+                "y": 43
+              },
+              "canonicalGameplayAnchor": {
+                "x": 52,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 29,
+                "y": 8
+              },
+              "flipXVisibleOrigin": {
+                "x": 23,
+                "y": 43
+              },
+              "flipXVisualOffset": {
+                "x": -29,
+                "y": 8
+              }
+            },
+            {
+              "anchorId": "thread-spawn-c",
+              "visibleAttackOrigin": {
+                "x": 81,
+                "y": 45
+              },
+              "canonicalGameplayAnchor": {
+                "x": 67,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 14,
+                "y": 10
+              },
+              "flipXVisibleOrigin": {
+                "x": 23,
+                "y": 45
+              },
+              "flipXVisualOffset": {
+                "x": -14,
+                "y": 10
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "alert_to_deploy",
+          "frame": 1,
+          "file": "mineral_spider/alert_to_deploy/mineral_spider_alert_to_deploy_f01.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "thread-spawn-a",
+              "visibleAttackOrigin": {
+                "x": 81,
+                "y": 41
+              },
+              "canonicalGameplayAnchor": {
+                "x": 37,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 44,
+                "y": 6
+              },
+              "flipXVisibleOrigin": {
+                "x": 23,
+                "y": 41
+              },
+              "flipXVisualOffset": {
+                "x": -44,
+                "y": 6
+              }
+            },
+            {
+              "anchorId": "thread-spawn-b",
+              "visibleAttackOrigin": {
+                "x": 81,
+                "y": 43
+              },
+              "canonicalGameplayAnchor": {
+                "x": 52,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 29,
+                "y": 8
+              },
+              "flipXVisibleOrigin": {
+                "x": 23,
+                "y": 43
+              },
+              "flipXVisualOffset": {
+                "x": -29,
+                "y": 8
+              }
+            },
+            {
+              "anchorId": "thread-spawn-c",
+              "visibleAttackOrigin": {
+                "x": 81,
+                "y": 45
+              },
+              "canonicalGameplayAnchor": {
+                "x": 67,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 14,
+                "y": 10
+              },
+              "flipXVisibleOrigin": {
+                "x": 23,
+                "y": 45
+              },
+              "flipXVisualOffset": {
+                "x": -14,
+                "y": 10
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "alert_to_deploy",
+          "frame": 2,
+          "file": "mineral_spider/alert_to_deploy/mineral_spider_alert_to_deploy_f02.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "thread-spawn-a",
+              "visibleAttackOrigin": {
+                "x": 82,
+                "y": 41
+              },
+              "canonicalGameplayAnchor": {
+                "x": 37,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 45,
+                "y": 6
+              },
+              "flipXVisibleOrigin": {
+                "x": 22,
+                "y": 41
+              },
+              "flipXVisualOffset": {
+                "x": -45,
+                "y": 6
+              }
+            },
+            {
+              "anchorId": "thread-spawn-b",
+              "visibleAttackOrigin": {
+                "x": 82,
+                "y": 43
+              },
+              "canonicalGameplayAnchor": {
+                "x": 52,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 30,
+                "y": 8
+              },
+              "flipXVisibleOrigin": {
+                "x": 22,
+                "y": 43
+              },
+              "flipXVisualOffset": {
+                "x": -30,
+                "y": 8
+              }
+            },
+            {
+              "anchorId": "thread-spawn-c",
+              "visibleAttackOrigin": {
+                "x": 82,
+                "y": 45
+              },
+              "canonicalGameplayAnchor": {
+                "x": 67,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 15,
+                "y": 10
+              },
+              "flipXVisibleOrigin": {
+                "x": 22,
+                "y": 45
+              },
+              "flipXVisualOffset": {
+                "x": -15,
+                "y": 10
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "alert_to_deploy",
+          "frame": 3,
+          "file": "mineral_spider/alert_to_deploy/mineral_spider_alert_to_deploy_f03.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "thread-spawn-a",
+              "visibleAttackOrigin": {
+                "x": 81,
+                "y": 42
+              },
+              "canonicalGameplayAnchor": {
+                "x": 37,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 44,
+                "y": 7
+              },
+              "flipXVisibleOrigin": {
+                "x": 23,
+                "y": 42
+              },
+              "flipXVisualOffset": {
+                "x": -44,
+                "y": 7
+              }
+            },
+            {
+              "anchorId": "thread-spawn-b",
+              "visibleAttackOrigin": {
+                "x": 81,
+                "y": 44
+              },
+              "canonicalGameplayAnchor": {
+                "x": 52,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 29,
+                "y": 9
+              },
+              "flipXVisibleOrigin": {
+                "x": 23,
+                "y": 44
+              },
+              "flipXVisualOffset": {
+                "x": -29,
+                "y": 9
+              }
+            },
+            {
+              "anchorId": "thread-spawn-c",
+              "visibleAttackOrigin": {
+                "x": 81,
+                "y": 46
+              },
+              "canonicalGameplayAnchor": {
+                "x": 67,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 14,
+                "y": 11
+              },
+              "flipXVisibleOrigin": {
+                "x": 23,
+                "y": 46
+              },
+              "flipXVisualOffset": {
+                "x": -14,
+                "y": 11
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "deploy_to_attack",
+          "frame": 1,
+          "file": "mineral_spider/deploy_to_attack/mineral_spider_deploy_to_attack_f01.png",
+          "applyToVfx": true,
+          "origins": [
+            {
+              "anchorId": "thread-spawn-a",
+              "visibleAttackOrigin": {
+                "x": 82,
+                "y": 45
+              },
+              "canonicalGameplayAnchor": {
+                "x": 37,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 45,
+                "y": 10
+              },
+              "flipXVisibleOrigin": {
+                "x": 22,
+                "y": 45
+              },
+              "flipXVisualOffset": {
+                "x": -45,
+                "y": 10
+              }
+            },
+            {
+              "anchorId": "thread-spawn-b",
+              "visibleAttackOrigin": {
+                "x": 82,
+                "y": 47
+              },
+              "canonicalGameplayAnchor": {
+                "x": 52,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 30,
+                "y": 12
+              },
+              "flipXVisibleOrigin": {
+                "x": 22,
+                "y": 47
+              },
+              "flipXVisualOffset": {
+                "x": -30,
+                "y": 12
+              }
+            },
+            {
+              "anchorId": "thread-spawn-c",
+              "visibleAttackOrigin": {
+                "x": 82,
+                "y": 49
+              },
+              "canonicalGameplayAnchor": {
+                "x": 67,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 15,
+                "y": 14
+              },
+              "flipXVisibleOrigin": {
+                "x": 22,
+                "y": 49
+              },
+              "flipXVisualOffset": {
+                "x": -15,
+                "y": 14
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "deploy_to_attack",
+          "frame": 2,
+          "file": "mineral_spider/deploy_to_attack/mineral_spider_deploy_to_attack_f02.png",
+          "applyToVfx": true,
+          "origins": [
+            {
+              "anchorId": "thread-spawn-a",
+              "visibleAttackOrigin": {
+                "x": 72,
+                "y": 44
+              },
+              "canonicalGameplayAnchor": {
+                "x": 37,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 35,
+                "y": 9
+              },
+              "flipXVisibleOrigin": {
+                "x": 32,
+                "y": 44
+              },
+              "flipXVisualOffset": {
+                "x": -35,
+                "y": 9
+              }
+            },
+            {
+              "anchorId": "thread-spawn-b",
+              "visibleAttackOrigin": {
+                "x": 72,
+                "y": 46
+              },
+              "canonicalGameplayAnchor": {
+                "x": 52,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 20,
+                "y": 11
+              },
+              "flipXVisibleOrigin": {
+                "x": 32,
+                "y": 46
+              },
+              "flipXVisualOffset": {
+                "x": -20,
+                "y": 11
+              }
+            },
+            {
+              "anchorId": "thread-spawn-c",
+              "visibleAttackOrigin": {
+                "x": 72,
+                "y": 48
+              },
+              "canonicalGameplayAnchor": {
+                "x": 67,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 5,
+                "y": 13
+              },
+              "flipXVisibleOrigin": {
+                "x": 32,
+                "y": 48
+              },
+              "flipXVisualOffset": {
+                "x": -5,
+                "y": 13
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "deploy_to_attack",
+          "frame": 3,
+          "file": "mineral_spider/deploy_to_attack/mineral_spider_deploy_to_attack_f03.png",
+          "applyToVfx": true,
+          "origins": [
+            {
+              "anchorId": "thread-spawn-a",
+              "visibleAttackOrigin": {
+                "x": 72,
+                "y": 44
+              },
+              "canonicalGameplayAnchor": {
+                "x": 37,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 35,
+                "y": 9
+              },
+              "flipXVisibleOrigin": {
+                "x": 32,
+                "y": 44
+              },
+              "flipXVisualOffset": {
+                "x": -35,
+                "y": 9
+              }
+            },
+            {
+              "anchorId": "thread-spawn-b",
+              "visibleAttackOrigin": {
+                "x": 72,
+                "y": 46
+              },
+              "canonicalGameplayAnchor": {
+                "x": 52,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 20,
+                "y": 11
+              },
+              "flipXVisibleOrigin": {
+                "x": 32,
+                "y": 46
+              },
+              "flipXVisualOffset": {
+                "x": -20,
+                "y": 11
+              }
+            },
+            {
+              "anchorId": "thread-spawn-c",
+              "visibleAttackOrigin": {
+                "x": 72,
+                "y": 48
+              },
+              "canonicalGameplayAnchor": {
+                "x": 67,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 5,
+                "y": 13
+              },
+              "flipXVisibleOrigin": {
+                "x": 32,
+                "y": 48
+              },
+              "flipXVisualOffset": {
+                "x": -5,
+                "y": 13
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "deploy_to_attack",
+          "frame": 4,
+          "file": "mineral_spider/deploy_to_attack/mineral_spider_deploy_to_attack_f04.png",
+          "applyToVfx": true,
+          "origins": [
+            {
+              "anchorId": "thread-spawn-a",
+              "visibleAttackOrigin": {
+                "x": 81,
+                "y": 43
+              },
+              "canonicalGameplayAnchor": {
+                "x": 37,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 44,
+                "y": 8
+              },
+              "flipXVisibleOrigin": {
+                "x": 23,
+                "y": 43
+              },
+              "flipXVisualOffset": {
+                "x": -44,
+                "y": 8
+              }
+            },
+            {
+              "anchorId": "thread-spawn-b",
+              "visibleAttackOrigin": {
+                "x": 81,
+                "y": 45
+              },
+              "canonicalGameplayAnchor": {
+                "x": 52,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 29,
+                "y": 10
+              },
+              "flipXVisibleOrigin": {
+                "x": 23,
+                "y": 45
+              },
+              "flipXVisualOffset": {
+                "x": -29,
+                "y": 10
+              }
+            },
+            {
+              "anchorId": "thread-spawn-c",
+              "visibleAttackOrigin": {
+                "x": 81,
+                "y": 47
+              },
+              "canonicalGameplayAnchor": {
+                "x": 67,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 14,
+                "y": 12
+              },
+              "flipXVisibleOrigin": {
+                "x": 23,
+                "y": 47
+              },
+              "flipXVisualOffset": {
+                "x": -14,
+                "y": 12
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "attack_to_recover",
+          "frame": 1,
+          "file": "mineral_spider/attack_to_recover/mineral_spider_attack_to_recover_f01.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "thread-spawn-a",
+              "visibleAttackOrigin": {
+                "x": 82,
+                "y": 46
+              },
+              "canonicalGameplayAnchor": {
+                "x": 37,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 45,
+                "y": 11
+              },
+              "flipXVisibleOrigin": {
+                "x": 22,
+                "y": 46
+              },
+              "flipXVisualOffset": {
+                "x": -45,
+                "y": 11
+              }
+            },
+            {
+              "anchorId": "thread-spawn-b",
+              "visibleAttackOrigin": {
+                "x": 82,
+                "y": 48
+              },
+              "canonicalGameplayAnchor": {
+                "x": 52,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 30,
+                "y": 13
+              },
+              "flipXVisibleOrigin": {
+                "x": 22,
+                "y": 48
+              },
+              "flipXVisualOffset": {
+                "x": -30,
+                "y": 13
+              }
+            },
+            {
+              "anchorId": "thread-spawn-c",
+              "visibleAttackOrigin": {
+                "x": 82,
+                "y": 50
+              },
+              "canonicalGameplayAnchor": {
+                "x": 67,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 15,
+                "y": 15
+              },
+              "flipXVisibleOrigin": {
+                "x": 22,
+                "y": 50
+              },
+              "flipXVisualOffset": {
+                "x": -15,
+                "y": 15
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "attack_to_recover",
+          "frame": 2,
+          "file": "mineral_spider/attack_to_recover/mineral_spider_attack_to_recover_f02.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "thread-spawn-a",
+              "visibleAttackOrigin": {
+                "x": 84,
+                "y": 47
+              },
+              "canonicalGameplayAnchor": {
+                "x": 37,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 47,
+                "y": 12
+              },
+              "flipXVisibleOrigin": {
+                "x": 20,
+                "y": 47
+              },
+              "flipXVisualOffset": {
+                "x": -47,
+                "y": 12
+              }
+            },
+            {
+              "anchorId": "thread-spawn-b",
+              "visibleAttackOrigin": {
+                "x": 84,
+                "y": 49
+              },
+              "canonicalGameplayAnchor": {
+                "x": 52,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 32,
+                "y": 14
+              },
+              "flipXVisibleOrigin": {
+                "x": 20,
+                "y": 49
+              },
+              "flipXVisualOffset": {
+                "x": -32,
+                "y": 14
+              }
+            },
+            {
+              "anchorId": "thread-spawn-c",
+              "visibleAttackOrigin": {
+                "x": 84,
+                "y": 51
+              },
+              "canonicalGameplayAnchor": {
+                "x": 67,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 17,
+                "y": 16
+              },
+              "flipXVisibleOrigin": {
+                "x": 20,
+                "y": 51
+              },
+              "flipXVisualOffset": {
+                "x": -17,
+                "y": 16
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "attack_to_recover",
+          "frame": 3,
+          "file": "mineral_spider/attack_to_recover/mineral_spider_attack_to_recover_f03.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "thread-spawn-a",
+              "visibleAttackOrigin": {
+                "x": 86,
+                "y": 48
+              },
+              "canonicalGameplayAnchor": {
+                "x": 37,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 49,
+                "y": 13
+              },
+              "flipXVisibleOrigin": {
+                "x": 18,
+                "y": 48
+              },
+              "flipXVisualOffset": {
+                "x": -49,
+                "y": 13
+              }
+            },
+            {
+              "anchorId": "thread-spawn-b",
+              "visibleAttackOrigin": {
+                "x": 86,
+                "y": 50
+              },
+              "canonicalGameplayAnchor": {
+                "x": 52,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 34,
+                "y": 15
+              },
+              "flipXVisibleOrigin": {
+                "x": 18,
+                "y": 50
+              },
+              "flipXVisualOffset": {
+                "x": -34,
+                "y": 15
+              }
+            },
+            {
+              "anchorId": "thread-spawn-c",
+              "visibleAttackOrigin": {
+                "x": 86,
+                "y": 52
+              },
+              "canonicalGameplayAnchor": {
+                "x": 67,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 19,
+                "y": 17
+              },
+              "flipXVisibleOrigin": {
+                "x": 18,
+                "y": 52
+              },
+              "flipXVisualOffset": {
+                "x": -19,
+                "y": 17
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "stunned_or_retreat",
+          "frame": 1,
+          "file": "mineral_spider/stunned_or_retreat/mineral_spider_stunned_or_retreat_f01.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "thread-spawn-a",
+              "visibleAttackOrigin": {
+                "x": 86,
+                "y": 54
+              },
+              "canonicalGameplayAnchor": {
+                "x": 37,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 49,
+                "y": 19
+              },
+              "flipXVisibleOrigin": {
+                "x": 18,
+                "y": 54
+              },
+              "flipXVisualOffset": {
+                "x": -49,
+                "y": 19
+              }
+            },
+            {
+              "anchorId": "thread-spawn-b",
+              "visibleAttackOrigin": {
+                "x": 86,
+                "y": 56
+              },
+              "canonicalGameplayAnchor": {
+                "x": 52,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 34,
+                "y": 21
+              },
+              "flipXVisibleOrigin": {
+                "x": 18,
+                "y": 56
+              },
+              "flipXVisualOffset": {
+                "x": -34,
+                "y": 21
+              }
+            },
+            {
+              "anchorId": "thread-spawn-c",
+              "visibleAttackOrigin": {
+                "x": 86,
+                "y": 58
+              },
+              "canonicalGameplayAnchor": {
+                "x": 67,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 19,
+                "y": 23
+              },
+              "flipXVisibleOrigin": {
+                "x": 18,
+                "y": 58
+              },
+              "flipXVisualOffset": {
+                "x": -19,
+                "y": 23
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "stunned_or_retreat",
+          "frame": 2,
+          "file": "mineral_spider/stunned_or_retreat/mineral_spider_stunned_or_retreat_f02.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "thread-spawn-a",
+              "visibleAttackOrigin": {
+                "x": 84,
+                "y": 54
+              },
+              "canonicalGameplayAnchor": {
+                "x": 37,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 47,
+                "y": 19
+              },
+              "flipXVisibleOrigin": {
+                "x": 20,
+                "y": 54
+              },
+              "flipXVisualOffset": {
+                "x": -47,
+                "y": 19
+              }
+            },
+            {
+              "anchorId": "thread-spawn-b",
+              "visibleAttackOrigin": {
+                "x": 84,
+                "y": 56
+              },
+              "canonicalGameplayAnchor": {
+                "x": 52,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 32,
+                "y": 21
+              },
+              "flipXVisibleOrigin": {
+                "x": 20,
+                "y": 56
+              },
+              "flipXVisualOffset": {
+                "x": -32,
+                "y": 21
+              }
+            },
+            {
+              "anchorId": "thread-spawn-c",
+              "visibleAttackOrigin": {
+                "x": 84,
+                "y": 58
+              },
+              "canonicalGameplayAnchor": {
+                "x": 67,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 17,
+                "y": 23
+              },
+              "flipXVisibleOrigin": {
+                "x": 20,
+                "y": 58
+              },
+              "flipXVisualOffset": {
+                "x": -17,
+                "y": 23
+              }
+            }
+          ]
+        },
+        {
+          "sequence": "stunned_or_retreat",
+          "frame": 3,
+          "file": "mineral_spider/stunned_or_retreat/mineral_spider_stunned_or_retreat_f03.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "thread-spawn-a",
+              "visibleAttackOrigin": {
+                "x": 82,
+                "y": 50
+              },
+              "canonicalGameplayAnchor": {
+                "x": 37,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 45,
+                "y": 15
+              },
+              "flipXVisibleOrigin": {
+                "x": 22,
+                "y": 50
+              },
+              "flipXVisualOffset": {
+                "x": -45,
+                "y": 15
+              }
+            },
+            {
+              "anchorId": "thread-spawn-b",
+              "visibleAttackOrigin": {
+                "x": 82,
+                "y": 52
+              },
+              "canonicalGameplayAnchor": {
+                "x": 52,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 30,
+                "y": 17
+              },
+              "flipXVisibleOrigin": {
+                "x": 22,
+                "y": 52
+              },
+              "flipXVisualOffset": {
+                "x": -30,
+                "y": 17
+              }
+            },
+            {
+              "anchorId": "thread-spawn-c",
+              "visibleAttackOrigin": {
+                "x": 82,
+                "y": 54
+              },
+              "canonicalGameplayAnchor": {
+                "x": 67,
+                "y": 35
+              },
+              "frameVisualOffset": {
+                "x": 15,
+                "y": 19
+              },
+              "flipXVisibleOrigin": {
+                "x": 22,
+                "y": 54
+              },
+              "flipXVisualOffset": {
+                "x": -15,
+                "y": 19
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "resonance_goral",
+      "directionMode": "fixed",
+      "frames": [
+        {
+          "sequence": "idle",
+          "frame": 1,
+          "file": "resonance_goral/idle/resonance_goral_idle_f01.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "horn-root",
+              "visibleAttackOrigin": {
+                "x": 87,
+                "y": 57
+              },
+              "canonicalGameplayAnchor": {
+                "x": 110,
+                "y": 49
+              },
+              "frameVisualOffset": {
+                "x": -23,
+                "y": 8
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-left",
+              "visibleAttackOrigin": {
+                "x": 100,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 92,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": 8,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-right",
+              "visibleAttackOrigin": {
+                "x": 118,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 128,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": -10,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            }
+          ]
+        },
+        {
+          "sequence": "idle",
+          "frame": 2,
+          "file": "resonance_goral/idle/resonance_goral_idle_f02.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "horn-root",
+              "visibleAttackOrigin": {
+                "x": 87,
+                "y": 57
+              },
+              "canonicalGameplayAnchor": {
+                "x": 110,
+                "y": 49
+              },
+              "frameVisualOffset": {
+                "x": -23,
+                "y": 8
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-left",
+              "visibleAttackOrigin": {
+                "x": 100,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 92,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": 8,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-right",
+              "visibleAttackOrigin": {
+                "x": 118,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 128,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": -10,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            }
+          ]
+        },
+        {
+          "sequence": "idle",
+          "frame": 3,
+          "file": "resonance_goral/idle/resonance_goral_idle_f03.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "horn-root",
+              "visibleAttackOrigin": {
+                "x": 84,
+                "y": 57
+              },
+              "canonicalGameplayAnchor": {
+                "x": 110,
+                "y": 49
+              },
+              "frameVisualOffset": {
+                "x": -26,
+                "y": 8
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-left",
+              "visibleAttackOrigin": {
+                "x": 98,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 92,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": 6,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-right",
+              "visibleAttackOrigin": {
+                "x": 119,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 128,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": -9,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            }
+          ]
+        },
+        {
+          "sequence": "idle",
+          "frame": 4,
+          "file": "resonance_goral/idle/resonance_goral_idle_f04.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "horn-root",
+              "visibleAttackOrigin": {
+                "x": 86,
+                "y": 57
+              },
+              "canonicalGameplayAnchor": {
+                "x": 110,
+                "y": 49
+              },
+              "frameVisualOffset": {
+                "x": -24,
+                "y": 8
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-left",
+              "visibleAttackOrigin": {
+                "x": 99,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 92,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": 7,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-right",
+              "visibleAttackOrigin": {
+                "x": 119,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 128,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": -9,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            }
+          ]
+        },
+        {
+          "sequence": "warning",
+          "frame": 1,
+          "file": "resonance_goral/warning/resonance_goral_warning_f01.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "horn-root",
+              "visibleAttackOrigin": {
+                "x": 87,
+                "y": 64
+              },
+              "canonicalGameplayAnchor": {
+                "x": 110,
+                "y": 49
+              },
+              "frameVisualOffset": {
+                "x": -23,
+                "y": 15
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-left",
+              "visibleAttackOrigin": {
+                "x": 99,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 92,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": 7,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-right",
+              "visibleAttackOrigin": {
+                "x": 118,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 128,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": -10,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            }
+          ]
+        },
+        {
+          "sequence": "warning",
+          "frame": 2,
+          "file": "resonance_goral/warning/resonance_goral_warning_f02.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "horn-root",
+              "visibleAttackOrigin": {
+                "x": 85,
+                "y": 62
+              },
+              "canonicalGameplayAnchor": {
+                "x": 110,
+                "y": 49
+              },
+              "frameVisualOffset": {
+                "x": -25,
+                "y": 13
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-left",
+              "visibleAttackOrigin": {
+                "x": 99,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 92,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": 7,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-right",
+              "visibleAttackOrigin": {
+                "x": 119,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 128,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": -9,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            }
+          ]
+        },
+        {
+          "sequence": "warning",
+          "frame": 3,
+          "file": "resonance_goral/warning/resonance_goral_warning_f03.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "horn-root",
+              "visibleAttackOrigin": {
+                "x": 87,
+                "y": 64
+              },
+              "canonicalGameplayAnchor": {
+                "x": 110,
+                "y": 49
+              },
+              "frameVisualOffset": {
+                "x": -23,
+                "y": 15
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-left",
+              "visibleAttackOrigin": {
+                "x": 99,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 92,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": 7,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-right",
+              "visibleAttackOrigin": {
+                "x": 118,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 128,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": -10,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            }
+          ]
+        },
+        {
+          "sequence": "combat_prep",
+          "frame": 1,
+          "file": "resonance_goral/combat_prep/resonance_goral_combat_prep_f01.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "horn-root",
+              "visibleAttackOrigin": {
+                "x": 85,
+                "y": 76
+              },
+              "canonicalGameplayAnchor": {
+                "x": 110,
+                "y": 49
+              },
+              "frameVisualOffset": {
+                "x": -25,
+                "y": 27
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-left",
+              "visibleAttackOrigin": {
+                "x": 99,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 92,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": 7,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-right",
+              "visibleAttackOrigin": {
+                "x": 119,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 128,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": -9,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            }
+          ]
+        },
+        {
+          "sequence": "combat_prep",
+          "frame": 2,
+          "file": "resonance_goral/combat_prep/resonance_goral_combat_prep_f02.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "horn-root",
+              "visibleAttackOrigin": {
+                "x": 81,
+                "y": 77
+              },
+              "canonicalGameplayAnchor": {
+                "x": 110,
+                "y": 49
+              },
+              "frameVisualOffset": {
+                "x": -29,
+                "y": 28
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-left",
+              "visibleAttackOrigin": {
+                "x": 97,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 92,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": 5,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-right",
+              "visibleAttackOrigin": {
+                "x": 120,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 128,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": -8,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            }
+          ]
+        },
+        {
+          "sequence": "combat_prep",
+          "frame": 3,
+          "file": "resonance_goral/combat_prep/resonance_goral_combat_prep_f03.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "horn-root",
+              "visibleAttackOrigin": {
+                "x": 81,
+                "y": 78
+              },
+              "canonicalGameplayAnchor": {
+                "x": 110,
+                "y": 49
+              },
+              "frameVisualOffset": {
+                "x": -29,
+                "y": 29
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-left",
+              "visibleAttackOrigin": {
+                "x": 97,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 92,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": 5,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-right",
+              "visibleAttackOrigin": {
+                "x": 121,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 128,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": -7,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            }
+          ]
+        },
+        {
+          "sequence": "charge_attack",
+          "frame": 1,
+          "file": "resonance_goral/charge_attack/resonance_goral_charge_attack_f01.png",
+          "applyToVfx": true,
+          "origins": [
+            {
+              "anchorId": "horn-root",
+              "visibleAttackOrigin": {
+                "x": 75,
+                "y": 79
+              },
+              "canonicalGameplayAnchor": {
+                "x": 110,
+                "y": 49
+              },
+              "frameVisualOffset": {
+                "x": -35,
+                "y": 30
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-left",
+              "visibleAttackOrigin": {
+                "x": 94,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 92,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": 2,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-right",
+              "visibleAttackOrigin": {
+                "x": 123,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 128,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": -5,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            }
+          ]
+        },
+        {
+          "sequence": "charge_attack",
+          "frame": 2,
+          "file": "resonance_goral/charge_attack/resonance_goral_charge_attack_f02.png",
+          "applyToVfx": true,
+          "origins": [
+            {
+              "anchorId": "horn-root",
+              "visibleAttackOrigin": {
+                "x": 71,
+                "y": 75
+              },
+              "canonicalGameplayAnchor": {
+                "x": 110,
+                "y": 49
+              },
+              "frameVisualOffset": {
+                "x": -39,
+                "y": 26
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-left",
+              "visibleAttackOrigin": {
+                "x": 92,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 92,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": 0,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-right",
+              "visibleAttackOrigin": {
+                "x": 124,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 128,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": -4,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            }
+          ]
+        },
+        {
+          "sequence": "charge_attack",
+          "frame": 3,
+          "file": "resonance_goral/charge_attack/resonance_goral_charge_attack_f03.png",
+          "applyToVfx": true,
+          "origins": [
+            {
+              "anchorId": "horn-root",
+              "visibleAttackOrigin": {
+                "x": 69,
+                "y": 81
+              },
+              "canonicalGameplayAnchor": {
+                "x": 110,
+                "y": 49
+              },
+              "frameVisualOffset": {
+                "x": -41,
+                "y": 32
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-left",
+              "visibleAttackOrigin": {
+                "x": 91,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 92,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": -1,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-right",
+              "visibleAttackOrigin": {
+                "x": 125,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 128,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": -3,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            }
+          ]
+        },
+        {
+          "sequence": "charge_attack",
+          "frame": 4,
+          "file": "resonance_goral/charge_attack/resonance_goral_charge_attack_f04.png",
+          "applyToVfx": true,
+          "origins": [
+            {
+              "anchorId": "horn-root",
+              "visibleAttackOrigin": {
+                "x": 70,
+                "y": 81
+              },
+              "canonicalGameplayAnchor": {
+                "x": 110,
+                "y": 49
+              },
+              "frameVisualOffset": {
+                "x": -40,
+                "y": 32
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-left",
+              "visibleAttackOrigin": {
+                "x": 92,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 92,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": 0,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-right",
+              "visibleAttackOrigin": {
+                "x": 125,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 128,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": -3,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            }
+          ]
+        },
+        {
+          "sequence": "charge_attack",
+          "frame": 5,
+          "file": "resonance_goral/charge_attack/resonance_goral_charge_attack_f05.png",
+          "applyToVfx": true,
+          "origins": [
+            {
+              "anchorId": "horn-root",
+              "visibleAttackOrigin": {
+                "x": 78,
+                "y": 79
+              },
+              "canonicalGameplayAnchor": {
+                "x": 110,
+                "y": 49
+              },
+              "frameVisualOffset": {
+                "x": -32,
+                "y": 30
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-left",
+              "visibleAttackOrigin": {
+                "x": 95,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 92,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": 3,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-right",
+              "visibleAttackOrigin": {
+                "x": 122,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 128,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": -6,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            }
+          ]
+        },
+        {
+          "sequence": "hit_recover",
+          "frame": 1,
+          "file": "resonance_goral/hit_recover/resonance_goral_hit_recover_f01.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "horn-root",
+              "visibleAttackOrigin": {
+                "x": 84,
+                "y": 77
+              },
+              "canonicalGameplayAnchor": {
+                "x": 110,
+                "y": 49
+              },
+              "frameVisualOffset": {
+                "x": -26,
+                "y": 28
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-left",
+              "visibleAttackOrigin": {
+                "x": 98,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 92,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": 6,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-right",
+              "visibleAttackOrigin": {
+                "x": 119,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 128,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": -9,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            }
+          ]
+        },
+        {
+          "sequence": "hit_recover",
+          "frame": 2,
+          "file": "resonance_goral/hit_recover/resonance_goral_hit_recover_f02.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "horn-root",
+              "visibleAttackOrigin": {
+                "x": 81,
+                "y": 72
+              },
+              "canonicalGameplayAnchor": {
+                "x": 110,
+                "y": 49
+              },
+              "frameVisualOffset": {
+                "x": -29,
+                "y": 23
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-left",
+              "visibleAttackOrigin": {
+                "x": 96,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 92,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": 4,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-right",
+              "visibleAttackOrigin": {
+                "x": 120,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 128,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": -8,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            }
+          ]
+        },
+        {
+          "sequence": "hit_recover",
+          "frame": 3,
+          "file": "resonance_goral/hit_recover/resonance_goral_hit_recover_f03.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "horn-root",
+              "visibleAttackOrigin": {
+                "x": 85,
+                "y": 72
+              },
+              "canonicalGameplayAnchor": {
+                "x": 110,
+                "y": 49
+              },
+              "frameVisualOffset": {
+                "x": -25,
+                "y": 23
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-left",
+              "visibleAttackOrigin": {
+                "x": 99,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 92,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": 7,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-right",
+              "visibleAttackOrigin": {
+                "x": 119,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 128,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": -9,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            }
+          ]
+        },
+        {
+          "sequence": "hit_recover",
+          "frame": 4,
+          "file": "resonance_goral/hit_recover/resonance_goral_hit_recover_f04.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "horn-root",
+              "visibleAttackOrigin": {
+                "x": 89,
+                "y": 73
+              },
+              "canonicalGameplayAnchor": {
+                "x": 110,
+                "y": 49
+              },
+              "frameVisualOffset": {
+                "x": -21,
+                "y": 24
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-left",
+              "visibleAttackOrigin": {
+                "x": 100,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 92,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": 8,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-right",
+              "visibleAttackOrigin": {
+                "x": 118,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 128,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": -10,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            }
+          ]
+        },
+        {
+          "sequence": "retreat",
+          "frame": 1,
+          "file": "resonance_goral/retreat/resonance_goral_retreat_f01.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "horn-root",
+              "visibleAttackOrigin": {
+                "x": 83,
+                "y": 60
+              },
+              "canonicalGameplayAnchor": {
+                "x": 110,
+                "y": 49
+              },
+              "frameVisualOffset": {
+                "x": -27,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-left",
+              "visibleAttackOrigin": {
+                "x": 98,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 92,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": 6,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-right",
+              "visibleAttackOrigin": {
+                "x": 119,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 128,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": -9,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            }
+          ]
+        },
+        {
+          "sequence": "retreat",
+          "frame": 2,
+          "file": "resonance_goral/retreat/resonance_goral_retreat_f02.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "horn-root",
+              "visibleAttackOrigin": {
+                "x": 83,
+                "y": 59
+              },
+              "canonicalGameplayAnchor": {
+                "x": 110,
+                "y": 49
+              },
+              "frameVisualOffset": {
+                "x": -27,
+                "y": 10
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-left",
+              "visibleAttackOrigin": {
+                "x": 98,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 92,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": 6,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-right",
+              "visibleAttackOrigin": {
+                "x": 119,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 128,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": -9,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            }
+          ]
+        },
+        {
+          "sequence": "retreat",
+          "frame": 3,
+          "file": "resonance_goral/retreat/resonance_goral_retreat_f03.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "horn-root",
+              "visibleAttackOrigin": {
+                "x": 86,
+                "y": 68
+              },
+              "canonicalGameplayAnchor": {
+                "x": 110,
+                "y": 49
+              },
+              "frameVisualOffset": {
+                "x": -24,
+                "y": 19
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-left",
+              "visibleAttackOrigin": {
+                "x": 99,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 92,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": 7,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-right",
+              "visibleAttackOrigin": {
+                "x": 119,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 128,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": -9,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            }
+          ]
+        },
+        {
+          "sequence": "retreat",
+          "frame": 4,
+          "file": "resonance_goral/retreat/resonance_goral_retreat_f04.png",
+          "applyToVfx": false,
+          "origins": [
+            {
+              "anchorId": "horn-root",
+              "visibleAttackOrigin": {
+                "x": 87,
+                "y": 60
+              },
+              "canonicalGameplayAnchor": {
+                "x": 110,
+                "y": 49
+              },
+              "frameVisualOffset": {
+                "x": -23,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-left",
+              "visibleAttackOrigin": {
+                "x": 100,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 92,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": 8,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            },
+            {
+              "anchorId": "forehoof-right",
+              "visibleAttackOrigin": {
+                "x": 119,
+                "y": 149
+              },
+              "canonicalGameplayAnchor": {
+                "x": 128,
+                "y": 138
+              },
+              "frameVisualOffset": {
+                "x": -9,
+                "y": 11
+              },
+              "flipXVisibleOrigin": null,
+              "flipXVisualOffset": null
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

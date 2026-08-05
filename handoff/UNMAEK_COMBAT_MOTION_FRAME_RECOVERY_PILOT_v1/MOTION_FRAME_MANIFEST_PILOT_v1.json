@@ -1,0 +1,1326 @@
+{
+  "schemaVersion": 1,
+  "work": "UNMAEK_COMBAT_MOTION_FRAME_RECOVERY_PILOT_v1",
+  "player": {
+    "status": "SOURCE_BLOCKED",
+    "framesCreated": 0,
+    "blockerReport": "PLAYER_SOURCE_BLOCKER_REPORT.md"
+  },
+  "totalCreatureFrames": 99,
+  "timingPolicy": {
+    "previewDurationsAreGameplayValues": false,
+    "engineDuration": "USE_EXISTING_ENGINE_DURATION",
+    "hitTimestamp": "MAP_TO_EXISTING_HIT_TIMESTAMP"
+  },
+  "lockedChanges": {
+    "newStateMachine": 0,
+    "newAttack": 0,
+    "newAI": 0,
+    "manifestModified": false
+  },
+  "subjects": [
+    {
+      "id": "pressure_swift",
+      "displayName": "압각 칼새",
+      "canvas": {
+        "width": 36,
+        "height": 24
+      },
+      "groundPoint": {
+        "x": 18,
+        "y": 20
+      },
+      "hurtbox": null,
+      "directionMode": "flipX",
+      "canonicalAttackAnchors": [],
+      "existingStates": [
+        "fly",
+        "evade"
+      ],
+      "existingAliases": {
+        "idle": {
+          "sourceState": "fly",
+          "rotationDeg": 0,
+          "tint": null,
+          "shake": false,
+          "replaceAfterSubmission": true
+        }
+      },
+      "runtimeSourceFiles": [
+        "creatures/act1/pressure_swift/runtime/act1_pressure_swift_fly_side_01.png",
+        "creatures/act1/pressure_swift/runtime/act1_pressure_swift_evade_side_01.png"
+      ],
+      "pilotSequences": [
+        {
+          "id": "fly",
+          "verdict": "INBETWEEN_CREATED",
+          "frameCount": 6,
+          "frames": [
+            {
+              "number": 1,
+              "file": "pressure_swift/fly/pressure_swift_fly_f01.png",
+              "previewDurationMs": 100,
+              "hold": null
+            },
+            {
+              "number": 2,
+              "file": "pressure_swift/fly/pressure_swift_fly_f02.png",
+              "previewDurationMs": 100,
+              "hold": null
+            },
+            {
+              "number": 3,
+              "file": "pressure_swift/fly/pressure_swift_fly_f03.png",
+              "previewDurationMs": 100,
+              "hold": null
+            },
+            {
+              "number": 4,
+              "file": "pressure_swift/fly/pressure_swift_fly_f04.png",
+              "previewDurationMs": 100,
+              "hold": null
+            },
+            {
+              "number": 5,
+              "file": "pressure_swift/fly/pressure_swift_fly_f05.png",
+              "previewDurationMs": 100,
+              "hold": null
+            },
+            {
+              "number": 6,
+              "file": "pressure_swift/fly/pressure_swift_fly_f06.png",
+              "previewDurationMs": 100,
+              "hold": null
+            }
+          ],
+          "loopPlaybackOrder": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "loopClosurePolicy": "RETURN_TO_FIRST_FRAME",
+          "spriteSheetCandidate": "pressure_swift/sprite_sheets/pressure_swift_fly_sheet_candidate.png",
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hitTimestampBinding": null,
+          "hitAlignedFrameCandidate": null
+        },
+        {
+          "id": "evade",
+          "verdict": "INBETWEEN_CREATED",
+          "frameCount": 4,
+          "frames": [
+            {
+              "number": 1,
+              "file": "pressure_swift/evade/pressure_swift_evade_f01.png",
+              "previewDurationMs": 120,
+              "hold": null
+            },
+            {
+              "number": 2,
+              "file": "pressure_swift/evade/pressure_swift_evade_f02.png",
+              "previewDurationMs": 120,
+              "hold": null
+            },
+            {
+              "number": 3,
+              "file": "pressure_swift/evade/pressure_swift_evade_f03.png",
+              "previewDurationMs": 120,
+              "hold": null
+            },
+            {
+              "number": 4,
+              "file": "pressure_swift/evade/pressure_swift_evade_f04.png",
+              "previewDurationMs": 120,
+              "hold": null
+            }
+          ],
+          "loopPlaybackOrder": null,
+          "loopClosurePolicy": null,
+          "spriteSheetCandidate": "pressure_swift/sprite_sheets/pressure_swift_evade_sheet_candidate.png",
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hitTimestampBinding": null,
+          "hitAlignedFrameCandidate": null
+        }
+      ],
+      "previews": {
+        "runtime1x": "previews/runtime_1x/pressure_swift_motion_pilot_preview_1x.mp4",
+        "nearest4x": "previews/nearest_4x/pressure_swift_motion_pilot_preview_4x.mp4",
+        "animated": "previews/animated/pressure_swift_motion_pilot_preview.mp4",
+        "newContact": "previews/before_after/pressure_swift_new_frame_sequence_contact.png",
+        "v1Reference": "previews/before_after/pressure_swift_v1_static_strip_REFERENCE_ONLY.png"
+      }
+    },
+    {
+      "id": "deflect_bat",
+      "displayName": "편향관 박쥐",
+      "canvas": {
+        "width": 52,
+        "height": 36
+      },
+      "groundPoint": {
+        "x": 26,
+        "y": 29
+      },
+      "hurtbox": {
+        "x": 12,
+        "y": 9,
+        "width": 28,
+        "height": 20
+      },
+      "directionMode": "flipX",
+      "canonicalAttackAnchors": [
+        {
+          "id": "mouth-organ",
+          "original": {
+            "x": 26,
+            "y": 14
+          },
+          "flippedX": {
+            "x": 26,
+            "y": 14
+          }
+        }
+      ],
+      "existingStates": [
+        "idle",
+        "move"
+      ],
+      "existingAliases": {
+        "prep": {
+          "sourceState": "idle",
+          "rotationDeg": 0,
+          "tint": null,
+          "shake": false,
+          "replaceAfterSubmission": true
+        },
+        "attack": {
+          "sourceState": "move",
+          "rotationDeg": 0,
+          "tint": null,
+          "shake": false,
+          "replaceAfterSubmission": true
+        },
+        "hit": {
+          "sourceState": "move",
+          "rotationDeg": 0,
+          "tint": "#B94A3E",
+          "shake": true,
+          "replaceAfterSubmission": true
+        }
+      },
+      "runtimeSourceFiles": [
+        "creatures/act1/deflect_bat/runtime/act1_deflect_bat_idle_side_01.png",
+        "creatures/act1/deflect_bat/runtime/act1_deflect_bat_move_side_01.png"
+      ],
+      "pilotSequences": [
+        {
+          "id": "idle",
+          "verdict": "INBETWEEN_CREATED",
+          "frameCount": 4,
+          "frames": [
+            {
+              "number": 1,
+              "file": "deflect_bat/idle/deflect_bat_idle_f01.png",
+              "previewDurationMs": 140,
+              "hold": null
+            },
+            {
+              "number": 2,
+              "file": "deflect_bat/idle/deflect_bat_idle_f02.png",
+              "previewDurationMs": 140,
+              "hold": null
+            },
+            {
+              "number": 3,
+              "file": "deflect_bat/idle/deflect_bat_idle_f03.png",
+              "previewDurationMs": 140,
+              "hold": null
+            },
+            {
+              "number": 4,
+              "file": "deflect_bat/idle/deflect_bat_idle_f04.png",
+              "previewDurationMs": 140,
+              "hold": null
+            }
+          ],
+          "loopPlaybackOrder": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "loopClosurePolicy": "RETURN_TO_FIRST_FRAME",
+          "spriteSheetCandidate": "deflect_bat/sprite_sheets/deflect_bat_idle_sheet_candidate.png",
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hitTimestampBinding": null,
+          "hitAlignedFrameCandidate": null
+        },
+        {
+          "id": "move",
+          "verdict": "INBETWEEN_CREATED",
+          "frameCount": 6,
+          "frames": [
+            {
+              "number": 1,
+              "file": "deflect_bat/move/deflect_bat_move_f01.png",
+              "previewDurationMs": 95,
+              "hold": null
+            },
+            {
+              "number": 2,
+              "file": "deflect_bat/move/deflect_bat_move_f02.png",
+              "previewDurationMs": 95,
+              "hold": null
+            },
+            {
+              "number": 3,
+              "file": "deflect_bat/move/deflect_bat_move_f03.png",
+              "previewDurationMs": 95,
+              "hold": null
+            },
+            {
+              "number": 4,
+              "file": "deflect_bat/move/deflect_bat_move_f04.png",
+              "previewDurationMs": 95,
+              "hold": null
+            },
+            {
+              "number": 5,
+              "file": "deflect_bat/move/deflect_bat_move_f05.png",
+              "previewDurationMs": 95,
+              "hold": null
+            },
+            {
+              "number": 6,
+              "file": "deflect_bat/move/deflect_bat_move_f06.png",
+              "previewDurationMs": 95,
+              "hold": null
+            }
+          ],
+          "loopPlaybackOrder": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "loopClosurePolicy": "RETURN_TO_FIRST_FRAME",
+          "spriteSheetCandidate": "deflect_bat/sprite_sheets/deflect_bat_move_sheet_candidate.png",
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hitTimestampBinding": null,
+          "hitAlignedFrameCandidate": null
+        },
+        {
+          "id": "prep",
+          "verdict": "UNIQUE_STATE_FRAME_CANDIDATE",
+          "frameCount": 3,
+          "frames": [
+            {
+              "number": 1,
+              "file": "deflect_bat/prep/deflect_bat_prep_f01.png",
+              "previewDurationMs": 120,
+              "hold": null
+            },
+            {
+              "number": 2,
+              "file": "deflect_bat/prep/deflect_bat_prep_f02.png",
+              "previewDurationMs": 120,
+              "hold": null
+            },
+            {
+              "number": 3,
+              "file": "deflect_bat/prep/deflect_bat_prep_f03.png",
+              "previewDurationMs": 120,
+              "hold": null
+            }
+          ],
+          "loopPlaybackOrder": null,
+          "loopClosurePolicy": null,
+          "spriteSheetCandidate": "deflect_bat/sprite_sheets/deflect_bat_prep_sheet_candidate.png",
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hitTimestampBinding": null,
+          "hitAlignedFrameCandidate": null
+        },
+        {
+          "id": "attack",
+          "verdict": "UNIQUE_STATE_FRAME_CANDIDATE",
+          "frameCount": 4,
+          "frames": [
+            {
+              "number": 1,
+              "file": "deflect_bat/attack/deflect_bat_attack_f01.png",
+              "previewDurationMs": 95,
+              "hold": null
+            },
+            {
+              "number": 2,
+              "file": "deflect_bat/attack/deflect_bat_attack_f02.png",
+              "previewDurationMs": 95,
+              "hold": null
+            },
+            {
+              "number": 3,
+              "file": "deflect_bat/attack/deflect_bat_attack_f03.png",
+              "previewDurationMs": 95,
+              "hold": null
+            },
+            {
+              "number": 4,
+              "file": "deflect_bat/attack/deflect_bat_attack_f04.png",
+              "previewDurationMs": 95,
+              "hold": null
+            }
+          ],
+          "loopPlaybackOrder": null,
+          "loopClosurePolicy": null,
+          "spriteSheetCandidate": "deflect_bat/sprite_sheets/deflect_bat_attack_sheet_candidate.png",
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hitTimestampBinding": "MAP_TO_EXISTING_HIT_TIMESTAMP",
+          "hitAlignedFrameCandidate": 2
+        },
+        {
+          "id": "hit_recover",
+          "verdict": "UNIQUE_STATE_FRAME_CANDIDATE",
+          "frameCount": 3,
+          "frames": [
+            {
+              "number": 1,
+              "file": "deflect_bat/hit_recover/deflect_bat_hit_recover_f01.png",
+              "previewDurationMs": 120,
+              "hold": null
+            },
+            {
+              "number": 2,
+              "file": "deflect_bat/hit_recover/deflect_bat_hit_recover_f02.png",
+              "previewDurationMs": 120,
+              "hold": null
+            },
+            {
+              "number": 3,
+              "file": "deflect_bat/hit_recover/deflect_bat_hit_recover_f03.png",
+              "previewDurationMs": 120,
+              "hold": null
+            }
+          ],
+          "loopPlaybackOrder": null,
+          "loopClosurePolicy": null,
+          "spriteSheetCandidate": "deflect_bat/sprite_sheets/deflect_bat_hit_recover_sheet_candidate.png",
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hitTimestampBinding": null,
+          "hitAlignedFrameCandidate": null
+        }
+      ],
+      "previews": {
+        "runtime1x": "previews/runtime_1x/deflect_bat_motion_pilot_preview_1x.mp4",
+        "nearest4x": "previews/nearest_4x/deflect_bat_motion_pilot_preview_4x.mp4",
+        "animated": "previews/animated/deflect_bat_motion_pilot_preview.mp4",
+        "newContact": "previews/before_after/deflect_bat_new_frame_sequence_contact.png",
+        "v1Reference": "previews/before_after/deflect_bat_v1_static_strip_REFERENCE_ONLY.png"
+      }
+    },
+    {
+      "id": "rewind_lizard",
+      "displayName": "되감비늘 도마뱀",
+      "canvas": {
+        "width": 72,
+        "height": 40
+      },
+      "groundPoint": {
+        "x": 33,
+        "y": 34
+      },
+      "hurtbox": {
+        "x": 9,
+        "y": 12,
+        "width": 48,
+        "height": 22
+      },
+      "directionMode": "flipX",
+      "canonicalAttackAnchors": [
+        {
+          "id": "snout",
+          "original": {
+            "x": 9,
+            "y": 22
+          },
+          "flippedX": {
+            "x": 63,
+            "y": 22
+          }
+        }
+      ],
+      "existingStates": [
+        "idle",
+        "move"
+      ],
+      "existingAliases": {
+        "prep": {
+          "sourceState": "idle",
+          "rotationDeg": -3,
+          "tint": null,
+          "shake": false,
+          "replaceAfterSubmission": true
+        },
+        "attack": {
+          "sourceState": "move",
+          "rotationDeg": 0,
+          "tint": null,
+          "shake": false,
+          "replaceAfterSubmission": true
+        },
+        "hit": {
+          "sourceState": "idle",
+          "rotationDeg": 0,
+          "tint": "#B94A3E",
+          "shake": true,
+          "replaceAfterSubmission": true
+        }
+      },
+      "runtimeSourceFiles": [
+        "creatures/act1/rewind_lizard/runtime/act1_rewind_lizard_idle_side_01.png",
+        "creatures/act1/rewind_lizard/runtime/act1_rewind_lizard_move_side_01.png"
+      ],
+      "pilotSequences": [
+        {
+          "id": "idle",
+          "verdict": "INBETWEEN_CREATED",
+          "frameCount": 4,
+          "frames": [
+            {
+              "number": 1,
+              "file": "rewind_lizard/idle/rewind_lizard_idle_f01.png",
+              "previewDurationMs": 160,
+              "hold": null
+            },
+            {
+              "number": 2,
+              "file": "rewind_lizard/idle/rewind_lizard_idle_f02.png",
+              "previewDurationMs": 160,
+              "hold": null
+            },
+            {
+              "number": 3,
+              "file": "rewind_lizard/idle/rewind_lizard_idle_f03.png",
+              "previewDurationMs": 160,
+              "hold": null
+            },
+            {
+              "number": 4,
+              "file": "rewind_lizard/idle/rewind_lizard_idle_f04.png",
+              "previewDurationMs": 160,
+              "hold": null
+            }
+          ],
+          "loopPlaybackOrder": [
+            1,
+            2,
+            3,
+            4,
+            3,
+            2
+          ],
+          "loopClosurePolicy": "PING_PONG_NO_DUPLICATE_SOURCE_PNG",
+          "spriteSheetCandidate": "rewind_lizard/sprite_sheets/rewind_lizard_idle_sheet_candidate.png",
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hitTimestampBinding": null,
+          "hitAlignedFrameCandidate": null
+        },
+        {
+          "id": "move",
+          "verdict": "INBETWEEN_CREATED",
+          "frameCount": 6,
+          "frames": [
+            {
+              "number": 1,
+              "file": "rewind_lizard/move/rewind_lizard_move_f01.png",
+              "previewDurationMs": 100,
+              "hold": null
+            },
+            {
+              "number": 2,
+              "file": "rewind_lizard/move/rewind_lizard_move_f02.png",
+              "previewDurationMs": 100,
+              "hold": null
+            },
+            {
+              "number": 3,
+              "file": "rewind_lizard/move/rewind_lizard_move_f03.png",
+              "previewDurationMs": 100,
+              "hold": null
+            },
+            {
+              "number": 4,
+              "file": "rewind_lizard/move/rewind_lizard_move_f04.png",
+              "previewDurationMs": 100,
+              "hold": null
+            },
+            {
+              "number": 5,
+              "file": "rewind_lizard/move/rewind_lizard_move_f05.png",
+              "previewDurationMs": 100,
+              "hold": null
+            },
+            {
+              "number": 6,
+              "file": "rewind_lizard/move/rewind_lizard_move_f06.png",
+              "previewDurationMs": 100,
+              "hold": null
+            }
+          ],
+          "loopPlaybackOrder": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "loopClosurePolicy": "RETURN_TO_FIRST_FRAME",
+          "spriteSheetCandidate": "rewind_lizard/sprite_sheets/rewind_lizard_move_sheet_candidate.png",
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hitTimestampBinding": null,
+          "hitAlignedFrameCandidate": null
+        },
+        {
+          "id": "prep",
+          "verdict": "UNIQUE_STATE_FRAME_CANDIDATE",
+          "frameCount": 3,
+          "frames": [
+            {
+              "number": 1,
+              "file": "rewind_lizard/prep/rewind_lizard_prep_f01.png",
+              "previewDurationMs": 130,
+              "hold": null
+            },
+            {
+              "number": 2,
+              "file": "rewind_lizard/prep/rewind_lizard_prep_f02.png",
+              "previewDurationMs": 130,
+              "hold": null
+            },
+            {
+              "number": 3,
+              "file": "rewind_lizard/prep/rewind_lizard_prep_f03.png",
+              "previewDurationMs": 130,
+              "hold": null
+            }
+          ],
+          "loopPlaybackOrder": null,
+          "loopClosurePolicy": null,
+          "spriteSheetCandidate": "rewind_lizard/sprite_sheets/rewind_lizard_prep_sheet_candidate.png",
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hitTimestampBinding": null,
+          "hitAlignedFrameCandidate": null
+        },
+        {
+          "id": "attack",
+          "verdict": "UNIQUE_STATE_FRAME_CANDIDATE",
+          "frameCount": 4,
+          "frames": [
+            {
+              "number": 1,
+              "file": "rewind_lizard/attack/rewind_lizard_attack_f01.png",
+              "previewDurationMs": 95,
+              "hold": null
+            },
+            {
+              "number": 2,
+              "file": "rewind_lizard/attack/rewind_lizard_attack_f02.png",
+              "previewDurationMs": 95,
+              "hold": null
+            },
+            {
+              "number": 3,
+              "file": "rewind_lizard/attack/rewind_lizard_attack_f03.png",
+              "previewDurationMs": 95,
+              "hold": null
+            },
+            {
+              "number": 4,
+              "file": "rewind_lizard/attack/rewind_lizard_attack_f04.png",
+              "previewDurationMs": 95,
+              "hold": null
+            }
+          ],
+          "loopPlaybackOrder": null,
+          "loopClosurePolicy": null,
+          "spriteSheetCandidate": "rewind_lizard/sprite_sheets/rewind_lizard_attack_sheet_candidate.png",
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hitTimestampBinding": "MAP_TO_EXISTING_HIT_TIMESTAMP",
+          "hitAlignedFrameCandidate": 2
+        },
+        {
+          "id": "hit_recover",
+          "verdict": "UNIQUE_STATE_FRAME_CANDIDATE",
+          "frameCount": 3,
+          "frames": [
+            {
+              "number": 1,
+              "file": "rewind_lizard/hit_recover/rewind_lizard_hit_recover_f01.png",
+              "previewDurationMs": 120,
+              "hold": null
+            },
+            {
+              "number": 2,
+              "file": "rewind_lizard/hit_recover/rewind_lizard_hit_recover_f02.png",
+              "previewDurationMs": 120,
+              "hold": null
+            },
+            {
+              "number": 3,
+              "file": "rewind_lizard/hit_recover/rewind_lizard_hit_recover_f03.png",
+              "previewDurationMs": 120,
+              "hold": null
+            }
+          ],
+          "loopPlaybackOrder": null,
+          "loopClosurePolicy": null,
+          "spriteSheetCandidate": "rewind_lizard/sprite_sheets/rewind_lizard_hit_recover_sheet_candidate.png",
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hitTimestampBinding": null,
+          "hitAlignedFrameCandidate": null
+        }
+      ],
+      "previews": {
+        "runtime1x": "previews/runtime_1x/rewind_lizard_motion_pilot_preview_1x.mp4",
+        "nearest4x": "previews/nearest_4x/rewind_lizard_motion_pilot_preview_4x.mp4",
+        "animated": "previews/animated/rewind_lizard_motion_pilot_preview.mp4",
+        "newContact": "previews/before_after/rewind_lizard_new_frame_sequence_contact.png",
+        "v1Reference": "previews/before_after/rewind_lizard_v1_static_strip_REFERENCE_ONLY.png"
+      }
+    },
+    {
+      "id": "mineral_spider",
+      "displayName": "광물실거미",
+      "canvas": {
+        "width": 104,
+        "height": 88
+      },
+      "groundPoint": {
+        "x": 52,
+        "y": 72
+      },
+      "hurtbox": {
+        "x": 17,
+        "y": 22,
+        "width": 70,
+        "height": 50
+      },
+      "directionMode": "front-side",
+      "canonicalAttackAnchors": [
+        {
+          "id": "thread-spawn-a",
+          "original": {
+            "x": 37,
+            "y": 35
+          },
+          "flippedX": {
+            "x": 67,
+            "y": 35
+          }
+        },
+        {
+          "id": "thread-spawn-b",
+          "original": {
+            "x": 52,
+            "y": 35
+          },
+          "flippedX": {
+            "x": 52,
+            "y": 35
+          }
+        },
+        {
+          "id": "thread-spawn-c",
+          "original": {
+            "x": 67,
+            "y": 35
+          },
+          "flippedX": {
+            "x": 37,
+            "y": 35
+          }
+        }
+      ],
+      "existingStates": [
+        "idle",
+        "move",
+        "alert",
+        "deploy",
+        "attack",
+        "stunned",
+        "retreat"
+      ],
+      "existingAliases": {},
+      "runtimeSourceFiles": [
+        "creatures/act1/mineral_spider/runtime/act1_mineral_spider_idle_front_01.png",
+        "creatures/act1/mineral_spider/runtime/act1_mineral_spider_move_side_01.png",
+        "creatures/act1/mineral_spider/runtime/act1_mineral_spider_alert_front_01.png",
+        "creatures/act1/mineral_spider/runtime/act1_mineral_spider_deploy_side_01.png",
+        "creatures/act1/mineral_spider/runtime/act1_mineral_spider_attack_side_01.png",
+        "creatures/act1/mineral_spider/runtime/act1_mineral_spider_stunned_front_01.png",
+        "creatures/act1/mineral_spider/runtime/act1_mineral_spider_retreat_side_01.png"
+      ],
+      "pilotSequences": [
+        {
+          "id": "idle",
+          "verdict": "INBETWEEN_CREATED",
+          "frameCount": 4,
+          "frames": [
+            {
+              "number": 1,
+              "file": "mineral_spider/idle/mineral_spider_idle_f01.png",
+              "previewDurationMs": 150,
+              "hold": null
+            },
+            {
+              "number": 2,
+              "file": "mineral_spider/idle/mineral_spider_idle_f02.png",
+              "previewDurationMs": 150,
+              "hold": null
+            },
+            {
+              "number": 3,
+              "file": "mineral_spider/idle/mineral_spider_idle_f03.png",
+              "previewDurationMs": 150,
+              "hold": null
+            },
+            {
+              "number": 4,
+              "file": "mineral_spider/idle/mineral_spider_idle_f04.png",
+              "previewDurationMs": 150,
+              "hold": null
+            }
+          ],
+          "loopPlaybackOrder": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "loopClosurePolicy": "RETURN_TO_FIRST_FRAME",
+          "spriteSheetCandidate": "mineral_spider/sprite_sheets/mineral_spider_idle_sheet_candidate.png",
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hitTimestampBinding": null,
+          "hitAlignedFrameCandidate": null
+        },
+        {
+          "id": "move",
+          "verdict": "INBETWEEN_CREATED",
+          "frameCount": 6,
+          "frames": [
+            {
+              "number": 1,
+              "file": "mineral_spider/move/mineral_spider_move_f01.png",
+              "previewDurationMs": 100,
+              "hold": null
+            },
+            {
+              "number": 2,
+              "file": "mineral_spider/move/mineral_spider_move_f02.png",
+              "previewDurationMs": 100,
+              "hold": null
+            },
+            {
+              "number": 3,
+              "file": "mineral_spider/move/mineral_spider_move_f03.png",
+              "previewDurationMs": 100,
+              "hold": null
+            },
+            {
+              "number": 4,
+              "file": "mineral_spider/move/mineral_spider_move_f04.png",
+              "previewDurationMs": 100,
+              "hold": null
+            },
+            {
+              "number": 5,
+              "file": "mineral_spider/move/mineral_spider_move_f05.png",
+              "previewDurationMs": 100,
+              "hold": null
+            },
+            {
+              "number": 6,
+              "file": "mineral_spider/move/mineral_spider_move_f06.png",
+              "previewDurationMs": 100,
+              "hold": null
+            }
+          ],
+          "loopPlaybackOrder": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "loopClosurePolicy": "RETURN_TO_FIRST_FRAME",
+          "spriteSheetCandidate": "mineral_spider/sprite_sheets/mineral_spider_move_sheet_candidate.png",
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hitTimestampBinding": null,
+          "hitAlignedFrameCandidate": null
+        },
+        {
+          "id": "idle_to_alert",
+          "verdict": "INBETWEEN_CREATED",
+          "frameCount": 3,
+          "frames": [
+            {
+              "number": 1,
+              "file": "mineral_spider/idle_to_alert/mineral_spider_idle_to_alert_f01.png",
+              "previewDurationMs": 120,
+              "hold": null
+            },
+            {
+              "number": 2,
+              "file": "mineral_spider/idle_to_alert/mineral_spider_idle_to_alert_f02.png",
+              "previewDurationMs": 120,
+              "hold": null
+            },
+            {
+              "number": 3,
+              "file": "mineral_spider/idle_to_alert/mineral_spider_idle_to_alert_f03.png",
+              "previewDurationMs": 120,
+              "hold": null
+            }
+          ],
+          "loopPlaybackOrder": null,
+          "loopClosurePolicy": null,
+          "spriteSheetCandidate": "mineral_spider/sprite_sheets/mineral_spider_idle_to_alert_sheet_candidate.png",
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hitTimestampBinding": null,
+          "hitAlignedFrameCandidate": null
+        },
+        {
+          "id": "alert_to_deploy",
+          "verdict": "INBETWEEN_CREATED",
+          "frameCount": 3,
+          "frames": [
+            {
+              "number": 1,
+              "file": "mineral_spider/alert_to_deploy/mineral_spider_alert_to_deploy_f01.png",
+              "previewDurationMs": 120,
+              "hold": null
+            },
+            {
+              "number": 2,
+              "file": "mineral_spider/alert_to_deploy/mineral_spider_alert_to_deploy_f02.png",
+              "previewDurationMs": 120,
+              "hold": null
+            },
+            {
+              "number": 3,
+              "file": "mineral_spider/alert_to_deploy/mineral_spider_alert_to_deploy_f03.png",
+              "previewDurationMs": 120,
+              "hold": null
+            }
+          ],
+          "loopPlaybackOrder": null,
+          "loopClosurePolicy": null,
+          "spriteSheetCandidate": "mineral_spider/sprite_sheets/mineral_spider_alert_to_deploy_sheet_candidate.png",
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hitTimestampBinding": null,
+          "hitAlignedFrameCandidate": null
+        },
+        {
+          "id": "deploy_to_attack",
+          "verdict": "INBETWEEN_CREATED",
+          "frameCount": 4,
+          "frames": [
+            {
+              "number": 1,
+              "file": "mineral_spider/deploy_to_attack/mineral_spider_deploy_to_attack_f01.png",
+              "previewDurationMs": 95,
+              "hold": null
+            },
+            {
+              "number": 2,
+              "file": "mineral_spider/deploy_to_attack/mineral_spider_deploy_to_attack_f02.png",
+              "previewDurationMs": 95,
+              "hold": null
+            },
+            {
+              "number": 3,
+              "file": "mineral_spider/deploy_to_attack/mineral_spider_deploy_to_attack_f03.png",
+              "previewDurationMs": 95,
+              "hold": null
+            },
+            {
+              "number": 4,
+              "file": "mineral_spider/deploy_to_attack/mineral_spider_deploy_to_attack_f04.png",
+              "previewDurationMs": 95,
+              "hold": null
+            }
+          ],
+          "loopPlaybackOrder": null,
+          "loopClosurePolicy": null,
+          "spriteSheetCandidate": "mineral_spider/sprite_sheets/mineral_spider_deploy_to_attack_sheet_candidate.png",
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hitTimestampBinding": "MAP_TO_EXISTING_HIT_TIMESTAMP",
+          "hitAlignedFrameCandidate": 3
+        },
+        {
+          "id": "attack_to_recover",
+          "verdict": "INBETWEEN_CREATED",
+          "frameCount": 3,
+          "frames": [
+            {
+              "number": 1,
+              "file": "mineral_spider/attack_to_recover/mineral_spider_attack_to_recover_f01.png",
+              "previewDurationMs": 120,
+              "hold": null
+            },
+            {
+              "number": 2,
+              "file": "mineral_spider/attack_to_recover/mineral_spider_attack_to_recover_f02.png",
+              "previewDurationMs": 120,
+              "hold": null
+            },
+            {
+              "number": 3,
+              "file": "mineral_spider/attack_to_recover/mineral_spider_attack_to_recover_f03.png",
+              "previewDurationMs": 120,
+              "hold": null
+            }
+          ],
+          "loopPlaybackOrder": null,
+          "loopClosurePolicy": null,
+          "spriteSheetCandidate": "mineral_spider/sprite_sheets/mineral_spider_attack_to_recover_sheet_candidate.png",
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hitTimestampBinding": null,
+          "hitAlignedFrameCandidate": null
+        },
+        {
+          "id": "stunned_or_retreat",
+          "verdict": "INBETWEEN_CREATED",
+          "frameCount": 3,
+          "frames": [
+            {
+              "number": 1,
+              "file": "mineral_spider/stunned_or_retreat/mineral_spider_stunned_or_retreat_f01.png",
+              "previewDurationMs": 130,
+              "hold": null
+            },
+            {
+              "number": 2,
+              "file": "mineral_spider/stunned_or_retreat/mineral_spider_stunned_or_retreat_f02.png",
+              "previewDurationMs": 130,
+              "hold": null
+            },
+            {
+              "number": 3,
+              "file": "mineral_spider/stunned_or_retreat/mineral_spider_stunned_or_retreat_f03.png",
+              "previewDurationMs": 130,
+              "hold": null
+            }
+          ],
+          "loopPlaybackOrder": null,
+          "loopClosurePolicy": null,
+          "spriteSheetCandidate": "mineral_spider/sprite_sheets/mineral_spider_stunned_or_retreat_sheet_candidate.png",
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hitTimestampBinding": null,
+          "hitAlignedFrameCandidate": null
+        }
+      ],
+      "previews": {
+        "runtime1x": "previews/runtime_1x/mineral_spider_motion_pilot_preview_1x.mp4",
+        "nearest4x": "previews/nearest_4x/mineral_spider_motion_pilot_preview_4x.mp4",
+        "animated": "previews/animated/mineral_spider_motion_pilot_preview.mp4",
+        "newContact": "previews/before_after/mineral_spider_new_frame_sequence_contact.png",
+        "v1Reference": "previews/before_after/mineral_spider_v1_static_strip_REFERENCE_ONLY.png"
+      }
+    },
+    {
+      "id": "resonance_goral",
+      "displayName": "반향각 산양",
+      "canvas": {
+        "width": 220,
+        "height": 175
+      },
+      "groundPoint": {
+        "x": 110,
+        "y": 154
+      },
+      "hurtbox": {
+        "x": 51,
+        "y": 68,
+        "width": 118,
+        "height": 86
+      },
+      "directionMode": "fixed",
+      "canonicalAttackAnchors": [
+        {
+          "id": "horn-root",
+          "original": {
+            "x": 110,
+            "y": 49
+          },
+          "flippedX": null
+        },
+        {
+          "id": "forehoof-left",
+          "original": {
+            "x": 92,
+            "y": 138
+          },
+          "flippedX": null
+        },
+        {
+          "id": "forehoof-right",
+          "original": {
+            "x": 128,
+            "y": 138
+          },
+          "flippedX": null
+        }
+      ],
+      "existingStates": [
+        "idle",
+        "warning",
+        "combat",
+        "retreat"
+      ],
+      "existingAliases": {},
+      "runtimeSourceFiles": [
+        "creatures/act1/resonance_goral/runtime/act1_resonance_goral_idle_fixed_01.png",
+        "creatures/act1/resonance_goral/runtime/act1_resonance_goral_warning_fixed_01.png",
+        "creatures/act1/resonance_goral/runtime/act1_resonance_goral_combat_fixed_01.png",
+        "creatures/act1/resonance_goral/runtime/act1_resonance_goral_retreat_fixed_01.png"
+      ],
+      "pilotSequences": [
+        {
+          "id": "idle",
+          "verdict": "INBETWEEN_CREATED",
+          "frameCount": 4,
+          "frames": [
+            {
+              "number": 1,
+              "file": "resonance_goral/idle/resonance_goral_idle_f01.png",
+              "previewDurationMs": 180,
+              "hold": null
+            },
+            {
+              "number": 2,
+              "file": "resonance_goral/idle/resonance_goral_idle_f02.png",
+              "previewDurationMs": 180,
+              "hold": null
+            },
+            {
+              "number": 3,
+              "file": "resonance_goral/idle/resonance_goral_idle_f03.png",
+              "previewDurationMs": 180,
+              "hold": null
+            },
+            {
+              "number": 4,
+              "file": "resonance_goral/idle/resonance_goral_idle_f04.png",
+              "previewDurationMs": 180,
+              "hold": null
+            }
+          ],
+          "loopPlaybackOrder": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "loopClosurePolicy": "RETURN_TO_FIRST_FRAME",
+          "spriteSheetCandidate": "resonance_goral/sprite_sheets/resonance_goral_idle_sheet_candidate.png",
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hitTimestampBinding": null,
+          "hitAlignedFrameCandidate": null
+        },
+        {
+          "id": "warning",
+          "verdict": "INBETWEEN_CREATED",
+          "frameCount": 3,
+          "frames": [
+            {
+              "number": 1,
+              "file": "resonance_goral/warning/resonance_goral_warning_f01.png",
+              "previewDurationMs": 150,
+              "hold": null
+            },
+            {
+              "number": 2,
+              "file": "resonance_goral/warning/resonance_goral_warning_f02.png",
+              "previewDurationMs": 150,
+              "hold": null
+            },
+            {
+              "number": 3,
+              "file": "resonance_goral/warning/resonance_goral_warning_f03.png",
+              "previewDurationMs": 150,
+              "hold": null
+            }
+          ],
+          "loopPlaybackOrder": null,
+          "loopClosurePolicy": null,
+          "spriteSheetCandidate": "resonance_goral/sprite_sheets/resonance_goral_warning_sheet_candidate.png",
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hitTimestampBinding": null,
+          "hitAlignedFrameCandidate": null
+        },
+        {
+          "id": "combat_prep",
+          "verdict": "INBETWEEN_CREATED",
+          "frameCount": 3,
+          "frames": [
+            {
+              "number": 1,
+              "file": "resonance_goral/combat_prep/resonance_goral_combat_prep_f01.png",
+              "previewDurationMs": 150,
+              "hold": null
+            },
+            {
+              "number": 2,
+              "file": "resonance_goral/combat_prep/resonance_goral_combat_prep_f02.png",
+              "previewDurationMs": 150,
+              "hold": null
+            },
+            {
+              "number": 3,
+              "file": "resonance_goral/combat_prep/resonance_goral_combat_prep_f03.png",
+              "previewDurationMs": 150,
+              "hold": null
+            }
+          ],
+          "loopPlaybackOrder": null,
+          "loopClosurePolicy": null,
+          "spriteSheetCandidate": "resonance_goral/sprite_sheets/resonance_goral_combat_prep_sheet_candidate.png",
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hitTimestampBinding": null,
+          "hitAlignedFrameCandidate": null
+        },
+        {
+          "id": "charge_attack",
+          "verdict": "INBETWEEN_CREATED",
+          "frameCount": 5,
+          "frames": [
+            {
+              "number": 1,
+              "file": "resonance_goral/charge_attack/resonance_goral_charge_attack_f01.png",
+              "previewDurationMs": 110,
+              "hold": null
+            },
+            {
+              "number": 2,
+              "file": "resonance_goral/charge_attack/resonance_goral_charge_attack_f02.png",
+              "previewDurationMs": 110,
+              "hold": null
+            },
+            {
+              "number": 3,
+              "file": "resonance_goral/charge_attack/resonance_goral_charge_attack_f03.png",
+              "previewDurationMs": 110,
+              "hold": null
+            },
+            {
+              "number": 4,
+              "file": "resonance_goral/charge_attack/resonance_goral_charge_attack_f04.png",
+              "previewDurationMs": 110,
+              "hold": null
+            },
+            {
+              "number": 5,
+              "file": "resonance_goral/charge_attack/resonance_goral_charge_attack_f05.png",
+              "previewDurationMs": 110,
+              "hold": null
+            }
+          ],
+          "loopPlaybackOrder": null,
+          "loopClosurePolicy": null,
+          "spriteSheetCandidate": "resonance_goral/sprite_sheets/resonance_goral_charge_attack_sheet_candidate.png",
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hitTimestampBinding": "MAP_TO_EXISTING_HIT_TIMESTAMP",
+          "hitAlignedFrameCandidate": 4
+        },
+        {
+          "id": "hit_recover",
+          "verdict": "INBETWEEN_CREATED",
+          "frameCount": 4,
+          "frames": [
+            {
+              "number": 1,
+              "file": "resonance_goral/hit_recover/resonance_goral_hit_recover_f01.png",
+              "previewDurationMs": 140,
+              "hold": null
+            },
+            {
+              "number": 2,
+              "file": "resonance_goral/hit_recover/resonance_goral_hit_recover_f02.png",
+              "previewDurationMs": 140,
+              "hold": null
+            },
+            {
+              "number": 3,
+              "file": "resonance_goral/hit_recover/resonance_goral_hit_recover_f03.png",
+              "previewDurationMs": 140,
+              "hold": null
+            },
+            {
+              "number": 4,
+              "file": "resonance_goral/hit_recover/resonance_goral_hit_recover_f04.png",
+              "previewDurationMs": 140,
+              "hold": null
+            }
+          ],
+          "loopPlaybackOrder": null,
+          "loopClosurePolicy": null,
+          "spriteSheetCandidate": "resonance_goral/sprite_sheets/resonance_goral_hit_recover_sheet_candidate.png",
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hitTimestampBinding": null,
+          "hitAlignedFrameCandidate": null
+        },
+        {
+          "id": "retreat",
+          "verdict": "INBETWEEN_CREATED",
+          "frameCount": 4,
+          "frames": [
+            {
+              "number": 1,
+              "file": "resonance_goral/retreat/resonance_goral_retreat_f01.png",
+              "previewDurationMs": 140,
+              "hold": null
+            },
+            {
+              "number": 2,
+              "file": "resonance_goral/retreat/resonance_goral_retreat_f02.png",
+              "previewDurationMs": 140,
+              "hold": null
+            },
+            {
+              "number": 3,
+              "file": "resonance_goral/retreat/resonance_goral_retreat_f03.png",
+              "previewDurationMs": 140,
+              "hold": null
+            },
+            {
+              "number": 4,
+              "file": "resonance_goral/retreat/resonance_goral_retreat_f04.png",
+              "previewDurationMs": 140,
+              "hold": null
+            }
+          ],
+          "loopPlaybackOrder": null,
+          "loopClosurePolicy": null,
+          "spriteSheetCandidate": "resonance_goral/sprite_sheets/resonance_goral_retreat_sheet_candidate.png",
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hitTimestampBinding": null,
+          "hitAlignedFrameCandidate": null
+        }
+      ],
+      "previews": {
+        "runtime1x": "previews/runtime_1x/resonance_goral_motion_pilot_preview_1x.mp4",
+        "nearest4x": "previews/nearest_4x/resonance_goral_motion_pilot_preview_4x.mp4",
+        "animated": "previews/animated/resonance_goral_motion_pilot_preview.mp4",
+        "newContact": "previews/before_after/resonance_goral_new_frame_sequence_contact.png",
+        "v1Reference": "previews/before_after/resonance_goral_v1_static_strip_REFERENCE_ONLY.png"
+      }
+    }
+  ]
+}

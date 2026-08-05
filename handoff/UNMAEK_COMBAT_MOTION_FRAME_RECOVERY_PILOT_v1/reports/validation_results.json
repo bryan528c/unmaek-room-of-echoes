@@ -1,0 +1,4778 @@
+{
+  "summary": {
+    "pass": 881,
+    "fail": 0,
+    "creaturePilotVerdict": "PASS",
+    "overallVerdict": "CONDITIONAL_PASS"
+  },
+  "checks": [
+    {
+      "id": "pressure_swift.fly.count",
+      "status": "PASS",
+      "detail": "6/6"
+    },
+    {
+      "id": "pressure_swift.fly.pressure_swift_fly_f01.png.canvas",
+      "status": "PASS",
+      "detail": "36x24"
+    },
+    {
+      "id": "pressure_swift.fly.pressure_swift_fly_f01.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "pressure_swift.fly.pressure_swift_fly_f01.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "pressure_swift.fly.pressure_swift_fly_f01.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "pressure_swift.fly.pressure_swift_fly_f01.png.nonempty",
+      "status": "PASS",
+      "detail": "(12, 5, 24, 20)"
+    },
+    {
+      "id": "pressure_swift.fly.pressure_swift_fly_f01.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=20 GP.y=20"
+    },
+    {
+      "id": "pressure_swift.fly.pressure_swift_fly_f02.png.canvas",
+      "status": "PASS",
+      "detail": "36x24"
+    },
+    {
+      "id": "pressure_swift.fly.pressure_swift_fly_f02.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "pressure_swift.fly.pressure_swift_fly_f02.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "pressure_swift.fly.pressure_swift_fly_f02.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "pressure_swift.fly.pressure_swift_fly_f02.png.nonempty",
+      "status": "PASS",
+      "detail": "(12, 6, 24, 20)"
+    },
+    {
+      "id": "pressure_swift.fly.pressure_swift_fly_f02.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=20 GP.y=20"
+    },
+    {
+      "id": "pressure_swift.fly.pressure_swift_fly_f03.png.canvas",
+      "status": "PASS",
+      "detail": "36x24"
+    },
+    {
+      "id": "pressure_swift.fly.pressure_swift_fly_f03.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "pressure_swift.fly.pressure_swift_fly_f03.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "pressure_swift.fly.pressure_swift_fly_f03.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "pressure_swift.fly.pressure_swift_fly_f03.png.nonempty",
+      "status": "PASS",
+      "detail": "(12, 14, 25, 20)"
+    },
+    {
+      "id": "pressure_swift.fly.pressure_swift_fly_f03.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=20 GP.y=20"
+    },
+    {
+      "id": "pressure_swift.fly.pressure_swift_fly_f04.png.canvas",
+      "status": "PASS",
+      "detail": "36x24"
+    },
+    {
+      "id": "pressure_swift.fly.pressure_swift_fly_f04.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "pressure_swift.fly.pressure_swift_fly_f04.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "pressure_swift.fly.pressure_swift_fly_f04.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "pressure_swift.fly.pressure_swift_fly_f04.png.nonempty",
+      "status": "PASS",
+      "detail": "(12, 9, 23, 20)"
+    },
+    {
+      "id": "pressure_swift.fly.pressure_swift_fly_f04.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=20 GP.y=20"
+    },
+    {
+      "id": "pressure_swift.fly.pressure_swift_fly_f05.png.canvas",
+      "status": "PASS",
+      "detail": "36x24"
+    },
+    {
+      "id": "pressure_swift.fly.pressure_swift_fly_f05.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "pressure_swift.fly.pressure_swift_fly_f05.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "pressure_swift.fly.pressure_swift_fly_f05.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "pressure_swift.fly.pressure_swift_fly_f05.png.nonempty",
+      "status": "PASS",
+      "detail": "(12, 8, 24, 20)"
+    },
+    {
+      "id": "pressure_swift.fly.pressure_swift_fly_f05.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=20 GP.y=20"
+    },
+    {
+      "id": "pressure_swift.fly.pressure_swift_fly_f06.png.canvas",
+      "status": "PASS",
+      "detail": "36x24"
+    },
+    {
+      "id": "pressure_swift.fly.pressure_swift_fly_f06.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "pressure_swift.fly.pressure_swift_fly_f06.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "pressure_swift.fly.pressure_swift_fly_f06.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "pressure_swift.fly.pressure_swift_fly_f06.png.nonempty",
+      "status": "PASS",
+      "detail": "(12, 7, 23, 20)"
+    },
+    {
+      "id": "pressure_swift.fly.pressure_swift_fly_f06.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=20 GP.y=20"
+    },
+    {
+      "id": "pressure_swift.fly.adjacent_01.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.2857"
+    },
+    {
+      "id": "pressure_swift.fly.adjacent_01.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "pressure_swift.fly.adjacent_02.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.5467"
+    },
+    {
+      "id": "pressure_swift.fly.adjacent_02.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "pressure_swift.fly.adjacent_03.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.8415"
+    },
+    {
+      "id": "pressure_swift.fly.adjacent_03.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "pressure_swift.fly.adjacent_04.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.7381"
+    },
+    {
+      "id": "pressure_swift.fly.adjacent_04.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "pressure_swift.fly.adjacent_05.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.2424"
+    },
+    {
+      "id": "pressure_swift.fly.adjacent_05.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "pressure_swift.fly.sheet",
+      "status": "PASS",
+      "detail": "pressure_swift/sprite_sheets/pressure_swift_fly_sheet_candidate.png"
+    },
+    {
+      "id": "pressure_swift.fly.sheet_size",
+      "status": "PASS",
+      "detail": "(216, 24)"
+    },
+    {
+      "id": "pressure_swift.evade.count",
+      "status": "PASS",
+      "detail": "4/4"
+    },
+    {
+      "id": "pressure_swift.evade.pressure_swift_evade_f01.png.canvas",
+      "status": "PASS",
+      "detail": "36x24"
+    },
+    {
+      "id": "pressure_swift.evade.pressure_swift_evade_f01.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "pressure_swift.evade.pressure_swift_evade_f01.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "pressure_swift.evade.pressure_swift_evade_f01.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "pressure_swift.evade.pressure_swift_evade_f01.png.nonempty",
+      "status": "PASS",
+      "detail": "(12, 2, 23, 20)"
+    },
+    {
+      "id": "pressure_swift.evade.pressure_swift_evade_f01.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=20 GP.y=20"
+    },
+    {
+      "id": "pressure_swift.evade.pressure_swift_evade_f02.png.canvas",
+      "status": "PASS",
+      "detail": "36x24"
+    },
+    {
+      "id": "pressure_swift.evade.pressure_swift_evade_f02.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "pressure_swift.evade.pressure_swift_evade_f02.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "pressure_swift.evade.pressure_swift_evade_f02.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "pressure_swift.evade.pressure_swift_evade_f02.png.nonempty",
+      "status": "PASS",
+      "detail": "(12, 3, 25, 20)"
+    },
+    {
+      "id": "pressure_swift.evade.pressure_swift_evade_f02.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=20 GP.y=20"
+    },
+    {
+      "id": "pressure_swift.evade.pressure_swift_evade_f03.png.canvas",
+      "status": "PASS",
+      "detail": "36x24"
+    },
+    {
+      "id": "pressure_swift.evade.pressure_swift_evade_f03.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "pressure_swift.evade.pressure_swift_evade_f03.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "pressure_swift.evade.pressure_swift_evade_f03.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "pressure_swift.evade.pressure_swift_evade_f03.png.nonempty",
+      "status": "PASS",
+      "detail": "(12, 16, 24, 20)"
+    },
+    {
+      "id": "pressure_swift.evade.pressure_swift_evade_f03.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=20 GP.y=20"
+    },
+    {
+      "id": "pressure_swift.evade.pressure_swift_evade_f04.png.canvas",
+      "status": "PASS",
+      "detail": "36x24"
+    },
+    {
+      "id": "pressure_swift.evade.pressure_swift_evade_f04.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "pressure_swift.evade.pressure_swift_evade_f04.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "pressure_swift.evade.pressure_swift_evade_f04.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "pressure_swift.evade.pressure_swift_evade_f04.png.nonempty",
+      "status": "PASS",
+      "detail": "(12, 8, 24, 20)"
+    },
+    {
+      "id": "pressure_swift.evade.pressure_swift_evade_f04.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=20 GP.y=20"
+    },
+    {
+      "id": "pressure_swift.evade.adjacent_01.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.7179"
+    },
+    {
+      "id": "pressure_swift.evade.adjacent_01.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "pressure_swift.evade.adjacent_02.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.9192"
+    },
+    {
+      "id": "pressure_swift.evade.adjacent_02.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "pressure_swift.evade.adjacent_03.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.7042"
+    },
+    {
+      "id": "pressure_swift.evade.adjacent_03.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "pressure_swift.evade.sheet",
+      "status": "PASS",
+      "detail": "pressure_swift/sprite_sheets/pressure_swift_evade_sheet_candidate.png"
+    },
+    {
+      "id": "pressure_swift.evade.sheet_size",
+      "status": "PASS",
+      "detail": "(144, 24)"
+    },
+    {
+      "id": "pressure_swift.unique_frame_files",
+      "status": "PASS",
+      "detail": "duplicateGroups=0"
+    },
+    {
+      "id": "deflect_bat.idle.count",
+      "status": "PASS",
+      "detail": "4/4"
+    },
+    {
+      "id": "deflect_bat.idle.deflect_bat_idle_f01.png.canvas",
+      "status": "PASS",
+      "detail": "52x36"
+    },
+    {
+      "id": "deflect_bat.idle.deflect_bat_idle_f01.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "deflect_bat.idle.deflect_bat_idle_f01.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "deflect_bat.idle.deflect_bat_idle_f01.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "deflect_bat.idle.deflect_bat_idle_f01.png.nonempty",
+      "status": "PASS",
+      "detail": "(13, 9, 39, 29)"
+    },
+    {
+      "id": "deflect_bat.idle.deflect_bat_idle_f01.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=29 GP.y=29"
+    },
+    {
+      "id": "deflect_bat.idle.deflect_bat_idle_f02.png.canvas",
+      "status": "PASS",
+      "detail": "52x36"
+    },
+    {
+      "id": "deflect_bat.idle.deflect_bat_idle_f02.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "deflect_bat.idle.deflect_bat_idle_f02.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "deflect_bat.idle.deflect_bat_idle_f02.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "deflect_bat.idle.deflect_bat_idle_f02.png.nonempty",
+      "status": "PASS",
+      "detail": "(12, 3, 41, 29)"
+    },
+    {
+      "id": "deflect_bat.idle.deflect_bat_idle_f02.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=29 GP.y=29"
+    },
+    {
+      "id": "deflect_bat.idle.deflect_bat_idle_f03.png.canvas",
+      "status": "PASS",
+      "detail": "52x36"
+    },
+    {
+      "id": "deflect_bat.idle.deflect_bat_idle_f03.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "deflect_bat.idle.deflect_bat_idle_f03.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "deflect_bat.idle.deflect_bat_idle_f03.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "deflect_bat.idle.deflect_bat_idle_f03.png.nonempty",
+      "status": "PASS",
+      "detail": "(10, 7, 41, 29)"
+    },
+    {
+      "id": "deflect_bat.idle.deflect_bat_idle_f03.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=29 GP.y=29"
+    },
+    {
+      "id": "deflect_bat.idle.deflect_bat_idle_f04.png.canvas",
+      "status": "PASS",
+      "detail": "52x36"
+    },
+    {
+      "id": "deflect_bat.idle.deflect_bat_idle_f04.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "deflect_bat.idle.deflect_bat_idle_f04.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "deflect_bat.idle.deflect_bat_idle_f04.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "deflect_bat.idle.deflect_bat_idle_f04.png.nonempty",
+      "status": "PASS",
+      "detail": "(11, 6, 41, 29)"
+    },
+    {
+      "id": "deflect_bat.idle.deflect_bat_idle_f04.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=29 GP.y=29"
+    },
+    {
+      "id": "deflect_bat.idle.adjacent_01.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.4125"
+    },
+    {
+      "id": "deflect_bat.idle.adjacent_01.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "deflect_bat.idle.adjacent_02.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.3903"
+    },
+    {
+      "id": "deflect_bat.idle.adjacent_02.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "deflect_bat.idle.adjacent_03.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.4741"
+    },
+    {
+      "id": "deflect_bat.idle.adjacent_03.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "deflect_bat.idle.sheet",
+      "status": "PASS",
+      "detail": "deflect_bat/sprite_sheets/deflect_bat_idle_sheet_candidate.png"
+    },
+    {
+      "id": "deflect_bat.idle.sheet_size",
+      "status": "PASS",
+      "detail": "(208, 36)"
+    },
+    {
+      "id": "deflect_bat.move.count",
+      "status": "PASS",
+      "detail": "6/6"
+    },
+    {
+      "id": "deflect_bat.move.deflect_bat_move_f01.png.canvas",
+      "status": "PASS",
+      "detail": "52x36"
+    },
+    {
+      "id": "deflect_bat.move.deflect_bat_move_f01.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "deflect_bat.move.deflect_bat_move_f01.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "deflect_bat.move.deflect_bat_move_f01.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "deflect_bat.move.deflect_bat_move_f01.png.nonempty",
+      "status": "PASS",
+      "detail": "(14, 3, 38, 29)"
+    },
+    {
+      "id": "deflect_bat.move.deflect_bat_move_f01.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=29 GP.y=29"
+    },
+    {
+      "id": "deflect_bat.move.deflect_bat_move_f02.png.canvas",
+      "status": "PASS",
+      "detail": "52x36"
+    },
+    {
+      "id": "deflect_bat.move.deflect_bat_move_f02.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "deflect_bat.move.deflect_bat_move_f02.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "deflect_bat.move.deflect_bat_move_f02.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "deflect_bat.move.deflect_bat_move_f02.png.nonempty",
+      "status": "PASS",
+      "detail": "(13, 4, 39, 29)"
+    },
+    {
+      "id": "deflect_bat.move.deflect_bat_move_f02.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=29 GP.y=29"
+    },
+    {
+      "id": "deflect_bat.move.deflect_bat_move_f03.png.canvas",
+      "status": "PASS",
+      "detail": "52x36"
+    },
+    {
+      "id": "deflect_bat.move.deflect_bat_move_f03.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "deflect_bat.move.deflect_bat_move_f03.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "deflect_bat.move.deflect_bat_move_f03.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "deflect_bat.move.deflect_bat_move_f03.png.nonempty",
+      "status": "PASS",
+      "detail": "(10, 7, 43, 29)"
+    },
+    {
+      "id": "deflect_bat.move.deflect_bat_move_f03.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=29 GP.y=29"
+    },
+    {
+      "id": "deflect_bat.move.deflect_bat_move_f04.png.canvas",
+      "status": "PASS",
+      "detail": "52x36"
+    },
+    {
+      "id": "deflect_bat.move.deflect_bat_move_f04.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "deflect_bat.move.deflect_bat_move_f04.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "deflect_bat.move.deflect_bat_move_f04.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "deflect_bat.move.deflect_bat_move_f04.png.nonempty",
+      "status": "PASS",
+      "detail": "(14, 8, 39, 29)"
+    },
+    {
+      "id": "deflect_bat.move.deflect_bat_move_f04.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=29 GP.y=29"
+    },
+    {
+      "id": "deflect_bat.move.deflect_bat_move_f05.png.canvas",
+      "status": "PASS",
+      "detail": "52x36"
+    },
+    {
+      "id": "deflect_bat.move.deflect_bat_move_f05.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "deflect_bat.move.deflect_bat_move_f05.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "deflect_bat.move.deflect_bat_move_f05.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "deflect_bat.move.deflect_bat_move_f05.png.nonempty",
+      "status": "PASS",
+      "detail": "(14, 2, 38, 29)"
+    },
+    {
+      "id": "deflect_bat.move.deflect_bat_move_f05.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=29 GP.y=29"
+    },
+    {
+      "id": "deflect_bat.move.deflect_bat_move_f06.png.canvas",
+      "status": "PASS",
+      "detail": "52x36"
+    },
+    {
+      "id": "deflect_bat.move.deflect_bat_move_f06.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "deflect_bat.move.deflect_bat_move_f06.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "deflect_bat.move.deflect_bat_move_f06.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "deflect_bat.move.deflect_bat_move_f06.png.nonempty",
+      "status": "PASS",
+      "detail": "(13, 8, 39, 29)"
+    },
+    {
+      "id": "deflect_bat.move.deflect_bat_move_f06.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=29 GP.y=29"
+    },
+    {
+      "id": "deflect_bat.move.adjacent_01.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.2617"
+    },
+    {
+      "id": "deflect_bat.move.adjacent_01.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "deflect_bat.move.adjacent_02.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.3289"
+    },
+    {
+      "id": "deflect_bat.move.adjacent_02.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "deflect_bat.move.adjacent_03.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.3482"
+    },
+    {
+      "id": "deflect_bat.move.adjacent_03.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "deflect_bat.move.adjacent_04.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.3317"
+    },
+    {
+      "id": "deflect_bat.move.adjacent_04.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "deflect_bat.move.adjacent_05.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.3462"
+    },
+    {
+      "id": "deflect_bat.move.adjacent_05.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "deflect_bat.move.sheet",
+      "status": "PASS",
+      "detail": "deflect_bat/sprite_sheets/deflect_bat_move_sheet_candidate.png"
+    },
+    {
+      "id": "deflect_bat.move.sheet_size",
+      "status": "PASS",
+      "detail": "(312, 36)"
+    },
+    {
+      "id": "deflect_bat.prep.count",
+      "status": "PASS",
+      "detail": "3/3"
+    },
+    {
+      "id": "deflect_bat.prep.deflect_bat_prep_f01.png.canvas",
+      "status": "PASS",
+      "detail": "52x36"
+    },
+    {
+      "id": "deflect_bat.prep.deflect_bat_prep_f01.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "deflect_bat.prep.deflect_bat_prep_f01.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "deflect_bat.prep.deflect_bat_prep_f01.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "deflect_bat.prep.deflect_bat_prep_f01.png.nonempty",
+      "status": "PASS",
+      "detail": "(10, 11, 43, 29)"
+    },
+    {
+      "id": "deflect_bat.prep.deflect_bat_prep_f01.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=29 GP.y=29"
+    },
+    {
+      "id": "deflect_bat.prep.deflect_bat_prep_f02.png.canvas",
+      "status": "PASS",
+      "detail": "52x36"
+    },
+    {
+      "id": "deflect_bat.prep.deflect_bat_prep_f02.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "deflect_bat.prep.deflect_bat_prep_f02.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "deflect_bat.prep.deflect_bat_prep_f02.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "deflect_bat.prep.deflect_bat_prep_f02.png.nonempty",
+      "status": "PASS",
+      "detail": "(10, 6, 41, 29)"
+    },
+    {
+      "id": "deflect_bat.prep.deflect_bat_prep_f02.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=29 GP.y=29"
+    },
+    {
+      "id": "deflect_bat.prep.deflect_bat_prep_f03.png.canvas",
+      "status": "PASS",
+      "detail": "52x36"
+    },
+    {
+      "id": "deflect_bat.prep.deflect_bat_prep_f03.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "deflect_bat.prep.deflect_bat_prep_f03.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "deflect_bat.prep.deflect_bat_prep_f03.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "deflect_bat.prep.deflect_bat_prep_f03.png.nonempty",
+      "status": "PASS",
+      "detail": "(12, 10, 41, 29)"
+    },
+    {
+      "id": "deflect_bat.prep.deflect_bat_prep_f03.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=29 GP.y=29"
+    },
+    {
+      "id": "deflect_bat.prep.adjacent_01.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.3561"
+    },
+    {
+      "id": "deflect_bat.prep.adjacent_01.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "deflect_bat.prep.adjacent_02.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.2519"
+    },
+    {
+      "id": "deflect_bat.prep.adjacent_02.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "deflect_bat.prep.sheet",
+      "status": "PASS",
+      "detail": "deflect_bat/sprite_sheets/deflect_bat_prep_sheet_candidate.png"
+    },
+    {
+      "id": "deflect_bat.prep.sheet_size",
+      "status": "PASS",
+      "detail": "(156, 36)"
+    },
+    {
+      "id": "deflect_bat.attack.count",
+      "status": "PASS",
+      "detail": "4/4"
+    },
+    {
+      "id": "deflect_bat.attack.deflect_bat_attack_f01.png.canvas",
+      "status": "PASS",
+      "detail": "52x36"
+    },
+    {
+      "id": "deflect_bat.attack.deflect_bat_attack_f01.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "deflect_bat.attack.deflect_bat_attack_f01.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "deflect_bat.attack.deflect_bat_attack_f01.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "deflect_bat.attack.deflect_bat_attack_f01.png.nonempty",
+      "status": "PASS",
+      "detail": "(14, 8, 39, 29)"
+    },
+    {
+      "id": "deflect_bat.attack.deflect_bat_attack_f01.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=29 GP.y=29"
+    },
+    {
+      "id": "deflect_bat.attack.deflect_bat_attack_f02.png.canvas",
+      "status": "PASS",
+      "detail": "52x36"
+    },
+    {
+      "id": "deflect_bat.attack.deflect_bat_attack_f02.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "deflect_bat.attack.deflect_bat_attack_f02.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "deflect_bat.attack.deflect_bat_attack_f02.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "deflect_bat.attack.deflect_bat_attack_f02.png.nonempty",
+      "status": "PASS",
+      "detail": "(14, 8, 38, 29)"
+    },
+    {
+      "id": "deflect_bat.attack.deflect_bat_attack_f02.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=29 GP.y=29"
+    },
+    {
+      "id": "deflect_bat.attack.deflect_bat_attack_f03.png.canvas",
+      "status": "PASS",
+      "detail": "52x36"
+    },
+    {
+      "id": "deflect_bat.attack.deflect_bat_attack_f03.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "deflect_bat.attack.deflect_bat_attack_f03.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "deflect_bat.attack.deflect_bat_attack_f03.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "deflect_bat.attack.deflect_bat_attack_f03.png.nonempty",
+      "status": "PASS",
+      "detail": "(14, 6, 39, 29)"
+    },
+    {
+      "id": "deflect_bat.attack.deflect_bat_attack_f03.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=29 GP.y=29"
+    },
+    {
+      "id": "deflect_bat.attack.deflect_bat_attack_f04.png.canvas",
+      "status": "PASS",
+      "detail": "52x36"
+    },
+    {
+      "id": "deflect_bat.attack.deflect_bat_attack_f04.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "deflect_bat.attack.deflect_bat_attack_f04.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "deflect_bat.attack.deflect_bat_attack_f04.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "deflect_bat.attack.deflect_bat_attack_f04.png.nonempty",
+      "status": "PASS",
+      "detail": "(13, 6, 39, 29)"
+    },
+    {
+      "id": "deflect_bat.attack.deflect_bat_attack_f04.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=29 GP.y=29"
+    },
+    {
+      "id": "deflect_bat.attack.adjacent_01.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.3333"
+    },
+    {
+      "id": "deflect_bat.attack.adjacent_01.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "deflect_bat.attack.adjacent_02.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.3299"
+    },
+    {
+      "id": "deflect_bat.attack.adjacent_02.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "deflect_bat.attack.adjacent_03.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.1925"
+    },
+    {
+      "id": "deflect_bat.attack.adjacent_03.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "deflect_bat.attack.sheet",
+      "status": "PASS",
+      "detail": "deflect_bat/sprite_sheets/deflect_bat_attack_sheet_candidate.png"
+    },
+    {
+      "id": "deflect_bat.attack.sheet_size",
+      "status": "PASS",
+      "detail": "(208, 36)"
+    },
+    {
+      "id": "deflect_bat.hit_recover.count",
+      "status": "PASS",
+      "detail": "3/3"
+    },
+    {
+      "id": "deflect_bat.hit_recover.deflect_bat_hit_recover_f01.png.canvas",
+      "status": "PASS",
+      "detail": "52x36"
+    },
+    {
+      "id": "deflect_bat.hit_recover.deflect_bat_hit_recover_f01.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "deflect_bat.hit_recover.deflect_bat_hit_recover_f01.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "deflect_bat.hit_recover.deflect_bat_hit_recover_f01.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "deflect_bat.hit_recover.deflect_bat_hit_recover_f01.png.nonempty",
+      "status": "PASS",
+      "detail": "(12, 10, 39, 29)"
+    },
+    {
+      "id": "deflect_bat.hit_recover.deflect_bat_hit_recover_f01.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=29 GP.y=29"
+    },
+    {
+      "id": "deflect_bat.hit_recover.deflect_bat_hit_recover_f02.png.canvas",
+      "status": "PASS",
+      "detail": "52x36"
+    },
+    {
+      "id": "deflect_bat.hit_recover.deflect_bat_hit_recover_f02.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "deflect_bat.hit_recover.deflect_bat_hit_recover_f02.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "deflect_bat.hit_recover.deflect_bat_hit_recover_f02.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "deflect_bat.hit_recover.deflect_bat_hit_recover_f02.png.nonempty",
+      "status": "PASS",
+      "detail": "(12, 3, 41, 29)"
+    },
+    {
+      "id": "deflect_bat.hit_recover.deflect_bat_hit_recover_f02.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=29 GP.y=29"
+    },
+    {
+      "id": "deflect_bat.hit_recover.deflect_bat_hit_recover_f03.png.canvas",
+      "status": "PASS",
+      "detail": "52x36"
+    },
+    {
+      "id": "deflect_bat.hit_recover.deflect_bat_hit_recover_f03.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "deflect_bat.hit_recover.deflect_bat_hit_recover_f03.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "deflect_bat.hit_recover.deflect_bat_hit_recover_f03.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "deflect_bat.hit_recover.deflect_bat_hit_recover_f03.png.nonempty",
+      "status": "PASS",
+      "detail": "(12, 7, 39, 29)"
+    },
+    {
+      "id": "deflect_bat.hit_recover.deflect_bat_hit_recover_f03.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=29 GP.y=29"
+    },
+    {
+      "id": "deflect_bat.hit_recover.adjacent_01.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.4118"
+    },
+    {
+      "id": "deflect_bat.hit_recover.adjacent_01.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "deflect_bat.hit_recover.adjacent_02.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.3532"
+    },
+    {
+      "id": "deflect_bat.hit_recover.adjacent_02.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "deflect_bat.hit_recover.sheet",
+      "status": "PASS",
+      "detail": "deflect_bat/sprite_sheets/deflect_bat_hit_recover_sheet_candidate.png"
+    },
+    {
+      "id": "deflect_bat.hit_recover.sheet_size",
+      "status": "PASS",
+      "detail": "(156, 36)"
+    },
+    {
+      "id": "deflect_bat.unique_frame_files",
+      "status": "PASS",
+      "detail": "duplicateGroups=0"
+    },
+    {
+      "id": "rewind_lizard.idle.count",
+      "status": "PASS",
+      "detail": "4/4"
+    },
+    {
+      "id": "rewind_lizard.idle.rewind_lizard_idle_f01.png.canvas",
+      "status": "PASS",
+      "detail": "72x40"
+    },
+    {
+      "id": "rewind_lizard.idle.rewind_lizard_idle_f01.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "rewind_lizard.idle.rewind_lizard_idle_f01.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "rewind_lizard.idle.rewind_lizard_idle_f01.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "rewind_lizard.idle.rewind_lizard_idle_f01.png.nonempty",
+      "status": "PASS",
+      "detail": "(11, 12, 55, 34)"
+    },
+    {
+      "id": "rewind_lizard.idle.rewind_lizard_idle_f01.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=34 GP.y=34"
+    },
+    {
+      "id": "rewind_lizard.idle.rewind_lizard_idle_f02.png.canvas",
+      "status": "PASS",
+      "detail": "72x40"
+    },
+    {
+      "id": "rewind_lizard.idle.rewind_lizard_idle_f02.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "rewind_lizard.idle.rewind_lizard_idle_f02.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "rewind_lizard.idle.rewind_lizard_idle_f02.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "rewind_lizard.idle.rewind_lizard_idle_f02.png.nonempty",
+      "status": "PASS",
+      "detail": "(11, 12, 55, 34)"
+    },
+    {
+      "id": "rewind_lizard.idle.rewind_lizard_idle_f02.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=34 GP.y=34"
+    },
+    {
+      "id": "rewind_lizard.idle.rewind_lizard_idle_f03.png.canvas",
+      "status": "PASS",
+      "detail": "72x40"
+    },
+    {
+      "id": "rewind_lizard.idle.rewind_lizard_idle_f03.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "rewind_lizard.idle.rewind_lizard_idle_f03.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "rewind_lizard.idle.rewind_lizard_idle_f03.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "rewind_lizard.idle.rewind_lizard_idle_f03.png.nonempty",
+      "status": "PASS",
+      "detail": "(10, 12, 55, 34)"
+    },
+    {
+      "id": "rewind_lizard.idle.rewind_lizard_idle_f03.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=34 GP.y=34"
+    },
+    {
+      "id": "rewind_lizard.idle.rewind_lizard_idle_f04.png.canvas",
+      "status": "PASS",
+      "detail": "72x40"
+    },
+    {
+      "id": "rewind_lizard.idle.rewind_lizard_idle_f04.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "rewind_lizard.idle.rewind_lizard_idle_f04.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "rewind_lizard.idle.rewind_lizard_idle_f04.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "rewind_lizard.idle.rewind_lizard_idle_f04.png.nonempty",
+      "status": "PASS",
+      "detail": "(14, 5, 52, 34)"
+    },
+    {
+      "id": "rewind_lizard.idle.rewind_lizard_idle_f04.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=34 GP.y=34"
+    },
+    {
+      "id": "rewind_lizard.idle.adjacent_01.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.0287"
+    },
+    {
+      "id": "rewind_lizard.idle.adjacent_01.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "rewind_lizard.idle.adjacent_02.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.0915"
+    },
+    {
+      "id": "rewind_lizard.idle.adjacent_02.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "rewind_lizard.idle.adjacent_03.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.7362"
+    },
+    {
+      "id": "rewind_lizard.idle.adjacent_03.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "rewind_lizard.idle.sheet",
+      "status": "PASS",
+      "detail": "rewind_lizard/sprite_sheets/rewind_lizard_idle_sheet_candidate.png"
+    },
+    {
+      "id": "rewind_lizard.idle.sheet_size",
+      "status": "PASS",
+      "detail": "(288, 40)"
+    },
+    {
+      "id": "rewind_lizard.move.count",
+      "status": "PASS",
+      "detail": "6/6"
+    },
+    {
+      "id": "rewind_lizard.move.rewind_lizard_move_f01.png.canvas",
+      "status": "PASS",
+      "detail": "72x40"
+    },
+    {
+      "id": "rewind_lizard.move.rewind_lizard_move_f01.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "rewind_lizard.move.rewind_lizard_move_f01.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "rewind_lizard.move.rewind_lizard_move_f01.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "rewind_lizard.move.rewind_lizard_move_f01.png.nonempty",
+      "status": "PASS",
+      "detail": "(10, 12, 56, 34)"
+    },
+    {
+      "id": "rewind_lizard.move.rewind_lizard_move_f01.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=34 GP.y=34"
+    },
+    {
+      "id": "rewind_lizard.move.rewind_lizard_move_f02.png.canvas",
+      "status": "PASS",
+      "detail": "72x40"
+    },
+    {
+      "id": "rewind_lizard.move.rewind_lizard_move_f02.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "rewind_lizard.move.rewind_lizard_move_f02.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "rewind_lizard.move.rewind_lizard_move_f02.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "rewind_lizard.move.rewind_lizard_move_f02.png.nonempty",
+      "status": "PASS",
+      "detail": "(10, 13, 56, 34)"
+    },
+    {
+      "id": "rewind_lizard.move.rewind_lizard_move_f02.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=34 GP.y=34"
+    },
+    {
+      "id": "rewind_lizard.move.rewind_lizard_move_f03.png.canvas",
+      "status": "PASS",
+      "detail": "72x40"
+    },
+    {
+      "id": "rewind_lizard.move.rewind_lizard_move_f03.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "rewind_lizard.move.rewind_lizard_move_f03.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "rewind_lizard.move.rewind_lizard_move_f03.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "rewind_lizard.move.rewind_lizard_move_f03.png.nonempty",
+      "status": "PASS",
+      "detail": "(10, 13, 57, 34)"
+    },
+    {
+      "id": "rewind_lizard.move.rewind_lizard_move_f03.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=34 GP.y=34"
+    },
+    {
+      "id": "rewind_lizard.move.rewind_lizard_move_f04.png.canvas",
+      "status": "PASS",
+      "detail": "72x40"
+    },
+    {
+      "id": "rewind_lizard.move.rewind_lizard_move_f04.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "rewind_lizard.move.rewind_lizard_move_f04.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "rewind_lizard.move.rewind_lizard_move_f04.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "rewind_lizard.move.rewind_lizard_move_f04.png.nonempty",
+      "status": "PASS",
+      "detail": "(10, 13, 56, 34)"
+    },
+    {
+      "id": "rewind_lizard.move.rewind_lizard_move_f04.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=34 GP.y=34"
+    },
+    {
+      "id": "rewind_lizard.move.rewind_lizard_move_f05.png.canvas",
+      "status": "PASS",
+      "detail": "72x40"
+    },
+    {
+      "id": "rewind_lizard.move.rewind_lizard_move_f05.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "rewind_lizard.move.rewind_lizard_move_f05.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "rewind_lizard.move.rewind_lizard_move_f05.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "rewind_lizard.move.rewind_lizard_move_f05.png.nonempty",
+      "status": "PASS",
+      "detail": "(10, 11, 56, 34)"
+    },
+    {
+      "id": "rewind_lizard.move.rewind_lizard_move_f05.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=34 GP.y=34"
+    },
+    {
+      "id": "rewind_lizard.move.rewind_lizard_move_f06.png.canvas",
+      "status": "PASS",
+      "detail": "72x40"
+    },
+    {
+      "id": "rewind_lizard.move.rewind_lizard_move_f06.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "rewind_lizard.move.rewind_lizard_move_f06.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "rewind_lizard.move.rewind_lizard_move_f06.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "rewind_lizard.move.rewind_lizard_move_f06.png.nonempty",
+      "status": "PASS",
+      "detail": "(10, 13, 56, 34)"
+    },
+    {
+      "id": "rewind_lizard.move.rewind_lizard_move_f06.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=34 GP.y=34"
+    },
+    {
+      "id": "rewind_lizard.move.adjacent_01.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.2197"
+    },
+    {
+      "id": "rewind_lizard.move.adjacent_01.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "rewind_lizard.move.adjacent_02.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.2383"
+    },
+    {
+      "id": "rewind_lizard.move.adjacent_02.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "rewind_lizard.move.adjacent_03.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.2384"
+    },
+    {
+      "id": "rewind_lizard.move.adjacent_03.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "rewind_lizard.move.adjacent_04.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.3389"
+    },
+    {
+      "id": "rewind_lizard.move.adjacent_04.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "rewind_lizard.move.adjacent_05.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.3269"
+    },
+    {
+      "id": "rewind_lizard.move.adjacent_05.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "rewind_lizard.move.sheet",
+      "status": "PASS",
+      "detail": "rewind_lizard/sprite_sheets/rewind_lizard_move_sheet_candidate.png"
+    },
+    {
+      "id": "rewind_lizard.move.sheet_size",
+      "status": "PASS",
+      "detail": "(432, 40)"
+    },
+    {
+      "id": "rewind_lizard.prep.count",
+      "status": "PASS",
+      "detail": "3/3"
+    },
+    {
+      "id": "rewind_lizard.prep.rewind_lizard_prep_f01.png.canvas",
+      "status": "PASS",
+      "detail": "72x40"
+    },
+    {
+      "id": "rewind_lizard.prep.rewind_lizard_prep_f01.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "rewind_lizard.prep.rewind_lizard_prep_f01.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "rewind_lizard.prep.rewind_lizard_prep_f01.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "rewind_lizard.prep.rewind_lizard_prep_f01.png.nonempty",
+      "status": "PASS",
+      "detail": "(11, 16, 55, 34)"
+    },
+    {
+      "id": "rewind_lizard.prep.rewind_lizard_prep_f01.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=34 GP.y=34"
+    },
+    {
+      "id": "rewind_lizard.prep.rewind_lizard_prep_f02.png.canvas",
+      "status": "PASS",
+      "detail": "72x40"
+    },
+    {
+      "id": "rewind_lizard.prep.rewind_lizard_prep_f02.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "rewind_lizard.prep.rewind_lizard_prep_f02.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "rewind_lizard.prep.rewind_lizard_prep_f02.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "rewind_lizard.prep.rewind_lizard_prep_f02.png.nonempty",
+      "status": "PASS",
+      "detail": "(13, 18, 53, 34)"
+    },
+    {
+      "id": "rewind_lizard.prep.rewind_lizard_prep_f02.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=34 GP.y=34"
+    },
+    {
+      "id": "rewind_lizard.prep.rewind_lizard_prep_f03.png.canvas",
+      "status": "PASS",
+      "detail": "72x40"
+    },
+    {
+      "id": "rewind_lizard.prep.rewind_lizard_prep_f03.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "rewind_lizard.prep.rewind_lizard_prep_f03.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "rewind_lizard.prep.rewind_lizard_prep_f03.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "rewind_lizard.prep.rewind_lizard_prep_f03.png.nonempty",
+      "status": "PASS",
+      "detail": "(12, 18, 54, 34)"
+    },
+    {
+      "id": "rewind_lizard.prep.rewind_lizard_prep_f03.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=34 GP.y=34"
+    },
+    {
+      "id": "rewind_lizard.prep.adjacent_01.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.2042"
+    },
+    {
+      "id": "rewind_lizard.prep.adjacent_01.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "rewind_lizard.prep.adjacent_02.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.1076"
+    },
+    {
+      "id": "rewind_lizard.prep.adjacent_02.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "rewind_lizard.prep.sheet",
+      "status": "PASS",
+      "detail": "rewind_lizard/sprite_sheets/rewind_lizard_prep_sheet_candidate.png"
+    },
+    {
+      "id": "rewind_lizard.prep.sheet_size",
+      "status": "PASS",
+      "detail": "(216, 40)"
+    },
+    {
+      "id": "rewind_lizard.attack.count",
+      "status": "PASS",
+      "detail": "4/4"
+    },
+    {
+      "id": "rewind_lizard.attack.rewind_lizard_attack_f01.png.canvas",
+      "status": "PASS",
+      "detail": "72x40"
+    },
+    {
+      "id": "rewind_lizard.attack.rewind_lizard_attack_f01.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "rewind_lizard.attack.rewind_lizard_attack_f01.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "rewind_lizard.attack.rewind_lizard_attack_f01.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "rewind_lizard.attack.rewind_lizard_attack_f01.png.nonempty",
+      "status": "PASS",
+      "detail": "(6, 11, 59, 34)"
+    },
+    {
+      "id": "rewind_lizard.attack.rewind_lizard_attack_f01.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=34 GP.y=34"
+    },
+    {
+      "id": "rewind_lizard.attack.rewind_lizard_attack_f02.png.canvas",
+      "status": "PASS",
+      "detail": "72x40"
+    },
+    {
+      "id": "rewind_lizard.attack.rewind_lizard_attack_f02.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "rewind_lizard.attack.rewind_lizard_attack_f02.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "rewind_lizard.attack.rewind_lizard_attack_f02.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "rewind_lizard.attack.rewind_lizard_attack_f02.png.nonempty",
+      "status": "PASS",
+      "detail": "(4, 11, 62, 34)"
+    },
+    {
+      "id": "rewind_lizard.attack.rewind_lizard_attack_f02.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=34 GP.y=34"
+    },
+    {
+      "id": "rewind_lizard.attack.rewind_lizard_attack_f03.png.canvas",
+      "status": "PASS",
+      "detail": "72x40"
+    },
+    {
+      "id": "rewind_lizard.attack.rewind_lizard_attack_f03.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "rewind_lizard.attack.rewind_lizard_attack_f03.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "rewind_lizard.attack.rewind_lizard_attack_f03.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "rewind_lizard.attack.rewind_lizard_attack_f03.png.nonempty",
+      "status": "PASS",
+      "detail": "(10, 16, 57, 34)"
+    },
+    {
+      "id": "rewind_lizard.attack.rewind_lizard_attack_f03.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=34 GP.y=34"
+    },
+    {
+      "id": "rewind_lizard.attack.rewind_lizard_attack_f04.png.canvas",
+      "status": "PASS",
+      "detail": "72x40"
+    },
+    {
+      "id": "rewind_lizard.attack.rewind_lizard_attack_f04.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "rewind_lizard.attack.rewind_lizard_attack_f04.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "rewind_lizard.attack.rewind_lizard_attack_f04.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "rewind_lizard.attack.rewind_lizard_attack_f04.png.nonempty",
+      "status": "PASS",
+      "detail": "(12, 13, 54, 34)"
+    },
+    {
+      "id": "rewind_lizard.attack.rewind_lizard_attack_f04.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=34 GP.y=34"
+    },
+    {
+      "id": "rewind_lizard.attack.adjacent_01.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.2905"
+    },
+    {
+      "id": "rewind_lizard.attack.adjacent_01.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "rewind_lizard.attack.adjacent_02.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.5986"
+    },
+    {
+      "id": "rewind_lizard.attack.adjacent_02.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "rewind_lizard.attack.adjacent_03.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.3877"
+    },
+    {
+      "id": "rewind_lizard.attack.adjacent_03.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "rewind_lizard.attack.sheet",
+      "status": "PASS",
+      "detail": "rewind_lizard/sprite_sheets/rewind_lizard_attack_sheet_candidate.png"
+    },
+    {
+      "id": "rewind_lizard.attack.sheet_size",
+      "status": "PASS",
+      "detail": "(288, 40)"
+    },
+    {
+      "id": "rewind_lizard.hit_recover.count",
+      "status": "PASS",
+      "detail": "3/3"
+    },
+    {
+      "id": "rewind_lizard.hit_recover.rewind_lizard_hit_recover_f01.png.canvas",
+      "status": "PASS",
+      "detail": "72x40"
+    },
+    {
+      "id": "rewind_lizard.hit_recover.rewind_lizard_hit_recover_f01.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "rewind_lizard.hit_recover.rewind_lizard_hit_recover_f01.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "rewind_lizard.hit_recover.rewind_lizard_hit_recover_f01.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "rewind_lizard.hit_recover.rewind_lizard_hit_recover_f01.png.nonempty",
+      "status": "PASS",
+      "detail": "(11, 16, 55, 34)"
+    },
+    {
+      "id": "rewind_lizard.hit_recover.rewind_lizard_hit_recover_f01.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=34 GP.y=34"
+    },
+    {
+      "id": "rewind_lizard.hit_recover.rewind_lizard_hit_recover_f02.png.canvas",
+      "status": "PASS",
+      "detail": "72x40"
+    },
+    {
+      "id": "rewind_lizard.hit_recover.rewind_lizard_hit_recover_f02.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "rewind_lizard.hit_recover.rewind_lizard_hit_recover_f02.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "rewind_lizard.hit_recover.rewind_lizard_hit_recover_f02.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "rewind_lizard.hit_recover.rewind_lizard_hit_recover_f02.png.nonempty",
+      "status": "PASS",
+      "detail": "(13, 16, 53, 34)"
+    },
+    {
+      "id": "rewind_lizard.hit_recover.rewind_lizard_hit_recover_f02.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=34 GP.y=34"
+    },
+    {
+      "id": "rewind_lizard.hit_recover.rewind_lizard_hit_recover_f03.png.canvas",
+      "status": "PASS",
+      "detail": "72x40"
+    },
+    {
+      "id": "rewind_lizard.hit_recover.rewind_lizard_hit_recover_f03.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "rewind_lizard.hit_recover.rewind_lizard_hit_recover_f03.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "rewind_lizard.hit_recover.rewind_lizard_hit_recover_f03.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "rewind_lizard.hit_recover.rewind_lizard_hit_recover_f03.png.nonempty",
+      "status": "PASS",
+      "detail": "(10, 13, 55, 34)"
+    },
+    {
+      "id": "rewind_lizard.hit_recover.rewind_lizard_hit_recover_f03.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=34 GP.y=34"
+    },
+    {
+      "id": "rewind_lizard.hit_recover.adjacent_01.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.3171"
+    },
+    {
+      "id": "rewind_lizard.hit_recover.adjacent_01.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "rewind_lizard.hit_recover.adjacent_02.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.2914"
+    },
+    {
+      "id": "rewind_lizard.hit_recover.adjacent_02.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "rewind_lizard.hit_recover.sheet",
+      "status": "PASS",
+      "detail": "rewind_lizard/sprite_sheets/rewind_lizard_hit_recover_sheet_candidate.png"
+    },
+    {
+      "id": "rewind_lizard.hit_recover.sheet_size",
+      "status": "PASS",
+      "detail": "(216, 40)"
+    },
+    {
+      "id": "rewind_lizard.unique_frame_files",
+      "status": "PASS",
+      "detail": "duplicateGroups=0"
+    },
+    {
+      "id": "mineral_spider.idle.count",
+      "status": "PASS",
+      "detail": "4/4"
+    },
+    {
+      "id": "mineral_spider.idle.mineral_spider_idle_f01.png.canvas",
+      "status": "PASS",
+      "detail": "104x88"
+    },
+    {
+      "id": "mineral_spider.idle.mineral_spider_idle_f01.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "mineral_spider.idle.mineral_spider_idle_f01.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "mineral_spider.idle.mineral_spider_idle_f01.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "mineral_spider.idle.mineral_spider_idle_f01.png.nonempty",
+      "status": "PASS",
+      "detail": "(22, 14, 82, 72)"
+    },
+    {
+      "id": "mineral_spider.idle.mineral_spider_idle_f01.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=72 GP.y=72"
+    },
+    {
+      "id": "mineral_spider.idle.mineral_spider_idle_f02.png.canvas",
+      "status": "PASS",
+      "detail": "104x88"
+    },
+    {
+      "id": "mineral_spider.idle.mineral_spider_idle_f02.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "mineral_spider.idle.mineral_spider_idle_f02.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "mineral_spider.idle.mineral_spider_idle_f02.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "mineral_spider.idle.mineral_spider_idle_f02.png.nonempty",
+      "status": "PASS",
+      "detail": "(21, 15, 83, 72)"
+    },
+    {
+      "id": "mineral_spider.idle.mineral_spider_idle_f02.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=72 GP.y=72"
+    },
+    {
+      "id": "mineral_spider.idle.mineral_spider_idle_f03.png.canvas",
+      "status": "PASS",
+      "detail": "104x88"
+    },
+    {
+      "id": "mineral_spider.idle.mineral_spider_idle_f03.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "mineral_spider.idle.mineral_spider_idle_f03.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "mineral_spider.idle.mineral_spider_idle_f03.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "mineral_spider.idle.mineral_spider_idle_f03.png.nonempty",
+      "status": "PASS",
+      "detail": "(22, 15, 83, 72)"
+    },
+    {
+      "id": "mineral_spider.idle.mineral_spider_idle_f03.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=72 GP.y=72"
+    },
+    {
+      "id": "mineral_spider.idle.mineral_spider_idle_f04.png.canvas",
+      "status": "PASS",
+      "detail": "104x88"
+    },
+    {
+      "id": "mineral_spider.idle.mineral_spider_idle_f04.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "mineral_spider.idle.mineral_spider_idle_f04.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "mineral_spider.idle.mineral_spider_idle_f04.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "mineral_spider.idle.mineral_spider_idle_f04.png.nonempty",
+      "status": "PASS",
+      "detail": "(21, 15, 83, 72)"
+    },
+    {
+      "id": "mineral_spider.idle.mineral_spider_idle_f04.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=72 GP.y=72"
+    },
+    {
+      "id": "mineral_spider.idle.adjacent_01.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.1901"
+    },
+    {
+      "id": "mineral_spider.idle.adjacent_01.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "mineral_spider.idle.adjacent_02.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.2601"
+    },
+    {
+      "id": "mineral_spider.idle.adjacent_02.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "mineral_spider.idle.adjacent_03.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.1235"
+    },
+    {
+      "id": "mineral_spider.idle.adjacent_03.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "mineral_spider.idle.sheet",
+      "status": "PASS",
+      "detail": "mineral_spider/sprite_sheets/mineral_spider_idle_sheet_candidate.png"
+    },
+    {
+      "id": "mineral_spider.idle.sheet_size",
+      "status": "PASS",
+      "detail": "(416, 88)"
+    },
+    {
+      "id": "mineral_spider.move.count",
+      "status": "PASS",
+      "detail": "6/6"
+    },
+    {
+      "id": "mineral_spider.move.mineral_spider_move_f01.png.canvas",
+      "status": "PASS",
+      "detail": "104x88"
+    },
+    {
+      "id": "mineral_spider.move.mineral_spider_move_f01.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "mineral_spider.move.mineral_spider_move_f01.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "mineral_spider.move.mineral_spider_move_f01.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "mineral_spider.move.mineral_spider_move_f01.png.nonempty",
+      "status": "PASS",
+      "detail": "(16, 32, 88, 72)"
+    },
+    {
+      "id": "mineral_spider.move.mineral_spider_move_f01.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=72 GP.y=72"
+    },
+    {
+      "id": "mineral_spider.move.mineral_spider_move_f02.png.canvas",
+      "status": "PASS",
+      "detail": "104x88"
+    },
+    {
+      "id": "mineral_spider.move.mineral_spider_move_f02.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "mineral_spider.move.mineral_spider_move_f02.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "mineral_spider.move.mineral_spider_move_f02.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "mineral_spider.move.mineral_spider_move_f02.png.nonempty",
+      "status": "PASS",
+      "detail": "(16, 31, 87, 72)"
+    },
+    {
+      "id": "mineral_spider.move.mineral_spider_move_f02.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=72 GP.y=72"
+    },
+    {
+      "id": "mineral_spider.move.mineral_spider_move_f03.png.canvas",
+      "status": "PASS",
+      "detail": "104x88"
+    },
+    {
+      "id": "mineral_spider.move.mineral_spider_move_f03.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "mineral_spider.move.mineral_spider_move_f03.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "mineral_spider.move.mineral_spider_move_f03.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "mineral_spider.move.mineral_spider_move_f03.png.nonempty",
+      "status": "PASS",
+      "detail": "(20, 30, 85, 72)"
+    },
+    {
+      "id": "mineral_spider.move.mineral_spider_move_f03.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=72 GP.y=72"
+    },
+    {
+      "id": "mineral_spider.move.mineral_spider_move_f04.png.canvas",
+      "status": "PASS",
+      "detail": "104x88"
+    },
+    {
+      "id": "mineral_spider.move.mineral_spider_move_f04.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "mineral_spider.move.mineral_spider_move_f04.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "mineral_spider.move.mineral_spider_move_f04.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "mineral_spider.move.mineral_spider_move_f04.png.nonempty",
+      "status": "PASS",
+      "detail": "(14, 32, 90, 72)"
+    },
+    {
+      "id": "mineral_spider.move.mineral_spider_move_f04.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=72 GP.y=72"
+    },
+    {
+      "id": "mineral_spider.move.mineral_spider_move_f05.png.canvas",
+      "status": "PASS",
+      "detail": "104x88"
+    },
+    {
+      "id": "mineral_spider.move.mineral_spider_move_f05.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "mineral_spider.move.mineral_spider_move_f05.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "mineral_spider.move.mineral_spider_move_f05.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "mineral_spider.move.mineral_spider_move_f05.png.nonempty",
+      "status": "PASS",
+      "detail": "(14, 30, 90, 72)"
+    },
+    {
+      "id": "mineral_spider.move.mineral_spider_move_f05.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=72 GP.y=72"
+    },
+    {
+      "id": "mineral_spider.move.mineral_spider_move_f06.png.canvas",
+      "status": "PASS",
+      "detail": "104x88"
+    },
+    {
+      "id": "mineral_spider.move.mineral_spider_move_f06.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "mineral_spider.move.mineral_spider_move_f06.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "mineral_spider.move.mineral_spider_move_f06.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "mineral_spider.move.mineral_spider_move_f06.png.nonempty",
+      "status": "PASS",
+      "detail": "(16, 32, 89, 72)"
+    },
+    {
+      "id": "mineral_spider.move.mineral_spider_move_f06.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=72 GP.y=72"
+    },
+    {
+      "id": "mineral_spider.move.adjacent_01.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.1443"
+    },
+    {
+      "id": "mineral_spider.move.adjacent_01.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "mineral_spider.move.adjacent_02.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.3208"
+    },
+    {
+      "id": "mineral_spider.move.adjacent_02.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "mineral_spider.move.adjacent_03.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.3161"
+    },
+    {
+      "id": "mineral_spider.move.adjacent_03.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "mineral_spider.move.adjacent_04.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.1855"
+    },
+    {
+      "id": "mineral_spider.move.adjacent_04.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "mineral_spider.move.adjacent_05.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.2994"
+    },
+    {
+      "id": "mineral_spider.move.adjacent_05.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "mineral_spider.move.sheet",
+      "status": "PASS",
+      "detail": "mineral_spider/sprite_sheets/mineral_spider_move_sheet_candidate.png"
+    },
+    {
+      "id": "mineral_spider.move.sheet_size",
+      "status": "PASS",
+      "detail": "(624, 88)"
+    },
+    {
+      "id": "mineral_spider.idle_to_alert.count",
+      "status": "PASS",
+      "detail": "3/3"
+    },
+    {
+      "id": "mineral_spider.idle_to_alert.mineral_spider_idle_to_alert_f01.png.canvas",
+      "status": "PASS",
+      "detail": "104x88"
+    },
+    {
+      "id": "mineral_spider.idle_to_alert.mineral_spider_idle_to_alert_f01.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "mineral_spider.idle_to_alert.mineral_spider_idle_to_alert_f01.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "mineral_spider.idle_to_alert.mineral_spider_idle_to_alert_f01.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "mineral_spider.idle_to_alert.mineral_spider_idle_to_alert_f01.png.nonempty",
+      "status": "PASS",
+      "detail": "(20, 19, 83, 72)"
+    },
+    {
+      "id": "mineral_spider.idle_to_alert.mineral_spider_idle_to_alert_f01.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=72 GP.y=72"
+    },
+    {
+      "id": "mineral_spider.idle_to_alert.mineral_spider_idle_to_alert_f02.png.canvas",
+      "status": "PASS",
+      "detail": "104x88"
+    },
+    {
+      "id": "mineral_spider.idle_to_alert.mineral_spider_idle_to_alert_f02.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "mineral_spider.idle_to_alert.mineral_spider_idle_to_alert_f02.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "mineral_spider.idle_to_alert.mineral_spider_idle_to_alert_f02.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "mineral_spider.idle_to_alert.mineral_spider_idle_to_alert_f02.png.nonempty",
+      "status": "PASS",
+      "detail": "(19, 22, 85, 72)"
+    },
+    {
+      "id": "mineral_spider.idle_to_alert.mineral_spider_idle_to_alert_f02.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=72 GP.y=72"
+    },
+    {
+      "id": "mineral_spider.idle_to_alert.mineral_spider_idle_to_alert_f03.png.canvas",
+      "status": "PASS",
+      "detail": "104x88"
+    },
+    {
+      "id": "mineral_spider.idle_to_alert.mineral_spider_idle_to_alert_f03.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "mineral_spider.idle_to_alert.mineral_spider_idle_to_alert_f03.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "mineral_spider.idle_to_alert.mineral_spider_idle_to_alert_f03.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "mineral_spider.idle_to_alert.mineral_spider_idle_to_alert_f03.png.nonempty",
+      "status": "PASS",
+      "detail": "(20, 26, 84, 72)"
+    },
+    {
+      "id": "mineral_spider.idle_to_alert.mineral_spider_idle_to_alert_f03.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=72 GP.y=72"
+    },
+    {
+      "id": "mineral_spider.idle_to_alert.adjacent_01.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.2602"
+    },
+    {
+      "id": "mineral_spider.idle_to_alert.adjacent_01.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "mineral_spider.idle_to_alert.adjacent_02.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.3658"
+    },
+    {
+      "id": "mineral_spider.idle_to_alert.adjacent_02.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "mineral_spider.idle_to_alert.sheet",
+      "status": "PASS",
+      "detail": "mineral_spider/sprite_sheets/mineral_spider_idle_to_alert_sheet_candidate.png"
+    },
+    {
+      "id": "mineral_spider.idle_to_alert.sheet_size",
+      "status": "PASS",
+      "detail": "(312, 88)"
+    },
+    {
+      "id": "mineral_spider.alert_to_deploy.count",
+      "status": "PASS",
+      "detail": "3/3"
+    },
+    {
+      "id": "mineral_spider.alert_to_deploy.mineral_spider_alert_to_deploy_f01.png.canvas",
+      "status": "PASS",
+      "detail": "104x88"
+    },
+    {
+      "id": "mineral_spider.alert_to_deploy.mineral_spider_alert_to_deploy_f01.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "mineral_spider.alert_to_deploy.mineral_spider_alert_to_deploy_f01.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "mineral_spider.alert_to_deploy.mineral_spider_alert_to_deploy_f01.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "mineral_spider.alert_to_deploy.mineral_spider_alert_to_deploy_f01.png.nonempty",
+      "status": "PASS",
+      "detail": "(20, 27, 84, 72)"
+    },
+    {
+      "id": "mineral_spider.alert_to_deploy.mineral_spider_alert_to_deploy_f01.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=72 GP.y=72"
+    },
+    {
+      "id": "mineral_spider.alert_to_deploy.mineral_spider_alert_to_deploy_f02.png.canvas",
+      "status": "PASS",
+      "detail": "104x88"
+    },
+    {
+      "id": "mineral_spider.alert_to_deploy.mineral_spider_alert_to_deploy_f02.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "mineral_spider.alert_to_deploy.mineral_spider_alert_to_deploy_f02.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "mineral_spider.alert_to_deploy.mineral_spider_alert_to_deploy_f02.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "mineral_spider.alert_to_deploy.mineral_spider_alert_to_deploy_f02.png.nonempty",
+      "status": "PASS",
+      "detail": "(20, 27, 85, 72)"
+    },
+    {
+      "id": "mineral_spider.alert_to_deploy.mineral_spider_alert_to_deploy_f02.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=72 GP.y=72"
+    },
+    {
+      "id": "mineral_spider.alert_to_deploy.mineral_spider_alert_to_deploy_f03.png.canvas",
+      "status": "PASS",
+      "detail": "104x88"
+    },
+    {
+      "id": "mineral_spider.alert_to_deploy.mineral_spider_alert_to_deploy_f03.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "mineral_spider.alert_to_deploy.mineral_spider_alert_to_deploy_f03.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "mineral_spider.alert_to_deploy.mineral_spider_alert_to_deploy_f03.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "mineral_spider.alert_to_deploy.mineral_spider_alert_to_deploy_f03.png.nonempty",
+      "status": "PASS",
+      "detail": "(20, 28, 84, 72)"
+    },
+    {
+      "id": "mineral_spider.alert_to_deploy.mineral_spider_alert_to_deploy_f03.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=72 GP.y=72"
+    },
+    {
+      "id": "mineral_spider.alert_to_deploy.adjacent_01.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.2274"
+    },
+    {
+      "id": "mineral_spider.alert_to_deploy.adjacent_01.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "mineral_spider.alert_to_deploy.adjacent_02.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.2189"
+    },
+    {
+      "id": "mineral_spider.alert_to_deploy.adjacent_02.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "mineral_spider.alert_to_deploy.sheet",
+      "status": "PASS",
+      "detail": "mineral_spider/sprite_sheets/mineral_spider_alert_to_deploy_sheet_candidate.png"
+    },
+    {
+      "id": "mineral_spider.alert_to_deploy.sheet_size",
+      "status": "PASS",
+      "detail": "(312, 88)"
+    },
+    {
+      "id": "mineral_spider.deploy_to_attack.count",
+      "status": "PASS",
+      "detail": "4/4"
+    },
+    {
+      "id": "mineral_spider.deploy_to_attack.mineral_spider_deploy_to_attack_f01.png.canvas",
+      "status": "PASS",
+      "detail": "104x88"
+    },
+    {
+      "id": "mineral_spider.deploy_to_attack.mineral_spider_deploy_to_attack_f01.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "mineral_spider.deploy_to_attack.mineral_spider_deploy_to_attack_f01.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "mineral_spider.deploy_to_attack.mineral_spider_deploy_to_attack_f01.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "mineral_spider.deploy_to_attack.mineral_spider_deploy_to_attack_f01.png.nonempty",
+      "status": "PASS",
+      "detail": "(20, 33, 85, 72)"
+    },
+    {
+      "id": "mineral_spider.deploy_to_attack.mineral_spider_deploy_to_attack_f01.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=72 GP.y=72"
+    },
+    {
+      "id": "mineral_spider.deploy_to_attack.mineral_spider_deploy_to_attack_f02.png.canvas",
+      "status": "PASS",
+      "detail": "104x88"
+    },
+    {
+      "id": "mineral_spider.deploy_to_attack.mineral_spider_deploy_to_attack_f02.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "mineral_spider.deploy_to_attack.mineral_spider_deploy_to_attack_f02.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "mineral_spider.deploy_to_attack.mineral_spider_deploy_to_attack_f02.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "mineral_spider.deploy_to_attack.mineral_spider_deploy_to_attack_f02.png.nonempty",
+      "status": "PASS",
+      "detail": "(8, 31, 75, 72)"
+    },
+    {
+      "id": "mineral_spider.deploy_to_attack.mineral_spider_deploy_to_attack_f02.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=72 GP.y=72"
+    },
+    {
+      "id": "mineral_spider.deploy_to_attack.mineral_spider_deploy_to_attack_f03.png.canvas",
+      "status": "PASS",
+      "detail": "104x88"
+    },
+    {
+      "id": "mineral_spider.deploy_to_attack.mineral_spider_deploy_to_attack_f03.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "mineral_spider.deploy_to_attack.mineral_spider_deploy_to_attack_f03.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "mineral_spider.deploy_to_attack.mineral_spider_deploy_to_attack_f03.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "mineral_spider.deploy_to_attack.mineral_spider_deploy_to_attack_f03.png.nonempty",
+      "status": "PASS",
+      "detail": "(6, 31, 75, 72)"
+    },
+    {
+      "id": "mineral_spider.deploy_to_attack.mineral_spider_deploy_to_attack_f03.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=72 GP.y=72"
+    },
+    {
+      "id": "mineral_spider.deploy_to_attack.mineral_spider_deploy_to_attack_f04.png.canvas",
+      "status": "PASS",
+      "detail": "104x88"
+    },
+    {
+      "id": "mineral_spider.deploy_to_attack.mineral_spider_deploy_to_attack_f04.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "mineral_spider.deploy_to_attack.mineral_spider_deploy_to_attack_f04.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "mineral_spider.deploy_to_attack.mineral_spider_deploy_to_attack_f04.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "mineral_spider.deploy_to_attack.mineral_spider_deploy_to_attack_f04.png.nonempty",
+      "status": "PASS",
+      "detail": "(20, 30, 84, 72)"
+    },
+    {
+      "id": "mineral_spider.deploy_to_attack.mineral_spider_deploy_to_attack_f04.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=72 GP.y=72"
+    },
+    {
+      "id": "mineral_spider.deploy_to_attack.adjacent_01.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.4911"
+    },
+    {
+      "id": "mineral_spider.deploy_to_attack.adjacent_01.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "mineral_spider.deploy_to_attack.adjacent_02.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.2701"
+    },
+    {
+      "id": "mineral_spider.deploy_to_attack.adjacent_02.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "mineral_spider.deploy_to_attack.adjacent_03.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.5436"
+    },
+    {
+      "id": "mineral_spider.deploy_to_attack.adjacent_03.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "mineral_spider.deploy_to_attack.sheet",
+      "status": "PASS",
+      "detail": "mineral_spider/sprite_sheets/mineral_spider_deploy_to_attack_sheet_candidate.png"
+    },
+    {
+      "id": "mineral_spider.deploy_to_attack.sheet_size",
+      "status": "PASS",
+      "detail": "(416, 88)"
+    },
+    {
+      "id": "mineral_spider.attack_to_recover.count",
+      "status": "PASS",
+      "detail": "3/3"
+    },
+    {
+      "id": "mineral_spider.attack_to_recover.mineral_spider_attack_to_recover_f01.png.canvas",
+      "status": "PASS",
+      "detail": "104x88"
+    },
+    {
+      "id": "mineral_spider.attack_to_recover.mineral_spider_attack_to_recover_f01.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "mineral_spider.attack_to_recover.mineral_spider_attack_to_recover_f01.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "mineral_spider.attack_to_recover.mineral_spider_attack_to_recover_f01.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "mineral_spider.attack_to_recover.mineral_spider_attack_to_recover_f01.png.nonempty",
+      "status": "PASS",
+      "detail": "(20, 35, 85, 72)"
+    },
+    {
+      "id": "mineral_spider.attack_to_recover.mineral_spider_attack_to_recover_f01.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=72 GP.y=72"
+    },
+    {
+      "id": "mineral_spider.attack_to_recover.mineral_spider_attack_to_recover_f02.png.canvas",
+      "status": "PASS",
+      "detail": "104x88"
+    },
+    {
+      "id": "mineral_spider.attack_to_recover.mineral_spider_attack_to_recover_f02.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "mineral_spider.attack_to_recover.mineral_spider_attack_to_recover_f02.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "mineral_spider.attack_to_recover.mineral_spider_attack_to_recover_f02.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "mineral_spider.attack_to_recover.mineral_spider_attack_to_recover_f02.png.nonempty",
+      "status": "PASS",
+      "detail": "(16, 36, 87, 72)"
+    },
+    {
+      "id": "mineral_spider.attack_to_recover.mineral_spider_attack_to_recover_f02.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=72 GP.y=72"
+    },
+    {
+      "id": "mineral_spider.attack_to_recover.mineral_spider_attack_to_recover_f03.png.canvas",
+      "status": "PASS",
+      "detail": "104x88"
+    },
+    {
+      "id": "mineral_spider.attack_to_recover.mineral_spider_attack_to_recover_f03.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "mineral_spider.attack_to_recover.mineral_spider_attack_to_recover_f03.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "mineral_spider.attack_to_recover.mineral_spider_attack_to_recover_f03.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "mineral_spider.attack_to_recover.mineral_spider_attack_to_recover_f03.png.nonempty",
+      "status": "PASS",
+      "detail": "(14, 38, 89, 72)"
+    },
+    {
+      "id": "mineral_spider.attack_to_recover.mineral_spider_attack_to_recover_f03.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=72 GP.y=72"
+    },
+    {
+      "id": "mineral_spider.attack_to_recover.adjacent_01.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.2829"
+    },
+    {
+      "id": "mineral_spider.attack_to_recover.adjacent_01.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "mineral_spider.attack_to_recover.adjacent_02.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.2658"
+    },
+    {
+      "id": "mineral_spider.attack_to_recover.adjacent_02.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "mineral_spider.attack_to_recover.sheet",
+      "status": "PASS",
+      "detail": "mineral_spider/sprite_sheets/mineral_spider_attack_to_recover_sheet_candidate.png"
+    },
+    {
+      "id": "mineral_spider.attack_to_recover.sheet_size",
+      "status": "PASS",
+      "detail": "(312, 88)"
+    },
+    {
+      "id": "mineral_spider.stunned_or_retreat.count",
+      "status": "PASS",
+      "detail": "3/3"
+    },
+    {
+      "id": "mineral_spider.stunned_or_retreat.mineral_spider_stunned_or_retreat_f01.png.canvas",
+      "status": "PASS",
+      "detail": "104x88"
+    },
+    {
+      "id": "mineral_spider.stunned_or_retreat.mineral_spider_stunned_or_retreat_f01.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "mineral_spider.stunned_or_retreat.mineral_spider_stunned_or_retreat_f01.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "mineral_spider.stunned_or_retreat.mineral_spider_stunned_or_retreat_f01.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "mineral_spider.stunned_or_retreat.mineral_spider_stunned_or_retreat_f01.png.nonempty",
+      "status": "PASS",
+      "detail": "(16, 47, 89, 72)"
+    },
+    {
+      "id": "mineral_spider.stunned_or_retreat.mineral_spider_stunned_or_retreat_f01.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=72 GP.y=72"
+    },
+    {
+      "id": "mineral_spider.stunned_or_retreat.mineral_spider_stunned_or_retreat_f02.png.canvas",
+      "status": "PASS",
+      "detail": "104x88"
+    },
+    {
+      "id": "mineral_spider.stunned_or_retreat.mineral_spider_stunned_or_retreat_f02.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "mineral_spider.stunned_or_retreat.mineral_spider_stunned_or_retreat_f02.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "mineral_spider.stunned_or_retreat.mineral_spider_stunned_or_retreat_f02.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "mineral_spider.stunned_or_retreat.mineral_spider_stunned_or_retreat_f02.png.nonempty",
+      "status": "PASS",
+      "detail": "(16, 47, 87, 72)"
+    },
+    {
+      "id": "mineral_spider.stunned_or_retreat.mineral_spider_stunned_or_retreat_f02.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=72 GP.y=72"
+    },
+    {
+      "id": "mineral_spider.stunned_or_retreat.mineral_spider_stunned_or_retreat_f03.png.canvas",
+      "status": "PASS",
+      "detail": "104x88"
+    },
+    {
+      "id": "mineral_spider.stunned_or_retreat.mineral_spider_stunned_or_retreat_f03.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "mineral_spider.stunned_or_retreat.mineral_spider_stunned_or_retreat_f03.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "mineral_spider.stunned_or_retreat.mineral_spider_stunned_or_retreat_f03.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "mineral_spider.stunned_or_retreat.mineral_spider_stunned_or_retreat_f03.png.nonempty",
+      "status": "PASS",
+      "detail": "(19, 40, 85, 72)"
+    },
+    {
+      "id": "mineral_spider.stunned_or_retreat.mineral_spider_stunned_or_retreat_f03.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=72 GP.y=72"
+    },
+    {
+      "id": "mineral_spider.stunned_or_retreat.adjacent_01.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.2370"
+    },
+    {
+      "id": "mineral_spider.stunned_or_retreat.adjacent_01.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "mineral_spider.stunned_or_retreat.adjacent_02.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.4646"
+    },
+    {
+      "id": "mineral_spider.stunned_or_retreat.adjacent_02.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "mineral_spider.stunned_or_retreat.sheet",
+      "status": "PASS",
+      "detail": "mineral_spider/sprite_sheets/mineral_spider_stunned_or_retreat_sheet_candidate.png"
+    },
+    {
+      "id": "mineral_spider.stunned_or_retreat.sheet_size",
+      "status": "PASS",
+      "detail": "(312, 88)"
+    },
+    {
+      "id": "mineral_spider.unique_frame_files",
+      "status": "PASS",
+      "detail": "duplicateGroups=0"
+    },
+    {
+      "id": "resonance_goral.idle.count",
+      "status": "PASS",
+      "detail": "4/4"
+    },
+    {
+      "id": "resonance_goral.idle.resonance_goral_idle_f01.png.canvas",
+      "status": "PASS",
+      "detail": "220x175"
+    },
+    {
+      "id": "resonance_goral.idle.resonance_goral_idle_f01.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "resonance_goral.idle.resonance_goral_idle_f01.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "resonance_goral.idle.resonance_goral_idle_f01.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "resonance_goral.idle.resonance_goral_idle_f01.png.nonempty",
+      "status": "PASS",
+      "detail": "(58, 30, 162, 154)"
+    },
+    {
+      "id": "resonance_goral.idle.resonance_goral_idle_f01.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=154 GP.y=154"
+    },
+    {
+      "id": "resonance_goral.idle.resonance_goral_idle_f02.png.canvas",
+      "status": "PASS",
+      "detail": "220x175"
+    },
+    {
+      "id": "resonance_goral.idle.resonance_goral_idle_f02.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "resonance_goral.idle.resonance_goral_idle_f02.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "resonance_goral.idle.resonance_goral_idle_f02.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "resonance_goral.idle.resonance_goral_idle_f02.png.nonempty",
+      "status": "PASS",
+      "detail": "(58, 30, 162, 154)"
+    },
+    {
+      "id": "resonance_goral.idle.resonance_goral_idle_f02.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=154 GP.y=154"
+    },
+    {
+      "id": "resonance_goral.idle.resonance_goral_idle_f03.png.canvas",
+      "status": "PASS",
+      "detail": "220x175"
+    },
+    {
+      "id": "resonance_goral.idle.resonance_goral_idle_f03.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "resonance_goral.idle.resonance_goral_idle_f03.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "resonance_goral.idle.resonance_goral_idle_f03.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "resonance_goral.idle.resonance_goral_idle_f03.png.nonempty",
+      "status": "PASS",
+      "detail": "(52, 29, 167, 154)"
+    },
+    {
+      "id": "resonance_goral.idle.resonance_goral_idle_f03.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=154 GP.y=154"
+    },
+    {
+      "id": "resonance_goral.idle.resonance_goral_idle_f04.png.canvas",
+      "status": "PASS",
+      "detail": "220x175"
+    },
+    {
+      "id": "resonance_goral.idle.resonance_goral_idle_f04.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "resonance_goral.idle.resonance_goral_idle_f04.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "resonance_goral.idle.resonance_goral_idle_f04.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "resonance_goral.idle.resonance_goral_idle_f04.png.nonempty",
+      "status": "PASS",
+      "detail": "(56, 30, 164, 154)"
+    },
+    {
+      "id": "resonance_goral.idle.resonance_goral_idle_f04.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=154 GP.y=154"
+    },
+    {
+      "id": "resonance_goral.idle.adjacent_01.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.0157"
+    },
+    {
+      "id": "resonance_goral.idle.adjacent_01.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "resonance_goral.idle.adjacent_02.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.0891"
+    },
+    {
+      "id": "resonance_goral.idle.adjacent_02.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "resonance_goral.idle.adjacent_03.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.1487"
+    },
+    {
+      "id": "resonance_goral.idle.adjacent_03.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "resonance_goral.idle.sheet",
+      "status": "PASS",
+      "detail": "resonance_goral/sprite_sheets/resonance_goral_idle_sheet_candidate.png"
+    },
+    {
+      "id": "resonance_goral.idle.sheet_size",
+      "status": "PASS",
+      "detail": "(880, 175)"
+    },
+    {
+      "id": "resonance_goral.warning.count",
+      "status": "PASS",
+      "detail": "3/3"
+    },
+    {
+      "id": "resonance_goral.warning.resonance_goral_warning_f01.png.canvas",
+      "status": "PASS",
+      "detail": "220x175"
+    },
+    {
+      "id": "resonance_goral.warning.resonance_goral_warning_f01.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "resonance_goral.warning.resonance_goral_warning_f01.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "resonance_goral.warning.resonance_goral_warning_f01.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "resonance_goral.warning.resonance_goral_warning_f01.png.nonempty",
+      "status": "PASS",
+      "detail": "(57, 39, 163, 154)"
+    },
+    {
+      "id": "resonance_goral.warning.resonance_goral_warning_f01.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=154 GP.y=154"
+    },
+    {
+      "id": "resonance_goral.warning.resonance_goral_warning_f02.png.canvas",
+      "status": "PASS",
+      "detail": "220x175"
+    },
+    {
+      "id": "resonance_goral.warning.resonance_goral_warning_f02.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "resonance_goral.warning.resonance_goral_warning_f02.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "resonance_goral.warning.resonance_goral_warning_f02.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "resonance_goral.warning.resonance_goral_warning_f02.png.nonempty",
+      "status": "PASS",
+      "detail": "(53, 36, 167, 154)"
+    },
+    {
+      "id": "resonance_goral.warning.resonance_goral_warning_f02.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=154 GP.y=154"
+    },
+    {
+      "id": "resonance_goral.warning.resonance_goral_warning_f03.png.canvas",
+      "status": "PASS",
+      "detail": "220x175"
+    },
+    {
+      "id": "resonance_goral.warning.resonance_goral_warning_f03.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "resonance_goral.warning.resonance_goral_warning_f03.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "resonance_goral.warning.resonance_goral_warning_f03.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "resonance_goral.warning.resonance_goral_warning_f03.png.nonempty",
+      "status": "PASS",
+      "detail": "(57, 39, 163, 154)"
+    },
+    {
+      "id": "resonance_goral.warning.resonance_goral_warning_f03.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=154 GP.y=154"
+    },
+    {
+      "id": "resonance_goral.warning.adjacent_01.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.2262"
+    },
+    {
+      "id": "resonance_goral.warning.adjacent_01.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "resonance_goral.warning.adjacent_02.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.2557"
+    },
+    {
+      "id": "resonance_goral.warning.adjacent_02.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "resonance_goral.warning.sheet",
+      "status": "PASS",
+      "detail": "resonance_goral/sprite_sheets/resonance_goral_warning_sheet_candidate.png"
+    },
+    {
+      "id": "resonance_goral.warning.sheet_size",
+      "status": "PASS",
+      "detail": "(660, 175)"
+    },
+    {
+      "id": "resonance_goral.combat_prep.count",
+      "status": "PASS",
+      "detail": "3/3"
+    },
+    {
+      "id": "resonance_goral.combat_prep.resonance_goral_combat_prep_f01.png.canvas",
+      "status": "PASS",
+      "detail": "220x175"
+    },
+    {
+      "id": "resonance_goral.combat_prep.resonance_goral_combat_prep_f01.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "resonance_goral.combat_prep.resonance_goral_combat_prep_f01.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "resonance_goral.combat_prep.resonance_goral_combat_prep_f01.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "resonance_goral.combat_prep.resonance_goral_combat_prep_f01.png.nonempty",
+      "status": "PASS",
+      "detail": "(53, 54, 167, 154)"
+    },
+    {
+      "id": "resonance_goral.combat_prep.resonance_goral_combat_prep_f01.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=154 GP.y=154"
+    },
+    {
+      "id": "resonance_goral.combat_prep.resonance_goral_combat_prep_f02.png.canvas",
+      "status": "PASS",
+      "detail": "220x175"
+    },
+    {
+      "id": "resonance_goral.combat_prep.resonance_goral_combat_prep_f02.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "resonance_goral.combat_prep.resonance_goral_combat_prep_f02.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "resonance_goral.combat_prep.resonance_goral_combat_prep_f02.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "resonance_goral.combat_prep.resonance_goral_combat_prep_f02.png.nonempty",
+      "status": "PASS",
+      "detail": "(45, 55, 175, 154)"
+    },
+    {
+      "id": "resonance_goral.combat_prep.resonance_goral_combat_prep_f02.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=154 GP.y=154"
+    },
+    {
+      "id": "resonance_goral.combat_prep.resonance_goral_combat_prep_f03.png.canvas",
+      "status": "PASS",
+      "detail": "220x175"
+    },
+    {
+      "id": "resonance_goral.combat_prep.resonance_goral_combat_prep_f03.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "resonance_goral.combat_prep.resonance_goral_combat_prep_f03.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "resonance_goral.combat_prep.resonance_goral_combat_prep_f03.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "resonance_goral.combat_prep.resonance_goral_combat_prep_f03.png.nonempty",
+      "status": "PASS",
+      "detail": "(44, 56, 177, 154)"
+    },
+    {
+      "id": "resonance_goral.combat_prep.resonance_goral_combat_prep_f03.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=154 GP.y=154"
+    },
+    {
+      "id": "resonance_goral.combat_prep.adjacent_01.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.2315"
+    },
+    {
+      "id": "resonance_goral.combat_prep.adjacent_01.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "resonance_goral.combat_prep.adjacent_02.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.1665"
+    },
+    {
+      "id": "resonance_goral.combat_prep.adjacent_02.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "resonance_goral.combat_prep.sheet",
+      "status": "PASS",
+      "detail": "resonance_goral/sprite_sheets/resonance_goral_combat_prep_sheet_candidate.png"
+    },
+    {
+      "id": "resonance_goral.combat_prep.sheet_size",
+      "status": "PASS",
+      "detail": "(660, 175)"
+    },
+    {
+      "id": "resonance_goral.charge_attack.count",
+      "status": "PASS",
+      "detail": "5/5"
+    },
+    {
+      "id": "resonance_goral.charge_attack.resonance_goral_charge_attack_f01.png.canvas",
+      "status": "PASS",
+      "detail": "220x175"
+    },
+    {
+      "id": "resonance_goral.charge_attack.resonance_goral_charge_attack_f01.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "resonance_goral.charge_attack.resonance_goral_charge_attack_f01.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "resonance_goral.charge_attack.resonance_goral_charge_attack_f01.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "resonance_goral.charge_attack.resonance_goral_charge_attack_f01.png.nonempty",
+      "status": "PASS",
+      "detail": "(31, 58, 189, 154)"
+    },
+    {
+      "id": "resonance_goral.charge_attack.resonance_goral_charge_attack_f01.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=154 GP.y=154"
+    },
+    {
+      "id": "resonance_goral.charge_attack.resonance_goral_charge_attack_f02.png.canvas",
+      "status": "PASS",
+      "detail": "220x175"
+    },
+    {
+      "id": "resonance_goral.charge_attack.resonance_goral_charge_attack_f02.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "resonance_goral.charge_attack.resonance_goral_charge_attack_f02.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "resonance_goral.charge_attack.resonance_goral_charge_attack_f02.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "resonance_goral.charge_attack.resonance_goral_charge_attack_f02.png.nonempty",
+      "status": "PASS",
+      "detail": "(22, 53, 198, 154)"
+    },
+    {
+      "id": "resonance_goral.charge_attack.resonance_goral_charge_attack_f02.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=154 GP.y=154"
+    },
+    {
+      "id": "resonance_goral.charge_attack.resonance_goral_charge_attack_f03.png.canvas",
+      "status": "PASS",
+      "detail": "220x175"
+    },
+    {
+      "id": "resonance_goral.charge_attack.resonance_goral_charge_attack_f03.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "resonance_goral.charge_attack.resonance_goral_charge_attack_f03.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "resonance_goral.charge_attack.resonance_goral_charge_attack_f03.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "resonance_goral.charge_attack.resonance_goral_charge_attack_f03.png.nonempty",
+      "status": "PASS",
+      "detail": "(17, 61, 203, 154)"
+    },
+    {
+      "id": "resonance_goral.charge_attack.resonance_goral_charge_attack_f03.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=154 GP.y=154"
+    },
+    {
+      "id": "resonance_goral.charge_attack.resonance_goral_charge_attack_f04.png.canvas",
+      "status": "PASS",
+      "detail": "220x175"
+    },
+    {
+      "id": "resonance_goral.charge_attack.resonance_goral_charge_attack_f04.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "resonance_goral.charge_attack.resonance_goral_charge_attack_f04.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "resonance_goral.charge_attack.resonance_goral_charge_attack_f04.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "resonance_goral.charge_attack.resonance_goral_charge_attack_f04.png.nonempty",
+      "status": "PASS",
+      "detail": "(18, 61, 203, 154)"
+    },
+    {
+      "id": "resonance_goral.charge_attack.resonance_goral_charge_attack_f04.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=154 GP.y=154"
+    },
+    {
+      "id": "resonance_goral.charge_attack.resonance_goral_charge_attack_f05.png.canvas",
+      "status": "PASS",
+      "detail": "220x175"
+    },
+    {
+      "id": "resonance_goral.charge_attack.resonance_goral_charge_attack_f05.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "resonance_goral.charge_attack.resonance_goral_charge_attack_f05.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "resonance_goral.charge_attack.resonance_goral_charge_attack_f05.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "resonance_goral.charge_attack.resonance_goral_charge_attack_f05.png.nonempty",
+      "status": "PASS",
+      "detail": "(37, 58, 183, 154)"
+    },
+    {
+      "id": "resonance_goral.charge_attack.resonance_goral_charge_attack_f05.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=154 GP.y=154"
+    },
+    {
+      "id": "resonance_goral.charge_attack.adjacent_01.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.3288"
+    },
+    {
+      "id": "resonance_goral.charge_attack.adjacent_01.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "resonance_goral.charge_attack.adjacent_02.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.1393"
+    },
+    {
+      "id": "resonance_goral.charge_attack.adjacent_02.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "resonance_goral.charge_attack.adjacent_03.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.3131"
+    },
+    {
+      "id": "resonance_goral.charge_attack.adjacent_03.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "resonance_goral.charge_attack.adjacent_04.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.3806"
+    },
+    {
+      "id": "resonance_goral.charge_attack.adjacent_04.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "resonance_goral.charge_attack.sheet",
+      "status": "PASS",
+      "detail": "resonance_goral/sprite_sheets/resonance_goral_charge_attack_sheet_candidate.png"
+    },
+    {
+      "id": "resonance_goral.charge_attack.sheet_size",
+      "status": "PASS",
+      "detail": "(1100, 175)"
+    },
+    {
+      "id": "resonance_goral.hit_recover.count",
+      "status": "PASS",
+      "detail": "4/4"
+    },
+    {
+      "id": "resonance_goral.hit_recover.resonance_goral_hit_recover_f01.png.canvas",
+      "status": "PASS",
+      "detail": "220x175"
+    },
+    {
+      "id": "resonance_goral.hit_recover.resonance_goral_hit_recover_f01.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "resonance_goral.hit_recover.resonance_goral_hit_recover_f01.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "resonance_goral.hit_recover.resonance_goral_hit_recover_f01.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "resonance_goral.hit_recover.resonance_goral_hit_recover_f01.png.nonempty",
+      "status": "PASS",
+      "detail": "(52, 55, 167, 154)"
+    },
+    {
+      "id": "resonance_goral.hit_recover.resonance_goral_hit_recover_f01.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=154 GP.y=154"
+    },
+    {
+      "id": "resonance_goral.hit_recover.resonance_goral_hit_recover_f02.png.canvas",
+      "status": "PASS",
+      "detail": "220x175"
+    },
+    {
+      "id": "resonance_goral.hit_recover.resonance_goral_hit_recover_f02.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "resonance_goral.hit_recover.resonance_goral_hit_recover_f02.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "resonance_goral.hit_recover.resonance_goral_hit_recover_f02.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "resonance_goral.hit_recover.resonance_goral_hit_recover_f02.png.nonempty",
+      "status": "PASS",
+      "detail": "(44, 49, 175, 154)"
+    },
+    {
+      "id": "resonance_goral.hit_recover.resonance_goral_hit_recover_f02.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=154 GP.y=154"
+    },
+    {
+      "id": "resonance_goral.hit_recover.resonance_goral_hit_recover_f03.png.canvas",
+      "status": "PASS",
+      "detail": "220x175"
+    },
+    {
+      "id": "resonance_goral.hit_recover.resonance_goral_hit_recover_f03.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "resonance_goral.hit_recover.resonance_goral_hit_recover_f03.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "resonance_goral.hit_recover.resonance_goral_hit_recover_f03.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "resonance_goral.hit_recover.resonance_goral_hit_recover_f03.png.nonempty",
+      "status": "PASS",
+      "detail": "(53, 49, 167, 154)"
+    },
+    {
+      "id": "resonance_goral.hit_recover.resonance_goral_hit_recover_f03.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=154 GP.y=154"
+    },
+    {
+      "id": "resonance_goral.hit_recover.resonance_goral_hit_recover_f04.png.canvas",
+      "status": "PASS",
+      "detail": "220x175"
+    },
+    {
+      "id": "resonance_goral.hit_recover.resonance_goral_hit_recover_f04.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "resonance_goral.hit_recover.resonance_goral_hit_recover_f04.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "resonance_goral.hit_recover.resonance_goral_hit_recover_f04.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "resonance_goral.hit_recover.resonance_goral_hit_recover_f04.png.nonempty",
+      "status": "PASS",
+      "detail": "(62, 50, 158, 154)"
+    },
+    {
+      "id": "resonance_goral.hit_recover.resonance_goral_hit_recover_f04.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=154 GP.y=154"
+    },
+    {
+      "id": "resonance_goral.hit_recover.adjacent_01.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.3019"
+    },
+    {
+      "id": "resonance_goral.hit_recover.adjacent_01.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "resonance_goral.hit_recover.adjacent_02.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.2143"
+    },
+    {
+      "id": "resonance_goral.hit_recover.adjacent_02.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "resonance_goral.hit_recover.adjacent_03.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.2048"
+    },
+    {
+      "id": "resonance_goral.hit_recover.adjacent_03.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "resonance_goral.hit_recover.sheet",
+      "status": "PASS",
+      "detail": "resonance_goral/sprite_sheets/resonance_goral_hit_recover_sheet_candidate.png"
+    },
+    {
+      "id": "resonance_goral.hit_recover.sheet_size",
+      "status": "PASS",
+      "detail": "(880, 175)"
+    },
+    {
+      "id": "resonance_goral.retreat.count",
+      "status": "PASS",
+      "detail": "4/4"
+    },
+    {
+      "id": "resonance_goral.retreat.resonance_goral_retreat_f01.png.canvas",
+      "status": "PASS",
+      "detail": "220x175"
+    },
+    {
+      "id": "resonance_goral.retreat.resonance_goral_retreat_f01.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "resonance_goral.retreat.resonance_goral_retreat_f01.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "resonance_goral.retreat.resonance_goral_retreat_f01.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "resonance_goral.retreat.resonance_goral_retreat_f01.png.nonempty",
+      "status": "PASS",
+      "detail": "(50, 33, 169, 154)"
+    },
+    {
+      "id": "resonance_goral.retreat.resonance_goral_retreat_f01.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=154 GP.y=154"
+    },
+    {
+      "id": "resonance_goral.retreat.resonance_goral_retreat_f02.png.canvas",
+      "status": "PASS",
+      "detail": "220x175"
+    },
+    {
+      "id": "resonance_goral.retreat.resonance_goral_retreat_f02.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "resonance_goral.retreat.resonance_goral_retreat_f02.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "resonance_goral.retreat.resonance_goral_retreat_f02.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "resonance_goral.retreat.resonance_goral_retreat_f02.png.nonempty",
+      "status": "PASS",
+      "detail": "(50, 32, 169, 154)"
+    },
+    {
+      "id": "resonance_goral.retreat.resonance_goral_retreat_f02.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=154 GP.y=154"
+    },
+    {
+      "id": "resonance_goral.retreat.resonance_goral_retreat_f03.png.canvas",
+      "status": "PASS",
+      "detail": "220x175"
+    },
+    {
+      "id": "resonance_goral.retreat.resonance_goral_retreat_f03.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "resonance_goral.retreat.resonance_goral_retreat_f03.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "resonance_goral.retreat.resonance_goral_retreat_f03.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "resonance_goral.retreat.resonance_goral_retreat_f03.png.nonempty",
+      "status": "PASS",
+      "detail": "(55, 44, 165, 154)"
+    },
+    {
+      "id": "resonance_goral.retreat.resonance_goral_retreat_f03.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=154 GP.y=154"
+    },
+    {
+      "id": "resonance_goral.retreat.resonance_goral_retreat_f04.png.canvas",
+      "status": "PASS",
+      "detail": "220x175"
+    },
+    {
+      "id": "resonance_goral.retreat.resonance_goral_retreat_f04.png.mode",
+      "status": "PASS",
+      "detail": "RGBA"
+    },
+    {
+      "id": "resonance_goral.retreat.resonance_goral_retreat_f04.png.alpha_binary",
+      "status": "PASS",
+      "detail": "[0, 255]"
+    },
+    {
+      "id": "resonance_goral.retreat.resonance_goral_retreat_f04.png.transparent_corners",
+      "status": "PASS",
+      "detail": "[np.uint8(0), np.uint8(0), np.uint8(0), np.uint8(0)]"
+    },
+    {
+      "id": "resonance_goral.retreat.resonance_goral_retreat_f04.png.nonempty",
+      "status": "PASS",
+      "detail": "(56, 33, 165, 154)"
+    },
+    {
+      "id": "resonance_goral.retreat.resonance_goral_retreat_f04.png.ground",
+      "status": "PASS",
+      "detail": "alphaBottom=154 GP.y=154"
+    },
+    {
+      "id": "resonance_goral.retreat.adjacent_01.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.0918"
+    },
+    {
+      "id": "resonance_goral.retreat.adjacent_01.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "resonance_goral.retreat.adjacent_02.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.3404"
+    },
+    {
+      "id": "resonance_goral.retreat.adjacent_02.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "resonance_goral.retreat.adjacent_03.silhouette",
+      "status": "PASS",
+      "detail": "delta=0.2892"
+    },
+    {
+      "id": "resonance_goral.retreat.adjacent_03.not_translation_only",
+      "status": "PASS",
+      "detail": "translation-invariant crop differs"
+    },
+    {
+      "id": "resonance_goral.retreat.sheet",
+      "status": "PASS",
+      "detail": "resonance_goral/sprite_sheets/resonance_goral_retreat_sheet_candidate.png"
+    },
+    {
+      "id": "resonance_goral.retreat.sheet_size",
+      "status": "PASS",
+      "detail": "(880, 175)"
+    },
+    {
+      "id": "resonance_goral.unique_frame_files",
+      "status": "PASS",
+      "detail": "duplicateGroups=0"
+    },
+    {
+      "id": "frames.total",
+      "status": "PASS",
+      "detail": "99/99"
+    },
+    {
+      "id": "pressure_swift.preview.1x.exists",
+      "status": "PASS",
+      "detail": "previews/runtime_1x/pressure_swift_motion_pilot_preview_1x.mp4"
+    },
+    {
+      "id": "pressure_swift.preview.4x.exists",
+      "status": "PASS",
+      "detail": "previews/nearest_4x/pressure_swift_motion_pilot_preview_4x.mp4"
+    },
+    {
+      "id": "pressure_swift.preview.animated.exists",
+      "status": "PASS",
+      "detail": "previews/animated/pressure_swift_motion_pilot_preview.mp4"
+    },
+    {
+      "id": "pressure_swift.preview.1x.size",
+      "status": "PASS",
+      "detail": "36x24"
+    },
+    {
+      "id": "pressure_swift.preview.4x.size",
+      "status": "PASS",
+      "detail": "144x96"
+    },
+    {
+      "id": "deflect_bat.preview.1x.exists",
+      "status": "PASS",
+      "detail": "previews/runtime_1x/deflect_bat_motion_pilot_preview_1x.mp4"
+    },
+    {
+      "id": "deflect_bat.preview.4x.exists",
+      "status": "PASS",
+      "detail": "previews/nearest_4x/deflect_bat_motion_pilot_preview_4x.mp4"
+    },
+    {
+      "id": "deflect_bat.preview.animated.exists",
+      "status": "PASS",
+      "detail": "previews/animated/deflect_bat_motion_pilot_preview.mp4"
+    },
+    {
+      "id": "deflect_bat.preview.1x.size",
+      "status": "PASS",
+      "detail": "52x36"
+    },
+    {
+      "id": "deflect_bat.preview.4x.size",
+      "status": "PASS",
+      "detail": "208x144"
+    },
+    {
+      "id": "rewind_lizard.preview.1x.exists",
+      "status": "PASS",
+      "detail": "previews/runtime_1x/rewind_lizard_motion_pilot_preview_1x.mp4"
+    },
+    {
+      "id": "rewind_lizard.preview.4x.exists",
+      "status": "PASS",
+      "detail": "previews/nearest_4x/rewind_lizard_motion_pilot_preview_4x.mp4"
+    },
+    {
+      "id": "rewind_lizard.preview.animated.exists",
+      "status": "PASS",
+      "detail": "previews/animated/rewind_lizard_motion_pilot_preview.mp4"
+    },
+    {
+      "id": "rewind_lizard.preview.1x.size",
+      "status": "PASS",
+      "detail": "72x40"
+    },
+    {
+      "id": "rewind_lizard.preview.4x.size",
+      "status": "PASS",
+      "detail": "288x160"
+    },
+    {
+      "id": "mineral_spider.preview.1x.exists",
+      "status": "PASS",
+      "detail": "previews/runtime_1x/mineral_spider_motion_pilot_preview_1x.mp4"
+    },
+    {
+      "id": "mineral_spider.preview.4x.exists",
+      "status": "PASS",
+      "detail": "previews/nearest_4x/mineral_spider_motion_pilot_preview_4x.mp4"
+    },
+    {
+      "id": "mineral_spider.preview.animated.exists",
+      "status": "PASS",
+      "detail": "previews/animated/mineral_spider_motion_pilot_preview.mp4"
+    },
+    {
+      "id": "mineral_spider.preview.1x.size",
+      "status": "PASS",
+      "detail": "104x88"
+    },
+    {
+      "id": "mineral_spider.preview.4x.size",
+      "status": "PASS",
+      "detail": "416x352"
+    },
+    {
+      "id": "resonance_goral.preview.1x.exists",
+      "status": "PASS",
+      "detail": "previews/runtime_1x/resonance_goral_motion_pilot_preview_1x.mp4"
+    },
+    {
+      "id": "resonance_goral.preview.4x.exists",
+      "status": "PASS",
+      "detail": "previews/nearest_4x/resonance_goral_motion_pilot_preview_4x.mp4"
+    },
+    {
+      "id": "resonance_goral.preview.animated.exists",
+      "status": "PASS",
+      "detail": "previews/animated/resonance_goral_motion_pilot_preview.mp4"
+    },
+    {
+      "id": "resonance_goral.preview.1x.size",
+      "status": "PASS",
+      "detail": "220x176"
+    },
+    {
+      "id": "resonance_goral.preview.4x.size",
+      "status": "PASS",
+      "detail": "880x700"
+    },
+    {
+      "id": "gameplay.bat_attack_pilot_960x540.mp4.exists",
+      "status": "PASS",
+      "detail": "previews/gameplay_960x540/bat_attack_pilot_960x540.mp4"
+    },
+    {
+      "id": "gameplay.bat_attack_pilot_960x540.mp4.size",
+      "status": "PASS",
+      "detail": "960x540"
+    },
+    {
+      "id": "gameplay.lizard_attack_pilot_960x540.mp4.exists",
+      "status": "PASS",
+      "detail": "previews/gameplay_960x540/lizard_attack_pilot_960x540.mp4"
+    },
+    {
+      "id": "gameplay.lizard_attack_pilot_960x540.mp4.size",
+      "status": "PASS",
+      "detail": "960x540"
+    },
+    {
+      "id": "gameplay.spider_attack_pilot_960x540.mp4.exists",
+      "status": "PASS",
+      "detail": "previews/gameplay_960x540/spider_attack_pilot_960x540.mp4"
+    },
+    {
+      "id": "gameplay.spider_attack_pilot_960x540.mp4.size",
+      "status": "PASS",
+      "detail": "960x540"
+    },
+    {
+      "id": "gameplay.goral_attack_pilot_960x540.mp4.exists",
+      "status": "PASS",
+      "detail": "previews/gameplay_960x540/goral_attack_pilot_960x540.mp4"
+    },
+    {
+      "id": "gameplay.goral_attack_pilot_960x540.mp4.size",
+      "status": "PASS",
+      "detail": "960x540"
+    },
+    {
+      "id": "player.preview.omitted_by_blocker",
+      "status": "PASS",
+      "detail": "SOURCE_BLOCKED; no proxy preview"
+    },
+    {
+      "id": "player.gameplay.omitted_by_blocker",
+      "status": "PASS",
+      "detail": "SOURCE_BLOCKED; no proxy gameplay video"
+    },
+    {
+      "id": "required.README_COMBAT_MOTION_FRAME_RECOVERY_PILOT_v1.md",
+      "status": "PASS",
+      "detail": "README_COMBAT_MOTION_FRAME_RECOVERY_PILOT_v1.md"
+    },
+    {
+      "id": "required.PLAYER_SOURCE_BLOCKER_REPORT.md",
+      "status": "PASS",
+      "detail": "PLAYER_SOURCE_BLOCKER_REPORT.md"
+    },
+    {
+      "id": "required.SOURCE_AUDIT_PLAYER_ACT1_v1.md",
+      "status": "PASS",
+      "detail": "SOURCE_AUDIT_PLAYER_ACT1_v1.md"
+    },
+    {
+      "id": "required.SUPERSEDED_REFERENCE_MAP_v1.md",
+      "status": "PASS",
+      "detail": "SUPERSEDED_REFERENCE_MAP_v1.md"
+    },
+    {
+      "id": "required.MOTION_SEQUENCE_MATRIX_PILOT_v1.md",
+      "status": "PASS",
+      "detail": "MOTION_SEQUENCE_MATRIX_PILOT_v1.md"
+    },
+    {
+      "id": "required.FRAME_NEED_REASSESSMENT_v1.md",
+      "status": "PASS",
+      "detail": "FRAME_NEED_REASSESSMENT_v1.md"
+    },
+    {
+      "id": "required.PER_FRAME_ANCHOR_OFFSET_PILOT_v1.json",
+      "status": "PASS",
+      "detail": "PER_FRAME_ANCHOR_OFFSET_PILOT_v1.json"
+    },
+    {
+      "id": "required.MOTION_FRAME_MANIFEST_PILOT_v1.json",
+      "status": "PASS",
+      "detail": "MOTION_FRAME_MANIFEST_PILOT_v1.json"
+    },
+    {
+      "id": "player.status",
+      "status": "PASS",
+      "detail": "SOURCE_BLOCKED"
+    },
+    {
+      "id": "locked.new_state_machine",
+      "status": "PASS",
+      "detail": "{'newStateMachine': 0, 'newAttack': 0, 'newAI': 0, 'manifestModified': False}"
+    },
+    {
+      "id": "locked.new_attack",
+      "status": "PASS",
+      "detail": "{'newStateMachine': 0, 'newAttack': 0, 'newAI': 0, 'manifestModified': False}"
+    },
+    {
+      "id": "locked.new_ai",
+      "status": "PASS",
+      "detail": "{'newStateMachine': 0, 'newAttack': 0, 'newAI': 0, 'manifestModified': False}"
+    },
+    {
+      "id": "locked.manifest",
+      "status": "PASS",
+      "detail": "{'newStateMachine': 0, 'newAttack': 0, 'newAI': 0, 'manifestModified': False}"
+    },
+    {
+      "id": "timing.no_invented_gameplay_value",
+      "status": "PASS",
+      "detail": "{'previewDurationsAreGameplayValues': False, 'engineDuration': 'USE_EXISTING_ENGINE_DURATION', 'hitTimestamp': 'MAP_TO_EXISTING_HIT_TIMESTAMP'}"
+    },
+    {
+      "id": "manual.pressure_swift.readability",
+      "status": "PASS",
+      "detail": "1×에서 날개 상/중/하 위치와 머리 진행방향 즉시 구분"
+    },
+    {
+      "id": "manual.deflect_bat.readability",
+      "status": "PASS",
+      "detail": "1×에서 날개 위치·귀/머리 조준·attack 방향 중 2개 이상 구분"
+    },
+    {
+      "id": "manual.rewind_lizard.readability",
+      "status": "PASS",
+      "detail": "1×에서 낮은 prep과 좌향 lunge 방향 구분"
+    },
+    {
+      "id": "manual.mineral_spider.readability",
+      "status": "PASS",
+      "detail": "다리 접지 순서·복부 상승·spinneret 정렬이 4×와 960 합성에서 구분"
+    },
+    {
+      "id": "manual.resonance_goral.readability",
+      "status": "PASS",
+      "detail": "굽·목/어깨 하강·charge 접촉 압축·비살상 retreat 구분"
+    },
+    {
+      "id": "manual.ground_jitter",
+      "status": "PASS",
+      "detail": "모든 frame alpha bottom이 canonical GP.y에 고정; gameplay root·shadow 동일 기준"
+    },
+    {
+      "id": "manual.vfx_body_connection",
+      "status": "PASS",
+      "detail": "960×540 영상에서 canonical anchor marker·승인 spider thread marker·goral phase3 overlay가 신체 origin에 연결"
+    },
+    {
+      "id": "manual.frame_identity",
+      "status": "PASS",
+      "detail": "정적 PNG 좌표 이동이 아니라 날개·다리·몸통·굽 실루엣 변화 확인"
+    },
+    {
+      "id": "manual.creature_differentiation",
+      "status": "PASS",
+      "detail": "비행/공중 조준, 낮춤/돌진, 8다리/실 배치, 굽/뿔 charge가 서로 다른 리듬"
+    }
+  ],
+  "metrics": {
+    "subjects": {
+      "pressure_swift": {
+        "sequence": {
+          "fly": {
+            "frameCount": 6,
+            "adjacentSilhouetteDelta": [
+              0.285714,
+              0.546667,
+              0.841463,
+              0.738095,
+              0.242424
+            ],
+            "minAdjacentSilhouetteDelta": 0.242424,
+            "groundPointEndDeltaPx": [
+              0,
+              0
+            ]
+          },
+          "evade": {
+            "frameCount": 4,
+            "adjacentSilhouetteDelta": [
+              0.717949,
+              0.919192,
+              0.704225
+            ],
+            "minAdjacentSilhouetteDelta": 0.704225,
+            "groundPointEndDeltaPx": [
+              0,
+              0
+            ]
+          }
+        },
+        "allowedPaletteUnionCount": 19,
+        "paletteDrift": 0,
+        "duplicateGroups": 0
+      },
+      "deflect_bat": {
+        "sequence": {
+          "idle": {
+            "frameCount": 4,
+            "adjacentSilhouetteDelta": [
+              0.4125,
+              0.390291,
+              0.47412
+            ],
+            "minAdjacentSilhouetteDelta": 0.390291,
+            "groundPointEndDeltaPx": [
+              0,
+              0
+            ]
+          },
+          "move": {
+            "frameCount": 6,
+            "adjacentSilhouetteDelta": [
+              0.261658,
+              0.328947,
+              0.348168,
+              0.331658,
+              0.346154
+            ],
+            "minAdjacentSilhouetteDelta": 0.261658,
+            "groundPointEndDeltaPx": [
+              0,
+              0
+            ]
+          },
+          "prep": {
+            "frameCount": 3,
+            "adjacentSilhouetteDelta": [
+              0.356132,
+              0.251889
+            ],
+            "minAdjacentSilhouetteDelta": 0.251889,
+            "groundPointEndDeltaPx": [
+              0,
+              0
+            ]
+          },
+          "attack": {
+            "frameCount": 4,
+            "adjacentSilhouetteDelta": [
+              0.333333,
+              0.32987,
+              0.192513
+            ],
+            "minAdjacentSilhouetteDelta": 0.192513,
+            "groundPointEndDeltaPx": [
+              0,
+              0
+            ]
+          },
+          "hit_recover": {
+            "frameCount": 3,
+            "adjacentSilhouetteDelta": [
+              0.411765,
+              0.353211
+            ],
+            "minAdjacentSilhouetteDelta": 0.353211,
+            "groundPointEndDeltaPx": [
+              0,
+              0
+            ]
+          }
+        },
+        "allowedPaletteUnionCount": 23,
+        "paletteDrift": 0,
+        "duplicateGroups": 0
+      },
+      "rewind_lizard": {
+        "sequence": {
+          "idle": {
+            "frameCount": 4,
+            "adjacentSilhouetteDelta": [
+              0.028689,
+              0.091451,
+              0.736165
+            ],
+            "minAdjacentSilhouetteDelta": 0.028689,
+            "groundPointEndDeltaPx": [
+              0,
+              0
+            ]
+          },
+          "move": {
+            "frameCount": 6,
+            "adjacentSilhouetteDelta": [
+              0.219697,
+              0.238267,
+              0.238351,
+              0.338898,
+              0.326892
+            ],
+            "minAdjacentSilhouetteDelta": 0.219697,
+            "groundPointEndDeltaPx": [
+              0,
+              0
+            ]
+          },
+          "prep": {
+            "frameCount": 3,
+            "adjacentSilhouetteDelta": [
+              0.204167,
+              0.107551
+            ],
+            "minAdjacentSilhouetteDelta": 0.107551,
+            "groundPointEndDeltaPx": [
+              0,
+              0
+            ]
+          },
+          "attack": {
+            "frameCount": 4,
+            "adjacentSilhouetteDelta": [
+              0.290476,
+              0.598611,
+              0.38765
+            ],
+            "minAdjacentSilhouetteDelta": 0.290476,
+            "groundPointEndDeltaPx": [
+              0,
+              0
+            ]
+          },
+          "hit_recover": {
+            "frameCount": 3,
+            "adjacentSilhouetteDelta": [
+              0.317073,
+              0.291429
+            ],
+            "minAdjacentSilhouetteDelta": 0.291429,
+            "groundPointEndDeltaPx": [
+              0,
+              0
+            ]
+          }
+        },
+        "allowedPaletteUnionCount": 23,
+        "paletteDrift": 0,
+        "duplicateGroups": 0
+      },
+      "mineral_spider": {
+        "sequence": {
+          "idle": {
+            "frameCount": 4,
+            "adjacentSilhouetteDelta": [
+              0.190144,
+              0.260077,
+              0.123482
+            ],
+            "minAdjacentSilhouetteDelta": 0.123482,
+            "groundPointEndDeltaPx": [
+              0,
+              0
+            ]
+          },
+          "move": {
+            "frameCount": 6,
+            "adjacentSilhouetteDelta": [
+              0.144304,
+              0.320798,
+              0.316115,
+              0.185474,
+              0.299429
+            ],
+            "minAdjacentSilhouetteDelta": 0.144304,
+            "groundPointEndDeltaPx": [
+              0,
+              0
+            ]
+          },
+          "idle_to_alert": {
+            "frameCount": 3,
+            "adjacentSilhouetteDelta": [
+              0.260217,
+              0.365777
+            ],
+            "minAdjacentSilhouetteDelta": 0.260217,
+            "groundPointEndDeltaPx": [
+              0,
+              0
+            ]
+          },
+          "alert_to_deploy": {
+            "frameCount": 3,
+            "adjacentSilhouetteDelta": [
+              0.227444,
+              0.21887
+            ],
+            "minAdjacentSilhouetteDelta": 0.21887,
+            "groundPointEndDeltaPx": [
+              0,
+              0
+            ]
+          },
+          "deploy_to_attack": {
+            "frameCount": 4,
+            "adjacentSilhouetteDelta": [
+              0.491109,
+              0.270055,
+              0.543579
+            ],
+            "minAdjacentSilhouetteDelta": 0.270055,
+            "groundPointEndDeltaPx": [
+              0,
+              0
+            ]
+          },
+          "attack_to_recover": {
+            "frameCount": 3,
+            "adjacentSilhouetteDelta": [
+              0.282915,
+              0.265839
+            ],
+            "minAdjacentSilhouetteDelta": 0.265839,
+            "groundPointEndDeltaPx": [
+              0,
+              0
+            ]
+          },
+          "stunned_or_retreat": {
+            "frameCount": 3,
+            "adjacentSilhouetteDelta": [
+              0.236963,
+              0.464602
+            ],
+            "minAdjacentSilhouetteDelta": 0.236963,
+            "groundPointEndDeltaPx": [
+              0,
+              0
+            ]
+          }
+        },
+        "allowedPaletteUnionCount": 32,
+        "paletteDrift": 0,
+        "duplicateGroups": 0
+      },
+      "resonance_goral": {
+        "sequence": {
+          "idle": {
+            "frameCount": 4,
+            "adjacentSilhouetteDelta": [
+              0.015672,
+              0.089129,
+              0.148746
+            ],
+            "minAdjacentSilhouetteDelta": 0.015672,
+            "groundPointEndDeltaPx": [
+              0,
+              0
+            ]
+          },
+          "warning": {
+            "frameCount": 3,
+            "adjacentSilhouetteDelta": [
+              0.226177,
+              0.255668
+            ],
+            "minAdjacentSilhouetteDelta": 0.226177,
+            "groundPointEndDeltaPx": [
+              0,
+              0
+            ]
+          },
+          "combat_prep": {
+            "frameCount": 3,
+            "adjacentSilhouetteDelta": [
+              0.231485,
+              0.1665
+            ],
+            "minAdjacentSilhouetteDelta": 0.1665,
+            "groundPointEndDeltaPx": [
+              0,
+              0
+            ]
+          },
+          "charge_attack": {
+            "frameCount": 5,
+            "adjacentSilhouetteDelta": [
+              0.328814,
+              0.139276,
+              0.31312,
+              0.380619
+            ],
+            "minAdjacentSilhouetteDelta": 0.139276,
+            "groundPointEndDeltaPx": [
+              0,
+              0
+            ]
+          },
+          "hit_recover": {
+            "frameCount": 4,
+            "adjacentSilhouetteDelta": [
+              0.301893,
+              0.214326,
+              0.204788
+            ],
+            "minAdjacentSilhouetteDelta": 0.204788,
+            "groundPointEndDeltaPx": [
+              0,
+              0
+            ]
+          },
+          "retreat": {
+            "frameCount": 4,
+            "adjacentSilhouetteDelta": [
+              0.091782,
+              0.340445,
+              0.289173
+            ],
+            "minAdjacentSilhouetteDelta": 0.091782,
+            "groundPointEndDeltaPx": [
+              0,
+              0
+            ]
+          }
+        },
+        "allowedPaletteUnionCount": 48,
+        "paletteDrift": 0,
+        "duplicateGroups": 0
+      }
+    }
+  }
+}

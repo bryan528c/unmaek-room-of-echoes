@@ -1,0 +1,1383 @@
+{
+  "schemaVersion": 1,
+  "canonicalCanvas": {
+    "width": 64,
+    "height": 64
+  },
+  "groundPoint": {
+    "x": 32,
+    "y": 57
+  },
+  "coordinateSpace": "logical_1x_pixels",
+  "gameplayCollisionChanged": false,
+  "anchors": {
+    "player/direction_lock/player_n.png": {
+      "dagger_tip": [
+        53,
+        44
+      ],
+      "parry_center": [
+        46,
+        38
+      ],
+      "word_target": [
+        58,
+        48
+      ],
+      "collarbone_resonance": [
+        37,
+        30
+      ]
+    },
+    "player/direction_lock/player_ne.png": {
+      "dagger_tip": [
+        41,
+        48
+      ],
+      "parry_center": [
+        34,
+        40
+      ],
+      "word_target": [
+        45,
+        53
+      ],
+      "collarbone_resonance": [
+        26,
+        30
+      ]
+    },
+    "player/direction_lock/player_e.png": {
+      "dagger_tip": [
+        40,
+        47
+      ],
+      "parry_center": [
+        35,
+        39
+      ],
+      "word_target": [
+        43,
+        52
+      ],
+      "collarbone_resonance": [
+        28,
+        29
+      ]
+    },
+    "player/direction_lock/player_se.png": {
+      "dagger_tip": [
+        50,
+        38
+      ],
+      "parry_center": [
+        45,
+        34
+      ],
+      "word_target": [
+        55,
+        41
+      ],
+      "collarbone_resonance": [
+        38,
+        30
+      ]
+    },
+    "player/direction_lock/player_s.png": {
+      "dagger_tip": [
+        20,
+        48
+      ],
+      "parry_center": [
+        27,
+        40
+      ],
+      "word_target": [
+        16,
+        52
+      ],
+      "collarbone_resonance": [
+        36,
+        30
+      ]
+    },
+    "player/direction_lock/player_sw.png": {
+      "dagger_tip": [
+        16,
+        49
+      ],
+      "parry_center": [
+        20,
+        40
+      ],
+      "word_target": [
+        13,
+        54
+      ],
+      "collarbone_resonance": [
+        26,
+        30
+      ]
+    },
+    "player/direction_lock/player_w.png": {
+      "dagger_tip": [
+        22,
+        47
+      ],
+      "parry_center": [
+        28,
+        39
+      ],
+      "word_target": [
+        18,
+        52
+      ],
+      "collarbone_resonance": [
+        36,
+        30
+      ]
+    },
+    "player/direction_lock/player_nw.png": {
+      "dagger_tip": [
+        23,
+        48
+      ],
+      "parry_center": [
+        30,
+        40
+      ],
+      "word_target": [
+        19,
+        53
+      ],
+      "collarbone_resonance": [
+        38,
+        30
+      ]
+    },
+    "player/s/idle/player_s_idle_f01.png": {
+      "dagger_tip": [
+        14,
+        49
+      ],
+      "parry_center": [
+        20,
+        40
+      ],
+      "word_target": [
+        10,
+        54
+      ],
+      "collarbone_resonance": [
+        28,
+        30
+      ]
+    },
+    "player/s/idle/player_s_idle_f02.png": {
+      "dagger_tip": [
+        13,
+        49
+      ],
+      "parry_center": [
+        20,
+        40
+      ],
+      "word_target": [
+        9,
+        54
+      ],
+      "collarbone_resonance": [
+        28,
+        30
+      ]
+    },
+    "player/s/idle/player_s_idle_f03.png": {
+      "dagger_tip": [
+        16,
+        49
+      ],
+      "parry_center": [
+        22,
+        40
+      ],
+      "word_target": [
+        13,
+        54
+      ],
+      "collarbone_resonance": [
+        29,
+        30
+      ]
+    },
+    "player/s/idle/player_s_idle_f04.png": {
+      "dagger_tip": [
+        17,
+        49
+      ],
+      "parry_center": [
+        23,
+        40
+      ],
+      "word_target": [
+        13,
+        54
+      ],
+      "collarbone_resonance": [
+        31,
+        30
+      ]
+    },
+    "player/s/move/player_s_move_f01.png": {
+      "dagger_tip": [
+        12,
+        51
+      ],
+      "parry_center": [
+        17,
+        43
+      ],
+      "word_target": [
+        9,
+        56
+      ],
+      "collarbone_resonance": [
+        23,
+        34
+      ]
+    },
+    "player/s/move/player_s_move_f02.png": {
+      "dagger_tip": [
+        15,
+        51
+      ],
+      "parry_center": [
+        20,
+        43
+      ],
+      "word_target": [
+        12,
+        56
+      ],
+      "collarbone_resonance": [
+        26,
+        34
+      ]
+    },
+    "player/s/move/player_s_move_f03.png": {
+      "dagger_tip": [
+        7,
+        44
+      ],
+      "parry_center": [
+        14,
+        40
+      ],
+      "word_target": [
+        2,
+        47
+      ],
+      "collarbone_resonance": [
+        22,
+        34
+      ]
+    },
+    "player/s/move/player_s_move_f04.png": {
+      "dagger_tip": [
+        15,
+        50
+      ],
+      "parry_center": [
+        20,
+        43
+      ],
+      "word_target": [
+        12,
+        55
+      ],
+      "collarbone_resonance": [
+        25,
+        34
+      ]
+    },
+    "player/s/move/player_s_move_f05.png": {
+      "dagger_tip": [
+        15,
+        50
+      ],
+      "parry_center": [
+        20,
+        43
+      ],
+      "word_target": [
+        12,
+        55
+      ],
+      "collarbone_resonance": [
+        25,
+        34
+      ]
+    },
+    "player/s/move/player_s_move_f06.png": {
+      "dagger_tip": [
+        13,
+        45
+      ],
+      "parry_center": [
+        20,
+        40
+      ],
+      "word_target": [
+        8,
+        48
+      ],
+      "collarbone_resonance": [
+        28,
+        35
+      ]
+    },
+    "player/s/dash/player_s_dash_f01.png": {
+      "dagger_tip": [
+        16,
+        52
+      ],
+      "parry_center": [
+        21,
+        45
+      ],
+      "word_target": [
+        12,
+        57
+      ],
+      "collarbone_resonance": [
+        28,
+        36
+      ]
+    },
+    "player/s/dash/player_s_dash_f02.png": {
+      "dagger_tip": [
+        27,
+        43
+      ],
+      "parry_center": [
+        35,
+        40
+      ],
+      "word_target": [
+        21,
+        45
+      ],
+      "collarbone_resonance": [
+        44,
+        37
+      ]
+    },
+    "player/s/dash/player_s_dash_f03.png": {
+      "dagger_tip": [
+        47,
+        42
+      ],
+      "parry_center": [
+        43,
+        40
+      ],
+      "word_target": [
+        52,
+        44
+      ],
+      "collarbone_resonance": [
+        38,
+        38
+      ]
+    },
+    "player/s/dash/player_s_dash_f04.png": {
+      "dagger_tip": [
+        19,
+        52
+      ],
+      "parry_center": [
+        24,
+        44
+      ],
+      "word_target": [
+        16,
+        57
+      ],
+      "collarbone_resonance": [
+        31,
+        35
+      ]
+    },
+    "player/s/basic_attack/player_s_basic_attack_f01.png": {
+      "dagger_tip": [
+        12,
+        48
+      ],
+      "parry_center": [
+        19,
+        40
+      ],
+      "word_target": [
+        8,
+        53
+      ],
+      "collarbone_resonance": [
+        27,
+        30
+      ]
+    },
+    "player/s/basic_attack/player_s_basic_attack_f02.png": {
+      "dagger_tip": [
+        22,
+        25
+      ],
+      "parry_center": [
+        26,
+        27
+      ],
+      "word_target": [
+        17,
+        23
+      ],
+      "collarbone_resonance": [
+        31,
+        29
+      ]
+    },
+    "player/s/basic_attack/player_s_basic_attack_f03.png": {
+      "dagger_tip": [
+        47,
+        33
+      ],
+      "parry_center": [
+        40,
+        31
+      ],
+      "word_target": [
+        53,
+        34
+      ],
+      "collarbone_resonance": [
+        31,
+        29
+      ]
+    },
+    "player/s/basic_attack/player_s_basic_attack_f04.png": {
+      "dagger_tip": [
+        48,
+        31
+      ],
+      "parry_center": [
+        40,
+        31
+      ],
+      "word_target": [
+        54,
+        31
+      ],
+      "collarbone_resonance": [
+        31,
+        30
+      ]
+    },
+    "player/s/basic_attack/player_s_basic_attack_f05.png": {
+      "dagger_tip": [
+        21,
+        47
+      ],
+      "parry_center": [
+        29,
+        39
+      ],
+      "word_target": [
+        17,
+        51
+      ],
+      "collarbone_resonance": [
+        38,
+        29
+      ]
+    },
+    "player/s/parry/player_s_parry_f01.png": {
+      "dagger_tip": [
+        46,
+        32
+      ],
+      "parry_center": [
+        41,
+        31
+      ],
+      "word_target": [
+        52,
+        33
+      ],
+      "collarbone_resonance": [
+        34,
+        30
+      ]
+    },
+    "player/s/parry/player_s_parry_f02.png": {
+      "dagger_tip": [
+        28,
+        40
+      ],
+      "parry_center": [
+        33,
+        36
+      ],
+      "word_target": [
+        24,
+        44
+      ],
+      "collarbone_resonance": [
+        39,
+        30
+      ]
+    },
+    "player/s/parry/player_s_parry_f03.png": {
+      "dagger_tip": [
+        51,
+        28
+      ],
+      "parry_center": [
+        46,
+        29
+      ],
+      "word_target": [
+        57,
+        27
+      ],
+      "collarbone_resonance": [
+        39,
+        30
+      ]
+    },
+    "player/s/parry/player_s_parry_f04.png": {
+      "dagger_tip": [
+        12,
+        31
+      ],
+      "parry_center": [
+        19,
+        31
+      ],
+      "word_target": [
+        6,
+        31
+      ],
+      "collarbone_resonance": [
+        27,
+        31
+      ]
+    },
+    "player/s/parry/player_s_parry_f05.png": {
+      "dagger_tip": [
+        17,
+        43
+      ],
+      "parry_center": [
+        22,
+        37
+      ],
+      "word_target": [
+        13,
+        48
+      ],
+      "collarbone_resonance": [
+        27,
+        30
+      ]
+    },
+    "player/s/parry/player_s_parry_success_f01.png": {
+      "dagger_tip": [
+        51,
+        28
+      ],
+      "parry_center": [
+        39,
+        30
+      ],
+      "word_target": [
+        57,
+        27
+      ],
+      "collarbone_resonance": [
+        24,
+        33
+      ]
+    },
+    "player/s/parry/player_s_parry_failure_f01.png": {
+      "dagger_tip": [
+        5,
+        41
+      ],
+      "parry_center": [
+        14,
+        37
+      ],
+      "word_target": [
+        0,
+        43
+      ],
+      "collarbone_resonance": [
+        25,
+        32
+      ]
+    },
+    "player/s/word_skill/player_s_word_skill_f01.png": {
+      "dagger_tip": [
+        22,
+        49
+      ],
+      "parry_center": [
+        28,
+        41
+      ],
+      "word_target": [
+        18,
+        54
+      ],
+      "collarbone_resonance": [
+        36,
+        31
+      ]
+    },
+    "player/s/word_skill/player_s_word_skill_f02.png": {
+      "dagger_tip": [
+        54,
+        30
+      ],
+      "parry_center": [
+        44,
+        31
+      ],
+      "word_target": [
+        60,
+        29
+      ],
+      "collarbone_resonance": [
+        32,
+        33
+      ]
+    },
+    "player/s/word_skill/player_s_word_skill_f03.png": {
+      "dagger_tip": [
+        39,
+        42
+      ],
+      "parry_center": [
+        34,
+        38
+      ],
+      "word_target": [
+        43,
+        46
+      ],
+      "collarbone_resonance": [
+        29,
+        32
+      ]
+    },
+    "player/s/word_skill/player_s_word_skill_f04.png": {
+      "dagger_tip": [
+        16,
+        49
+      ],
+      "parry_center": [
+        23,
+        41
+      ],
+      "word_target": [
+        12,
+        53
+      ],
+      "collarbone_resonance": [
+        31,
+        32
+      ]
+    },
+    "player/s/word_skill/player_s_word_skill_f05.png": {
+      "dagger_tip": [
+        23,
+        50
+      ],
+      "parry_center": [
+        28,
+        42
+      ],
+      "word_target": [
+        20,
+        55
+      ],
+      "collarbone_resonance": [
+        35,
+        32
+      ]
+    },
+    "player/s/hit_recover/player_s_hit_recover_f01.png": {
+      "dagger_tip": [
+        9,
+        50
+      ],
+      "parry_center": [
+        16,
+        40
+      ],
+      "word_target": [
+        6,
+        55
+      ],
+      "collarbone_resonance": [
+        24,
+        28
+      ]
+    },
+    "player/s/hit_recover/player_s_hit_recover_f02.png": {
+      "dagger_tip": [
+        40,
+        51
+      ],
+      "parry_center": [
+        32,
+        43
+      ],
+      "word_target": [
+        44,
+        55
+      ],
+      "collarbone_resonance": [
+        22,
+        34
+      ]
+    },
+    "player/s/hit_recover/player_s_hit_recover_f03.png": {
+      "dagger_tip": [
+        21,
+        49
+      ],
+      "parry_center": [
+        27,
+        40
+      ],
+      "word_target": [
+        18,
+        54
+      ],
+      "collarbone_resonance": [
+        34,
+        30
+      ]
+    },
+    "player/e/idle/player_e_idle_f01.png": {
+      "dagger_tip": [
+        39,
+        47
+      ],
+      "parry_center": [
+        35,
+        39
+      ],
+      "word_target": [
+        42,
+        52
+      ],
+      "collarbone_resonance": [
+        31,
+        30
+      ]
+    },
+    "player/e/idle/player_e_idle_f02.png": {
+      "dagger_tip": [
+        39,
+        47
+      ],
+      "parry_center": [
+        36,
+        39
+      ],
+      "word_target": [
+        41,
+        53
+      ],
+      "collarbone_resonance": [
+        32,
+        29
+      ]
+    },
+    "player/e/idle/player_e_idle_f03.png": {
+      "dagger_tip": [
+        39,
+        46
+      ],
+      "parry_center": [
+        36,
+        39
+      ],
+      "word_target": [
+        41,
+        51
+      ],
+      "collarbone_resonance": [
+        32,
+        30
+      ]
+    },
+    "player/e/idle/player_e_idle_f04.png": {
+      "dagger_tip": [
+        39,
+        46
+      ],
+      "parry_center": [
+        36,
+        39
+      ],
+      "word_target": [
+        41,
+        51
+      ],
+      "collarbone_resonance": [
+        32,
+        30
+      ]
+    },
+    "player/e/move/player_e_move_f01.png": {
+      "dagger_tip": [
+        33,
+        42
+      ],
+      "parry_center": [
+        27,
+        38
+      ],
+      "word_target": [
+        38,
+        45
+      ],
+      "collarbone_resonance": [
+        19,
+        34
+      ]
+    },
+    "player/e/move/player_e_move_f02.png": {
+      "dagger_tip": [
+        52,
+        44
+      ],
+      "parry_center": [
+        45,
+        39
+      ],
+      "word_target": [
+        57,
+        48
+      ],
+      "collarbone_resonance": [
+        37,
+        33
+      ]
+    },
+    "player/e/move/player_e_move_f03.png": {
+      "dagger_tip": [
+        36,
+        40
+      ],
+      "parry_center": [
+        29,
+        37
+      ],
+      "word_target": [
+        42,
+        42
+      ],
+      "collarbone_resonance": [
+        20,
+        34
+      ]
+    },
+    "player/e/move/player_e_move_f04.png": {
+      "dagger_tip": [
+        53,
+        44
+      ],
+      "parry_center": [
+        47,
+        39
+      ],
+      "word_target": [
+        58,
+        48
+      ],
+      "collarbone_resonance": [
+        39,
+        33
+      ]
+    },
+    "player/e/move/player_e_move_f05.png": {
+      "dagger_tip": [
+        34,
+        45
+      ],
+      "parry_center": [
+        28,
+        40
+      ],
+      "word_target": [
+        39,
+        49
+      ],
+      "collarbone_resonance": [
+        21,
+        34
+      ]
+    },
+    "player/e/move/player_e_move_f06.png": {
+      "dagger_tip": [
+        37,
+        48
+      ],
+      "parry_center": [
+        30,
+        43
+      ],
+      "word_target": [
+        42,
+        52
+      ],
+      "collarbone_resonance": [
+        21,
+        36
+      ]
+    },
+    "player/e/dash/player_e_dash_f01.png": {
+      "dagger_tip": [
+        47,
+        49
+      ],
+      "parry_center": [
+        42,
+        42
+      ],
+      "word_target": [
+        50,
+        54
+      ],
+      "collarbone_resonance": [
+        37,
+        33
+      ]
+    },
+    "player/e/dash/player_e_dash_f02.png": {
+      "dagger_tip": [
+        53,
+        37
+      ],
+      "parry_center": [
+        48,
+        36
+      ],
+      "word_target": [
+        59,
+        39
+      ],
+      "collarbone_resonance": [
+        42,
+        34
+      ]
+    },
+    "player/e/dash/player_e_dash_f03.png": {
+      "dagger_tip": [
+        47,
+        47
+      ],
+      "parry_center": [
+        45,
+        42
+      ],
+      "word_target": [
+        49,
+        53
+      ],
+      "collarbone_resonance": [
+        43,
+        36
+      ]
+    },
+    "player/e/dash/player_e_dash_f04.png": {
+      "dagger_tip": [
+        45,
+        48
+      ],
+      "parry_center": [
+        40,
+        41
+      ],
+      "word_target": [
+        49,
+        53
+      ],
+      "collarbone_resonance": [
+        34,
+        33
+      ]
+    },
+    "player/e/basic_attack/player_e_basic_attack_f01.png": {
+      "dagger_tip": [
+        39,
+        45
+      ],
+      "parry_center": [
+        36,
+        41
+      ],
+      "word_target": [
+        42,
+        50
+      ],
+      "collarbone_resonance": [
+        33,
+        36
+      ]
+    },
+    "player/e/basic_attack/player_e_basic_attack_f02.png": {
+      "dagger_tip": [
+        41,
+        37
+      ],
+      "parry_center": [
+        35,
+        37
+      ],
+      "word_target": [
+        47,
+        37
+      ],
+      "collarbone_resonance": [
+        28,
+        37
+      ]
+    },
+    "player/e/basic_attack/player_e_basic_attack_f03.png": {
+      "dagger_tip": [
+        49,
+        41
+      ],
+      "parry_center": [
+        40,
+        39
+      ],
+      "word_target": [
+        55,
+        42
+      ],
+      "collarbone_resonance": [
+        29,
+        37
+      ]
+    },
+    "player/e/basic_attack/player_e_basic_attack_f04.png": {
+      "dagger_tip": [
+        49,
+        39
+      ],
+      "parry_center": [
+        42,
+        39
+      ],
+      "word_target": [
+        55,
+        39
+      ],
+      "collarbone_resonance": [
+        34,
+        39
+      ]
+    },
+    "player/e/basic_attack/player_e_basic_attack_f05.png": {
+      "dagger_tip": [
+        39,
+        49
+      ],
+      "parry_center": [
+        35,
+        44
+      ],
+      "word_target": [
+        43,
+        54
+      ],
+      "collarbone_resonance": [
+        30,
+        37
+      ]
+    },
+    "player/e/parry/player_e_parry_f01.png": {
+      "dagger_tip": [
+        18,
+        43
+      ],
+      "parry_center": [
+        23,
+        40
+      ],
+      "word_target": [
+        13,
+        46
+      ],
+      "collarbone_resonance": [
+        29,
+        36
+      ]
+    },
+    "player/e/parry/player_e_parry_f02.png": {
+      "dagger_tip": [
+        22,
+        24
+      ],
+      "parry_center": [
+        24,
+        30
+      ],
+      "word_target": [
+        20,
+        18
+      ],
+      "collarbone_resonance": [
+        27,
+        37
+      ]
+    },
+    "player/e/parry/player_e_parry_f03.png": {
+      "dagger_tip": [
+        17,
+        33
+      ],
+      "parry_center": [
+        22,
+        34
+      ],
+      "word_target": [
+        11,
+        31
+      ],
+      "collarbone_resonance": [
+        27,
+        36
+      ]
+    },
+    "player/e/parry/player_e_parry_f04.png": {
+      "dagger_tip": [
+        38,
+        35
+      ],
+      "parry_center": [
+        34,
+        35
+      ],
+      "word_target": [
+        44,
+        34
+      ],
+      "collarbone_resonance": [
+        30,
+        36
+      ]
+    },
+    "player/e/parry/player_e_parry_f05.png": {
+      "dagger_tip": [
+        41,
+        50
+      ],
+      "parry_center": [
+        37,
+        44
+      ],
+      "word_target": [
+        44,
+        55
+      ],
+      "collarbone_resonance": [
+        33,
+        36
+      ]
+    },
+    "player/e/parry/player_e_parry_success_f01.png": {
+      "dagger_tip": [
+        17,
+        41
+      ],
+      "parry_center": [
+        22,
+        39
+      ],
+      "word_target": [
+        12,
+        43
+      ],
+      "collarbone_resonance": [
+        28,
+        36
+      ]
+    },
+    "player/e/parry/player_e_parry_failure_f01.png": {
+      "dagger_tip": [
+        43,
+        32
+      ],
+      "parry_center": [
+        42,
+        34
+      ],
+      "word_target": [
+        47,
+        27
+      ],
+      "collarbone_resonance": [
+        40,
+        36
+      ]
+    },
+    "player/e/word_skill/player_e_word_skill_f01.png": {
+      "dagger_tip": [
+        37,
+        46
+      ],
+      "parry_center": [
+        33,
+        38
+      ],
+      "word_target": [
+        40,
+        51
+      ],
+      "collarbone_resonance": [
+        28,
+        29
+      ]
+    },
+    "player/e/word_skill/player_e_word_skill_f02.png": {
+      "dagger_tip": [
+        58,
+        27
+      ],
+      "parry_center": [
+        44,
+        28
+      ],
+      "word_target": [
+        63,
+        26
+      ],
+      "collarbone_resonance": [
+        27,
+        30
+      ]
+    },
+    "player/e/word_skill/player_e_word_skill_f03.png": {
+      "dagger_tip": [
+        49,
+        28
+      ],
+      "parry_center": [
+        40,
+        29
+      ],
+      "word_target": [
+        55,
+        27
+      ],
+      "collarbone_resonance": [
+        29,
+        30
+      ]
+    },
+    "player/e/word_skill/player_e_word_skill_f04.png": {
+      "dagger_tip": [
+        52,
+        27
+      ],
+      "parry_center": [
+        41,
+        28
+      ],
+      "word_target": [
+        58,
+        26
+      ],
+      "collarbone_resonance": [
+        28,
+        30
+      ]
+    },
+    "player/e/word_skill/player_e_word_skill_f05.png": {
+      "dagger_tip": [
+        39,
+        47
+      ],
+      "parry_center": [
+        34,
+        39
+      ],
+      "word_target": [
+        42,
+        52
+      ],
+      "collarbone_resonance": [
+        28,
+        30
+      ]
+    },
+    "player/e/hit_recover/player_e_hit_recover_f01.png": {
+      "dagger_tip": [
+        43,
+        50
+      ],
+      "parry_center": [
+        37,
+        41
+      ],
+      "word_target": [
+        46,
+        55
+      ],
+      "collarbone_resonance": [
+        29,
+        30
+      ]
+    },
+    "player/e/hit_recover/player_e_hit_recover_f02.png": {
+      "dagger_tip": [
+        39,
+        53
+      ],
+      "parry_center": [
+        34,
+        45
+      ],
+      "word_target": [
+        42,
+        58
+      ],
+      "collarbone_resonance": [
+        29,
+        35
+      ]
+    },
+    "player/e/hit_recover/player_e_hit_recover_f03.png": {
+      "dagger_tip": [
+        47,
+        50
+      ],
+      "parry_center": [
+        42,
+        42
+      ],
+      "word_target": [
+        50,
+        55
+      ],
+      "collarbone_resonance": [
+        37,
+        32
+      ]
+    }
+  }
+}

@@ -1,0 +1,478 @@
+{
+  "schemaVersion": 1,
+  "package": "UNMAEK_PLAYER_RUNTIME_MOTION_PILOT_v1",
+  "canonicalCanvas": {
+    "width": 64,
+    "height": 64
+  },
+  "groundPoint": {
+    "x": 32,
+    "y": 57
+  },
+  "runtimeScale": 2,
+  "targetDisplayedBodyHeightPx": 92,
+  "pixelFormat": "RGBA 8-bit",
+  "sampling": "nearest-neighbor",
+  "palette": "shared package palette; transparent index converted to alpha",
+  "directionLock": [
+    "player/direction_lock/player_n.png",
+    "player/direction_lock/player_ne.png",
+    "player/direction_lock/player_e.png",
+    "player/direction_lock/player_se.png",
+    "player/direction_lock/player_s.png",
+    "player/direction_lock/player_sw.png",
+    "player/direction_lock/player_w.png",
+    "player/direction_lock/player_nw.png"
+  ],
+  "sequences": {
+    "s": {
+      "idle": {
+        "frameCount": 4,
+        "frames": [
+          {
+            "file": "player/s/idle/player_s_idle_f01.png",
+            "durationMs": 180,
+            "role": "main"
+          },
+          {
+            "file": "player/s/idle/player_s_idle_f02.png",
+            "durationMs": 180,
+            "role": "main"
+          },
+          {
+            "file": "player/s/idle/player_s_idle_f03.png",
+            "durationMs": 180,
+            "role": "main"
+          },
+          {
+            "file": "player/s/idle/player_s_idle_f04.png",
+            "durationMs": 180,
+            "role": "main"
+          }
+        ],
+        "loop": true,
+        "groundPointLoopDeltaPx": 0
+      },
+      "move": {
+        "frameCount": 6,
+        "frames": [
+          {
+            "file": "player/s/move/player_s_move_f01.png",
+            "durationMs": 90,
+            "role": "main"
+          },
+          {
+            "file": "player/s/move/player_s_move_f02.png",
+            "durationMs": 90,
+            "role": "main"
+          },
+          {
+            "file": "player/s/move/player_s_move_f03.png",
+            "durationMs": 90,
+            "role": "main"
+          },
+          {
+            "file": "player/s/move/player_s_move_f04.png",
+            "durationMs": 90,
+            "role": "main"
+          },
+          {
+            "file": "player/s/move/player_s_move_f05.png",
+            "durationMs": 90,
+            "role": "main"
+          },
+          {
+            "file": "player/s/move/player_s_move_f06.png",
+            "durationMs": 90,
+            "role": "main"
+          }
+        ],
+        "loop": true,
+        "groundPointLoopDeltaPx": 0
+      },
+      "dash": {
+        "frameCount": 4,
+        "frames": [
+          {
+            "file": "player/s/dash/player_s_dash_f01.png",
+            "durationMs": 90,
+            "role": "main"
+          },
+          {
+            "file": "player/s/dash/player_s_dash_f02.png",
+            "durationMs": 70,
+            "role": "main"
+          },
+          {
+            "file": "player/s/dash/player_s_dash_f03.png",
+            "durationMs": 70,
+            "role": "main"
+          },
+          {
+            "file": "player/s/dash/player_s_dash_f04.png",
+            "durationMs": 120,
+            "role": "main"
+          }
+        ],
+        "loop": false,
+        "groundPointLoopDeltaPx": null
+      },
+      "basic_attack": {
+        "frameCount": 5,
+        "frames": [
+          {
+            "file": "player/s/basic_attack/player_s_basic_attack_f01.png",
+            "durationMs": 100,
+            "role": "main"
+          },
+          {
+            "file": "player/s/basic_attack/player_s_basic_attack_f02.png",
+            "durationMs": 80,
+            "role": "main"
+          },
+          {
+            "file": "player/s/basic_attack/player_s_basic_attack_f03.png",
+            "durationMs": 70,
+            "role": "main"
+          },
+          {
+            "file": "player/s/basic_attack/player_s_basic_attack_f04.png",
+            "durationMs": 80,
+            "role": "main"
+          },
+          {
+            "file": "player/s/basic_attack/player_s_basic_attack_f05.png",
+            "durationMs": 140,
+            "role": "main"
+          }
+        ],
+        "loop": false,
+        "groundPointLoopDeltaPx": null
+      },
+      "parry": {
+        "frameCount": 7,
+        "frames": [
+          {
+            "file": "player/s/parry/player_s_parry_f01.png",
+            "durationMs": 90,
+            "role": "main"
+          },
+          {
+            "file": "player/s/parry/player_s_parry_f02.png",
+            "durationMs": 80,
+            "role": "main"
+          },
+          {
+            "file": "player/s/parry/player_s_parry_f03.png",
+            "durationMs": 70,
+            "role": "main"
+          },
+          {
+            "file": "player/s/parry/player_s_parry_f04.png",
+            "durationMs": 100,
+            "role": "main"
+          },
+          {
+            "file": "player/s/parry/player_s_parry_f05.png",
+            "durationMs": 140,
+            "role": "main"
+          },
+          {
+            "file": "player/s/parry/player_s_parry_success_f01.png",
+            "durationMs": 110,
+            "role": "success_aux"
+          },
+          {
+            "file": "player/s/parry/player_s_parry_failure_f01.png",
+            "durationMs": 110,
+            "role": "failure_aux"
+          }
+        ],
+        "loop": false,
+        "groundPointLoopDeltaPx": null
+      },
+      "word_skill": {
+        "frameCount": 5,
+        "frames": [
+          {
+            "file": "player/s/word_skill/player_s_word_skill_f01.png",
+            "durationMs": 130,
+            "role": "main"
+          },
+          {
+            "file": "player/s/word_skill/player_s_word_skill_f02.png",
+            "durationMs": 110,
+            "role": "main"
+          },
+          {
+            "file": "player/s/word_skill/player_s_word_skill_f03.png",
+            "durationMs": 150,
+            "role": "main"
+          },
+          {
+            "file": "player/s/word_skill/player_s_word_skill_f04.png",
+            "durationMs": 160,
+            "role": "main"
+          },
+          {
+            "file": "player/s/word_skill/player_s_word_skill_f05.png",
+            "durationMs": 180,
+            "role": "main"
+          }
+        ],
+        "loop": false,
+        "groundPointLoopDeltaPx": null
+      },
+      "hit_recover": {
+        "frameCount": 3,
+        "frames": [
+          {
+            "file": "player/s/hit_recover/player_s_hit_recover_f01.png",
+            "durationMs": 80,
+            "role": "main"
+          },
+          {
+            "file": "player/s/hit_recover/player_s_hit_recover_f02.png",
+            "durationMs": 110,
+            "role": "main"
+          },
+          {
+            "file": "player/s/hit_recover/player_s_hit_recover_f03.png",
+            "durationMs": 160,
+            "role": "main"
+          }
+        ],
+        "loop": false,
+        "groundPointLoopDeltaPx": null
+      }
+    },
+    "e": {
+      "idle": {
+        "frameCount": 4,
+        "frames": [
+          {
+            "file": "player/e/idle/player_e_idle_f01.png",
+            "durationMs": 180,
+            "role": "main"
+          },
+          {
+            "file": "player/e/idle/player_e_idle_f02.png",
+            "durationMs": 180,
+            "role": "main"
+          },
+          {
+            "file": "player/e/idle/player_e_idle_f03.png",
+            "durationMs": 180,
+            "role": "main"
+          },
+          {
+            "file": "player/e/idle/player_e_idle_f04.png",
+            "durationMs": 180,
+            "role": "main"
+          }
+        ],
+        "loop": true,
+        "groundPointLoopDeltaPx": 0
+      },
+      "move": {
+        "frameCount": 6,
+        "frames": [
+          {
+            "file": "player/e/move/player_e_move_f01.png",
+            "durationMs": 90,
+            "role": "main"
+          },
+          {
+            "file": "player/e/move/player_e_move_f02.png",
+            "durationMs": 90,
+            "role": "main"
+          },
+          {
+            "file": "player/e/move/player_e_move_f03.png",
+            "durationMs": 90,
+            "role": "main"
+          },
+          {
+            "file": "player/e/move/player_e_move_f04.png",
+            "durationMs": 90,
+            "role": "main"
+          },
+          {
+            "file": "player/e/move/player_e_move_f05.png",
+            "durationMs": 90,
+            "role": "main"
+          },
+          {
+            "file": "player/e/move/player_e_move_f06.png",
+            "durationMs": 90,
+            "role": "main"
+          }
+        ],
+        "loop": true,
+        "groundPointLoopDeltaPx": 0
+      },
+      "dash": {
+        "frameCount": 4,
+        "frames": [
+          {
+            "file": "player/e/dash/player_e_dash_f01.png",
+            "durationMs": 90,
+            "role": "main"
+          },
+          {
+            "file": "player/e/dash/player_e_dash_f02.png",
+            "durationMs": 70,
+            "role": "main"
+          },
+          {
+            "file": "player/e/dash/player_e_dash_f03.png",
+            "durationMs": 70,
+            "role": "main"
+          },
+          {
+            "file": "player/e/dash/player_e_dash_f04.png",
+            "durationMs": 120,
+            "role": "main"
+          }
+        ],
+        "loop": false,
+        "groundPointLoopDeltaPx": null
+      },
+      "basic_attack": {
+        "frameCount": 5,
+        "frames": [
+          {
+            "file": "player/e/basic_attack/player_e_basic_attack_f01.png",
+            "durationMs": 100,
+            "role": "main"
+          },
+          {
+            "file": "player/e/basic_attack/player_e_basic_attack_f02.png",
+            "durationMs": 80,
+            "role": "main"
+          },
+          {
+            "file": "player/e/basic_attack/player_e_basic_attack_f03.png",
+            "durationMs": 70,
+            "role": "main"
+          },
+          {
+            "file": "player/e/basic_attack/player_e_basic_attack_f04.png",
+            "durationMs": 80,
+            "role": "main"
+          },
+          {
+            "file": "player/e/basic_attack/player_e_basic_attack_f05.png",
+            "durationMs": 140,
+            "role": "main"
+          }
+        ],
+        "loop": false,
+        "groundPointLoopDeltaPx": null
+      },
+      "parry": {
+        "frameCount": 7,
+        "frames": [
+          {
+            "file": "player/e/parry/player_e_parry_f01.png",
+            "durationMs": 90,
+            "role": "main"
+          },
+          {
+            "file": "player/e/parry/player_e_parry_f02.png",
+            "durationMs": 80,
+            "role": "main"
+          },
+          {
+            "file": "player/e/parry/player_e_parry_f03.png",
+            "durationMs": 70,
+            "role": "main"
+          },
+          {
+            "file": "player/e/parry/player_e_parry_f04.png",
+            "durationMs": 100,
+            "role": "main"
+          },
+          {
+            "file": "player/e/parry/player_e_parry_f05.png",
+            "durationMs": 140,
+            "role": "main"
+          },
+          {
+            "file": "player/e/parry/player_e_parry_success_f01.png",
+            "durationMs": 110,
+            "role": "success_aux"
+          },
+          {
+            "file": "player/e/parry/player_e_parry_failure_f01.png",
+            "durationMs": 110,
+            "role": "failure_aux"
+          }
+        ],
+        "loop": false,
+        "groundPointLoopDeltaPx": null
+      },
+      "word_skill": {
+        "frameCount": 5,
+        "frames": [
+          {
+            "file": "player/e/word_skill/player_e_word_skill_f01.png",
+            "durationMs": 130,
+            "role": "main"
+          },
+          {
+            "file": "player/e/word_skill/player_e_word_skill_f02.png",
+            "durationMs": 110,
+            "role": "main"
+          },
+          {
+            "file": "player/e/word_skill/player_e_word_skill_f03.png",
+            "durationMs": 150,
+            "role": "main"
+          },
+          {
+            "file": "player/e/word_skill/player_e_word_skill_f04.png",
+            "durationMs": 160,
+            "role": "main"
+          },
+          {
+            "file": "player/e/word_skill/player_e_word_skill_f05.png",
+            "durationMs": 180,
+            "role": "main"
+          }
+        ],
+        "loop": false,
+        "groundPointLoopDeltaPx": null
+      },
+      "hit_recover": {
+        "frameCount": 3,
+        "frames": [
+          {
+            "file": "player/e/hit_recover/player_e_hit_recover_f01.png",
+            "durationMs": 80,
+            "role": "main"
+          },
+          {
+            "file": "player/e/hit_recover/player_e_hit_recover_f02.png",
+            "durationMs": 110,
+            "role": "main"
+          },
+          {
+            "file": "player/e/hit_recover/player_e_hit_recover_f03.png",
+            "durationMs": 160,
+            "role": "main"
+          }
+        ],
+        "loop": false,
+        "groundPointLoopDeltaPx": null
+      }
+    }
+  },
+  "gameplayChanges": {
+    "collision": false,
+    "hurtbox": false,
+    "attackTiming": false,
+    "stateMachine": false,
+    "wordSystem": false
+  }
+}

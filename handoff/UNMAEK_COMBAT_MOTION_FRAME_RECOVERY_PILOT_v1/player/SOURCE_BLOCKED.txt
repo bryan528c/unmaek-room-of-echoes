@@ -1,0 +1,3 @@
+Player runtime/state originals and individual historical key-pose sources were not found.
+No proxy frames, sprite sheets, previews, or gameplay composite were created.
+See ../PLAYER_SOURCE_BLOCKER_REPORT.md.

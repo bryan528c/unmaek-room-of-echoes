@@ -1,0 +1,769 @@
+{
+  "previewTimingPurpose": "REVIEW_PLAYBACK_ONLY_NOT_GAMEPLAY_TIMING",
+  "subjects": {
+    "pressure_swift": {
+      "runtime1x": "previews/runtime_1x/pressure_swift_motion_pilot_preview_1x.mp4",
+      "nearest4x": "previews/nearest_4x/pressure_swift_motion_pilot_preview_4x.mp4",
+      "animated": "previews/animated/pressure_swift_motion_pilot_preview.mp4",
+      "newContact": "previews/before_after/pressure_swift_new_frame_sequence_contact.png",
+      "v1Reference": "previews/before_after/pressure_swift_v1_static_strip_REFERENCE_ONLY.png",
+      "timing": [
+        {
+          "sequence": "fly",
+          "frame": 1,
+          "previewDurationMs": 100,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "fly",
+          "frame": 2,
+          "previewDurationMs": 100,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "fly",
+          "frame": 3,
+          "previewDurationMs": 100,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "fly",
+          "frame": 4,
+          "previewDurationMs": 100,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "fly",
+          "frame": 5,
+          "previewDurationMs": 100,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "fly",
+          "frame": 6,
+          "previewDurationMs": 100,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "evade",
+          "frame": 1,
+          "previewDurationMs": 120,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "evade",
+          "frame": 2,
+          "previewDurationMs": 120,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "evade",
+          "frame": 3,
+          "previewDurationMs": 120,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "evade",
+          "frame": 4,
+          "previewDurationMs": 120,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        }
+      ]
+    },
+    "deflect_bat": {
+      "runtime1x": "previews/runtime_1x/deflect_bat_motion_pilot_preview_1x.mp4",
+      "nearest4x": "previews/nearest_4x/deflect_bat_motion_pilot_preview_4x.mp4",
+      "animated": "previews/animated/deflect_bat_motion_pilot_preview.mp4",
+      "newContact": "previews/before_after/deflect_bat_new_frame_sequence_contact.png",
+      "v1Reference": "previews/before_after/deflect_bat_v1_static_strip_REFERENCE_ONLY.png",
+      "timing": [
+        {
+          "sequence": "idle",
+          "frame": 1,
+          "previewDurationMs": 140,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "idle",
+          "frame": 2,
+          "previewDurationMs": 140,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "idle",
+          "frame": 3,
+          "previewDurationMs": 140,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "idle",
+          "frame": 4,
+          "previewDurationMs": 140,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "move",
+          "frame": 1,
+          "previewDurationMs": 95,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "move",
+          "frame": 2,
+          "previewDurationMs": 95,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "move",
+          "frame": 3,
+          "previewDurationMs": 95,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "move",
+          "frame": 4,
+          "previewDurationMs": 95,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "move",
+          "frame": 5,
+          "previewDurationMs": 95,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "move",
+          "frame": 6,
+          "previewDurationMs": 95,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "prep",
+          "frame": 1,
+          "previewDurationMs": 120,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "prep",
+          "frame": 2,
+          "previewDurationMs": 120,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "prep",
+          "frame": 3,
+          "previewDurationMs": 120,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "attack",
+          "frame": 1,
+          "previewDurationMs": 95,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "attack",
+          "frame": 2,
+          "previewDurationMs": 95,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "attack",
+          "frame": 3,
+          "previewDurationMs": 95,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "attack",
+          "frame": 4,
+          "previewDurationMs": 95,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "hit_recover",
+          "frame": 1,
+          "previewDurationMs": 120,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "hit_recover",
+          "frame": 2,
+          "previewDurationMs": 120,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "hit_recover",
+          "frame": 3,
+          "previewDurationMs": 120,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        }
+      ]
+    },
+    "rewind_lizard": {
+      "runtime1x": "previews/runtime_1x/rewind_lizard_motion_pilot_preview_1x.mp4",
+      "nearest4x": "previews/nearest_4x/rewind_lizard_motion_pilot_preview_4x.mp4",
+      "animated": "previews/animated/rewind_lizard_motion_pilot_preview.mp4",
+      "newContact": "previews/before_after/rewind_lizard_new_frame_sequence_contact.png",
+      "v1Reference": "previews/before_after/rewind_lizard_v1_static_strip_REFERENCE_ONLY.png",
+      "timing": [
+        {
+          "sequence": "idle",
+          "frame": 1,
+          "previewDurationMs": 160,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "idle",
+          "frame": 2,
+          "previewDurationMs": 160,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "idle",
+          "frame": 3,
+          "previewDurationMs": 160,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "idle",
+          "frame": 4,
+          "previewDurationMs": 160,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "move",
+          "frame": 1,
+          "previewDurationMs": 100,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "move",
+          "frame": 2,
+          "previewDurationMs": 100,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "move",
+          "frame": 3,
+          "previewDurationMs": 100,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "move",
+          "frame": 4,
+          "previewDurationMs": 100,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "move",
+          "frame": 5,
+          "previewDurationMs": 100,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "move",
+          "frame": 6,
+          "previewDurationMs": 100,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "prep",
+          "frame": 1,
+          "previewDurationMs": 130,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "prep",
+          "frame": 2,
+          "previewDurationMs": 130,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "prep",
+          "frame": 3,
+          "previewDurationMs": 130,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "attack",
+          "frame": 1,
+          "previewDurationMs": 95,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "attack",
+          "frame": 2,
+          "previewDurationMs": 95,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "attack",
+          "frame": 3,
+          "previewDurationMs": 95,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "attack",
+          "frame": 4,
+          "previewDurationMs": 95,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "hit_recover",
+          "frame": 1,
+          "previewDurationMs": 120,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "hit_recover",
+          "frame": 2,
+          "previewDurationMs": 120,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "hit_recover",
+          "frame": 3,
+          "previewDurationMs": 120,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        }
+      ]
+    },
+    "mineral_spider": {
+      "runtime1x": "previews/runtime_1x/mineral_spider_motion_pilot_preview_1x.mp4",
+      "nearest4x": "previews/nearest_4x/mineral_spider_motion_pilot_preview_4x.mp4",
+      "animated": "previews/animated/mineral_spider_motion_pilot_preview.mp4",
+      "newContact": "previews/before_after/mineral_spider_new_frame_sequence_contact.png",
+      "v1Reference": "previews/before_after/mineral_spider_v1_static_strip_REFERENCE_ONLY.png",
+      "timing": [
+        {
+          "sequence": "idle",
+          "frame": 1,
+          "previewDurationMs": 150,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "idle",
+          "frame": 2,
+          "previewDurationMs": 150,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "idle",
+          "frame": 3,
+          "previewDurationMs": 150,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "idle",
+          "frame": 4,
+          "previewDurationMs": 150,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "move",
+          "frame": 1,
+          "previewDurationMs": 100,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "move",
+          "frame": 2,
+          "previewDurationMs": 100,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "move",
+          "frame": 3,
+          "previewDurationMs": 100,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "move",
+          "frame": 4,
+          "previewDurationMs": 100,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "move",
+          "frame": 5,
+          "previewDurationMs": 100,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "move",
+          "frame": 6,
+          "previewDurationMs": 100,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "idle_to_alert",
+          "frame": 1,
+          "previewDurationMs": 120,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "idle_to_alert",
+          "frame": 2,
+          "previewDurationMs": 120,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "idle_to_alert",
+          "frame": 3,
+          "previewDurationMs": 120,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "alert_to_deploy",
+          "frame": 1,
+          "previewDurationMs": 120,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "alert_to_deploy",
+          "frame": 2,
+          "previewDurationMs": 120,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "alert_to_deploy",
+          "frame": 3,
+          "previewDurationMs": 120,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "deploy_to_attack",
+          "frame": 1,
+          "previewDurationMs": 95,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "deploy_to_attack",
+          "frame": 2,
+          "previewDurationMs": 95,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "deploy_to_attack",
+          "frame": 3,
+          "previewDurationMs": 95,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "deploy_to_attack",
+          "frame": 4,
+          "previewDurationMs": 95,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "attack_to_recover",
+          "frame": 1,
+          "previewDurationMs": 120,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "attack_to_recover",
+          "frame": 2,
+          "previewDurationMs": 120,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "attack_to_recover",
+          "frame": 3,
+          "previewDurationMs": 120,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "stunned_or_retreat",
+          "frame": 1,
+          "previewDurationMs": 130,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "stunned_or_retreat",
+          "frame": 2,
+          "previewDurationMs": 130,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "stunned_or_retreat",
+          "frame": 3,
+          "previewDurationMs": 130,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        }
+      ]
+    },
+    "resonance_goral": {
+      "runtime1x": "previews/runtime_1x/resonance_goral_motion_pilot_preview_1x.mp4",
+      "nearest4x": "previews/nearest_4x/resonance_goral_motion_pilot_preview_4x.mp4",
+      "animated": "previews/animated/resonance_goral_motion_pilot_preview.mp4",
+      "newContact": "previews/before_after/resonance_goral_new_frame_sequence_contact.png",
+      "v1Reference": "previews/before_after/resonance_goral_v1_static_strip_REFERENCE_ONLY.png",
+      "timing": [
+        {
+          "sequence": "idle",
+          "frame": 1,
+          "previewDurationMs": 180,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "idle",
+          "frame": 2,
+          "previewDurationMs": 180,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "idle",
+          "frame": 3,
+          "previewDurationMs": 180,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "idle",
+          "frame": 4,
+          "previewDurationMs": 180,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "warning",
+          "frame": 1,
+          "previewDurationMs": 150,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "warning",
+          "frame": 2,
+          "previewDurationMs": 150,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "warning",
+          "frame": 3,
+          "previewDurationMs": 150,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "combat_prep",
+          "frame": 1,
+          "previewDurationMs": 150,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "combat_prep",
+          "frame": 2,
+          "previewDurationMs": 150,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "combat_prep",
+          "frame": 3,
+          "previewDurationMs": 150,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "charge_attack",
+          "frame": 1,
+          "previewDurationMs": 110,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "charge_attack",
+          "frame": 2,
+          "previewDurationMs": 110,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "charge_attack",
+          "frame": 3,
+          "previewDurationMs": 110,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "charge_attack",
+          "frame": 4,
+          "previewDurationMs": 110,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "charge_attack",
+          "frame": 5,
+          "previewDurationMs": 110,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "hit_recover",
+          "frame": 1,
+          "previewDurationMs": 140,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "hit_recover",
+          "frame": 2,
+          "previewDurationMs": 140,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "hit_recover",
+          "frame": 3,
+          "previewDurationMs": 140,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "hit_recover",
+          "frame": 4,
+          "previewDurationMs": 140,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "retreat",
+          "frame": 1,
+          "previewDurationMs": 140,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "retreat",
+          "frame": 2,
+          "previewDurationMs": 140,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "retreat",
+          "frame": 3,
+          "previewDurationMs": 140,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        },
+        {
+          "sequence": "retreat",
+          "frame": 4,
+          "previewDurationMs": 140,
+          "engineDurationBinding": "USE_EXISTING_ENGINE_DURATION",
+          "hold": null
+        }
+      ]
+    }
+  },
+  "gameplay": {
+    "deflect_bat": {
+      "video": "previews/gameplay_960x540/bat_attack_pilot_960x540.mp4",
+      "poster": "previews/gameplay_960x540/posters/bat_attack_pilot_960x540_poster.png"
+    },
+    "rewind_lizard": {
+      "video": "previews/gameplay_960x540/lizard_attack_pilot_960x540.mp4",
+      "poster": "previews/gameplay_960x540/posters/lizard_attack_pilot_960x540_poster.png"
+    },
+    "mineral_spider": {
+      "video": "previews/gameplay_960x540/spider_attack_pilot_960x540.mp4",
+      "poster": "previews/gameplay_960x540/posters/spider_attack_pilot_960x540_poster.png"
+    },
+    "resonance_goral": {
+      "video": "previews/gameplay_960x540/goral_attack_pilot_960x540.mp4",
+      "poster": "previews/gameplay_960x540/posters/goral_attack_pilot_960x540_poster.png"
+    }
+  },
+  "approvedAct1VfxUsed": {
+    "mineral_spider": "review/approved_vfx/mineral_spider_thread_spawn_marker.png",
+    "resonance_goral": "review/approved_vfx/resonance_goral_phase3_overlay.png"
+  },
+  "player": {
+    "status": "SOURCE_BLOCKED",
+    "previewCreated": false
+  }
+}
