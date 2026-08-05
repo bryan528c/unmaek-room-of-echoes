@@ -1,0 +1,23 @@
+UNMAEK VISUAL RECOVERY RUNTIME EXPORT v1 — USAGE NOTICE
+
+This folder is a recovery runtime candidate package. It does not overwrite or modify the official game repository or manifest.
+
+Runtime candidates:
+- maps/*/*/*_bg_recovery_1280x720.png
+- maps/*/*/*_collision_recovery.png
+- maps/act1/*/*_hazard_recovery.png
+- creatures/act1/mineral_spider/runtime_corrected/*.png
+
+Review-only files — never load at runtime:
+- *_overlay_review.png
+- *_gameplay_composite_960x540.png
+- previews/*
+- UNMAEK_VISUAL_RECOVERY_RUNTIME_EXPORT_REVIEW_v1.pptx
+
+Integration rules:
+- Use uniform scaling only. Do not stretch width and height independently.
+- Collision: 255 walkable, 0 blocked.
+- Hazard: 255 hazard, 0 safe.
+- Keep Ground Point (52,72) for every corrected mineral-spider candidate.
+- Apply MAP_MANIFEST_PATCH_PROPOSAL_v1.json manually after review; do not replace the official manifest automatically.
+- No new creature, boss, state, AI, attack pattern, card, word skill, terrain object, or combat system is included.

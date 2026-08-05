@@ -1,0 +1,1102 @@
+{
+  "packageId": "UNMAEK_VISUAL_RECOVERY_RUNTIME_EXPORT_v1",
+  "date": "2026-08-05",
+  "status": "PASS",
+  "passCount": 182,
+  "failCount": 0,
+  "zipChecked": "UNMAEK_VISUAL_RECOVERY_RUNTIME_EXPORT_v1.zip",
+  "checks": [
+    {
+      "category": "existence",
+      "name": "ASSET_INVENTORY_VISUAL_RECOVERY_v1.md",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "CHECKSUMS_SHA256.txt",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "MAP_MANIFEST_PATCH_PROPOSAL_v1.json",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "MAP_RECOVERY_SPEC_v1.json",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "MINERAL_SPIDER_7STATE_CORRECTION_REPORT.md",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "README_VISUAL_RECOVERY_RUNTIME_EXPORT_v1.md",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "USAGE_NOTICE.txt",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "VISUAL_RECOVERY_VALIDATION_REPORT_v1.md",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "creatures/act1/mineral_spider/mineral_spider_7state_before_after_contact_sheet.png",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "creatures/act1/mineral_spider/runtime_corrected/act1_mineral_spider_alert_front_corrected_candidate_104x88.png",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "creatures/act1/mineral_spider/runtime_corrected/act1_mineral_spider_attack_side_corrected_candidate_104x88.png",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "creatures/act1/mineral_spider/runtime_corrected/act1_mineral_spider_deploy_side_corrected_candidate_104x88.png",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "creatures/act1/mineral_spider/runtime_corrected/act1_mineral_spider_idle_front_corrected_candidate_104x88.png",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "creatures/act1/mineral_spider/runtime_corrected/act1_mineral_spider_move_side_corrected_candidate_104x88.png",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "creatures/act1/mineral_spider/runtime_corrected/act1_mineral_spider_retreat_side_corrected_candidate_104x88.png",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "creatures/act1/mineral_spider/runtime_corrected/act1_mineral_spider_stunned_front_corrected_candidate_104x88.png",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "maps/act1/boss/act1_boss_bg_recovery_1280x720.png",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "maps/act1/boss/act1_boss_collision_recovery.png",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "maps/act1/boss/act1_boss_gameplay_composite_960x540.png",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "maps/act1/boss/act1_boss_hazard_recovery.png",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "maps/act1/boss/act1_boss_recovery_notes.md",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "maps/act1/boss/act1_boss_spawn_territory_overlay_review.png",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "maps/act1/general/act1_general_bg_recovery_1280x720.png",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "maps/act1/general/act1_general_collision_recovery.png",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "maps/act1/general/act1_general_gameplay_composite_960x540.png",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "maps/act1/general/act1_general_hazard_recovery.png",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "maps/act1/general/act1_general_recovery_notes.md",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "maps/act1/general/act1_general_spawn_overlay_review.png",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "maps/act2/boss/act2_boss_bg_recovery_1280x720.png",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "maps/act2/boss/act2_boss_collision_recovery.png",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "maps/act2/boss/act2_boss_gameplay_composite_960x540.png",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "maps/act2/boss/act2_boss_recovery_notes.md",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "maps/act2/boss/act2_boss_spawn_territory_overlay_review.png",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "maps/act2/general/act2_general_bg_recovery_1280x720.png",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "maps/act2/general/act2_general_collision_recovery.png",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "maps/act2/general/act2_general_gameplay_composite_960x540.png",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "maps/act2/general/act2_general_recovery_notes.md",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "maps/act2/general/act2_general_spawn_overlay_review.png",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "maps/act3/boss/act3_boss_bg_recovery_1280x720.png",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "maps/act3/boss/act3_boss_collision_recovery.png",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "maps/act3/boss/act3_boss_gameplay_composite_960x540.png",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "maps/act3/boss/act3_boss_recovery_notes.md",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "maps/act3/boss/act3_boss_spawn_territory_overlay_review.png",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "maps/act3/general/act3_general_bg_recovery_1280x720.png",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "maps/act3/general/act3_general_collision_recovery.png",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "maps/act3/general/act3_general_gameplay_composite_960x540.png",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "maps/act3/general/act3_general_recovery_notes.md",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "maps/act3/general/act3_general_spawn_overlay_review.png",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "previews/UNMAEK_VISUAL_RECOVERY_RUNTIME_EXPORT_REVIEW_v1.pptx",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "previews/map_backgrounds_contact_sheet.png",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "previews/map_composites_contact_sheet.png",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "previews/map_masks_overlays_contact_sheet.png",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "previews/mineral_spider_7state_review_strip.png",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "reports/validation_results.json",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "reports/visual_gate_metrics.json",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "existence",
+      "name": "tools/validate_visual_recovery_export.py",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "image",
+      "name": "act1_general background",
+      "status": "PASS",
+      "detail": "1280x720, mode=RGB, bitDepth=8"
+    },
+    {
+      "category": "image",
+      "name": "act1_general collision",
+      "status": "PASS",
+      "detail": "1280x720, mode=L, bitDepth=8"
+    },
+    {
+      "category": "image",
+      "name": "act1_general hazard",
+      "status": "PASS",
+      "detail": "1280x720, mode=L, bitDepth=8"
+    },
+    {
+      "category": "image",
+      "name": "act1_general review overlay",
+      "status": "PASS",
+      "detail": "1280x720, mode=RGB, bitDepth=8"
+    },
+    {
+      "category": "image",
+      "name": "act1_general gameplay composite",
+      "status": "PASS",
+      "detail": "960x540, mode=RGB, bitDepth=8"
+    },
+    {
+      "category": "mask",
+      "name": "act1_general collision binary",
+      "status": "PASS",
+      "detail": "values=[0, 255]"
+    },
+    {
+      "category": "mask",
+      "name": "act1_general combat core blocker islands",
+      "status": "PASS",
+      "detail": "coreValues=[255]"
+    },
+    {
+      "category": "mask",
+      "name": "act1_general hazard binary",
+      "status": "PASS",
+      "detail": "values=[0, 255]"
+    },
+    {
+      "category": "spawn",
+      "name": "act1_general player bounds",
+      "status": "PASS",
+      "detail": "[410, 525]"
+    },
+    {
+      "category": "spawn",
+      "name": "act1_general player walkable",
+      "status": "PASS",
+      "detail": "[410, 525]"
+    },
+    {
+      "category": "spawn",
+      "name": "act1_general player non-hazard",
+      "status": "PASS",
+      "detail": "[410, 525]"
+    },
+    {
+      "category": "spawn",
+      "name": "act1_general enemy1 bounds",
+      "status": "PASS",
+      "detail": "[705, 145]"
+    },
+    {
+      "category": "spawn",
+      "name": "act1_general enemy1 walkable",
+      "status": "PASS",
+      "detail": "[705, 145]"
+    },
+    {
+      "category": "spawn",
+      "name": "act1_general enemy1 non-hazard",
+      "status": "PASS",
+      "detail": "[705, 145]"
+    },
+    {
+      "category": "spawn",
+      "name": "act1_general enemy2 bounds",
+      "status": "PASS",
+      "detail": "[623, 401]"
+    },
+    {
+      "category": "spawn",
+      "name": "act1_general enemy2 walkable",
+      "status": "PASS",
+      "detail": "[623, 401]"
+    },
+    {
+      "category": "spawn",
+      "name": "act1_general enemy2 non-hazard",
+      "status": "PASS",
+      "detail": "[623, 401]"
+    },
+    {
+      "category": "spawn",
+      "name": "act1_general enemy3 bounds",
+      "status": "PASS",
+      "detail": "[930, 400]"
+    },
+    {
+      "category": "spawn",
+      "name": "act1_general enemy3 walkable",
+      "status": "PASS",
+      "detail": "[930, 400]"
+    },
+    {
+      "category": "spawn",
+      "name": "act1_general enemy3 non-hazard",
+      "status": "PASS",
+      "detail": "[930, 400]"
+    },
+    {
+      "category": "territory",
+      "name": "act1_general boss territory bounds",
+      "status": "PASS",
+      "detail": "null"
+    },
+    {
+      "category": "runtime-path",
+      "name": "act1_general candidate paths exclude review/source",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "image",
+      "name": "act1_boss background",
+      "status": "PASS",
+      "detail": "1280x720, mode=RGB, bitDepth=8"
+    },
+    {
+      "category": "image",
+      "name": "act1_boss collision",
+      "status": "PASS",
+      "detail": "1280x720, mode=L, bitDepth=8"
+    },
+    {
+      "category": "image",
+      "name": "act1_boss hazard",
+      "status": "PASS",
+      "detail": "1280x720, mode=L, bitDepth=8"
+    },
+    {
+      "category": "image",
+      "name": "act1_boss review overlay",
+      "status": "PASS",
+      "detail": "1280x720, mode=RGB, bitDepth=8"
+    },
+    {
+      "category": "image",
+      "name": "act1_boss gameplay composite",
+      "status": "PASS",
+      "detail": "960x540, mode=RGB, bitDepth=8"
+    },
+    {
+      "category": "mask",
+      "name": "act1_boss collision binary",
+      "status": "PASS",
+      "detail": "values=[0, 255]"
+    },
+    {
+      "category": "mask",
+      "name": "act1_boss combat core blocker islands",
+      "status": "PASS",
+      "detail": "coreValues=[255]"
+    },
+    {
+      "category": "mask",
+      "name": "act1_boss hazard binary",
+      "status": "PASS",
+      "detail": "values=[0, 255]"
+    },
+    {
+      "category": "spawn",
+      "name": "act1_boss player bounds",
+      "status": "PASS",
+      "detail": "[350, 530]"
+    },
+    {
+      "category": "spawn",
+      "name": "act1_boss player walkable",
+      "status": "PASS",
+      "detail": "[350, 530]"
+    },
+    {
+      "category": "spawn",
+      "name": "act1_boss player non-hazard",
+      "status": "PASS",
+      "detail": "[350, 530]"
+    },
+    {
+      "category": "spawn",
+      "name": "act1_boss boss bounds",
+      "status": "PASS",
+      "detail": "[640, 265]"
+    },
+    {
+      "category": "spawn",
+      "name": "act1_boss boss walkable",
+      "status": "PASS",
+      "detail": "[640, 265]"
+    },
+    {
+      "category": "spawn",
+      "name": "act1_boss boss non-hazard",
+      "status": "PASS",
+      "detail": "[640, 265]"
+    },
+    {
+      "category": "territory",
+      "name": "act1_boss boss territory bounds",
+      "status": "PASS",
+      "detail": "{\"type\": \"circle\", \"center\": [640, 350], \"radius\": 280}"
+    },
+    {
+      "category": "runtime-path",
+      "name": "act1_boss candidate paths exclude review/source",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "image",
+      "name": "act2_general background",
+      "status": "PASS",
+      "detail": "1280x720, mode=RGB, bitDepth=8"
+    },
+    {
+      "category": "image",
+      "name": "act2_general collision",
+      "status": "PASS",
+      "detail": "1280x720, mode=L, bitDepth=8"
+    },
+    {
+      "category": "image",
+      "name": "act2_general review overlay",
+      "status": "PASS",
+      "detail": "1280x720, mode=RGB, bitDepth=8"
+    },
+    {
+      "category": "image",
+      "name": "act2_general gameplay composite",
+      "status": "PASS",
+      "detail": "960x540, mode=RGB, bitDepth=8"
+    },
+    {
+      "category": "mask",
+      "name": "act2_general collision binary",
+      "status": "PASS",
+      "detail": "values=[0, 255]"
+    },
+    {
+      "category": "mask",
+      "name": "act2_general combat core blocker islands",
+      "status": "PASS",
+      "detail": "coreValues=[255]"
+    },
+    {
+      "category": "spawn",
+      "name": "act2_general player bounds",
+      "status": "PASS",
+      "detail": "[599, 604]"
+    },
+    {
+      "category": "spawn",
+      "name": "act2_general player walkable",
+      "status": "PASS",
+      "detail": "[599, 604]"
+    },
+    {
+      "category": "spawn",
+      "name": "act2_general enemy1 bounds",
+      "status": "PASS",
+      "detail": "[229, 214]"
+    },
+    {
+      "category": "spawn",
+      "name": "act2_general enemy1 walkable",
+      "status": "PASS",
+      "detail": "[229, 214]"
+    },
+    {
+      "category": "spawn",
+      "name": "act2_general enemy2 bounds",
+      "status": "PASS",
+      "detail": "[1023, 306]"
+    },
+    {
+      "category": "spawn",
+      "name": "act2_general enemy2 walkable",
+      "status": "PASS",
+      "detail": "[1023, 306]"
+    },
+    {
+      "category": "territory",
+      "name": "act2_general boss territory bounds",
+      "status": "PASS",
+      "detail": "null"
+    },
+    {
+      "category": "runtime-path",
+      "name": "act2_general candidate paths exclude review/source",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "image",
+      "name": "act2_boss background",
+      "status": "PASS",
+      "detail": "1280x720, mode=RGB, bitDepth=8"
+    },
+    {
+      "category": "image",
+      "name": "act2_boss collision",
+      "status": "PASS",
+      "detail": "1280x720, mode=L, bitDepth=8"
+    },
+    {
+      "category": "image",
+      "name": "act2_boss review overlay",
+      "status": "PASS",
+      "detail": "1280x720, mode=RGB, bitDepth=8"
+    },
+    {
+      "category": "image",
+      "name": "act2_boss gameplay composite",
+      "status": "PASS",
+      "detail": "960x540, mode=RGB, bitDepth=8"
+    },
+    {
+      "category": "mask",
+      "name": "act2_boss collision binary",
+      "status": "PASS",
+      "detail": "values=[0, 255]"
+    },
+    {
+      "category": "mask",
+      "name": "act2_boss combat core blocker islands",
+      "status": "PASS",
+      "detail": "coreValues=[255]"
+    },
+    {
+      "category": "spawn",
+      "name": "act2_boss player bounds",
+      "status": "PASS",
+      "detail": "[631, 604]"
+    },
+    {
+      "category": "spawn",
+      "name": "act2_boss player walkable",
+      "status": "PASS",
+      "detail": "[631, 604]"
+    },
+    {
+      "category": "spawn",
+      "name": "act2_boss boss bounds",
+      "status": "PASS",
+      "detail": "[640, 320]"
+    },
+    {
+      "category": "spawn",
+      "name": "act2_boss boss walkable",
+      "status": "PASS",
+      "detail": "[640, 320]"
+    },
+    {
+      "category": "territory",
+      "name": "act2_boss boss territory bounds",
+      "status": "PASS",
+      "detail": "{\"type\": \"ellipse\", \"bounds\": [166, 95, 1119, 574]}"
+    },
+    {
+      "category": "runtime-path",
+      "name": "act2_boss candidate paths exclude review/source",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "image",
+      "name": "act3_general background",
+      "status": "PASS",
+      "detail": "1280x720, mode=RGB, bitDepth=8"
+    },
+    {
+      "category": "image",
+      "name": "act3_general collision",
+      "status": "PASS",
+      "detail": "1280x720, mode=L, bitDepth=8"
+    },
+    {
+      "category": "image",
+      "name": "act3_general review overlay",
+      "status": "PASS",
+      "detail": "1280x720, mode=RGB, bitDepth=8"
+    },
+    {
+      "category": "image",
+      "name": "act3_general gameplay composite",
+      "status": "PASS",
+      "detail": "960x540, mode=RGB, bitDepth=8"
+    },
+    {
+      "category": "mask",
+      "name": "act3_general collision binary",
+      "status": "PASS",
+      "detail": "values=[0, 255]"
+    },
+    {
+      "category": "mask",
+      "name": "act3_general combat core blocker islands",
+      "status": "PASS",
+      "detail": "coreValues=[255]"
+    },
+    {
+      "category": "spawn",
+      "name": "act3_general player bounds",
+      "status": "PASS",
+      "detail": "[605, 604]"
+    },
+    {
+      "category": "spawn",
+      "name": "act3_general player walkable",
+      "status": "PASS",
+      "detail": "[605, 604]"
+    },
+    {
+      "category": "spawn",
+      "name": "act3_general enemy1 bounds",
+      "status": "PASS",
+      "detail": "[229, 285]"
+    },
+    {
+      "category": "spawn",
+      "name": "act3_general enemy1 walkable",
+      "status": "PASS",
+      "detail": "[229, 285]"
+    },
+    {
+      "category": "spawn",
+      "name": "act3_general enemy2 bounds",
+      "status": "PASS",
+      "detail": "[1035, 212]"
+    },
+    {
+      "category": "spawn",
+      "name": "act3_general enemy2 walkable",
+      "status": "PASS",
+      "detail": "[1035, 212]"
+    },
+    {
+      "category": "territory",
+      "name": "act3_general boss territory bounds",
+      "status": "PASS",
+      "detail": "null"
+    },
+    {
+      "category": "runtime-path",
+      "name": "act3_general candidate paths exclude review/source",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "image",
+      "name": "act3_boss background",
+      "status": "PASS",
+      "detail": "1280x720, mode=RGB, bitDepth=8"
+    },
+    {
+      "category": "image",
+      "name": "act3_boss collision",
+      "status": "PASS",
+      "detail": "1280x720, mode=L, bitDepth=8"
+    },
+    {
+      "category": "image",
+      "name": "act3_boss review overlay",
+      "status": "PASS",
+      "detail": "1280x720, mode=RGB, bitDepth=8"
+    },
+    {
+      "category": "image",
+      "name": "act3_boss gameplay composite",
+      "status": "PASS",
+      "detail": "960x540, mode=RGB, bitDepth=8"
+    },
+    {
+      "category": "mask",
+      "name": "act3_boss collision binary",
+      "status": "PASS",
+      "detail": "values=[0, 255]"
+    },
+    {
+      "category": "mask",
+      "name": "act3_boss combat core blocker islands",
+      "status": "PASS",
+      "detail": "coreValues=[255]"
+    },
+    {
+      "category": "spawn",
+      "name": "act3_boss player bounds",
+      "status": "PASS",
+      "detail": "[631, 604]"
+    },
+    {
+      "category": "spawn",
+      "name": "act3_boss player walkable",
+      "status": "PASS",
+      "detail": "[631, 604]"
+    },
+    {
+      "category": "spawn",
+      "name": "act3_boss boss bounds",
+      "status": "PASS",
+      "detail": "[340, 270]"
+    },
+    {
+      "category": "spawn",
+      "name": "act3_boss boss walkable",
+      "status": "PASS",
+      "detail": "[340, 270]"
+    },
+    {
+      "category": "territory",
+      "name": "act3_boss boss territory bounds",
+      "status": "PASS",
+      "detail": "{\"type\": \"ellipse\", \"bounds\": [157, 91, 1129, 574]}"
+    },
+    {
+      "category": "runtime-path",
+      "name": "act3_boss candidate paths exclude review/source",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "spider",
+      "name": "idle_front",
+      "status": "PASS",
+      "detail": "104x88, mode=RGBA, bitDepth=8"
+    },
+    {
+      "category": "spider",
+      "name": "idle_front transparent corners",
+      "status": "PASS",
+      "detail": "[0, 0, 0, 0]"
+    },
+    {
+      "category": "spider",
+      "name": "idle_front Ground Point / crop",
+      "status": "PASS",
+      "detail": "alphaBBox=(15, 4, 89, 72), groundY=72"
+    },
+    {
+      "category": "spider",
+      "name": "move_side",
+      "status": "PASS",
+      "detail": "104x88, mode=RGBA, bitDepth=8"
+    },
+    {
+      "category": "spider",
+      "name": "move_side transparent corners",
+      "status": "PASS",
+      "detail": "[0, 0, 0, 0]"
+    },
+    {
+      "category": "spider",
+      "name": "move_side Ground Point / crop",
+      "status": "PASS",
+      "detail": "alphaBBox=(16, 8, 88, 72), groundY=72"
+    },
+    {
+      "category": "spider",
+      "name": "alert_front",
+      "status": "PASS",
+      "detail": "104x88, mode=RGBA, bitDepth=8"
+    },
+    {
+      "category": "spider",
+      "name": "alert_front transparent corners",
+      "status": "PASS",
+      "detail": "[0, 0, 0, 0]"
+    },
+    {
+      "category": "spider",
+      "name": "alert_front Ground Point / crop",
+      "status": "PASS",
+      "detail": "alphaBBox=(16, 0, 88, 72), groundY=72"
+    },
+    {
+      "category": "spider",
+      "name": "deploy_side",
+      "status": "PASS",
+      "detail": "104x88, mode=RGBA, bitDepth=8"
+    },
+    {
+      "category": "spider",
+      "name": "deploy_side transparent corners",
+      "status": "PASS",
+      "detail": "[0, 0, 0, 0]"
+    },
+    {
+      "category": "spider",
+      "name": "deploy_side Ground Point / crop",
+      "status": "PASS",
+      "detail": "alphaBBox=(14, 10, 91, 72), groundY=72"
+    },
+    {
+      "category": "spider",
+      "name": "attack_side",
+      "status": "PASS",
+      "detail": "104x88, mode=RGBA, bitDepth=8"
+    },
+    {
+      "category": "spider",
+      "name": "attack_side transparent corners",
+      "status": "PASS",
+      "detail": "[0, 0, 0, 0]"
+    },
+    {
+      "category": "spider",
+      "name": "attack_side Ground Point / crop",
+      "status": "PASS",
+      "detail": "alphaBBox=(12, 10, 92, 72), groundY=72"
+    },
+    {
+      "category": "spider",
+      "name": "stunned_front",
+      "status": "PASS",
+      "detail": "104x88, mode=RGBA, bitDepth=8"
+    },
+    {
+      "category": "spider",
+      "name": "stunned_front transparent corners",
+      "status": "PASS",
+      "detail": "[0, 0, 0, 0]"
+    },
+    {
+      "category": "spider",
+      "name": "stunned_front Ground Point / crop",
+      "status": "PASS",
+      "detail": "alphaBBox=(18, 12, 87, 72), groundY=72"
+    },
+    {
+      "category": "spider",
+      "name": "retreat_side",
+      "status": "PASS",
+      "detail": "104x88, mode=RGBA, bitDepth=8"
+    },
+    {
+      "category": "spider",
+      "name": "retreat_side transparent corners",
+      "status": "PASS",
+      "detail": "[0, 0, 0, 0]"
+    },
+    {
+      "category": "spider",
+      "name": "retreat_side Ground Point / crop",
+      "status": "PASS",
+      "detail": "alphaBBox=(12, 14, 91, 72), groundY=72"
+    },
+    {
+      "category": "visual-gate",
+      "name": "ACT2 boss mound lower edge",
+      "status": "PASS",
+      "detail": "0.1778 <= 0.1800"
+    },
+    {
+      "category": "visual-gate",
+      "name": "ACT2 boss telegraph inside territory",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "visual-gate",
+      "name": "ACT2 boss spawn background complexity",
+      "status": "PASS",
+      "detail": "stddev=12.897"
+    },
+    {
+      "category": "visual-gate",
+      "name": "ACT3 general center high-frequency reduction",
+      "status": "PASS",
+      "detail": "11.733 -> 10.117"
+    },
+    {
+      "category": "visual-gate",
+      "name": "ACT3 boss current-line adjustment decision",
+      "status": "PASS",
+      "detail": "none; cyan/teal telegraph remains distinct in actual composite"
+    },
+    {
+      "category": "hygiene",
+      "name": "temporary workspace paths absent from documents",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "hygiene",
+      "name": "hidden files absent",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "hygiene",
+      "name": "temporary files absent",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "hygiene",
+      "name": "duplicate files absent",
+      "status": "PASS",
+      "detail": "[]"
+    },
+    {
+      "category": "checksum",
+      "name": "checksum syntax",
+      "status": "PASS",
+      "detail": "[]"
+    },
+    {
+      "category": "checksum",
+      "name": "checksum coverage",
+      "status": "PASS",
+      "detail": "listed=55, files=55"
+    },
+    {
+      "category": "checksum",
+      "name": "checksum values",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "category": "zip",
+      "name": "ZIP CRC integrity",
+      "status": "PASS",
+      "detail": "None"
+    },
+    {
+      "category": "zip",
+      "name": "ZIP single top-level folder",
+      "status": "PASS",
+      "detail": "['UNMAEK_VISUAL_RECOVERY_RUNTIME_EXPORT_v1']"
+    },
+    {
+      "category": "zip",
+      "name": "ZIP file set matches package",
+      "status": "PASS",
+      "detail": "zip=56, disk=56"
+    }
+  ]
+}

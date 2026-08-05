@@ -1,0 +1,62 @@
+{
+  "act1_general": {
+    "candidateBackground": "maps/act1/general/act1_general_bg_recovery_1280x720.png",
+    "candidateCollision": "maps/act1/general/act1_general_collision_recovery.png",
+    "candidateHazard": "maps/act1/general/act1_general_hazard_recovery.png",
+    "playerSpawn": [410, 525],
+    "enemySpawn": [[705, 145], [623, 401], [930, 400]],
+    "bossSpawn": null,
+    "bossTerritory": null,
+    "foregroundFadeZone": [[0, 0, 96, 720], [0, 650, 1280, 720], [1184, 0, 1280, 720]]
+  },
+  "act1_boss": {
+    "candidateBackground": "maps/act1/boss/act1_boss_bg_recovery_1280x720.png",
+    "candidateCollision": "maps/act1/boss/act1_boss_collision_recovery.png",
+    "candidateHazard": "maps/act1/boss/act1_boss_hazard_recovery.png",
+    "playerSpawn": [350, 530],
+    "enemySpawn": [],
+    "bossSpawn": [640, 265],
+    "bossTerritory": {"type": "circle", "center": [640, 350], "radius": 280},
+    "foregroundFadeZone": [[0, 0, 82, 720], [1198, 0, 1280, 720], [0, 656, 1280, 720]]
+  },
+  "act2_general": {
+    "candidateBackground": "maps/act2/general/act2_general_bg_recovery_1280x720.png",
+    "candidateCollision": "maps/act2/general/act2_general_collision_recovery.png",
+    "candidateHazard": null,
+    "playerSpawn": [599, 604],
+    "enemySpawn": [[229, 214], [1023, 306]],
+    "bossSpawn": null,
+    "bossTerritory": null,
+    "foregroundFadeZone": [[0, 0, 78, 720], [1202, 0, 1280, 720], [0, 662, 1280, 720]]
+  },
+  "act2_boss": {
+    "candidateBackground": "maps/act2/boss/act2_boss_bg_recovery_1280x720.png",
+    "candidateCollision": "maps/act2/boss/act2_boss_collision_recovery.png",
+    "candidateHazard": null,
+    "playerSpawn": [631, 604],
+    "enemySpawn": [],
+    "bossSpawn": [640, 320],
+    "bossTerritory": {"type": "ellipse", "bounds": [166, 95, 1119, 574]},
+    "foregroundFadeZone": [[0, 0, 74, 720], [1206, 0, 1280, 720], [0, 660, 1280, 720]]
+  },
+  "act3_general": {
+    "candidateBackground": "maps/act3/general/act3_general_bg_recovery_1280x720.png",
+    "candidateCollision": "maps/act3/general/act3_general_collision_recovery.png",
+    "candidateHazard": null,
+    "playerSpawn": [605, 604],
+    "enemySpawn": [[229, 285], [1035, 212]],
+    "bossSpawn": null,
+    "bossTerritory": null,
+    "foregroundFadeZone": [[0, 0, 70, 720], [1210, 0, 1280, 720], [0, 665, 1280, 720]]
+  },
+  "act3_boss": {
+    "candidateBackground": "maps/act3/boss/act3_boss_bg_recovery_1280x720.png",
+    "candidateCollision": "maps/act3/boss/act3_boss_collision_recovery.png",
+    "candidateHazard": null,
+    "playerSpawn": [631, 604],
+    "enemySpawn": [],
+    "bossSpawn": [340, 270],
+    "bossTerritory": {"type": "ellipse", "bounds": [157, 91, 1129, 574]},
+    "foregroundFadeZone": [[0, 0, 68, 720], [1212, 0, 1280, 720], [0, 666, 1280, 720]]
+  }
+}

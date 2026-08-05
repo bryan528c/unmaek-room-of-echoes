@@ -1,0 +1,24 @@
+{
+  "act2_boss": {
+    "boss_spawn": [
+      640,
+      320
+    ],
+    "fungal_mound_lower_edge_px": 128,
+    "fungal_mound_lower_edge_ratio": 0.1778,
+    "limit_ratio": 0.18,
+    "local_background_mean_luma": 56.095,
+    "local_background_stddev": 12.897,
+    "telegraph_bounds_inside_territory": true,
+    "micro_adjustment": "mound lower fringe shortened and lower edge slightly darkened only; candidate boss spawn separated below it"
+  },
+  "act3_general": {
+    "central_high_frequency_energy_before": 11.733,
+    "central_high_frequency_energy_after": 10.117,
+    "telegraph_color": "cyan",
+    "micro_adjustment": "central water/gravel high-frequency contrast reduced only"
+  },
+  "act3_boss": {
+    "current_line_adjustment": "none; cyan/teal telegraph remains distinct in actual composite"
+  }
+}

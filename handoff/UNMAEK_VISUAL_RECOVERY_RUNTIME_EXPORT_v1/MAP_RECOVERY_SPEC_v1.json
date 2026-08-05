@@ -1,0 +1,65 @@
+{
+  "schemaVersion": "1.0",
+  "packageId": "UNMAEK_VISUAL_RECOVERY_RUNTIME_EXPORT_v1",
+  "coordinateSystem": {"origin": "top-left", "width": 1280, "height": 720, "unit": "pixel"},
+  "imageRules": {
+    "background": {"width": 1280, "height": 720, "mode": "RGB", "bitDepth": 8, "alpha": false, "runtimeScale": "uniform-only"},
+    "collision": {"width": 1280, "height": 720, "mode": "L", "bitDepth": 8, "values": {"0": "blocked", "255": "walkable"}},
+    "hazard": {"acts": [1], "width": 1280, "height": 720, "mode": "L", "bitDepth": 8, "values": {"0": "safe", "255": "hazard"}},
+    "reviewOverlay": {"width": 1280, "height": 720, "runtimeLoad": false},
+    "gameplayComposite": {"width": 960, "height": 540, "runtimeLoad": false}
+  },
+  "commonGameplayRules": {
+    "internalBlocker": 0,
+    "foregroundFadePixels": 64,
+    "maximumCharacterOcclusionRatio": 0.30,
+    "heroTargetPixelsAt1280": 92,
+    "outlinePixels": {"regular": 1, "boss": 2},
+    "shadowOrRipple": "required",
+    "telegraphMinimumCountPerComposite": 1
+  },
+  "maps": {
+    "act1_general": {
+      "approvedVisual": "v1.1",
+      "combatCore": [300, 150, 970, 620],
+      "collisionShape": {"type": "polygon", "points": [[365, 40], [865, 38], [1015, 118], [1112, 305], [1090, 615], [920, 700], [290, 700], [165, 625], [190, 430], [245, 205]]},
+      "spawnCues": ["basalt cleft", "vegetation gap", "root pocket"],
+      "microAdjustment": "none"
+    },
+    "act1_boss": {
+      "approvedVisual": "v1.1",
+      "combatCore": [360, 190, 920, 570],
+      "collisionShape": {"type": "ellipse", "bounds": [126, 42, 1154, 678]},
+      "spawnCues": ["upper cliff recess"],
+      "microAdjustment": "none"
+    },
+    "act2_general": {
+      "approvedVisual": "v1.1",
+      "combatCore": [260, 145, 1020, 625],
+      "collisionShape": {"type": "roundedRect", "bounds": [80, 50, 1200, 680], "radius": 120},
+      "spawnCues": ["left forest gap", "right root recess"],
+      "microAdjustment": "none"
+    },
+    "act2_boss": {
+      "approvedVisual": "v1.1 with permitted mound gate adjustment",
+      "combatCore": [330, 175, 950, 600],
+      "collisionShape": {"type": "ellipse", "bounds": [85, 42, 1195, 685]},
+      "spawnCues": ["fungal nest threshold"],
+      "microAdjustment": {"scope": "top fungal mound lower edge only", "lowerEdgePixels": 128, "lowerEdgeRatio": 0.1778, "limitRatio": 0.18, "brightness": "slightly lowered"}
+    },
+    "act3_general": {
+      "approvedVisual": "v1.1 with permitted central contrast adjustment",
+      "combatCore": [210, 135, 1070, 625],
+      "collisionShape": {"type": "roundedRect", "bounds": [60, 42, 1220, 680], "radius": 105},
+      "spawnCues": ["left dark channel", "right reed opening"],
+      "microAdjustment": {"scope": "central water and gravel high-frequency contrast only", "highFrequencyBefore": 11.733, "highFrequencyAfter": 10.117}
+    },
+    "act3_boss": {
+      "approvedVisual": "v1.1",
+      "combatCore": [225, 130, 1060, 620],
+      "collisionShape": {"type": "roundedRect", "bounds": [52, 38, 1228, 684], "radius": 105},
+      "spawnCues": ["upper current merge"],
+      "microAdjustment": "none; current-line brightness passed composite gate"
+    }
+  }
+}
