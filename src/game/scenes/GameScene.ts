@@ -25,7 +25,7 @@ import { distributeLinkedDamage } from '../systems/LinkDamage';
 import { ParryResolver } from '../systems/ParrySystem';
 import { RewindBuffer } from '../systems/RewindBuffer';
 import { RunProgressController } from '../systems/RunProgressController';
-import { activeModifiersForWave, RunActDirector, type ActPatternId, type EndlessModifierId } from '../systems/RunActDirector';
+import { activeModifiersForWave, RunActDirector, shouldFinishSubmissionRun, type ActPatternId, type EndlessModifierId } from '../systems/RunActDirector';
 import { RunSessionController, type RunId } from '../systems/RunSessionController';
 import { runStabilityStressSimulation } from '../systems/StabilityStressSimulation';
 import { TimeControlService } from '../systems/TimeControlService';
@@ -53,7 +53,8 @@ import {
   runtimeTextureKey,
   sourcePointToGame,
   submissionMapId,
-  SUBMISSION_GAME_SCALE,
+  SUBMISSION_HERO_PRESENTATION_SCALE,
+  runtimePresentationScale,
 } from '../runtime/SubmissionRuntime';
 
 interface InkZone { circle: Phaser.GameObjects.Arc; expiresAt: number; nextDamageAt: number; radius: number; damage: number; style: 'ink' | 'erasure'; patternName: string; modifier?: string }
@@ -237,6 +238,7 @@ export class GameScene extends Phaser.Scene {
   private bufferedAction?: { action: CombatAction; expiresAt: number; x: number; y: number };
   private timeouts: number[] = [];
   private qaMode = false;
+  private submissionEndlessRequested = false;
   private comboTarget?: Enemy;
   private heldAttackTarget?: Enemy;
   private targetMarkerUntil = 0;
@@ -298,6 +300,7 @@ export class GameScene extends Phaser.Scene {
     this.lastHeartbeatAt = performance.now();
     const developmentParams = new URLSearchParams(window.location.search);
     this.qaMode = import.meta.env.DEV && developmentParams.has('qa');
+    this.submissionEndlessRequested = import.meta.env.DEV && developmentParams.get('endless') === '1';
     this.legacyCombatMode = import.meta.env.DEV && developmentParams.has('legacyCombo');
     this.defensiveSlashEnabled = BALANCE.hero.defensiveSlash.enabledByDefault || (import.meta.env.DEV && developmentParams.has('defensiveSlash'));
     if (import.meta.env.DEV) {
@@ -314,12 +317,12 @@ export class GameScene extends Phaser.Scene {
     this.createAtmosphere();
     const playerSpawn = this.submissionMap?.playerSpawn ?? { x: 480, y: 300 };
     this.heroMapSafePoint = { ...playerSpawn };
-    this.heroShadow = this.add.ellipse(playerSpawn.x, playerSpawn.y + 4, 38, 12, 0x020506, 0.55).setDepth(DEPTH.shadow);
+    this.heroShadow = this.add.ellipse(playerSpawn.x, playerSpawn.y + 4, 38, 12, 0x020506, 0.3).setDepth(DEPTH.shadow);
     this.hero = new Hero(this, playerSpawn.x, playerSpawn.y);
     this.linkGraphics = this.add.graphics().setDepth(DEPTH.word);
     this.rewindGraphics = this.add.graphics().setDepth(DEPTH.rewind);
     this.rewindPreviewGhosts = Array.from({ length: 3 }, () => this.add.image(this.hero.x, this.hero.y, 'hero-move')
-      .setOrigin(0.5, 1).setScale(0.4).setTint(0x43add0).setAlpha(0).setVisible(false).setDepth(DEPTH.rewind));
+      .setOrigin(0.5, 1).setScale(SUBMISSION_HERO_PRESENTATION_SCALE).setTint(0x43add0).setAlpha(0).setVisible(false).setDepth(DEPTH.rewind));
     this.heroRune = this.add.circle(this.hero.x, this.hero.y - 7, 22, 0x5bd2bd, 0).setStrokeStyle(2, 0x8ff3df, 0).setDepth(DEPTH.word);
     this.targetMarker = this.add.graphics().setDepth(DEPTH.target).setAlpha(0);
     if (import.meta.env.DEV) this.debugGraphics = this.add.graphics().setDepth(DEPTH.debug).setVisible(false);
@@ -600,6 +603,7 @@ export class GameScene extends Phaser.Scene {
     this.updateRewindPreview(time);
     this.updateLinks(time);
     this.updateWaveLifecycle();
+    this.syncEnemyPresentationCompanions();
     this.drawCombatDebug(time);
     this.updateHud(time);
     this.publishDebugState();
@@ -630,7 +634,7 @@ export class GameScene extends Phaser.Scene {
       threatBudget: this.threatBudget.snapshot(this.time.now),
       heartbeats: { ...this.combatHeartbeats },
       stats: this.combatStats.snapshot(),
-      enemies: [...this.enemies].filter((enemy) => enemy.active).map((enemy) => ({ id: enemy.id, kind: enemy.kind, creatureId: enemy.creatureId, health: enemy.health, x: enemy.x, y: enemy.y, removing: enemy.removing, stopped: enemy.isStopped, linked: enemy.linked, echo: enemy.isEchoMarked, groundPoint: enemy.groundPoint, hurtbox: enemy.hurtbox, attackAnchor: enemy.attackAnchor, flipX: enemy.flipX, rotation: enemy.rotation, runtimeState: enemy.runtimeState, runtimeAssetFile: enemy.runtimeAssetFile, runtimeOverlayActive: enemy.runtimeOverlayActive })),
+      enemies: [...this.enemies].filter((enemy) => enemy.active).map((enemy) => ({ id: enemy.id, kind: enemy.kind, creatureId: enemy.creatureId, health: enemy.health, x: enemy.x, y: enemy.y, removing: enemy.removing, stopped: enemy.isStopped, linked: enemy.linked, echo: enemy.isEchoMarked, groundPoint: enemy.groundPoint, hurtbox: enemy.hurtbox, attackAnchor: enemy.attackAnchor, flipX: enemy.flipX, rotation: enemy.rotation, runtimeState: enemy.runtimeState, runtimeAssetFile: enemy.runtimeAssetFile, runtimeOverlayActive: enemy.runtimeOverlayActive, presentationCompanions: enemy.presentationCompanions })),
       submissionRuntime: { mapId: this.submissionMap?.definition.id, mapName: this.submissionMap?.displayName, backgroundCueCount: this.backgroundCues.size, hazard: this.submissionMap?.hasHazardMask ?? false },
       upgrades: this.upgrades.entries().map(({ id, stacks }) => ({ id, stacks, preview: this.upgrades.preview(id) })),
       upgradeRuntime: this.upgrades.runtimeSnapshot(),
@@ -1267,7 +1271,7 @@ export class GameScene extends Phaser.Scene {
     this.echoFinisherUntil = 0; target.echoUntil = 0; this.showWordTypography('잔향 재현', target.x, target.y - 56);
     this.runDelayedCall(150, () => {
       if (!target.active || target.removing) return;
-      const echo = this.add.image(target.x - Math.cos(angle) * 34, target.y, 'hero-attack').setOrigin(0.5, 1).setScale(0.4).setFlipX(Math.cos(angle) < 0).setTint(0x55c7e6).setAlpha(0.52).setDepth(DEPTH.rewind);
+      const echo = this.add.image(target.x - Math.cos(angle) * 34, target.y, 'hero-attack').setOrigin(0.5, 1).setScale(SUBMISSION_HERO_PRESENTATION_SCALE).setFlipX(Math.cos(angle) < 0).setTint(0x55c7e6).setAlpha(0.52).setDepth(DEPTH.rewind);
       this.tweens.add({ targets: echo, x: target.x, alpha: 0, duration: 210, onComplete: () => echo.destroy() });
       this.damageEnemy(target, dealt * BALANCE.hero.finisher.echoReplayRatio, angle, false, true, undefined, 'rewind');
     });
@@ -1659,7 +1663,7 @@ export class GameScene extends Phaser.Scene {
     this.hero.cancelAttackRecovery();
     this.services.audio.play('rewind'); this.showWordTypography('되돌린다', this.hero.x, this.hero.y - 48); this.hero.rewinding = true; this.hero.invulnerableUntil = this.time.now + 900;
     if (targetState) {
-      const marker = this.add.image(targetState.x, targetState.y, 'hero-idle').setOrigin(0.5, 1).setScale(0.4).setFlipX(Math.cos(targetState.facing) < 0).setTint(0x68cbe5).setAlpha(0.42).setDepth(DEPTH.rewind);
+      const marker = this.add.image(targetState.x, targetState.y, 'hero-idle').setOrigin(0.5, 1).setScale(SUBMISSION_HERO_PRESENTATION_SCALE).setFlipX(Math.cos(targetState.facing) < 0).setTint(0x68cbe5).setAlpha(0.42).setDepth(DEPTH.rewind);
       this.tweens.add({ targets: marker, alpha: 0, scaleX: 0.44, scaleY: 0.44, duration: 520, onComplete: () => marker.destroy() });
     }
     const echoDamage = this.rewindEchoBurst(before.x, before.y, enhanced, overchargeMultiplier);
@@ -1755,7 +1759,7 @@ export class GameScene extends Phaser.Scene {
       && angleDelta(Phaser.Math.Angle.Between(record.x, record.y, enemy.x, enemy.y), record.angle) <= 1.18));
     if (resonanceReady && !linkedInReplaySpace) this.recordResonanceContribution('regression-chain', { activationCount: 0, failedConditions: 1 });
     recent.forEach((record, index) => this.runDelayedCall(index * 135, () => {
-      const echo = this.add.image(record.x, record.y, 'hero-attack').setOrigin(0.5, 1).setScale(0.4).setFlipX(Math.cos(record.angle) < 0).setTint(0x43add0).setAlpha(0.55).setDepth(DEPTH.rewind);
+      const echo = this.add.image(record.x, record.y, 'hero-attack').setOrigin(0.5, 1).setScale(SUBMISSION_HERO_PRESENTATION_SCALE).setFlipX(Math.cos(record.angle) < 0).setTint(0x43add0).setAlpha(0.55).setDepth(DEPTH.rewind);
       this.tweens.add({ targets: echo, alpha: 0, x: record.x + Math.cos(record.angle) * 22, duration: 210, onComplete: () => echo.destroy() });
       const range = record.kind === 'finisher' ? BALANCE.hero.finisher.range : 96;
       const slash = this.add.graphics().setDepth(DEPTH.word);
@@ -3226,8 +3230,13 @@ export class GameScene extends Phaser.Scene {
     if (!this.flow?.allowsCombatSimulation || this.timeControl?.isHardPaused || this.timeControl?.hasReason('HITSTOP')) return;
     this.resolveEntitySeparation(this.frameDelta);
     this.enforceSubmissionMapContract();
+    this.syncEnemyPresentationCompanions();
     this.heroShadow?.setPosition(this.hero.x, this.hero.y + 9).setScale(this.hero.isDashing ? 1.5 : 1);
     this.heroRune?.setPosition(this.hero.x, this.hero.y - 7);
+  }
+
+  private syncEnemyPresentationCompanions(): void {
+    for (const enemy of this.enemies) if (enemy.active) enemy.syncPresentationCompanions();
   }
 
   private separateHeroFromBoss(): void {
@@ -3368,6 +3377,11 @@ export class GameScene extends Phaser.Scene {
         resonances,
       }, () => {
         if (!this.sys.isActive() || this.flow.baseState !== 'ACT_CLEAR') return;
+        if (shouldFinishSubmissionRun(act.index, { development: import.meta.env.DEV, endlessRequested: this.submissionEndlessRequested })) {
+          this.timeControl.release('REWARD_SCREEN', this.timeOwner);
+          this.finishRun(true);
+          return;
+        }
         if (!this.transitionFlow('BOSS_REWARD_REVEAL')) return;
         this.showUpgradeChoices(undefined, true);
       });
@@ -3478,7 +3492,7 @@ export class GameScene extends Phaser.Scene {
       sourcePositions.forEach((source, index) => {
         const point = sourcePointToGame(source); const origin = runtimeSpriteOrigin(creatureId, index % 2 === 1);
         const cue = this.add.image(point.x, point.y, runtimeTextureKey(fly.assetFile)).setOrigin(origin.x, origin.y)
-          .setScale(SUBMISSION_GAME_SCALE * metadata.runtimeScale).setFlipX(index % 2 === 1).setDepth(DEPTH.characterBase + Math.floor(point.y));
+          .setScale(runtimePresentationScale(creatureId)).setFlipX(index % 2 === 1).setDepth(DEPTH.characterBase + Math.floor(point.y));
         this.backgroundCues.add(cue);
         this.tweens.add({
           targets: cue, x: point.x + (index % 2 === 0 ? 54 : -54), y: point.y - 12, duration: 2100 + index * 260,

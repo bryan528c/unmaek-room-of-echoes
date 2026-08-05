@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { BootScene } from './scenes/BootScene';
 import { MenuScene } from './scenes/MenuScene';
 import { GameScene } from './scenes/GameScene';
+import { SUBMISSION_FOREGROUND_DEPTH } from './runtime/SubmissionRuntime';
 
 export const GAME_WIDTH = 960;
 export const GAME_HEIGHT = 540;
@@ -14,7 +15,10 @@ export const DEPTH = {
   target: 170,
   characterBase: 200,
   rewind: 190,
-  foreground: 745,
+  // Submission occlusion keeps depth cues without hiding combatants or their
+  // Telegraphs. The map image/mask stays unchanged; only its presentation
+  // layer is constrained below combat-readable layers.
+  foreground: SUBMISSION_FOREGROUND_DEPTH,
   melee: 760,
   projectile: 780,
   word: 800,

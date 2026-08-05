@@ -63,6 +63,19 @@ export interface RunActSnapshot {
   staleActCallbacksBlocked: number;
 }
 
+export interface SubmissionRunAccess {
+  development: boolean;
+  endlessRequested: boolean;
+}
+
+/**
+ * The submission Run ends with the official Act 3. Generated Endless content
+ * remains available only through an explicit development-only request.
+ */
+export const shouldFinishSubmissionRun = (completedActIndex: number, access: Readonly<SubmissionRunAccess>): boolean => (
+  completedActIndex >= 3 && !(access.development && access.endlessRequested)
+);
+
 const actOneWaves: readonly ActWaveDefinition[] = [
   { label: `${creatureDisplayName('rewind_lizard')} · ${creatureDisplayName('deflect_bat')}`, batches: [['chaser', 'chaser'], ['chaser', 'archer']], patterns: ['archive-baseline'], reward: true },
   { label: `${creatureDisplayName('deflect_bat')} · ${creatureDisplayName('mineral_spider')}`, batches: [['archer', 'ink'], ['archer', 'ink', 'chaser']], patterns: ['archive-baseline'], reward: true },

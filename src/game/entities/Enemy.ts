@@ -74,11 +74,14 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     body.setCollideWorldBounds(true).setEnable(false);
     if (this.presentation) {
       const hurtbox = this.presentation.hurtbox({ x, y });
-      const waterContact = creatureId === 'pulsebarbel_catfish';
-      this.runtimeShadow = scene.add.ellipse(x, y, Math.max(22, (hurtbox?.radiusX ?? 18) * 1.7), Math.max(7, (hurtbox?.radiusY ?? 8) * 0.7), waterContact ? 0x3f8790 : 0x020506, waterContact ? 0.08 : 0.5)
-        .setStrokeStyle(waterContact ? 2 : 0, waterContact ? 0x79b9b5 : 0x020506, waterContact ? 0.42 : 0)
-        .setDepth(DEPTH.shadow).setAlpha(0);
-      this.updatePresentationLayout();
+      const contactMode = this.presentation.profile.contactMode;
+      if (contactMode !== 'none') {
+        const waterContact = contactMode === 'ripple';
+        this.runtimeShadow = scene.add.ellipse(x, y, Math.max(22, (hurtbox?.radiusX ?? 18) * 1.7), Math.max(7, (hurtbox?.radiusY ?? 8) * 0.7), waterContact ? 0x3f8790 : 0x020506, waterContact ? 0.08 : 0.28)
+          .setStrokeStyle(waterContact ? 2 : 0, waterContact ? 0x79b9b5 : 0x020506, waterContact ? 0.32 : 0)
+          .setDepth(DEPTH.shadow).setAlpha(0);
+      }
+      this.syncPresentationCompanions();
     }
   }
 
@@ -106,10 +109,18 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     });
   }
 
+  public override preUpdate(time: number, delta: number): void {
+    super.preUpdate(time, delta);
+    // Presentation companions belong to the render owner, not to a particular
+    // AI implementation. Boss overrides updateAI, and retreating owners skip AI
+    // entirely, so synchronizing here keeps every companion on the owner for
+    // normal movement, phase tweens, nonlethal retreat, and scene cleanup.
+    this.syncPresentationCompanions();
+  }
+
   public updateAI(time: number, hero: Phaser.Physics.Arcade.Sprite): void {
     if (!this.active || !this.spawned) return;
     this.setDepth(DEPTH.characterBase + Math.floor(this.y));
-    this.updatePresentationLayout();
     if (this.linked && time >= this.linkedUntil) this.linked = false;
     this.updateStatusGraphics(time);
     if (time < this.frozenUntil) { this.setVelocity(0); this.setPresentationState('stunned'); this.setTint(0x54bbaa); return; }
@@ -393,6 +404,34 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   public get runtimeState(): string | undefined { return this.presentation?.currentState; }
   public get runtimeAssetFile(): string | undefined { return this.presentation?.currentAssetFile; }
   public get runtimeOverlayActive(): boolean { return this.presentation?.hasOverlay ?? false; }
+  public get presentationCompanions(): Readonly<{
+    primary: 0 | 1;
+    outline: 0 | 1;
+    contact: 0 | 1;
+    stateOverlay: 0 | 1;
+    phaseOverlay: 0 | 1;
+    total: number;
+    outlineTransform: ReturnType<CreaturePresentation['companionSnapshot']>['outline'];
+    overlayTransform: ReturnType<CreaturePresentation['companionSnapshot']>['overlay'];
+    contactTransform: { x: number; y: number; alpha: number; depth: number } | null;
+  }> {
+    const presentation = this.presentation?.companionSnapshot();
+    const overlay = presentation?.overlay ? 1 : 0;
+    const contact = this.runtimeShadow?.active ? 1 : 0;
+    return {
+      primary: this.active ? 1 : 0,
+      outline: presentation?.outline ? 1 : 0,
+      contact,
+      stateOverlay: this.kind === 'boss' ? 0 : overlay,
+      phaseOverlay: this.kind === 'boss' ? overlay : 0,
+      total: (presentation?.total ?? 0) + contact,
+      outlineTransform: presentation?.outline ?? null,
+      overlayTransform: presentation?.overlay ?? null,
+      contactTransform: this.runtimeShadow?.active
+        ? { x: this.runtimeShadow.x, y: this.runtimeShadow.y, alpha: this.runtimeShadow.alpha, depth: this.runtimeShadow.depth }
+        : null,
+    };
+  }
 
   public setGroundPosition(x: number, y: number): this {
     this.setPosition(x, y);
@@ -455,7 +494,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.presentation?.applyBossPhase(phase);
   }
 
-  private updatePresentationLayout(): void {
+  public syncPresentationCompanions(): void {
     const presentation = this.presentation; if (!presentation) return;
     presentation.updateLayout();
     const shadow = presentation.shadowAnchor(this.groundPoint);

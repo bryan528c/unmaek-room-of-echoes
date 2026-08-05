@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { activeModifiersForWave, actDefinition, RunActDirector, simulateLongRun } from '../game/systems/RunActDirector';
+import { RunOutcomeController } from '../game/systems/CombatLifecycle';
+import { activeModifiersForWave, actDefinition, RunActDirector, shouldFinishSubmissionRun, simulateLongRun } from '../game/systems/RunActDirector';
 
 describe('RunActDirector', () => {
   it('keeps the run alive after the Act 1 boss and advances to the distinct Act 2 definition', () => {
@@ -30,6 +31,24 @@ describe('RunActDirector', () => {
     expect(actDefinition(30).healthMultiplier).toBeLessThanOrEqual(2.35);
     expect(actDefinition(30).damageMultiplier).toBeLessThanOrEqual(1.85);
     expect(director.snapshot()).toMatchObject({ bossesDefeated: 3, completedActs: 3, highestAct: 4 });
+  });
+
+  it('ends the production submission after Act 3 exactly once while keeping explicit development Endless access', () => {
+    expect(shouldFinishSubmissionRun(2, { development: false, endlessRequested: false })).toBe(false);
+    expect(shouldFinishSubmissionRun(3, { development: false, endlessRequested: false })).toBe(true);
+    expect(shouldFinishSubmissionRun(3, { development: false, endlessRequested: true })).toBe(true);
+    expect(shouldFinishSubmissionRun(3, { development: true, endlessRequested: false })).toBe(true);
+    expect(shouldFinishSubmissionRun(3, { development: true, endlessRequested: true })).toBe(false);
+
+    const director = new RunActDirector(); director.beginRun(11);
+    director.completeBoss(100_000, 10); director.advanceAct(104_000, 10);
+    director.completeBoss(220_000, 20); director.advanceAct(224_000, 20);
+    director.completeBoss(340_000, 30);
+    const outcome = new RunOutcomeController(); let resultTransitions = 0;
+    if (outcome.claim('VICTORY') && outcome.consumeResultTransition('VICTORY')) resultTransitions += 1;
+    if (outcome.claim('VICTORY') && outcome.consumeResultTransition('VICTORY')) resultTransitions += 1;
+    expect(resultTransitions).toBe(1);
+    expect(director.snapshot()).toMatchObject({ current: { index: 3 }, bossesDefeated: 3, completedActs: 3, highestAct: 3 });
   });
 
   it('blocks old act callbacks without discarding run-wide boss and result records', () => {

@@ -799,43 +799,43 @@
           "resolution": "unique-asset",
           "assetKey": "idle",
           "direction": "front",
-          "file": "creatures/act1/mineral_spider/runtime/act1_mineral_spider_idle_front_01.png"
+          "file": "creatures/act1/mineral_spider/runtime_corrected/act1_mineral_spider_idle_front_corrected_candidate_104x88.png"
         },
         "move": {
           "resolution": "unique-asset",
           "assetKey": "move",
           "direction": "side",
-          "file": "creatures/act1/mineral_spider/runtime/act1_mineral_spider_move_side_01.png"
+          "file": "creatures/act1/mineral_spider/runtime_corrected/act1_mineral_spider_move_side_corrected_candidate_104x88.png"
         },
         "alert": {
           "resolution": "unique-asset",
           "assetKey": "alert",
           "direction": "front",
-          "file": "creatures/act1/mineral_spider/runtime/act1_mineral_spider_alert_front_01.png"
+          "file": "creatures/act1/mineral_spider/runtime_corrected/act1_mineral_spider_alert_front_corrected_candidate_104x88.png"
         },
         "deploy": {
           "resolution": "unique-asset",
           "assetKey": "deploy",
           "direction": "side",
-          "file": "creatures/act1/mineral_spider/runtime/act1_mineral_spider_deploy_side_01.png"
+          "file": "creatures/act1/mineral_spider/runtime_corrected/act1_mineral_spider_deploy_side_corrected_candidate_104x88.png"
         },
         "attack": {
           "resolution": "unique-asset",
           "assetKey": "attack",
           "direction": "side",
-          "file": "creatures/act1/mineral_spider/runtime/act1_mineral_spider_attack_side_01.png"
+          "file": "creatures/act1/mineral_spider/runtime_corrected/act1_mineral_spider_attack_side_corrected_candidate_104x88.png"
         },
         "stunned": {
           "resolution": "unique-asset",
           "assetKey": "stunned",
           "direction": "front",
-          "file": "creatures/act1/mineral_spider/runtime/act1_mineral_spider_stunned_front_01.png"
+          "file": "creatures/act1/mineral_spider/runtime_corrected/act1_mineral_spider_stunned_front_corrected_candidate_104x88.png"
         },
         "retreat": {
           "resolution": "unique-asset",
           "assetKey": "retreat",
           "direction": "side",
-          "file": "creatures/act1/mineral_spider/runtime/act1_mineral_spider_retreat_side_01.png"
+          "file": "creatures/act1/mineral_spider/runtime_corrected/act1_mineral_spider_retreat_side_corrected_candidate_104x88.png"
         }
       },
       "stateAliases": {},
@@ -850,13 +850,13 @@
         "retreat": "creatures/act1/mineral_spider/master/act1_mineral_spider_retreat_side_master.png"
       },
       "runtimeFiles": {
-        "idle": "creatures/act1/mineral_spider/runtime/act1_mineral_spider_idle_front_01.png",
-        "move": "creatures/act1/mineral_spider/runtime/act1_mineral_spider_move_side_01.png",
-        "alert": "creatures/act1/mineral_spider/runtime/act1_mineral_spider_alert_front_01.png",
-        "deploy": "creatures/act1/mineral_spider/runtime/act1_mineral_spider_deploy_side_01.png",
-        "attack": "creatures/act1/mineral_spider/runtime/act1_mineral_spider_attack_side_01.png",
-        "stunned": "creatures/act1/mineral_spider/runtime/act1_mineral_spider_stunned_front_01.png",
-        "retreat": "creatures/act1/mineral_spider/runtime/act1_mineral_spider_retreat_side_01.png"
+        "idle": "creatures/act1/mineral_spider/runtime_corrected/act1_mineral_spider_idle_front_corrected_candidate_104x88.png",
+        "move": "creatures/act1/mineral_spider/runtime_corrected/act1_mineral_spider_move_side_corrected_candidate_104x88.png",
+        "alert": "creatures/act1/mineral_spider/runtime_corrected/act1_mineral_spider_alert_front_corrected_candidate_104x88.png",
+        "deploy": "creatures/act1/mineral_spider/runtime_corrected/act1_mineral_spider_deploy_side_corrected_candidate_104x88.png",
+        "attack": "creatures/act1/mineral_spider/runtime_corrected/act1_mineral_spider_attack_side_corrected_candidate_104x88.png",
+        "stunned": "creatures/act1/mineral_spider/runtime_corrected/act1_mineral_spider_stunned_front_corrected_candidate_104x88.png",
+        "retreat": "creatures/act1/mineral_spider/runtime_corrected/act1_mineral_spider_retreat_side_corrected_candidate_104x88.png"
       },
       "optionalOverlays": [
         {

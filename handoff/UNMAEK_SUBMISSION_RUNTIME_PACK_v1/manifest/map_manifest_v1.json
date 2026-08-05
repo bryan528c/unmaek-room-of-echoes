@@ -11,9 +11,9 @@
       "act": 1,
       "width": 1280,
       "height": 720,
-      "backgroundFile": "maps/act1/act1_general_bg_1280x720.png",
-      "collisionMaskFile": "maps/act1/act1_general_collision.png",
-      "hazardMaskFile": "maps/act1/act1_general_hazard.png",
+      "backgroundFile": "maps/act1/general/act1_general_bg_recovery_1280x720.png",
+      "collisionMaskFile": "maps/act1/general/act1_general_collision_recovery.png",
+      "hazardMaskFile": "maps/act1/general/act1_general_hazard_recovery.png",
       "playerSpawn": {
         "x": 410,
         "y": 525
@@ -85,23 +85,23 @@
       "act": 1,
       "width": 1280,
       "height": 720,
-      "backgroundFile": "maps/act1/act1_boss_bg_1280x720.png",
-      "collisionMaskFile": "maps/act1/act1_boss_collision.png",
-      "hazardMaskFile": "maps/act1/act1_boss_hazard.png",
+      "backgroundFile": "maps/act1/boss/act1_boss_bg_recovery_1280x720.png",
+      "collisionMaskFile": "maps/act1/boss/act1_boss_collision_recovery.png",
+      "hazardMaskFile": "maps/act1/boss/act1_boss_hazard_recovery.png",
       "playerSpawn": {
         "x": 350,
         "y": 530
       },
       "enemySpawnSlots": [],
       "bossSpawn": {
-        "x": 620,
-        "y": 150
+        "x": 640,
+        "y": 265
       },
       "bossTerritory": {
         "shape": "circle",
         "center": {
           "x": 640,
-          "y": 340
+          "y": 350
         },
         "radius": 280
       },
@@ -140,8 +140,8 @@
       "act": 2,
       "width": 1280,
       "height": 720,
-      "backgroundFile": "maps/act2/act2_general_bg_1280x720.png",
-      "collisionMaskFile": "maps/act2/act2_general_collision.png",
+      "backgroundFile": "maps/act2/general/act2_general_bg_recovery_1280x720.png",
+      "collisionMaskFile": "maps/act2/general/act2_general_collision_recovery.png",
       "hazardMaskFile": null,
       "playerSpawn": {
         "x": 599,
@@ -191,8 +191,8 @@
       "act": 2,
       "width": 1280,
       "height": 720,
-      "backgroundFile": "maps/act2/act2_boss_bg_1280x720.png",
-      "collisionMaskFile": "maps/act2/act2_boss_collision.png",
+      "backgroundFile": "maps/act2/boss/act2_boss_bg_recovery_1280x720.png",
+      "collisionMaskFile": "maps/act2/boss/act2_boss_collision_recovery.png",
       "hazardMaskFile": null,
       "playerSpawn": {
         "x": 631,
@@ -200,8 +200,8 @@
       },
       "enemySpawnSlots": [],
       "bossSpawn": {
-        "x": 618,
-        "y": 175
+        "x": 640,
+        "y": 320
       },
       "bossTerritory": {
         "shape": "ellipse",
@@ -247,8 +247,8 @@
       "act": 3,
       "width": 1280,
       "height": 720,
-      "backgroundFile": "maps/act3/act3_general_bg_1280x720.png",
-      "collisionMaskFile": "maps/act3/act3_general_collision.png",
+      "backgroundFile": "maps/act3/general/act3_general_bg_recovery_1280x720.png",
+      "collisionMaskFile": "maps/act3/general/act3_general_collision_recovery.png",
       "hazardMaskFile": null,
       "playerSpawn": {
         "x": 605,
@@ -298,8 +298,8 @@
       "act": 3,
       "width": 1280,
       "height": 720,
-      "backgroundFile": "maps/act3/act3_boss_bg_1280x720.png",
-      "collisionMaskFile": "maps/act3/act3_boss_collision.png",
+      "backgroundFile": "maps/act3/boss/act3_boss_bg_recovery_1280x720.png",
+      "collisionMaskFile": "maps/act3/boss/act3_boss_collision_recovery.png",
       "hazardMaskFile": null,
       "playerSpawn": {
         "x": 631,
@@ -307,8 +307,8 @@
       },
       "enemySpawnSlots": [],
       "bossSpawn": {
-        "x": 227,
-        "y": 170
+        "x": 340,
+        "y": 270
       },
       "bossTerritory": {
         "shape": "ellipse",

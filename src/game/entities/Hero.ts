@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { BALANCE, COMBAT_BOUNDS } from '../balance';
 import { DEPTH } from '../config';
+import { SUBMISSION_HERO_OUTLINE_PIXELS, SUBMISSION_HERO_PRESENTATION_SCALE } from '../runtime/SubmissionRuntime';
 import { synchronizeArcadeBodyAfterGameObjectMove } from '../systems/ArcadeBodySync';
 import type { Ellipse } from '../systems/CombatGeometry';
 import { clamp } from '../utils/math';
@@ -18,7 +19,8 @@ export interface HeroAttack {
 
 export type HeroAttackStyle = 'legacy' | 'finisher' | 'cut';
 
-const HERO_SCALE = 0.4;
+const HERO_SCALE = SUBMISSION_HERO_PRESENTATION_SCALE;
+const HERO_OUTLINE_ALPHA = 0.52;
 const HERO_VISUAL_HALF_WIDTH = 42;
 const HERO_VISUAL_HEIGHT = 86;
 
@@ -50,16 +52,24 @@ export class Hero extends Phaser.Physics.Arcade.Sprite {
   private lungeVelocity = new Phaser.Math.Vector2();
   private lungeDistanceValue = 0;
   private comboStyle: HeroAttackStyle = 'legacy';
+  private readabilityOutline?: Phaser.GameObjects.Image;
 
   public constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y, 'hero-idle');
     scene.add.existing(this);
     scene.physics.add.existing(this);
+    this.readabilityOutline = scene.add.image(x, y, 'hero-idle').setTint(0x071012).setAlpha(0);
     this.setDepth(DEPTH.characterBase + Math.floor(y)).setOrigin(0.5, 1).setScale(HERO_SCALE);
     const body = this.body as Phaser.Physics.Arcade.Body;
     body.setCircle(BALANCE.collision.heroMovementRadius);
     body.setOffset((this.width - BALANCE.collision.heroMovementRadius * 2) / 2, this.height - BALANCE.collision.heroMovementRadius * 2 - 2);
     body.setCollideWorldBounds(true);
+    this.updateReadabilityOutline();
+  }
+
+  public override preUpdate(time: number, delta: number): void {
+    super.preUpdate(time, delta);
+    this.updateReadabilityOutline();
   }
 
   public updateMovement(time: number, x: number, y: number, aimX: number, aimY: number): void {
@@ -217,6 +227,25 @@ export class Hero extends Phaser.Physics.Arcade.Sprite {
 
   public cancelAttackRecovery(): void { if (this.comboActive) this.finishCombo(true); }
 
+  private updateReadabilityOutline(): void {
+    const outline = this.readabilityOutline;
+    if (!outline?.active) return;
+    if (outline.texture.key !== this.texture.key) outline.setTexture(this.texture.key);
+    const frameWidth = Math.max(1, outline.frame.realWidth);
+    const frameHeight = Math.max(1, outline.frame.realHeight);
+    outline.setPosition(this.x, this.y)
+      .setOrigin(this.originX, this.originY)
+      .setScale(
+        Math.abs(this.scaleX) + SUBMISSION_HERO_OUTLINE_PIXELS * 2 / frameWidth,
+        Math.abs(this.scaleY) + SUBMISSION_HERO_OUTLINE_PIXELS * 2 / frameHeight,
+      )
+      .setRotation(this.rotation)
+      .setFlipX(this.flipX)
+      .setAlpha(this.alpha * HERO_OUTLINE_ALPHA)
+      .setVisible(this.visible)
+      .setDepth(this.depth - 0.1);
+  }
+
   private finishCombo(cancelled: boolean): void {
     if (!this.comboActive) return;
     for (const timer of this.comboTimers) if (!timer.hasDispatched) timer.remove(false);
@@ -267,6 +296,8 @@ export class Hero extends Phaser.Physics.Arcade.Sprite {
     this.delayedSlash?.remove(false);
     for (const timer of this.comboTimers) timer.remove(false);
     this.comboTimers = [];
+    this.readabilityOutline?.destroy();
+    this.readabilityOutline = undefined;
     super.destroy(fromScene);
   }
 }

@@ -5,6 +5,9 @@ import mapManifestJson from '../../../handoff/UNMAEK_SUBMISSION_RUNTIME_PACK_v1/
 export const SUBMISSION_SOURCE_WIDTH = 1280;
 export const SUBMISSION_SOURCE_HEIGHT = 720;
 export const SUBMISSION_GAME_SCALE = 0.75;
+export const SUBMISSION_FOREGROUND_DEPTH = 60;
+export const SUBMISSION_HERO_PRESENTATION_SCALE = 0.34;
+export const SUBMISSION_HERO_OUTLINE_PIXELS = 1;
 
 export interface RuntimePoint {
   x: number;
@@ -68,6 +71,16 @@ interface RuntimeBossPhaseEntry {
 export type RuntimeCreatureRole = 'environmental-cue' | 'regular-enemy' | 'boss';
 export type RuntimeAiRole = 'background-cue' | 'chaser-melee' | 'projectile' | 'area-control' | 'defense-melee' | 'boss-3phase';
 export type RuntimeDirectionMode = 'fixed' | 'flipX' | 'front-side' | 'front-back-side';
+
+export type RuntimePresentationSizeTier = 'background-cue' | 'small' | 'regular' | 'defense' | 'boss';
+
+export interface RuntimePresentationProfile {
+  visualScale: number;
+  sizeTier: RuntimePresentationSizeTier;
+  hostileReadability: 'none' | 'neutral-outline';
+  outlinePixels: 0 | 1 | 2;
+  contactMode: 'none' | 'shadow' | 'ripple';
+}
 
 export interface RuntimeCreatureMetadata {
   id: string;
@@ -166,6 +179,24 @@ const displayStrings = JSON.parse(displayStringsJson) as DisplayStringsManifest;
 const creaturesById = new Map(creatureManifest.creatures.map((creature) => [creature.id, creature]));
 const mapsById = new Map(mapManifest.maps.map((map) => [map.id, map]));
 
+// Submission footage uses a 960x540 logical viewport. These presentation-only
+// multipliers compensate for transparent padding and small painted silhouettes
+// in the locked runtime PNGs. Keeping them here also keeps every Ground Point-
+// relative transform on one scale contract.
+const presentationProfiles: Readonly<Record<string, RuntimePresentationProfile>> = {
+  pressure_swift: { visualScale: 2, sizeTier: 'background-cue', hostileReadability: 'none', outlinePixels: 0, contactMode: 'none' },
+  deflect_bat: { visualScale: 1.8, sizeTier: 'small', hostileReadability: 'neutral-outline', outlinePixels: 1, contactMode: 'shadow' },
+  rewind_lizard: { visualScale: 1.8, sizeTier: 'small', hostileReadability: 'neutral-outline', outlinePixels: 1, contactMode: 'shadow' },
+  mineral_spider: { visualScale: 0.95, sizeTier: 'regular', hostileReadability: 'neutral-outline', outlinePixels: 1, contactMode: 'shadow' },
+  resonance_goral: { visualScale: 1.17, sizeTier: 'boss', hostileReadability: 'neutral-outline', outlinePixels: 2, contactMode: 'shadow' },
+  resonance_civet: { visualScale: 1, sizeTier: 'regular', hostileReadability: 'neutral-outline', outlinePixels: 1, contactMode: 'shadow' },
+  pleated_frog: { visualScale: 1, sizeTier: 'regular', hostileReadability: 'neutral-outline', outlinePixels: 1, contactMode: 'shadow' },
+  diffraction_pangolin: { visualScale: 1.12, sizeTier: 'boss', hostileReadability: 'neutral-outline', outlinePixels: 2, contactMode: 'shadow' },
+  flowjaw_crab: { visualScale: 0.92, sizeTier: 'defense', hostileReadability: 'neutral-outline', outlinePixels: 1, contactMode: 'ripple' },
+  pulsebarbel_catfish: { visualScale: 1.25, sizeTier: 'regular', hostileReadability: 'neutral-outline', outlinePixels: 1, contactMode: 'ripple' },
+  channel_otter_mother: { visualScale: 1.4, sizeTier: 'boss', hostileReadability: 'neutral-outline', outlinePixels: 2, contactMode: 'ripple' },
+};
+
 export const sourcePointToGame = (point: Readonly<RuntimePoint>): RuntimePoint => ({
   x: point.x * SUBMISSION_GAME_SCALE,
   y: point.y * SUBMISSION_GAME_SCALE,
@@ -201,6 +232,22 @@ export const resolveCreatureMetadata = (creatureId: string): RuntimeCreatureMeta
   const creature = creaturesById.get(creatureId);
   if (!creature) throw new Error(`[SubmissionRuntime] Unknown creature id: ${creatureId}`);
   return creature;
+};
+
+export const resolveCreaturePresentationProfile = (creatureId: string): RuntimePresentationProfile => {
+  resolveCreatureMetadata(creatureId);
+  return presentationProfiles[creatureId] ?? {
+    visualScale: 1,
+    sizeTier: 'regular',
+    hostileReadability: 'neutral-outline',
+    outlinePixels: 1,
+    contactMode: 'shadow',
+  };
+};
+
+export const runtimePresentationScale = (creatureId: string): number => {
+  const creature = resolveCreatureMetadata(creatureId);
+  return SUBMISSION_GAME_SCALE * creature.runtimeScale * resolveCreaturePresentationProfile(creatureId).visualScale;
 };
 
 export const resolveMapDefinition = (mapId: string): RuntimeMapDefinition => {
@@ -281,7 +328,7 @@ export const resolveWorldHurtbox = (creatureId: string, groundPoint: Readonly<Ru
   if (!creature.hurtbox) return null;
   const box = flipped && creature.hurtbox.flippedX ? creature.hurtbox.flippedX : creature.hurtbox.original;
   const anchor = flippableAnchorValue(creature.groundPoint, flipped).pixel;
-  const scale = SUBMISSION_GAME_SCALE * creature.runtimeScale;
+  const scale = runtimePresentationScale(creatureId);
   return {
     x: groundPoint.x + (box.x + box.width / 2 - anchor.x) * scale,
     y: groundPoint.y + (box.y + box.height / 2 - anchor.y) * scale,
@@ -296,7 +343,7 @@ export const resolveWorldAttackAnchor = (creatureId: string, groundPoint: Readon
   if (!attackAnchor) return { ...groundPoint };
   const anchor = flippableAnchorValue(attackAnchor, flipped).pixel;
   const ground = flippableAnchorValue(creature.groundPoint, flipped).pixel;
-  const scale = SUBMISSION_GAME_SCALE * creature.runtimeScale;
+  const scale = runtimePresentationScale(creatureId);
   return { x: groundPoint.x + (anchor.x - ground.x) * scale, y: groundPoint.y + (anchor.y - ground.y) * scale };
 };
 
@@ -304,7 +351,7 @@ export const resolveWorldShadowAnchor = (creatureId: string, groundPoint: Readon
   const creature = resolveCreatureMetadata(creatureId);
   const anchor = flippableAnchorValue(creature.shadowAnchor, flipped).pixel;
   const ground = flippableAnchorValue(creature.groundPoint, flipped).pixel;
-  const scale = SUBMISSION_GAME_SCALE * creature.runtimeScale;
+  const scale = runtimePresentationScale(creatureId);
   return { x: groundPoint.x + (anchor.x - ground.x) * scale, y: groundPoint.y + (anchor.y - ground.y) * scale };
 };
 
