@@ -1,6 +1,8 @@
+import { resolveAct1RuntimeMode } from '../final/Act1FinalConfig';
+
 export interface MotionPilotConfig {
   enabled: boolean;
-  source: 'URL_QUERY' | 'DEFAULT_OFF';
+  source: 'URL_QUERY' | 'DEFAULT_FINAL' | 'DEFAULT_OFF' | 'LEGACY_OVERRIDE';
 }
 
 export type MotionPilotTarget =
@@ -50,12 +52,15 @@ export const resolveMirroredStagingFlip = (current: boolean, horizontalDelta: nu
 
 export const resolveMotionPilotConfig = (search: string): MotionPilotConfig => {
   const params = new URLSearchParams(search);
-  const enabled = params.get('motionPilot') === '1' || params.get('act1Final') === '1';
+  const mode = resolveAct1RuntimeMode(search);
+  if (mode === 'LEGACY') return { enabled: false, source: 'LEGACY_OVERRIDE' };
+  if (mode === 'FINAL') return { enabled: true, source: params.get('act1Final') === '1' ? 'URL_QUERY' : 'DEFAULT_FINAL' };
+  const enabled = params.get('motionPilot') === '1';
   return { enabled, source: enabled ? 'URL_QUERY' : 'DEFAULT_OFF' };
 };
 
 export const motionPilotConfig = (): MotionPilotConfig => resolveMotionPilotConfig(
-  typeof window === 'undefined' ? '' : window.location.search,
+  typeof window === 'undefined' ? '?legacyRuntime=1' : window.location.search,
 );
 
 export const motionPilotEnabled = (): boolean => motionPilotConfig().enabled;

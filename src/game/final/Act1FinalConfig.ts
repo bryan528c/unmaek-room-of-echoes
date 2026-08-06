@@ -1,6 +1,7 @@
 export type Act1FinalPlayerSource = 'FINAL_HANDOFF' | 'CURRENT_MOTION_PILOT' | 'LEGACY';
 export type Act1FinalCreatureSource = 'FINAL_CORRECTED' | 'VERIFIED_MOTION' | 'LEGACY';
 export type Act1FinalVfxSource = 'FINAL_PNG' | 'PROCEDURAL' | 'LEGACY';
+export type Act1RuntimeMode = 'FINAL' | 'LEGACY' | 'COMPARISON';
 
 export interface Act1FinalCreaturePresentationProfile {
   uniformScale: number;
@@ -11,6 +12,7 @@ export interface Act1FinalCreaturePresentationProfile {
 }
 
 export interface Act1FinalConfig {
+  mode: Act1RuntimeMode;
   enabled: boolean;
   player: Act1FinalPlayerSource;
   creatures: Readonly<Record<string, Act1FinalCreatureSource>>;
@@ -118,18 +120,31 @@ export const act1FinalCreaturePresentationProfile = (creatureId: string): Act1Fi
 export const act1FinalCorrectedFrameIsStable = (creatureId: string, sequenceId: string, frameIndex: number): boolean =>
   ACT1_FINAL_STABLE_CORRECTED_FRAME_KEYS[creatureId]?.has(`${sequenceId}:${frameIndex}`) ?? false;
 
+export const resolveAct1RuntimeMode = (search: string): Act1RuntimeMode => {
+  const params = new URLSearchParams(search);
+  if (params.get('legacyRuntime') === '1') return 'LEGACY';
+  if (params.get('act1Final') === '1') return 'FINAL';
+  if (params.get('motionPilot') === '1' || params.get('act1Showcase') === '1') return 'COMPARISON';
+  return 'FINAL';
+};
+
 export const resolveAct1FinalConfig = (search: string): Act1FinalConfig => {
-  const enabled = new URLSearchParams(search).get('act1Final') === '1';
+  const params = new URLSearchParams(search);
+  const mode = resolveAct1RuntimeMode(search);
+  const enabled = mode === 'FINAL';
+  const comparisonMotion = mode === 'COMPARISON' && params.get('motionPilot') === '1';
+  const comparisonVfx = comparisonMotion && params.get('act1Showcase') === '1';
   return {
+    mode,
     enabled,
-    player: enabled ? 'FINAL_HANDOFF' : 'LEGACY',
-    creatures: Object.fromEntries(CREATURES.map((id) => [id, enabled ? 'FINAL_CORRECTED' : 'LEGACY'])),
-    vfx: enabled ? 'FINAL_PNG' : 'LEGACY',
+    player: enabled ? 'FINAL_HANDOFF' : comparisonMotion ? 'CURRENT_MOTION_PILOT' : 'LEGACY',
+    creatures: Object.fromEntries(CREATURES.map((id) => [id, enabled ? 'FINAL_CORRECTED' : comparisonMotion ? 'VERIFIED_MOTION' : 'LEGACY'])),
+    vfx: enabled ? 'FINAL_PNG' : comparisonVfx ? 'PROCEDURAL' : 'LEGACY',
   };
 };
 
 export const act1FinalConfig = (): Act1FinalConfig => resolveAct1FinalConfig(
-  typeof window === 'undefined' ? '' : window.location.search,
+  typeof window === 'undefined' ? '?legacyRuntime=1' : window.location.search,
 );
 
 export const act1FinalEnabled = (): boolean => act1FinalConfig().enabled;

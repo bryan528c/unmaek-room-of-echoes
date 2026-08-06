@@ -15,6 +15,8 @@ describe('ACT 1 showcase procedural VFX staging', () => {
     expect(resolveAct1ShowcaseConfig('?act1Showcase=1')).toEqual({ enabled: false, source: 'MOTION_PILOT_REQUIRED' });
     const enabled = resolveAct1ShowcaseConfig('?motionPilot=1&act1Showcase=1');
     expect(enabled).toEqual({ enabled: true, source: 'URL_QUERY' });
+    expect(resolveAct1ShowcaseConfig('?legacyRuntime=1&motionPilot=1&act1Showcase=1')).toEqual({ enabled: false, source: 'DEFAULT_OFF' });
+    expect(resolveAct1ShowcaseConfig('?act1Final=1&motionPilot=1&act1Showcase=1')).toEqual({ enabled: false, source: 'DEFAULT_OFF' });
     expect(act1ShowcaseEnabledForAct(enabled, 1)).toBe(true);
     expect(act1ShowcaseEnabledForAct(enabled, 2)).toBe(false);
     expect(act1ShowcaseEnabledForAct(enabled, 3)).toBe(false);

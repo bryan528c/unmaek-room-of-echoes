@@ -14,6 +14,7 @@ import {
   projectileCorridorLines,
   resolveAct1FinalPresentationSource,
   resolveAct1FinalConfig,
+  resolveAct1RuntimeMode,
 } from '../game/final/Act1FinalConfig';
 import { playerMotionSource } from '../game/motion/MotionPilotRuntime';
 
@@ -31,12 +32,15 @@ const player = JSON.parse(readFileSync(`${root}/PLAYER_FULL8_MOTION_MANIFEST.jso
 const vfx = JSON.parse(readFileSync(`${root}/ACT1_VFX_MANIFEST.json`, 'utf8')) as VfxManifest;
 
 describe('ACT 1 final handoff staging mode and loader', () => {
-  it('is explicitly default-off and one-query enabled with independent rollback sources', () => {
-    expect(resolveAct1FinalConfig('')).toMatchObject({ enabled: false, player: 'LEGACY', vfx: 'LEGACY' });
+  it('promotes final by default while preserving explicit comparison and legacy rollback modes', () => {
+    expect(resolveAct1FinalConfig('')).toMatchObject({ mode: 'FINAL', enabled: true, player: 'FINAL_HANDOFF', vfx: 'FINAL_PNG' });
     const enabled = resolveAct1FinalConfig('?act1Final=1');
-    expect(enabled).toMatchObject({ enabled: true, player: 'FINAL_HANDOFF', vfx: 'FINAL_PNG' });
+    expect(enabled).toMatchObject({ mode: 'FINAL', enabled: true, player: 'FINAL_HANDOFF', vfx: 'FINAL_PNG' });
     expect(new Set(Object.values(enabled.creatures))).toEqual(new Set(['FINAL_CORRECTED']));
-    expect(resolveAct1FinalConfig('?act1Final=true').enabled).toBe(false);
+    expect(resolveAct1FinalConfig('?motionPilot=1&act1Showcase=1')).toMatchObject({ mode: 'COMPARISON', enabled: false, player: 'CURRENT_MOTION_PILOT', vfx: 'PROCEDURAL' });
+    expect(resolveAct1FinalConfig('?legacyRuntime=1')).toMatchObject({ mode: 'LEGACY', enabled: false, player: 'LEGACY', vfx: 'LEGACY' });
+    expect(resolveAct1RuntimeMode('?legacyRuntime=1&act1Final=1&motionPilot=1&act1Showcase=1')).toBe('LEGACY');
+    expect(resolveAct1FinalConfig('?legacyRuntime=1&act1Final=1&motionPilot=1&act1Showcase=1')).toMatchObject({ mode: 'LEGACY', enabled: false, player: 'LEGACY', vfx: 'LEGACY' });
   });
 
   it('loads only the individual manifest assets and excludes review media and sheets', () => {

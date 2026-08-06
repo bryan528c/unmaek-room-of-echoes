@@ -31,11 +31,14 @@ const playerManifest = JSON.parse(readFileSync('handoff/UNMAEK_PLAYER_RUNTIME_MO
 const creatureManifest = JSON.parse(readFileSync('handoff/UNMAEK_COMBAT_MOTION_FRAME_RECOVERY_PILOT_v1/MOTION_FRAME_MANIFEST_PILOT_v1.json', 'utf8')) as CreatureManifest;
 
 describe('motion pilot flag and strict loader', () => {
-  it('is default-off and enables only the explicit motionPilot=1 query', () => {
-    expect(resolveMotionPilotConfig('')).toEqual({ enabled: false, source: 'DEFAULT_OFF' });
-    expect(resolveMotionPilotConfig('?motionPilot=0')).toEqual({ enabled: false, source: 'DEFAULT_OFF' });
+  it('follows final-by-default, comparison, and explicit legacy precedence', () => {
+    expect(resolveMotionPilotConfig('')).toEqual({ enabled: true, source: 'DEFAULT_FINAL' });
+    expect(resolveMotionPilotConfig('?motionPilot=0')).toEqual({ enabled: true, source: 'DEFAULT_FINAL' });
     expect(resolveMotionPilotConfig('?motionPilot=1')).toEqual({ enabled: true, source: 'URL_QUERY' });
-    expect(resolveMotionPilotConfig('?motionPilot=true')).toEqual({ enabled: false, source: 'DEFAULT_OFF' });
+    expect(resolveMotionPilotConfig('?motionPilot=1&act1Showcase=1')).toEqual({ enabled: true, source: 'URL_QUERY' });
+    expect(resolveMotionPilotConfig('?act1Showcase=1')).toEqual({ enabled: false, source: 'DEFAULT_OFF' });
+    expect(resolveMotionPilotConfig('?act1Final=1')).toEqual({ enabled: true, source: 'URL_QUERY' });
+    expect(resolveMotionPilotConfig('?legacyRuntime=1&act1Final=1&motionPilot=1&act1Showcase=1')).toEqual({ enabled: false, source: 'LEGACY_OVERRIDE' });
   });
 
   it('preloads zero pilot assets when off and exactly manifest frames when on', () => {

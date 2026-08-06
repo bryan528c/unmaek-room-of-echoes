@@ -1,3 +1,5 @@
+import { resolveAct1RuntimeMode } from '../final/Act1FinalConfig';
+
 export interface Act1ShowcaseConfig {
   enabled: boolean;
   source: 'URL_QUERY' | 'DEFAULT_OFF' | 'MOTION_PILOT_REQUIRED';
@@ -35,6 +37,7 @@ export const ACT1_SHOWCASE_VFX = {
 
 export const resolveAct1ShowcaseConfig = (search: string): Act1ShowcaseConfig => {
   const params = new URLSearchParams(search);
+  if (resolveAct1RuntimeMode(search) !== 'COMPARISON') return { enabled: false, source: 'DEFAULT_OFF' };
   const motionPilot = params.get('motionPilot') === '1';
   const showcase = params.get('act1Showcase') === '1';
   if (!motionPilot && showcase) return { enabled: false, source: 'MOTION_PILOT_REQUIRED' };
