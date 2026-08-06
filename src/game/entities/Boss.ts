@@ -45,7 +45,7 @@ export class Boss extends Enemy {
     if (slowed) this.setTint(0x62b9aa); else this.clearTint();
     const distance = Phaser.Math.Distance.Between(this.x, this.y, hero.x, hero.y);
     this.facingAngle = Phaser.Math.Angle.Between(this.x, this.y, hero.x, hero.y);
-    this.setFacingFlipX(Math.cos(this.facingAngle) < 0);
+    this.setFacingFlipX(Math.cos(this.facingAngle) < 0, hero.x - this.x);
     if (time < this.actionLockedUntil) return;
     if (time < this.nextActionAt) {
       if (distance > 145) this.moveToward(this.facingAngle, BALANCE.enemies.boss.speed * (this.phase === 3 ? 1.16 : 1) * (slowed ? 0.36 : 1));
@@ -86,8 +86,14 @@ export class Boss extends Enemy {
     this.patternIndex = 0;
     this.setVelocity(0).setTint(0xa0f4e5);
     this.applyBossPresentationPhase(phase);
+    // Keep the hidden gameplay owner on the legacy transform path. A pilot
+    // visual, when present, is independent and remains uniformly scaled.
     this.scene.tweens.add({ targets: this, scaleX: 1.48, scaleY: 1.48, duration: 330, yoyo: true });
+    // The phase callback cancels all outstanding gameplay attack intents,
+    // including the boss. Start the authored warning after that cleanup so it
+    // is not immediately replaced by the base phase texture.
     this.bossCallbacks.phaseChanged(phase);
+    this.presentation?.playMotionAction(['warning'], BALANCE.boss.phaseTransition);
     if (phase === 3) this.scene.time.delayedCall(900, () => { if (this.active) this.bossCallbacks.summon(3); });
   }
 
@@ -101,6 +107,7 @@ export class Boss extends Enemy {
     }
     const angle = this.facingAngle;
     this.actionLockedUntil = this.scene.time.now + 850;
+    this.presentation?.playMotionAction(['warning'], 720);
     this.showAim(angle, 720, 0xd95842, 650);
     const generation = this.attackIntentGeneration;
     this.scene.time.delayedCall(680, () => {
@@ -145,6 +152,7 @@ export class Boss extends Enemy {
     }
     const angle = this.facingAngle;
     this.actionLockedUntil = this.scene.time.now + 720;
+    this.presentation?.playMotionAction(['warning'], 520);
     this.showAim(angle, 520, 0xe36f4b, 680);
     const generation = this.attackIntentGeneration;
     this.scene.time.delayedCall(480, () => {
@@ -159,6 +167,7 @@ export class Boss extends Enemy {
     this.patternIndex += 1;
     const angle = Phaser.Math.Angle.Between(this.x, this.y, hero.x, hero.y);
     this.setVelocity(0); this.actionLockedUntil = this.scene.time.now + 820;
+    this.presentation?.playMotionAction(['warning'], 680);
     this.showAim(angle, 680, 0xb44861, 700);
     const generation = this.attackIntentGeneration;
     this.scene.time.delayedCall(650, () => {
@@ -189,6 +198,7 @@ export class Boss extends Enemy {
     if (this.patternIndex % 3 === 0) this.bossCallbacks.summon(3);
     const angle = Phaser.Math.Angle.Between(this.x, this.y, hero.x, hero.y);
     this.setVelocity(0); this.actionLockedUntil = this.scene.time.now + 780;
+    this.presentation?.playMotionAction(['warning'], 620);
     this.showAim(angle, 620, 0xa53d68, 650);
     const generation = this.attackIntentGeneration;
     this.scene.time.delayedCall(590, () => {

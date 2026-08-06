@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { CreatureMotionPresentation } from '../motion/MotionPilotRuntime';
 import { BALANCE, COMBAT_BOUNDS, enemyGroundExtents, type EnemyKind } from '../balance';
 import { DEPTH } from '../config';
 import { Boss, type BossCallbacks } from '../entities/Boss';
@@ -20,6 +21,7 @@ import { CombatStats, empoweredWordEffectIsValid, type DamageSource, type Empowe
 import { DamageQueue, simulateDamageFreezeRegression, type DamageEventFlag } from '../systems/DamageQueue';
 import { DamageHistory, type RecordedDamageKind } from '../systems/DamageHistory';
 import { GameFlowController, type BaseGameFlowState } from '../systems/GameFlowController';
+import { resolveDevelopmentCombatFlags, sceneDamageRejectionReason, type HeroDamageRejectionReason } from '../systems/HeroDamagePolicy';
 import { InputRouter, type InputContext } from '../systems/InputRouter';
 import { distributeLinkedDamage } from '../systems/LinkDamage';
 import { ParryResolver } from '../systems/ParrySystem';
@@ -42,6 +44,7 @@ import { angleDelta, distanceSq, rankFor } from '../utils/math';
 import { createArchiveArena, createInkArchiveArena } from '../utils/arena';
 import type { ResultStats } from '../../ui/OverlayUI';
 import { SubmissionMapRuntime } from '../runtime/SubmissionMapRuntime';
+import { nearestRuntimeSafeGroundPoint, runtimeGroundPointIsSafe } from '../runtime/RuntimeSafeSpawn';
 import { isSubmissionActIntegrated } from '../runtime/RuntimeIntegrationGate';
 import {
   backgroundCueCreatureIdsForAct,
@@ -54,6 +57,7 @@ import {
   sourcePointToGame,
   submissionMapId,
   SUBMISSION_HERO_PRESENTATION_SCALE,
+  SUBMISSION_GAME_SCALE,
   runtimePresentationScale,
 } from '../runtime/SubmissionRuntime';
 
@@ -79,6 +83,28 @@ interface HeroDamageContext {
   modifier?: string;
   parryable: boolean;
 }
+interface SceneHeroDamageAttemptSnapshot {
+  source: DamageSource;
+  requestedDamage: number;
+  actualDamage: number;
+  healthBefore: number;
+  healthAfter: number;
+  reason?: HeroDamageRejectionReason;
+  attackerId: string;
+  at: number;
+}
+interface SummonSpawnDiagnostic {
+  index: number;
+  raw: Readonly<{ x: number; y: number }>;
+  mapPixel: Readonly<{ x: number; y: number }>;
+  rawWalkable: boolean;
+  rawInsideTerritory: boolean;
+  corrected: boolean;
+  final: Readonly<{ x: number; y: number }>;
+  finalWalkable: boolean;
+  finalInsideTerritory: boolean;
+  enemyId?: string;
+}
 interface WordCastContext {
   enhanced: boolean;
   empoweredByF: boolean;
@@ -86,7 +112,14 @@ interface WordCastContext {
   overchargeDurationBonus: number;
 }
 type CombatAction = 'attack' | 'parry' | 'dash' | WordId;
-type DebugWindow = Window & { __EONMAEK_DEBUG__?: () => unknown };
+type MotionReviewAction = 'idle' | 'move' | 'dash' | 'basic_attack' | 'parry_failure' | 'parry_success' | 'word_skill' | 'hit_recover' | 'advance';
+type MotionReviewDirection = 'N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW';
+type MotionR2ReviewAction = 'damage-projectile' | 'damage-melee' | 'goral-left' | 'goral-right' | 'phase-next' | 'qa-advance';
+type DebugWindow = Window & {
+  __EONMAEK_DEBUG__?: () => unknown;
+  __EONMAEK_MOTION_REVIEW__?: (direction: MotionReviewDirection, action: MotionReviewAction) => unknown;
+  __EONMAEK_MOTION_R2_REVIEW__?: (action: MotionR2ReviewAction) => unknown;
+};
 
 const modifierIdsForPause = (patterns: ReadonlySet<ActPatternId>, endless: readonly EndlessModifierId[]): string[] =>
   [...new Set<ActPatternId | EndlessModifierId>([
@@ -151,6 +184,8 @@ export class GameScene extends Phaser.Scene {
   private arenaContainer?: Phaser.GameObjects.Container;
   private submissionMap?: SubmissionMapRuntime;
   private backgroundCues = new Set<Phaser.GameObjects.Image>();
+  private backgroundCueMotions = new Map<Phaser.GameObjects.Image, CreatureMotionPresentation>();
+  private motionReviewMovement?: { x: number; y: number; until: number };
   private heroMapSafePoint = { x: 480, y: 300 };
   private atmosphere?: Phaser.GameObjects.Particles.ParticleEmitter;
   private modifierEnvironment?: Phaser.GameObjects.Graphics;
@@ -248,9 +283,14 @@ export class GameScene extends Phaser.Scene {
   private debugStatsVisible = false;
   private debugGraphics?: Phaser.GameObjects.Graphics;
   private debugStatsText?: Phaser.GameObjects.Text;
+  private debugMotionText?: Phaser.GameObjects.Text;
+  private motionReviewPanel?: HTMLDivElement;
   private debugScenarioText?: Phaser.GameObjects.Text;
   private debugScenarioIndex = 0;
   private debugInvulnerable = false;
+  private godMode = false;
+  private lastHeroDamageAttempt?: SceneHeroDamageAttemptSnapshot;
+  private summonSpawnDiagnostics: SummonSpawnDiagnostic[] = [];
   private pointerHandler!: (pointer: Phaser.Input.Pointer) => void;
   private escapeHandler!: (event: KeyboardEvent) => void;
   private attackKeyDownHandler!: (_key: Phaser.Input.Keyboard.Key, event: KeyboardEvent) => void;
@@ -299,7 +339,9 @@ export class GameScene extends Phaser.Scene {
     this.inputRouter.setContext('COMBAT');
     this.lastHeartbeatAt = performance.now();
     const developmentParams = new URLSearchParams(window.location.search);
-    this.qaMode = import.meta.env.DEV && developmentParams.has('qa');
+    const developmentCombatFlags = resolveDevelopmentCombatFlags(window.location.search, import.meta.env.DEV);
+    this.qaMode = developmentCombatFlags.qa;
+    this.godMode = developmentCombatFlags.godMode;
     this.submissionEndlessRequested = import.meta.env.DEV && developmentParams.get('endless') === '1';
     this.legacyCombatMode = import.meta.env.DEV && developmentParams.has('legacyCombo');
     this.defensiveSlashEnabled = BALANCE.hero.defensiveSlash.enabledByDefault || (import.meta.env.DEV && developmentParams.has('defensiveSlash'));
@@ -336,11 +378,13 @@ export class GameScene extends Phaser.Scene {
       act: this.runAct.snapshot(),
       time: this.timeControl.snapshot(),
       input: this.inputRouter.snapshot(),
-      hero: { x: this.hero.x, y: this.hero.y, comboActive: this.hero.isComboActive, comboStep: this.hero.comboStep, direction: this.hero.attackDirection, health: this.hero.health, finisherCharges: this.finisherCharges.charges },
+      development: { qa: this.qaMode, godMode: this.godMode, scenarioInvulnerable: this.debugInvulnerable },
+      hero: { x: this.hero.x, y: this.hero.y, active: this.hero.active, visible: this.hero.visible, alpha: this.hero.alpha, bodyEnabled: (this.hero.body as Phaser.Physics.Arcade.Body).enable, comboActive: this.hero.isComboActive, comboStep: this.hero.comboStep, direction: this.hero.attackDirection, health: this.hero.health, finisherCharges: this.finisherCharges.charges, flipX: this.hero.flipX, textureKey: this.hero.texture.key, geometry: this.hero.motionGeometrySnapshot, motion: this.hero.motionSnapshot, lastDamageAttempt: this.hero.lastDamageAttempt },
+      heroDamageAttempt: this.lastHeroDamageAttempt,
       targetId: this.comboLock.targetId ?? this.heldAttackTarget?.id ?? this.currentTarget?.id,
       targetDistance: this.targetDistance,
-      enemies: [...this.enemies].filter((enemy) => enemy.active).map((enemy) => ({ id: enemy.id, kind: enemy.kind, creatureId: enemy.creatureId, x: enemy.x, y: enemy.y, health: enemy.health, insideBounds: groundFootprintInsideBounds(enemy.groundPoint, enemyGroundExtents(enemy.kind), COMBAT_BOUNDS) })),
-      submissionRuntime: { mapId: this.submissionMap?.definition.id, mapName: this.submissionMap?.displayName, backgroundCueCount: this.backgroundCues.size, hazard: this.submissionMap?.hasHazardMask ?? false },
+      enemies: [...this.enemies].filter((enemy) => enemy.active).map((enemy) => ({ id: enemy.id, kind: enemy.kind, creatureId: enemy.creatureId, phase: enemy instanceof Boss ? enemy.phase : undefined, x: enemy.x, y: enemy.y, health: enemy.health, flipX: enemy.flipX, visualFlipX: enemy.visualFlipX, motion: enemy.motionSnapshot, summonSpawn: enemy.getData('summonSpawn'), insideBounds: groundFootprintInsideBounds(enemy.groundPoint, enemyGroundExtents(enemy.kind), COMBAT_BOUNDS) })),
+      submissionRuntime: { mapId: this.submissionMap?.definition.id, mapName: this.submissionMap?.displayName, backgroundCueCount: this.backgroundCues.size, backgroundCueMotions: [...this.backgroundCueMotions.values()].map((motion) => motion.snapshot()), hazard: this.submissionMap?.hasHazardMask ?? false, summonSpawns: this.summonSpawnDiagnostics },
       wave: this.waveDirector.snapshot(),
       runActFlow: {
         currentBossDefinition: this.boss?.definition.bossId,
@@ -359,6 +403,9 @@ export class GameScene extends Phaser.Scene {
       stats: this.combatStats.snapshot(),
       bounds: COMBAT_BOUNDS,
     });
+    if (import.meta.env.DEV) (window as DebugWindow).__EONMAEK_MOTION_REVIEW__ = (direction, action) => this.runMotionReview(direction, action);
+    if (import.meta.env.DEV) (window as DebugWindow).__EONMAEK_MOTION_R2_REVIEW__ = (action) => this.runMotionR2Review(action);
+    if (import.meta.env.DEV && this.qaMode && this.hero.motionPilotActive) this.createMotionReviewPanel();
     // Arcade Physics applies Body movement to Game Objects in its own
     // POST_UPDATE listener. Manual separation must run afterwards; doing it in
     // Scene.update overwrites the movement calculated for the same frame and
@@ -383,7 +430,7 @@ export class GameScene extends Phaser.Scene {
     this.services.ui.showHud(); this.startTime = this.time.now;
     this.tutorialEnabled = this.services.save.settings.showTutorial && !this.services.save.tutorialSeen;
     if (this.tutorialEnabled) { const first = this.tutorialSteps[0]; if (first) this.services.ui.showTutorial(first.text); this.tutorialHideAt = this.time.now + 5000; }
-    if (startAtBoss) { this.debugInvulnerable = true; this.startBoss(); } else this.spawnWave(0);
+    if (startAtBoss) this.startBoss(); else this.spawnWave(0);
   }
 
   private startNewRun(): void {
@@ -399,13 +446,13 @@ export class GameScene extends Phaser.Scene {
     // cleared automatically even though display-list children are destroyed.
     this.boss = undefined;
     this.enemies = new Set(); this.projectiles = new Set(); this.inkZones = []; this.linkedTargets = new Set(); this.linkMarkers = new Map(); this.linkShareRatio = BALANCE.words.linkShare; this.linkGeneration = 0;
-    this.submissionMap = undefined; this.backgroundCues = new Set(); this.heroMapSafePoint = { x: 480, y: 300 };
+    this.submissionMap = undefined; this.backgroundCues = new Set(); this.backgroundCueMotions = new Map(); this.motionReviewMovement = undefined; this.heroMapSafePoint = { x: 480, y: 300 };
     this.upgrades = this.runProgress.upgrades; this.rewind = new RewindBuffer(BALANCE.words.rewindDuration); this.targeting = new TargetingSystem(BALANCE.targeting); this.wordChain = new WordChainSystem(BALANCE.chain.window); this.wordLoadout = new WordLoadoutState(DEFAULT_WORD_LOADOUT); this.wordStatuses = new WordStatusRuntime(); this.wordReadyAt = { stop: 0, rewind: 0, link: 0, pull: 0, mark: 0, push: 0 }; this.damageHistory = new DamageHistory(BALANCE.chain.damageHistoryRetention); this.combatStats = this.runProgress.combatStats; this.attackRegistry = new AttackHitRegistry(); this.attackInput = new RisingEdgeInput(); this.comboLock = new SoftTargetLock(); this.flow = new GameFlowController('RUN_START', import.meta.env.DEV ? (message) => console.warn(`[GameFlow] ${message}`) : undefined, performance.now()); this.inputRouter = new InputRouter(); this.parryResolver = new ParryResolver(); this.finisherCharges = new FinisherChargeSystem(BALANCE.hero.finisher.maximumCharges); this.weaponCooldowns = new WeaponCooldowns(); this.weaponCooldowns.reset(0); this.resonanceRuntime = new ResonanceRuntime(); this.waveDirector = new WaveDirector(BALANCE.pacing.roundClearStability, BALANCE.pacing.staleEnemyRecovery); this.threatBudget = new ThreatBudget(); this.runOutcome = new RunOutcomeController(); this.attacks = [];
     this.waveIndex = 0; this.waveSpawnGeneration = 0; this.enemySpawnTimes = new Map(); this.enemyFirstDamageAt = new Map(); this.currentComboDamage = 0; this.nextDefensiveSlashAt = 0; this.defensiveSlashEnabled = false; this.nextHeldComboAt = 0; this.firstWaveSpawnOrdinal = 0; this.defensiveSlashSequence = 100000; this.echoBladeSequence = 200000; this.lastDirectTargetId = undefined; this.echoFinisherUntil = 0; this.echoAmplifierUntil = 0; this.bossMechanicRewardUntil = 0; this.encounterStartedAt = 0; this.bossPhaseStartedAt = 0; this.currentWaveBatches = []; this.nextBatchIndex = 0; this.activeBatchPendingSpawns = 0; this.miniWaveReadyAt = 0; this.parryAnchorUntil = 0; this.lastWaveDiagnosticAt = 0; this.score = 0; this.activeActPatterns = new Set(); this.activeEndlessModifiers = []; this.actPatternGeneration = 0; this.echoProjectileSequence = 0; this.stitchedPairs = new Map(); this.arenaContainer = undefined; this.modifierEnvironment = undefined; this.modifierIntroductions = new ModifierIntroductionTracker(this.services.save.modifierTutorialsSeen);
     this.sentence = 0; this.empowered = false; this.stopReadyAt = 0; this.rewindReadyAt = 0; this.linkReadyAt = 0;
     this.damageTaken = 0; this.deathSequenceStarted = false; this.parries = 0; this.wordUses = { '멎는다': 0, '되돌린다': 0, '잇는다': 0, '당긴다': 0, '새긴다': 0, '밀어낸다': 0 };
     this.tutorialIndex = 0; this.tutorialSteps = TUTORIAL.map((step) => ({ ...step })); this.tutorialHideAt = 0; this.firstHitAvailable = true; this.lastPursuitId = ''; this.pursuitCount = 0; this.regressionCharged = false; this.parryCounterUntil = 0; this.parryAimUntil = 0; this.parryStartedAt = 0; this.sentencePulseUntil = 0; this.sentenceFullAt = 0; this.sentenceReminderShown = false; this.perfectCounterUntil = 0; this.headwindGuardUntil = 0; this.cutPerfectCounterActive = false; this.lastDashAt = Number.NEGATIVE_INFINITY; this.echoHarvestWindowStartedAt = 0; this.echoHarvestWindowGain = 0; this.lastUpgradeToastAt = new Map(); this.lastActivatedUpgrade = undefined; this.lastActivatedUpgradeUntil = 0; this.lastActivatedResonance = undefined; this.lastActivatedResonanceUntil = 0; this.transientCombatObjects.clear(); this.bossTransitionUntil = 0; this.bossSignatureExecutions = new Set(); this.bossDeathEvents = 0; this.actTransitionStartedAt = 0; this.lastActTransitionDuration = 0; this.bufferedAction = undefined; this.currentTarget = undefined; this.comboTarget = undefined; this.heldAttackTarget = undefined; this.targetMarkerUntil = 0; this.targetDistance = 0; this.timeouts = []; this.rewindPreviewGhosts = [];
-    this.activeDaggerDebug = undefined; this.debugHitboxes = false; this.debugStatsVisible = false; this.debugScenarioIndex = 0; this.debugInvulnerable = false; this.watchdogHandle = undefined; this.lastHeartbeatAt = performance.now(); this.lastWatchdogReportAt = 0; this.watchdogMessage = 'normal'; this.watchdogStalled = false; this.lastAttackAt = 0; this.lastHitAt = 0; this.lastDebugPublishAt = 0; this.frameDelta = 1000 / 60; this.combatHeartbeats = { scene: 0, physics: 0, damageQueue: 0, timeControl: 0, audio: 0, bossAi: 0 };
+    this.activeDaggerDebug = undefined; this.debugHitboxes = false; this.debugStatsVisible = false; this.debugScenarioIndex = 0; this.debugInvulnerable = false; this.lastHeroDamageAttempt = undefined; this.summonSpawnDiagnostics = []; this.watchdogHandle = undefined; this.lastHeartbeatAt = performance.now(); this.lastWatchdogReportAt = 0; this.watchdogMessage = 'normal'; this.watchdogStalled = false; this.lastAttackAt = 0; this.lastHitAt = 0; this.lastDebugPublishAt = 0; this.frameDelta = 1000 / 60; this.combatHeartbeats = { scene: 0, physics: 0, damageQueue: 0, timeControl: 0, audio: 0, bossAi: 0 };
   }
 
   private runDelayedCall(delay: number, callback: () => void): Phaser.Time.TimerEvent {
@@ -516,18 +563,23 @@ export class GameScene extends Phaser.Scene {
     this.combatHeartbeats.damageQueue = realtimeNow;
     this.combatHeartbeats.timeControl = realtimeNow;
     this.frameDelta = Number.isFinite(delta) && delta > 0 ? delta : 1000 / 60;
+    for (const motion of this.backgroundCueMotions.values()) motion.update(time);
     this.lastHeartbeatAt = realtimeNow;
     this.combatHeartbeats.scene = realtimeNow;
     if (this.tutorialEnabled && this.tutorialHideAt > 0 && time >= this.tutorialHideAt) { this.services.ui.hideTutorial(); this.tutorialHideAt = 0; }
     if (import.meta.env.DEV && Phaser.Input.Keyboard.JustDown(this.keys.f2)) this.toggleHitboxDebug();
     if (import.meta.env.DEV && Phaser.Input.Keyboard.JustDown(this.keys.f3)) this.toggleStatsDebug();
     if (import.meta.env.DEV && Phaser.Input.Keyboard.JustDown(this.keys.f4)) this.showDebugScenarioMenu();
+    if (import.meta.env.DEV) this.consumeMotionReviewRequest();
     if (!this.flow.allowsCombatSimulation || this.timeControl.isHardPaused) {
       this.drawCombatDebug(time); this.updateHud(time); this.publishDebugState(); return;
     }
     const pointer = this.input.activePointer;
-    const x = (this.keys.d.isDown || this.cursors.right.isDown ? 1 : 0) - (this.keys.a.isDown || this.cursors.left.isDown ? 1 : 0);
-    const y = (this.keys.s.isDown || this.cursors.down.isDown ? 1 : 0) - (this.keys.w.isDown || this.cursors.up.isDown ? 1 : 0);
+    let x = (this.keys.d.isDown || this.cursors.right.isDown ? 1 : 0) - (this.keys.a.isDown || this.cursors.left.isDown ? 1 : 0);
+    let y = (this.keys.s.isDown || this.cursors.down.isDown ? 1 : 0) - (this.keys.w.isDown || this.cursors.up.isDown ? 1 : 0);
+    if (import.meta.env.DEV && this.motionReviewMovement && time < this.motionReviewMovement.until) {
+      x = this.motionReviewMovement.x; y = this.motionReviewMovement.y;
+    } else if (this.motionReviewMovement) this.motionReviewMovement = undefined;
     const keyboardMode = this.services.save.settings.controlMode === 'keyboard';
     this.game.canvas.style.cursor = keyboardMode ? 'none' : '';
     this.targeting.updateDirection(x, y);
@@ -615,7 +667,9 @@ export class GameScene extends Phaser.Scene {
     this.game.canvas.dataset.eonmaekDebug = JSON.stringify({
       flow: this.flow.state,
       run: this.runSession.snapshot(),
-      hero: { x: this.hero.x, y: this.hero.y, health: this.hero.health, parrying: this.hero.isParrying, finisherCharges: this.finisherCharges.charges, finisherMax: this.finisherCharges.maxCharges, comboActive: this.hero.isComboActive, comboStep: this.hero.comboStep, direction: this.hero.attackDirection },
+      development: { qa: this.qaMode, godMode: this.godMode, scenarioInvulnerable: this.debugInvulnerable },
+      hero: { x: this.hero.x, y: this.hero.y, active: this.hero.active, visible: this.hero.visible, alpha: this.hero.alpha, bodyEnabled: (this.hero.body as Phaser.Physics.Arcade.Body).enable, health: this.hero.health, parrying: this.hero.isParrying, finisherCharges: this.finisherCharges.charges, finisherMax: this.finisherCharges.maxCharges, comboActive: this.hero.isComboActive, comboStep: this.hero.comboStep, direction: this.hero.attackDirection, flipX: this.hero.flipX, textureKey: this.hero.texture.key, geometry: this.hero.motionGeometrySnapshot, motion: this.hero.motionSnapshot, lastDamageAttempt: this.hero.lastDamageAttempt },
+      heroDamageAttempt: this.lastHeroDamageAttempt,
       targetId: this.comboLock.targetId ?? this.heldAttackTarget?.id ?? this.currentTarget?.id,
       targetDistance: this.targetDistance,
       wave: this.waveDirector.snapshot(),
@@ -634,8 +688,8 @@ export class GameScene extends Phaser.Scene {
       threatBudget: this.threatBudget.snapshot(this.time.now),
       heartbeats: { ...this.combatHeartbeats },
       stats: this.combatStats.snapshot(),
-      enemies: [...this.enemies].filter((enemy) => enemy.active).map((enemy) => ({ id: enemy.id, kind: enemy.kind, creatureId: enemy.creatureId, health: enemy.health, x: enemy.x, y: enemy.y, removing: enemy.removing, stopped: enemy.isStopped, linked: enemy.linked, echo: enemy.isEchoMarked, groundPoint: enemy.groundPoint, hurtbox: enemy.hurtbox, attackAnchor: enemy.attackAnchor, flipX: enemy.flipX, rotation: enemy.rotation, runtimeState: enemy.runtimeState, runtimeAssetFile: enemy.runtimeAssetFile, runtimeOverlayActive: enemy.runtimeOverlayActive, presentationCompanions: enemy.presentationCompanions })),
-      submissionRuntime: { mapId: this.submissionMap?.definition.id, mapName: this.submissionMap?.displayName, backgroundCueCount: this.backgroundCues.size, hazard: this.submissionMap?.hasHazardMask ?? false },
+      enemies: [...this.enemies].filter((enemy) => enemy.active).map((enemy) => ({ id: enemy.id, kind: enemy.kind, creatureId: enemy.creatureId, phase: enemy instanceof Boss ? enemy.phase : undefined, health: enemy.health, x: enemy.x, y: enemy.y, removing: enemy.removing, stopped: enemy.isStopped, linked: enemy.linked, echo: enemy.isEchoMarked, groundPoint: enemy.groundPoint, hurtbox: enemy.hurtbox, attackAnchor: enemy.attackAnchor, visualAttackAnchor: enemy.visualAttackAnchor, flipX: enemy.flipX, visualFlipX: enemy.visualFlipX, rotation: enemy.rotation, runtimeState: enemy.runtimeState, runtimeAssetFile: enemy.runtimeAssetFile, runtimeOverlayActive: enemy.runtimeOverlayActive, motion: enemy.motionSnapshot, presentationCompanions: enemy.presentationCompanions, summonSpawn: enemy.getData('summonSpawn') })),
+      submissionRuntime: { mapId: this.submissionMap?.definition.id, mapName: this.submissionMap?.displayName, backgroundCueCount: this.backgroundCues.size, backgroundCueMotions: [...this.backgroundCueMotions.values()].map((motion) => motion.snapshot()), hazard: this.submissionMap?.hasHazardMask ?? false, summonSpawns: this.summonSpawnDiagnostics },
       upgrades: this.upgrades.entries().map(({ id, stacks }) => ({ id, stacks, preview: this.upgrades.preview(id) })),
       upgradeRuntime: this.upgrades.runtimeSnapshot(),
       time: this.timeControl.snapshot(),
@@ -844,7 +898,7 @@ export class GameScene extends Phaser.Scene {
   private enemyCallbacks(): EnemyCallbacks {
     const runId = this.runId;
     return {
-      shoot: (source, x, y, angle, speed, damage, texture) => { this.runSession.invoke(runId, () => this.spawnProjectile(source, x, y, angle, speed, damage, texture)); },
+      shoot: (source, x, y, angle, speed, damage, texture) => { this.runSession.invoke(runId, () => { this.showCreatureMotionContactCue(source); this.spawnProjectile(source, x, y, angle, speed, damage, texture); }); },
       melee: (enemy, damage) => { this.runSession.invoke(runId, () => this.hitHero(damage * Number(enemy.getData('damageMultiplier') ?? 1), enemy.x, enemy.y, enemy.kind === 'boss' ? 'boss' : 'melee', { attackerId: enemy.id, attackerDisplayName: enemy.kind === 'boss' ? this.boss?.definition.displayName ?? '보스' : enemy.displayName, attackId: enemy.meleeAttackId, patternName: enemy.kind === 'boss' ? `${this.boss?.definition.displayName ?? '보스'} 근접 공격` : `${enemy.displayName} · ${attackDisplayName(enemy.meleeAttackId, '근접 공격')}`, parryable: enemy.meleeParryable })); },
       died: (enemy, source) => { this.runSession.invoke(runId, () => this.onEnemyDied(enemy, source)); },
       cue: (cue) => { this.runSession.invoke(runId, () => this.services.audio.play(cue === 'warning' ? 'warning' : 'parryOpen')); },
@@ -885,6 +939,20 @@ export class GameScene extends Phaser.Scene {
         this.spawnProjectile(source, x, y, angle, speed * .82, damage * .65, texture, 1);
       });
     }
+  }
+
+  private showCreatureMotionContactCue(source: Enemy): void {
+    const anchor = source.visualAttackAnchor;
+    if (!anchor) return;
+    const cue = this.add.circle(anchor.x, anchor.y, 4, 0xe8fff7, 0.82).setStrokeStyle(1, 0x65cdb9, 0.9).setDepth(DEPTH.projectile);
+    this.tweens.add({ targets: cue, alpha: 0, scaleX: 1.8, scaleY: 1.8, duration: 95, onComplete: () => cue.destroy() });
+  }
+
+  private showPlayerMotionContactCue(): void {
+    const anchor = this.hero.motionVisualAnchor('dagger_tip');
+    if (!anchor) return;
+    const cue = this.add.circle(anchor.x, anchor.y, 4, 0xffffff, 0.88).setStrokeStyle(1, 0xd8c89f, 0.94).setDepth(DEPTH.melee);
+    this.tweens.add({ targets: cue, alpha: 0, scaleX: 1.9, scaleY: 1.9, duration: 90, onComplete: () => cue.destroy() });
   }
 
   private scheduleActPatterns(generation: number): void {
@@ -1027,13 +1095,15 @@ export class GameScene extends Phaser.Scene {
 
   private resolveCut(attack: HeroAttack): void {
     this.combatStats.attackAttempt(); this.lastAttackAt = performance.now();
+    this.showPlayerMotionContactCue();
     const perfectCounter = perfectCounterProfile(this.upgrades.getStack('perfect-counter'));
     const counterActive = this.cutPerfectCounterActive;
     const profile = { ...BALANCE.hero.cut, range: BALANCE.hero.cut.range * (counterActive ? perfectCounter.rangeMultiplier : 1) };
     const slash = this.add.graphics().setDepth(DEPTH.melee);
-    slash.lineStyle(12, 0x143d37, 0.68).beginPath().arc(attack.originX, attack.originY, profile.range, attack.angle - profile.halfAngle, attack.angle + profile.halfAngle).strokePath();
-    slash.lineStyle(6, 0xb5f6e8, 0.96).beginPath().arc(attack.originX, attack.originY, profile.range, attack.angle - profile.halfAngle, attack.angle + profile.halfAngle).strokePath();
-    this.tweens.add({ targets: slash, alpha: 0, scaleX: 1.12, scaleY: 1.12, duration: 175, onComplete: () => slash.destroy() });
+    const motionReadability = this.hero.motionPilotActive;
+    slash.lineStyle(motionReadability ? 6 : 12, 0x143d37, motionReadability ? 0.34 : 0.68).beginPath().arc(attack.originX, attack.originY, profile.range, attack.angle - profile.halfAngle, attack.angle + profile.halfAngle).strokePath();
+    slash.lineStyle(motionReadability ? 3 : 6, 0xb5f6e8, motionReadability ? 0.64 : 0.96).beginPath().arc(attack.originX, attack.originY, profile.range, attack.angle - profile.halfAngle, attack.angle + profile.halfAngle).strokePath();
+    this.tweens.add({ targets: slash, alpha: 0, scaleX: 1.12, scaleY: 1.12, duration: motionReadability ? 105 : 175, onComplete: () => slash.destroy() });
     this.activeDaggerDebug = { x: attack.originX, y: attack.originY, angle: attack.angle, range: profile.range, until: this.time.now + 105 };
     const candidates = [...this.enemies].filter((enemy) => enemy.active && enemy.spawned && !enemy.removing
       && cutHitsTarget({ x: attack.originX, y: attack.originY }, attack.angle, profile, enemy.hurtbox))
@@ -1206,6 +1276,7 @@ export class GameScene extends Phaser.Scene {
 
   private resolveFinisher(attack: HeroAttack): void {
     this.combatStats.attackAttempt(); this.lastAttackAt = performance.now();
+    this.showPlayerMotionContactCue();
     const slash = this.add.graphics().setDepth(DEPTH.melee);
     const range = BALANCE.hero.finisher.range;
     slash.lineStyle(13, 0x123d38, 0.72).beginPath().arc(attack.originX, attack.originY, range, attack.angle - BALANCE.hero.finisher.halfAngle, attack.angle + BALANCE.hero.finisher.halfAngle).strokePath();
@@ -1344,6 +1415,7 @@ export class GameScene extends Phaser.Scene {
 
   private resolveAttack(attack: HeroAttack): void {
     this.combatStats.attackAttempt(); this.lastAttackAt = performance.now();
+    this.showPlayerMotionContactCue();
     const index = attack.combo - 1;
     const chargedThird = attack.combo === 3 && this.finisherCharges.ready;
     const baseDamage = chargedThird ? BALANCE.hero.finisher.damage : BALANCE.hero.attackDamage[index] ?? 9;
@@ -1352,11 +1424,16 @@ export class GameScene extends Phaser.Scene {
     this.services.audio.play(chargedThird ? 'finisher' : attack.combo === 1 ? 'slash1' : attack.combo === 2 ? 'slash2' : 'slash3');
     if (chargedThird) this.combatStats.finisherInput();
     const slash = this.add.graphics().setDepth(DEPTH.melee);
-    if (chargedThird) slash.lineStyle(13, 0x123d38, 0.7).beginPath().arc(attack.originX, attack.originY, range, attack.angle - halfAngle, attack.angle + halfAngle).strokePath();
-    slash.lineStyle(chargedThird ? 7 : attack.combo === 3 ? 9 : 6, chargedThird ? 0xaaffed : attack.combo === 3 ? 0xb9fff1 : 0xd9c49e, chargedThird ? 0.98 : 0.85);
+    const motionReadability = this.hero.motionPilotActive;
+    if (chargedThird) slash.lineStyle(motionReadability ? 7 : 13, 0x123d38, motionReadability ? 0.42 : 0.7).beginPath().arc(attack.originX, attack.originY, range, attack.angle - halfAngle, attack.angle + halfAngle).strokePath();
+    slash.lineStyle(
+      motionReadability ? (chargedThird ? 4 : attack.combo === 3 ? 5 : 3) : chargedThird ? 7 : attack.combo === 3 ? 9 : 6,
+      chargedThird ? 0xaaffed : attack.combo === 3 ? 0xb9fff1 : 0xd9c49e,
+      motionReadability ? 0.62 : chargedThird ? 0.98 : 0.85,
+    );
     if (attack.combo === 2 && !chargedThird) slash.beginPath().arc(attack.originX, attack.originY, range, attack.angle + halfAngle, attack.angle - halfAngle, true).strokePath();
     else slash.beginPath().arc(attack.originX, attack.originY, range, attack.angle - halfAngle, attack.angle + halfAngle).strokePath();
-    this.tweens.add({ targets: slash, alpha: 0, scaleX: 1.18, scaleY: 1.18, duration: 130, onComplete: () => slash.destroy() });
+    this.tweens.add({ targets: slash, alpha: 0, scaleX: 1.18, scaleY: 1.18, duration: motionReadability ? 95 : 130, onComplete: () => slash.destroy() });
     this.activeDaggerDebug = { x: attack.originX, y: attack.originY, angle: attack.angle, range, until: this.time.now + 90 };
     this.attacks.push({ time: this.time.now, x: attack.originX, y: attack.originY, angle: attack.angle, kind: chargedThird ? 'finisher' : 'legacy', damage: baseDamage });
     let hits = 0;
@@ -1458,6 +1535,12 @@ export class GameScene extends Phaser.Scene {
   }
 
   private parrySuccess(enemy?: Enemy, projectile?: Projectile): void {
+    this.hero.resolveParryMotion(true);
+    const visualParryCenter = this.hero.motionVisualAnchor('parry_center');
+    if (visualParryCenter) {
+      const cue = this.add.circle(visualParryCenter.x, visualParryCenter.y, 5, 0xd889ff, 0.72).setDepth(DEPTH.word);
+      this.tweens.add({ targets: cue, alpha: 0, scaleX: 2, scaleY: 2, duration: 120, onComplete: () => cue.destroy() });
+    }
     const heroBefore = { x: this.hero.x, y: this.hero.y };
     const perfectBreath = this.upgrades.getStack('perfect-breath');
     const perfect = this.time.now - this.parryStartedAt <= BALANCE.hero.perfectParryWindow;
@@ -1507,11 +1590,11 @@ export class GameScene extends Phaser.Scene {
     if (this.empowered || this.sentence < this.sentenceMax) return;
     // Sentence is committed only after the empowered word produces a real
     // combat effect. Keeping it here makes failed target checks fully refundable.
-    this.empowered = true; this.combatStats.empower(); this.services.audio.play('upgrade'); this.hero.setTint(0x86ead8);
+    this.empowered = true; this.combatStats.empower(); this.services.audio.play('upgrade'); this.hero.setPresentationTint(0x86ead8);
     this.sentenceReminderShown = true;
     this.services.ui.showChainTrigger('다음 Q / E / R 강화', 850);
     this.runeBurst(this.hero.x, this.hero.y - 12, 12);
-    this.runDelayedCall(220, () => { if (this.hero.active) this.hero.clearTint(); });
+    this.runDelayedCall(220, () => { if (this.hero.active) this.hero.clearPresentationTint(); });
   }
 
   private canCast(readyAt: number): boolean { return this.flow.allowsCombatInput && this.time.now >= readyAt && this.wordInputAt !== this.game.loop.frame; }
@@ -2489,7 +2572,57 @@ export class GameScene extends Phaser.Scene {
 
   private summonMinions(count: number): void {
     const kind: EnemyKind = isSubmissionActIntegrated(this.runAct.current.index) && this.runAct.current.index === 3 ? 'elite' : 'minion';
-    const positions = this.spawnPositions(Array.from({ length: count }, () => kind)).slice(0, count); positions.forEach((position) => this.spawnEnemy(kind, position.x, position.y));
+    const rawPositions = this.spawnPositions(Array.from({ length: count }, () => kind)).slice(0, count);
+    const map = this.submissionMap;
+    // Spawn safety follows the gameplay movement footprint, not the much
+    // taller presentation/hurtbox silhouette. Using visual extents here can
+    // make a valid three-minion formation mathematically impossible inside a
+    // compact boss territory and fall back to the original blocked corner.
+    const clearance = BALANCE.collision.movementRadius[kind] + 5;
+    const chosen: { x: number; y: number }[] = [];
+    this.summonSpawnDiagnostics = [];
+    rawPositions.forEach((raw, index) => {
+      const accept = (point: Readonly<{ x: number; y: number }>): boolean => {
+        if (Phaser.Math.Distance.Between(point.x, point.y, this.hero.x, this.hero.y) < clearance + 54) return false;
+        if (this.boss?.active && Phaser.Math.Distance.Between(point.x, point.y, this.boss.x, this.boss.y) < clearance + 54) return false;
+        if ([...this.enemies].some((existing) => existing.active && existing !== this.boss
+          && Phaser.Math.Distance.Between(point.x, point.y, existing.x, existing.y) < clearance * 2 + 8)) return false;
+        return chosen.every((existing) => Phaser.Math.Distance.Between(point.x, point.y, existing.x, existing.y) >= clearance * 2 + 8);
+      };
+      let finalPoint: Readonly<{ x: number; y: number }> = raw;
+      if (map) {
+        const seeds = [raw, ...map.enemySpawnSlots];
+        if (this.boss?.active) {
+          const angle = index * Math.PI * 2 / Math.max(1, count);
+          seeds.push({ x: this.boss.x + Math.cos(angle) * 108, y: this.boss.y + Math.sin(angle) * 86 });
+        }
+        const resolved = seeds.map((seed) => nearestRuntimeSafeGroundPoint(map, seed, clearance, accept)).find((point) => Boolean(point));
+        if (resolved) finalPoint = resolved;
+        else {
+          const fallback = nearestRuntimeSafeGroundPoint(map, this.boss?.groundPoint ?? { x: 480, y: 270 }, clearance, accept, 300, 8);
+          if (fallback) finalPoint = fallback;
+          else if (import.meta.env.DEV) console.warn('[motion-staging-r2] no safe summon point', { mapId: map.definition.id, raw, index });
+        }
+      }
+      chosen.push({ x: finalPoint.x, y: finalPoint.y });
+      const enemy = this.spawnEnemy(kind, finalPoint.x, finalPoint.y);
+      enemy.setData('summonSpawn', { x: enemy.x, y: enemy.y, at: this.time.now });
+      const rawTerritory = map?.constrainToBossTerritory(raw);
+      const finalTerritory = map?.constrainToBossTerritory(enemy.groundPoint);
+      const diagnostic: SummonSpawnDiagnostic = {
+        index,
+        raw: { ...raw },
+        mapPixel: { x: raw.x / SUBMISSION_GAME_SCALE, y: raw.y / SUBMISSION_GAME_SCALE },
+        rawWalkable: map?.isWalkable(raw) ?? true,
+        rawInsideTerritory: rawTerritory ? !rawTerritory.corrected : true,
+        corrected: Math.abs(enemy.x - raw.x) > 0.5 || Math.abs(enemy.y - raw.y) > 0.5,
+        final: { ...enemy.groundPoint },
+        finalWalkable: map ? runtimeGroundPointIsSafe(map, enemy.groundPoint, clearance) : true,
+        finalInsideTerritory: finalTerritory ? !finalTerritory.corrected : true,
+        enemyId: enemy.id,
+      };
+      this.summonSpawnDiagnostics.push(diagnostic);
+    });
   }
 
   private createInkZone(x: number, y: number, radius: number, duration: number, style: 'ink' | 'erasure' = 'ink', damage = 10, patternName = style === 'erasure' ? '과거 교정' : '먹물 장판', modifier?: string): void {
@@ -2555,6 +2688,7 @@ export class GameScene extends Phaser.Scene {
       // the remaining attack timer lets the attacker travel through the hero
       // and creates a deep overlap that can pin movement on following frames.
       enemy.cancelAttackIntent(time + 120);
+      enemy.playResolvedContactRecovery();
       if (parry.cancelDamage) { if (parry.grantReward) this.parrySuccess(enemy); }
       else this.hitHero(Number(enemy.getData('meleeDamage') ?? BALANCE.enemies[enemy.kind === 'minion' ? 'chaser' : enemy.kind].damage), enemy.x, enemy.y, enemy.kind === 'boss' ? 'boss' : 'melee', { attackerId: enemy.id, attackerDisplayName: enemy.kind === 'boss' ? this.boss?.definition.displayName ?? '보스' : enemyDisplayName(enemy.kind), attackId: enemy.meleeAttackId, patternName: enemy.kind === 'boss' ? `${this.boss?.definition.displayName ?? '보스'} 돌진` : `${enemyDisplayName(enemy.kind)} · 돌진`, parryable: enemy.meleeParryable });
     }
@@ -2577,8 +2711,16 @@ export class GameScene extends Phaser.Scene {
   }
 
   private hitHero(baseDamage: number, sourceX: number, sourceY: number, source: DamageSource = 'other', context: HeroDamageContext = { attackerId: 'unknown', attackId: 'unknown', patternName: '알 수 없는 피해', parryable: false }): void {
-    if (this.flow.baseState === 'ACT_CLEAR' || this.flow.baseState === 'BOSS_REWARD' || this.flow.baseState === 'ACT_TRANSITION' || this.flow.baseState === 'RUN_OVER' || this.flow.baseState === 'RESULT') return;
-    if (this.qaMode || this.debugInvulnerable || this.time.now < this.bossTransitionUntil) return;
+    const healthBefore = this.hero.health;
+    const reason = sceneDamageRejectionReason({
+      flowLocked: this.flow.baseState === 'ACT_CLEAR' || this.flow.baseState === 'BOSS_REWARD' || this.flow.baseState === 'ACT_TRANSITION' || this.flow.baseState === 'RUN_OVER' || this.flow.baseState === 'RESULT',
+      godMode: this.godMode || this.debugInvulnerable,
+      bossTransition: this.time.now < this.bossTransitionUntil,
+    });
+    if (reason) {
+      this.lastHeroDamageAttempt = { source, requestedDamage: baseDamage, actualDamage: 0, healthBefore, healthAfter: this.hero.health, reason, attackerId: context.attackerId, at: this.time.now };
+      return;
+    }
     let damage = baseDamage;
     if (this.tutorialEnabled && this.tutorialIndex < this.tutorialSteps.length) damage *= 0.45;
     if (this.time.now < this.headwindGuardUntil) {
@@ -2593,7 +2735,12 @@ export class GameScene extends Phaser.Scene {
       const shield = this.add.ellipse(this.hero.hurtbox.x, this.hero.hurtbox.y, 56, 72, 0x253b39, .18).setStrokeStyle(3, 0x819d96, .78).setDepth(DEPTH.melee);
       this.tweens.add({ targets: shield, scaleX: 1.25, scaleY: 1.25, alpha: 0, duration: 260, onComplete: () => shield.destroy() });
     }
-    const dealt = this.hero.takeDamage(damage, sourceX, sourceY); if (dealt <= 0) return;
+    const dealt = this.hero.takeDamage(damage, sourceX, sourceY);
+    this.lastHeroDamageAttempt = {
+      source, requestedDamage: damage, actualDamage: dealt, healthBefore, healthAfter: this.hero.health,
+      reason: dealt <= 0 ? this.hero.lastDamageAttempt?.reason : undefined, attackerId: context.attackerId, at: this.time.now,
+    };
+    if (dealt <= 0) return;
     this.lastHitAt = performance.now();
     this.damageTaken += dealt; this.combatStats.damageTaken(source, dealt);
     this.combatStats.playerDamage({ time: this.time.now, attackerId: context.attackerId, attackerDisplayName: context.attackerDisplayName ?? (context.attackerId === 'environment' ? '환경' : '알 수 없는 공격자'), attackId: context.attackId, patternName: context.patternName, modifier: context.modifier, amount: dealt, act: this.runAct.current.index, wave: this.boss?.active ? `Boss P${this.boss.phase}` : this.runAct.current.waves[this.waveIndex]?.label ?? `Wave ${this.waveIndex + 1}`, x: this.hero.x, y: this.hero.y, parryable: context.parryable });
@@ -2894,7 +3041,11 @@ export class GameScene extends Phaser.Scene {
     this.debugHitboxes = !this.debugHitboxes;
     this.debugGraphics?.setVisible(this.debugHitboxes);
     this.submissionMap?.setDebugVisible(this.debugHitboxes);
-    if (!this.debugHitboxes) this.debugGraphics?.clear();
+    if (this.debugHitboxes) {
+      this.debugMotionText ??= this.add.text(18, 76, '', { fontFamily: 'Consolas, monospace', fontSize: '11px', color: '#f1f5f2', backgroundColor: '#051012dd', padding: { x: 7, y: 5 } }).setDepth(DEPTH.debug);
+    } else {
+      this.debugGraphics?.clear(); this.debugMotionText?.destroy(); this.debugMotionText = undefined;
+    }
   }
 
   private toggleStatsDebug(): void {
@@ -2912,10 +3063,18 @@ export class GameScene extends Phaser.Scene {
       graphics.lineStyle(2, 0xffffff, 0.72).strokeRect(COMBAT_BOUNDS.left, COMBAT_BOUNDS.top, COMBAT_BOUNDS.right - COMBAT_BOUNDS.left, COMBAT_BOUNDS.bottom - COMBAT_BOUNDS.top);
       const circle = (item: Readonly<{ x: number; y: number; radius: number }>, color: number): void => { graphics.lineStyle(1.5, color, 0.9).strokeCircle(item.x, item.y, item.radius); };
       const ellipse = (item: Readonly<{ x: number; y: number; radiusX: number; radiusY: number }>, color: number): void => { graphics.lineStyle(1.5, color, 0.9).strokeEllipse(item.x, item.y, item.radiusX * 2, item.radiusY * 2); };
-      graphics.fillStyle(0xffffff, 0.95).fillCircle(this.hero.x, this.hero.y, 2.5);
-      circle(this.hero.movementCircle, 0x68e59a); ellipse(this.hero.hurtbox, 0x55ccea);
+      graphics.fillStyle(0xffe46b, 0.95).fillCircle(this.hero.x, this.hero.y, 2.5);
+      circle(this.hero.movementCircle, 0x4f8fff); ellipse(this.hero.hurtbox, 0xff4c4c);
       const attackDirection = this.hero.attackDirection;
+      const gameplayAttackOrigin = { x: this.hero.x + attackDirection.x * BALANCE.hero.attackOriginOffset, y: this.hero.y + attackDirection.y * BALANCE.hero.attackOriginOffset };
+      graphics.fillStyle(0xff9b42, 0.95).fillCircle(gameplayAttackOrigin.x, gameplayAttackOrigin.y, 3);
       graphics.lineStyle(2, 0xffef87, 0.9).lineBetween(this.hero.x, this.hero.y, this.hero.x + attackDirection.x * 72, this.hero.y + attackDirection.y * 72);
+      const dagger = this.hero.motionVisualAnchor('dagger_tip');
+      const parryVisual = this.hero.motionVisualAnchor('parry_center');
+      const wordVisual = this.hero.motionVisualAnchor('word_target');
+      if (dagger) graphics.fillStyle(0xffffff, 0.95).fillCircle(dagger.x, dagger.y, 3);
+      if (parryVisual) graphics.fillStyle(0xd66bff, 0.95).fillCircle(parryVisual.x, parryVisual.y, 3);
+      if (wordVisual) graphics.fillStyle(0x58e6d1, 0.95).fillCircle(wordVisual.x, wordVisual.y, 3);
       if (this.hero.isParrying) {
         const hurtbox = this.hero.hurtbox;
         graphics.lineStyle(2, 0x8ffff0, 0.9).strokeEllipse(hurtbox.x, hurtbox.y, (hurtbox.radiusX + BALANCE.hero.parryEnvelopePadding) * 2, (hurtbox.radiusY + BALANCE.hero.parryEnvelopePadding) * 2);
@@ -2925,6 +3084,11 @@ export class GameScene extends Phaser.Scene {
         circle(enemy.movementCircle, 0xe7c769); ellipse(enemy.hurtbox, 0xff8a67);
         const attackAnchor = enemy.attackAnchor;
         graphics.fillStyle(0xffd36a, 0.95).fillCircle(attackAnchor.x, attackAnchor.y, 2.5);
+        const visualAttackAnchor = enemy.visualAttackAnchor;
+        if (visualAttackAnchor) {
+          graphics.fillStyle(0xffffff, 0.95).fillCircle(visualAttackAnchor.x, visualAttackAnchor.y, 2.5);
+          graphics.lineStyle(1, 0x61e6d0, 0.58).lineBetween(attackAnchor.x, attackAnchor.y, visualAttackAnchor.x, visualAttackAnchor.y);
+        }
         const telegraph = enemy.activeTelegraph;
         if (telegraph && telegraph.until > time) {
           graphics.lineStyle(2, 0xff563e, 0.86).lineBetween(attackAnchor.x, attackAnchor.y, attackAnchor.x + Math.cos(telegraph.angle) * telegraph.length, attackAnchor.y + Math.sin(telegraph.angle) * telegraph.length);
@@ -2937,9 +3101,39 @@ export class GameScene extends Phaser.Scene {
         circle(projectile.collisionCircle, projectile.enemyOwned ? 0xff6257 : 0x68e7d2);
         graphics.lineStyle(1, 0xff9c8d, 0.45).lineBetween(projectile.previousPosition.x, projectile.previousPosition.y, projectile.x, projectile.y);
       }
+      for (const spawn of this.summonSpawnDiagnostics) {
+        graphics.lineStyle(2, 0xff4c4c, 0.8).strokeCircle(spawn.raw.x, spawn.raw.y, 7);
+        graphics.lineStyle(2, 0x66f2a2, 0.9).strokeCircle(spawn.final.x, spawn.final.y, 9);
+        if (spawn.corrected) graphics.lineStyle(1, 0xffd45b, 0.65).lineBetween(spawn.raw.x, spawn.raw.y, spawn.final.x, spawn.final.y);
+      }
       if (this.activeDaggerDebug && this.activeDaggerDebug.until > time) graphics.lineStyle(3, 0xfff08a, 0.9).beginPath().arc(this.activeDaggerDebug.x, this.activeDaggerDebug.y, this.activeDaggerDebug.range, this.activeDaggerDebug.angle - BALANCE.collision.daggerHalfAngle, this.activeDaggerDebug.angle + BALANCE.collision.daggerHalfAngle).strokePath();
       if (this.currentTarget?.active) ellipse(this.currentTarget.hurtbox, 0x6dffd2);
       if (time < this.hero.invulnerableUntil) graphics.fillStyle(0x66cfff, 0.14).fillEllipse(this.hero.hurtbox.x, this.hero.hurtbox.y, this.hero.hurtbox.radiusX * 2, this.hero.hurtbox.radiusY * 2);
+    }
+    if (this.debugMotionText && this.debugHitboxes) {
+      const motion = this.hero.motionSnapshot;
+      const creatureMotion = [...this.enemies]
+        .filter((enemy) => enemy.active && enemy.motionSnapshot)
+        .slice(0, 6)
+        .map((enemy) => {
+          const snapshot = enemy.motionSnapshot!;
+          return `${enemy.creatureId}=${snapshot.renderSource} ${snapshot.sequence} f${snapshot.frameIndex + 1} flip=${enemy.visualFlipX ? 'R' : 'L'} r${snapshot.blockedRestartCount}`;
+        });
+      this.debugMotionText.setText(motion ? [
+        'PLAYER MOTION',
+        `direction=${motion.direction}`,
+        `sequence=${motion.sequence}`,
+        `source=${motion.source}`,
+        `render=${motion.renderSource}`,
+        `frame=${motion.frameIndex + 1}`,
+        `scale=${motion.uniformScale.toFixed(2)} visible=${motion.visibleWidth.toFixed(0)}x${motion.visibleHeight.toFixed(0)}`,
+        `groundDelta=${motion.groundPointDelta.toFixed(2)} advances=${motion.frameAdvanceCount}`,
+        `fallbackY=${motion.proceduralOffsetY} lean=${motion.proceduralRotationDeg.toFixed(1)}°`,
+        this.godMode || this.debugInvulnerable ? 'DEV GOD MODE=ON' : 'DEV GOD MODE=OFF',
+        '',
+        'MOTION SOURCE',
+        ...creatureMotion,
+      ] : ['PLAYER MOTION', 'source=LEGACY_RUNTIME']);
     }
     if (this.debugStatsText && this.debugStatsVisible) {
       const stats = this.combatStats.snapshot();
@@ -3283,6 +3477,7 @@ export class GameScene extends Phaser.Scene {
     const modifierItems = modifierIds.map((id) => { const definition = modifierDefinition(id); return { name: definition?.displayName ?? modifierLabel(id), icon: definition?.icon ?? '異' }; });
     this.services.ui.updateHud({
       health: this.hero.health, maxHealth: this.hero.maxHealth, sentence: this.sentence, sentenceMax: this.sentenceMax,
+      godMode: this.godMode || this.debugInvulnerable,
       score: this.score, stage: this.submissionMap ? `${this.submissionMap.displayName} · ${waveLabel}` : waveLabel,
       actIndex: this.runAct.current.index, actName: this.runAct.current.name, waveLabel, bossesDefeated: actSnapshot.bossesDefeated, modifiers: modifierItems,
       stopCooldown: Math.max(0, (this.stopReadyAt - time) / 1000), rewindCooldown: Math.max(0, (this.rewindReadyAt - time) / 1000), linkCooldown: Math.max(0, (this.linkReadyAt - time) / 1000), empowered: this.empowered,
@@ -3427,7 +3622,7 @@ export class GameScene extends Phaser.Scene {
     this.runSession.clearBoss(this.runId, victory);
     this.combatStats.resultTransition();
     this.timeControl.acquire('RESULT', this.timeOwner); this.hero.controlsLocked = true;
-    this.debugGraphics?.setVisible(false); this.debugStatsText?.setVisible(false); this.debugScenarioText?.setVisible(false);
+    this.debugGraphics?.setVisible(false); this.debugStatsText?.setVisible(false); this.debugMotionText?.setVisible(false); this.debugScenarioText?.setVisible(false);
     const elapsed = Math.max(1, (this.time.now - this.startTime) / 1000); if (victory) this.score += Math.max(0, 1200 - Math.floor(elapsed));
     const actSnapshot = this.runAct.snapshot();
     const progressStage = Math.min(7, this.boss?.active ? 3 + this.boss.phase : Math.min(3, this.waveIndex + 1));
@@ -3494,19 +3689,34 @@ export class GameScene extends Phaser.Scene {
         const cue = this.add.image(point.x, point.y, runtimeTextureKey(fly.assetFile)).setOrigin(origin.x, origin.y)
           .setScale(runtimePresentationScale(creatureId)).setFlipX(index % 2 === 1).setDepth(DEPTH.characterBase + Math.floor(point.y));
         this.backgroundCues.add(cue);
+        const motion = CreatureMotionPresentation.create(cue, creatureId, (textureKey) => cue.setTexture(textureKey));
+        if (motion) { motion.setState('fly', this.time.now); this.backgroundCueMotions.set(cue, motion); }
         this.tweens.add({
           targets: cue, x: point.x + (index % 2 === 0 ? 54 : -54), y: point.y - 12, duration: 2100 + index * 260,
           ease: 'Sine.InOut', yoyo: true, repeat: -1,
-          onYoyo: () => { if (cue.active) cue.setTexture(runtimeTextureKey(evade.assetFile)); },
-          onRepeat: () => { if (cue.active) cue.setTexture(runtimeTextureKey(fly.assetFile)); },
+          onYoyo: () => {
+            if (!cue.active) return;
+            if (motion) motion.playAction(['evade'], this.time.now, 480);
+            else cue.setTexture(runtimeTextureKey(evade.assetFile));
+          },
+          onRepeat: () => {
+            if (!cue.active) return;
+            if (motion) motion.setState('fly', this.time.now);
+            else cue.setTexture(runtimeTextureKey(fly.assetFile));
+          },
         });
       });
     });
   }
 
   private clearBackgroundCues(): void {
-    for (const cue of this.backgroundCues) { this.tweens?.killTweensOf(cue); cue.destroy(); }
+    for (const cue of this.backgroundCues) {
+      this.tweens?.killTweensOf(cue);
+      this.backgroundCueMotions.get(cue)?.destroy();
+      cue.destroy();
+    }
     this.backgroundCues.clear();
+    this.backgroundCueMotions.clear();
   }
 
   private runtimeEncounterPoint(point: Readonly<{ x: number; y: number }>, fallback: Readonly<{ x: number; y: number }>): Readonly<{ x: number; y: number }> {
@@ -3570,6 +3780,139 @@ export class GameScene extends Phaser.Scene {
     this.gainFinisherCharge('qa', this.finisherCharges.maxCharges);
   }
 
+  private runMotionReview(direction: MotionReviewDirection, action: MotionReviewAction): unknown {
+    if (!import.meta.env.DEV || !this.hero.motionPilotActive) return { ok: false, reason: 'MOTION_PILOT_DISABLED' };
+    const vectors: Record<MotionReviewDirection, Readonly<{ x: number; y: number }>> = {
+      N: { x: 0, y: -1 }, NE: { x: 1, y: -1 }, E: { x: 1, y: 0 }, SE: { x: 1, y: 1 },
+      S: { x: 0, y: 1 }, SW: { x: -1, y: 1 }, W: { x: -1, y: 0 }, NW: { x: -1, y: -1 },
+    };
+    const vector = vectors[direction];
+    const angle = Math.atan2(vector.y, vector.x);
+    this.hero.setFacing(angle);
+    if (action === 'advance') { this.qaAdvance(); return { ok: true, action, motion: this.hero.motionSnapshot }; }
+    if (action === 'idle') {
+      this.motionReviewMovement = undefined;
+      this.hero.updateMovement(this.time.now, 0, 0, this.hero.x + vector.x * 120, this.hero.y + vector.y * 120);
+    } else if (action === 'move') {
+      this.motionReviewMovement = { x: vector.x, y: vector.y, until: this.time.now + 700 };
+      this.hero.updateMovement(this.time.now, vector.x, vector.y, this.hero.x + vector.x * 120, this.hero.y + vector.y * 120);
+    } else if (action === 'dash') this.dash(vector.x, vector.y);
+    else if (action === 'basic_attack') this.useCut(angle);
+    else if (action === 'parry_failure') this.parry();
+    else if (action === 'parry_success') {
+      if (!this.hero.isParrying) this.parry();
+      this.parrySuccess();
+    } else if (action === 'word_skill') {
+      this.qaReadyWords();
+      this.executeCombatAction(this.wordLoadout.wordForSlot('Q'), vector.x, vector.y);
+    } else if (action === 'hit_recover') this.hero.takeDamage(1, this.hero.x - vector.x * 12, this.hero.y - vector.y * 12);
+    return { ok: true, direction, action, motion: this.hero.motionSnapshot };
+  }
+
+  private runMotionR2Review(action: MotionR2ReviewAction): unknown {
+    if (!import.meta.env.DEV || !this.qaMode) return { ok: false, reason: 'QA_REQUIRED' };
+    if (action === 'qa-advance') {
+      this.qaAdvance();
+      return { ok: true, action, flow: this.flow.state, act: this.runAct.current.index, bossPhase: this.boss?.phase };
+    }
+    if (action === 'damage-projectile' || action === 'damage-melee') {
+      // Reuse the existing F4 deterministic collision scenarios. This button
+      // only makes them reachable from the browser review harness; production
+      // attack ownership, damage, timing, and collision code stay untouched.
+      this.runFoundationScenario(action === 'damage-projectile' ? 7 : 8);
+      return { ok: true, action, health: this.hero.health };
+    }
+    if (action === 'phase-next') {
+      const phase = this.boss?.phase;
+      if (!phase || phase >= 3) return { ok: false, reason: 'NO_NEXT_PHASE', phase };
+      if (this.flow.baseState !== 'BOSS_COMBAT') return { ok: false, reason: 'BOSS_TRANSITION_ACTIVE', phase };
+      this.boss?.debugSetPhase((phase + 1) as 2 | 3);
+      return { ok: true, action, phase: this.boss?.phase };
+    }
+    if (!this.boss?.active || this.boss.creatureId !== 'resonance_goral') return { ok: false, reason: 'GORAL_REQUIRED' };
+    const requested = { x: this.boss.x + (action === 'goral-right' ? 132 : -132), y: this.boss.y + 58 };
+    const safe = this.submissionMap
+      ? nearestRuntimeSafeGroundPoint(this.submissionMap, requested, BALANCE.collision.heroMovementRadius, (point) => Phaser.Math.Distance.Between(point.x, point.y, this.boss!.x, this.boss!.y) >= 78)
+      : requested;
+    if (!safe) return { ok: false, reason: 'NO_SAFE_REVIEW_POINT', requested };
+    this.hero.setGroundPosition(safe.x, safe.y).setVelocity(0);
+    this.heroMapSafePoint = { ...this.hero.groundPoint };
+    return { ok: true, action, hero: this.hero.groundPoint, boss: this.boss.groundPoint };
+  }
+
+  private consumeMotionReviewRequest(): void {
+    const request = this.game.canvas.dataset.motionReview;
+    if (request) {
+      delete this.game.canvas.dataset.motionReview;
+      const [direction, action] = request.split(':');
+      const directions: readonly string[] = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+      const actions: readonly string[] = ['idle', 'move', 'dash', 'basic_attack', 'parry_failure', 'parry_success', 'word_skill', 'hit_recover', 'advance'];
+      const result = directions.includes(direction ?? '') && actions.includes(action ?? '')
+        ? this.runMotionReview(direction as MotionReviewDirection, action as MotionReviewAction)
+        : { ok: false, reason: 'INVALID_REQUEST', request };
+      this.game.canvas.dataset.motionReviewResult = JSON.stringify(result);
+    }
+    const r2Request = this.game.canvas.dataset.motionR2Review as MotionR2ReviewAction | undefined;
+    if (!r2Request) return;
+    delete this.game.canvas.dataset.motionR2Review;
+    const r2Actions: readonly string[] = ['damage-projectile', 'damage-melee', 'goral-left', 'goral-right', 'phase-next', 'qa-advance'];
+    const r2Result = r2Actions.includes(r2Request) ? this.runMotionR2Review(r2Request) : { ok: false, reason: 'INVALID_R2_REQUEST', request: r2Request };
+    this.game.canvas.dataset.motionR2ReviewResult = JSON.stringify(r2Result);
+  }
+
+  private createMotionReviewPanel(): void {
+    this.motionReviewPanel?.remove();
+    const panel = document.createElement('div');
+    panel.dataset.testid = 'motion-review-panel';
+    Object.assign(panel.style, {
+      position: 'fixed', right: '8px', bottom: '8px', zIndex: '9999', display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-end', maxWidth: 'calc(100vw - 16px)', gap: '4px', alignItems: 'center',
+      padding: '6px', background: '#051012e8', color: '#e8f6f1', font: '11px Consolas, monospace', border: '1px solid #47756d',
+    });
+    const direction = document.createElement('select');
+    direction.setAttribute('aria-label', 'Motion direction');
+    for (const value of ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW']) direction.add(new Option(value, value));
+    const action = document.createElement('select');
+    action.setAttribute('aria-label', 'Motion action');
+    for (const value of ['idle', 'move', 'dash', 'basic_attack', 'parry_failure', 'parry_success', 'word_skill', 'hit_recover', 'advance']) action.add(new Option(value, value));
+    const run = document.createElement('button');
+    run.type = 'button'; run.textContent = 'RUN MOTION REVIEW';
+    const debug = document.createElement('button');
+    debug.type = 'button'; debug.textContent = 'F2 DEBUG';
+    debug.addEventListener('click', () => this.toggleHitboxDebug());
+    const r2Buttons = (['damage-projectile', 'damage-melee', 'goral-left', 'goral-right', 'phase-next', 'qa-advance'] as const).map((reviewAction) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.dataset.motionR2Action = reviewAction;
+      button.textContent = reviewAction.toUpperCase();
+      button.addEventListener('click', () => {
+        output.textContent = JSON.stringify(this.runMotionR2Review(reviewAction));
+      });
+      return button;
+    });
+    const fallbackButtons = (['N', 'NE', 'SE', 'SW', 'W', 'NW'] as const).map((reviewDirection) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.dataset.motionFallbackDirection = reviewDirection;
+      button.textContent = `MOVE-${reviewDirection}`;
+      button.addEventListener('click', () => {
+        output.textContent = JSON.stringify(this.runMotionReview(reviewDirection, 'move'));
+      });
+      return button;
+    });
+    const output = document.createElement('span'); output.dataset.testid = 'motion-review-output';
+    run.addEventListener('click', () => {
+      const result = this.runMotionReview(direction.value as MotionReviewDirection, action.value as MotionReviewAction);
+      output.textContent = JSON.stringify(result);
+      const snapshotDelay = action.value === 'parry_failure' ? BALANCE.hero.parryWindow + 5 : 1;
+      this.time.delayedCall(snapshotDelay, () => {
+        if (this.hero?.active) output.textContent = JSON.stringify({ ok: true, action: action.value, motion: this.hero.motionSnapshot });
+      });
+    });
+    panel.append('MOTION QA', direction, action, run, debug, ...r2Buttons, ...fallbackButtons, output);
+    document.body.append(panel);
+    this.motionReviewPanel = panel;
+  }
+
   private cleanup(): void {
     this.clearTransientCombatObjects();
     this.events.off(Phaser.Scenes.Events.POST_UPDATE, this.handlePostPhysicsUpdate, this);
@@ -3581,12 +3924,21 @@ export class GameScene extends Phaser.Scene {
     document.removeEventListener('visibilitychange', this.visibilityHandler);
     window.removeEventListener('blur', this.blurHandler);
     window.removeEventListener('focus', this.focusHandler);
-    if (import.meta.env.DEV) delete (window as DebugWindow).__EONMAEK_DEBUG__;
+    if (import.meta.env.DEV) {
+      delete (window as DebugWindow).__EONMAEK_DEBUG__;
+      delete (window as DebugWindow).__EONMAEK_MOTION_REVIEW__;
+      delete (window as DebugWindow).__EONMAEK_MOTION_R2_REVIEW__;
+    }
+    this.motionReviewPanel?.remove(); this.motionReviewPanel = undefined;
     delete this.game.canvas.dataset.eonmaekDebug;
+    delete this.game.canvas.dataset.motionReview;
+    delete this.game.canvas.dataset.motionR2Review;
+    delete this.game.canvas.dataset.motionR2ReviewResult;
+    delete this.game.canvas.dataset.motionReviewResult;
     this.timeouts.forEach((handle) => window.clearTimeout(handle)); this.timeouts = [];
     if (this.watchdogHandle !== undefined) window.clearInterval(this.watchdogHandle); this.watchdogHandle = undefined;
     this.timeControl?.dispose(false); this.damageQueue.reset(); this.inputRouter.clear(); this.parryResolver.reset();
     this.game.canvas.style.cursor = ''; this.wordChain.reset(); this.damageHistory.reset(); this.targeting.clear(); this.attackRegistry.reset(); this.attackInput.reset();
-    this.clearLinks(); this.linkGraphics?.destroy(); this.rewindGraphics?.destroy(); this.rewindPreviewGhosts.forEach((ghost) => ghost.destroy()); this.rewindPreviewGhosts = []; this.heroRune?.destroy(); this.targetMarker?.destroy(); this.debugGraphics?.destroy(); this.debugStatsText?.destroy(); this.debugScenarioText?.destroy(); this.inkZones.forEach((zone) => zone.circle.destroy()); this.atmosphere?.destroy(); this.modifierEnvironment?.destroy(); this.arenaContainer?.destroy(true); this.submissionMap?.destroy(); this.submissionMap = undefined; this.clearBackgroundCues(); this.stitchedPairs.clear();
+    this.clearLinks(); this.linkGraphics?.destroy(); this.rewindGraphics?.destroy(); this.rewindPreviewGhosts.forEach((ghost) => ghost.destroy()); this.rewindPreviewGhosts = []; this.heroRune?.destroy(); this.targetMarker?.destroy(); this.debugGraphics?.destroy(); this.debugStatsText?.destroy(); this.debugMotionText?.destroy(); this.debugScenarioText?.destroy(); this.inkZones.forEach((zone) => zone.circle.destroy()); this.atmosphere?.destroy(); this.modifierEnvironment?.destroy(); this.arenaContainer?.destroy(true); this.submissionMap?.destroy(); this.submissionMap = undefined; this.clearBackgroundCues(); this.stitchedPairs.clear();
   }
 }

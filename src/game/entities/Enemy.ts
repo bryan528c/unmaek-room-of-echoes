@@ -129,7 +129,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     if (time < this.actionLockedUntil) return;
     const distance = Phaser.Math.Distance.Between(this.x, this.y, hero.x, hero.y);
     this.facingAngle = Phaser.Math.Angle.Between(this.x, this.y, hero.x, hero.y);
-    this.setFacingFlipX(Math.cos(this.facingAngle) < 0);
+    this.setFacingFlipX(Math.cos(this.facingAngle) < 0, hero.x - this.x);
     switch (this.kind) {
       case 'chaser': case 'minion': this.updateChaser(time, hero, distance); break;
       case 'archer': this.updateArcher(time, distance); break;
@@ -179,10 +179,17 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     if (time >= this.nextActionAt && distance < 500) {
       if (this.callbacks.requestAttack?.(this) === false) { this.nextActionAt = time + 160; return; }
       this.setVelocity(0); this.setPresentationState('prep'); this.actionLockedUntil = time + 620;
+      // End the presentation window just before the existing 620 ms recovery
+      // callback so timer ordering cannot reject the recover sequence. The
+      // projectile still spawns at the unchanged 540 ms gameplay timestamp.
+      this.presentation?.playMotionAction(['prep', 'attack'], 610, 540);
       const angle = this.facingAngle; this.showAim(angle, 520, 0xd05b45);
       const generation = this.attackIntentGeneration;
       this.scene.time.delayedCall(500, () => { if (generation === this.attackIntentGeneration) this.callbacks.cue('parryWindow'); });
-      this.scene.time.delayedCall(540, () => { if (generation === this.attackIntentGeneration && this.active && this.health > 0) { this.setPresentationState('attack'); const origin = this.projectileOrigin(-12); this.callbacks.shoot(this, origin.x, origin.y, angle, 250, BALANCE.enemies.archer.damage); } });
+      this.scene.time.delayedCall(540, () => { if (generation === this.attackIntentGeneration && this.active && this.health > 0) { this.setPresentationState('attack'); this.showMotionContactCue(); const origin = this.projectileOrigin(-12); this.callbacks.shoot(this, origin.x, origin.y, angle, 250, BALANCE.enemies.archer.damage); } });
+      this.scene.time.delayedCall(620, () => {
+        if (generation === this.attackIntentGeneration && this.active && this.health > 0) this.presentation?.playMotionAction(['hit_recover'], 220);
+      });
       this.nextActionAt = time + Phaser.Math.Between(1500, 2100); return;
     }
     this.setPresentationState('move');
@@ -195,13 +202,14 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     if (time >= this.nextActionAt && distance < 480) {
       if (this.callbacks.requestAttack?.(this) === false) { this.nextActionAt = time + 160; return; }
       this.setVelocity(0); this.setPresentationState('deploy'); this.actionLockedUntil = time + 780;
+      this.presentation?.playMotionAction(['idle_to_alert', 'alert_to_deploy', 'deploy_to_attack', 'attack_to_recover'], 780, 650);
       const telegraph = this.scene.add.graphics().setDepth(DEPTH.telegraph).lineStyle(2, 0xd26c52, 0.65).strokeCircle(this.x, this.y, 48);
       this.telegraph = telegraph;
       this.telegraphState = { angle: 0, length: 48, halfWidth: 48, until: time + 670 };
       this.scene.tweens.add({ targets: telegraph, scaleX: 1.6, scaleY: 1.6, alpha: 0, duration: 670, onComplete: () => { telegraph.destroy(); if (this.telegraph === telegraph) { this.telegraph = undefined; this.telegraphState = undefined; } } });
       const count = 7;
       const generation = this.attackIntentGeneration;
-      this.scene.time.delayedCall(650, () => { if (generation !== this.attackIntentGeneration || !this.active || this.health <= 0) return; this.setPresentationState('attack'); for (let index = 0; index < count; index += 1) { const origin = this.projectileOrigin(0, index); this.callbacks.shoot(this, origin.x, origin.y, this.facingAngle - 0.75 + index * 1.5 / (count - 1), 170, BALANCE.enemies.ink.damage, 'projectile-ink'); } });
+      this.scene.time.delayedCall(650, () => { if (generation !== this.attackIntentGeneration || !this.active || this.health <= 0) return; this.setPresentationState('attack'); this.showMotionContactCue(); for (let index = 0; index < count; index += 1) { const origin = this.projectileOrigin(0, index); this.callbacks.shoot(this, origin.x, origin.y, this.facingAngle - 0.75 + index * 1.5 / (count - 1), 170, BALANCE.enemies.ink.damage, 'projectile-ink'); } });
       this.nextActionAt = time + Phaser.Math.Between(2100, 2600); return;
     }
     if (distance > 260) { this.setPresentationState('move'); this.moveToward(this.facingAngle, BALANCE.enemies.ink.speed); } else { this.setPresentationState('idle'); this.setVelocity(0); }
@@ -218,19 +226,31 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
   protected telegraphDash(hero: Phaser.Physics.Arcade.Sprite, damage: number, warningMs: number, speed: number): void {
     this.setVelocity(0); this.setPresentationState('prep'); this.actionLockedUntil = this.scene.time.now + warningMs + 310;
+    // Keep a 10 ms presentation-only gap before the existing recovery
+    // callback. This avoids same-tick ordering suppressing hit_recover without
+    // changing warning, movement, contact, damage, or action-lock timing.
+    if (this.creatureId === 'rewind_lizard') this.presentation?.playMotionAction(['prep', 'attack'], warningMs + 300, warningMs);
+    if (this.creatureId === 'resonance_goral') this.presentation?.playMotionAction(['combat_prep', 'charge_attack'], warningMs + 300, warningMs);
     const angle = Phaser.Math.Angle.Between(this.x, this.y, hero.x, hero.y);
     this.showAim(angle, warningMs, 0xd56343, 185);
+    // Preserve the legacy physics-owner transform on both flag paths. The
+    // motion-pilot image is a separate, uniformly-scaled presentation object,
+    // so this tween cannot stretch or rotate its source pixels.
     this.scene.tweens.add({ targets: this, scaleX: this.baseScale * 1.08, scaleY: this.baseScale * 0.82, rotation: Math.cos(angle) < 0 ? -0.06 : 0.06, duration: warningMs * 0.72, yoyo: true });
     const generation = this.attackIntentGeneration;
     this.scene.time.delayedCall(warningMs, () => {
       if (generation !== this.attackIntentGeneration || !this.active || this.health <= 0) return;
       this.setPresentationState('attack');
       this.callbacks.cue('parryWindow'); this.setScale(this.baseScale).setRotation(0);
+      this.showMotionContactCue();
       this.meleeAttackIdValue = `${this.id}:melee:${this.meleeSequence += 1}`;
       this.attackActiveUntil = this.scene.time.now + 300;
       this.telegraphState = { angle, length: Math.max(40, speed * 0.28), halfWidth: this.meleeHitRadius * BALANCE.collision.meleeTelegraphPadding, until: this.attackActiveUntil };
       this.setVelocity(Math.cos(angle) * speed, Math.sin(angle) * speed);
       this.scene.time.delayedCall(280, () => { if (this.active) { this.setVelocity(0); this.setPresentationState('idle'); this.attackActiveUntil = 0; this.telegraphState = undefined; } });
+      this.scene.time.delayedCall(310, () => {
+        if (generation === this.attackIntentGeneration && this.active && this.health > 0) this.presentation?.playMotionAction(['hit_recover'], 220);
+      });
     });
     this.setData('meleeDamage', damage);
   }
@@ -252,6 +272,14 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
       if (this.telegraph === telegraph) this.telegraph = undefined;
       if ((this.telegraphState?.until ?? 0) <= this.scene.time.now) this.telegraphState = undefined;
     } });
+  }
+
+  private showMotionContactCue(): void {
+    if (!this.presentation?.motionPilotActive) return;
+    const anchor = this.presentation.visualAttackAnchor(this.groundPoint);
+    if (!anchor) return;
+    const cue = this.scene.add.circle(anchor.x, anchor.y, 3, 0xf2fff8, 0.78).setStrokeStyle(1, 0x61cdb9, 0.82).setDepth(DEPTH.melee);
+    this.scene.tweens.add({ targets: cue, alpha: 0, scaleX: 1.7, scaleY: 1.7, duration: 85, onComplete: () => cue.destroy() });
   }
 
   public freeze(until: number, bossSlow = false): void {
@@ -277,7 +305,19 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.actionLockedUntil = Math.max(this.actionLockedUntil, until); this.nextActionAt = Math.max(this.nextActionAt, until);
     this.scene.tweens.killTweensOf(this);
     this.setVelocity(0).setRotation(0).setScale(this.baseScale);
+    this.presentation?.cancelMotionAction();
     this.presentation?.restoreStateTransform();
+  }
+
+  /**
+   * A resolved melee overlap cancels the gameplay dash generation immediately.
+   * Start only the authored recovery pose after that cancellation so the
+   * contact remains readable without reviving an attack callback or changing
+   * the stagger/damage timing.
+   */
+  public playResolvedContactRecovery(): void {
+    if (this.creatureId !== 'rewind_lizard' && this.creatureId !== 'resonance_goral') return;
+    this.presentation?.playMotionAction(['hit_recover'], 220);
   }
 
   public takeDamage(amount: number, sourceAngle: number, parried = false, deathSource: EnemyDeathSource = 'other'): number {
@@ -309,9 +349,11 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   protected flashDamage(): void {
     const previousState = this.presentation?.currentState;
     this.setPresentationState('hit');
+    if (this.kind === 'boss') this.presentation?.playMotionAction(['hit_recover'], 240);
     const hitStateApplied = this.presentation?.currentState === 'hit';
-    this.setTintFill(0xf1e7d2);
-    this.scene.time.delayedCall(70, () => {
+    if (this.presentation?.motionPilotActive) this.setTint(0xe8d9c3);
+    else this.setTintFill(0xf1e7d2);
+    this.scene.time.delayedCall(this.presentation?.motionPilotActive ? 45 : 70, () => {
       if (!this.active) return;
       this.clearTint();
       // A phase transition may replace the presentation while the short hit
@@ -329,6 +371,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     (this.body as Phaser.Physics.Arcade.Body | undefined)?.setEnable(false);
     if (this.kind === 'boss' && this.presentation?.hasNonlethalRetreat) {
       this.presentation.applyBossPhase('defeated/nonlethal');
+      this.presentation.playMotionAction(['retreat'], 1100);
       const exitX = this.x < 480 ? -140 : 1100;
       scene.tweens.add({ targets: this.runtimeShadow, alpha: 0, duration: 900 });
       scene.tweens.add({ targets: this, x: exitX, alpha: 0.78, duration: 1100, ease: 'Sine.In', onComplete: () => { this.callbacks.died(this, source); if (this.active) this.destroy(); } });
@@ -401,6 +444,8 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   public get displayName(): string { return this.presentation?.displayName ?? this.kind; }
   public get nonlethalRetreat(): boolean { return this.presentation?.hasNonlethalRetreat ?? false; }
   public get attackAnchor(): Readonly<{ x: number; y: number }> { return this.projectileOrigin(); }
+  public get visualAttackAnchor(): Readonly<{ x: number; y: number }> | undefined { return this.presentation?.visualAttackAnchor(this.groundPoint); }
+  public get motionSnapshot() { return this.presentation?.motionSnapshot; }
   public get runtimeState(): string | undefined { return this.presentation?.currentState; }
   public get runtimeAssetFile(): string | undefined { return this.presentation?.currentAssetFile; }
   public get runtimeOverlayActive(): boolean { return this.presentation?.hasOverlay ?? false; }
@@ -472,10 +517,12 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     super.destroy(fromScene);
   }
 
-  protected setFacingFlipX(flipped: boolean): void {
-    if (this.presentation) this.presentation.setFacingFlipX(flipped);
+  protected setFacingFlipX(flipped: boolean, horizontalDelta?: number): void {
+    if (this.presentation) this.presentation.setFacingFlipX(flipped, horizontalDelta);
     else this.setFlipX(flipped);
   }
+
+  public get visualFlipX(): boolean { return this.presentation?.presentationFlipX ?? this.flipX; }
 
   protected projectileOrigin(fallbackYOffset = 0, anchorIndex = 0): Readonly<{ x: number; y: number }> {
     return this.presentation?.attackAnchor(this.groundPoint, anchorIndex) ?? { x: this.x, y: this.y + fallbackYOffset };

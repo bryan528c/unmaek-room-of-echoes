@@ -1,4 +1,6 @@
 import Phaser from 'phaser';
+import { CreatureMotionPresentation, type CreatureMotionSnapshot } from '../motion/MotionPilotRuntime';
+import { motionPilotPresentationProfile, resolveMirroredStagingFlip, type MotionPilotTarget } from '../motion/MotionPilotConfig';
 import type { Ellipse } from '../systems/CombatGeometry';
 import {
   bossDefeatPresentationFor,
@@ -58,9 +60,12 @@ export class CreaturePresentation {
   public readonly profile: RuntimePresentationProfile;
   private state: ResolvedRuntimeState;
   private requestedFlipX = false;
+  private pilotVisualFlipX = false;
   private outline?: Phaser.GameObjects.Image;
   private overlay?: Phaser.GameObjects.Image;
   private shakeUntil = 0;
+  private readonly motion?: CreatureMotionPresentation;
+  private pilotVisual?: Phaser.GameObjects.Image;
 
   public constructor(private readonly sprite: Phaser.Physics.Arcade.Sprite, creatureId: string) {
     this.metadata = resolveCreatureMetadata(creatureId);
@@ -75,6 +80,13 @@ export class CreaturePresentation {
         .setTint(0x071012).setAlpha(0);
     }
     this.applyResolvedState(this.state);
+    this.motion = CreatureMotionPresentation.create(this.sprite, creatureId, (textureKey) => this.applyMotionFrame(textureKey));
+    if (this.motion && this.motion.outlinePixels <= 0) {
+      this.outline?.destroy();
+      this.outline = undefined;
+    }
+    this.restoreStateTransform();
+    this.motion?.setState(initialState, this.sprite.scene.time.now);
   }
 
   public get creatureId(): string { return this.metadata.id; }
@@ -82,11 +94,16 @@ export class CreaturePresentation {
   public get baseScale(): number { return runtimePresentationScale(this.creatureId); }
   public get stateScale(): number { return this.state.scale; }
   public get effectiveFlipX(): boolean { return this.requestedFlipX !== this.state.flipX; }
+  public get presentationFlipX(): boolean {
+    return this.motion?.renderSource === 'PILOT_MIRRORED_STAGING_FALLBACK' ? this.pilotVisualFlipX : this.effectiveFlipX;
+  }
   public get currentState(): string { return this.state.requestedState; }
   public get currentAssetFile(): string { return this.state.assetFile; }
   public get hasOverlay(): boolean { return Boolean(this.overlay?.active); }
   public get hasHostileReadability(): boolean { return Boolean(this.outline?.active); }
   public get hasNonlethalRetreat(): boolean { return bossDefeatPresentationFor(this.creatureId).mode === 'nonlethal-retreat'; }
+  public get motionSnapshot(): CreatureMotionSnapshot | undefined { return this.motion?.snapshot(); }
+  public get motionPilotActive(): boolean { return Boolean(this.motion); }
 
   public companionSnapshot(): CreaturePresentationCompanionSnapshot {
     const outline = companionTransform(this.outline);
@@ -98,46 +115,82 @@ export class CreaturePresentation {
 
   public applyState(stateId: string): void {
     this.applyResolvedState(resolveCreatureState(this.creatureId, stateId));
+    this.motion?.setState(stateId, this.sprite.scene.time.now);
+    this.motion?.update(this.sprite.scene.time.now);
   }
 
   public applyBossPhase(phase: 1 | 2 | 3 | 'preFight' | 'defeated/nonlethal'): void {
     this.applyResolvedState(resolveBossPhaseState(this.creatureId, phase));
+    this.motion?.setState(phase === 'defeated/nonlethal' ? 'retreat' : 'idle', this.sprite.scene.time.now);
+    this.motion?.update(this.sprite.scene.time.now);
   }
 
-  public setFacingFlipX(flipped: boolean): void {
+  public playMotionAction(sequenceIds: readonly string[], durationMs: number, contactOffsetMs?: number): void {
+    this.motion?.playAction(sequenceIds, this.sprite.scene.time.now, durationMs, contactOffsetMs);
+  }
+
+  public cancelMotionAction(): void { this.motion?.cancelAction(this.sprite.scene.time.now); }
+
+  public setFacingFlipX(flipped: boolean, horizontalDelta = flipped ? -1 : 1): void {
     this.requestedFlipX = this.metadata.directionMode === 'fixed' ? false : flipped;
+    if (this.motion?.renderSource === 'PILOT_MIRRORED_STAGING_FALLBACK') {
+      // The approved goral pilot is canonically left-facing. Staging may
+      // mirror only its non-physics presentation; six logical pixels of
+      // hysteresis prevents target crossings from flickering at the center.
+      this.pilotVisualFlipX = resolveMirroredStagingFlip(this.pilotVisualFlipX, horizontalDelta);
+    } else this.pilotVisualFlipX = this.effectiveFlipX;
     this.applyOriginAndFlip();
   }
 
   public updateLayout(): void {
+    this.motion?.update(this.sprite.scene.time.now);
     this.applyOriginAndFlip();
     if (this.state.tint) this.sprite.setTint(parseTint(this.state.tint));
+    const primary = this.pilotVisual?.active ? this.pilotVisual : this.sprite;
+    if (this.pilotVisual?.active) {
+      const tint = this.sprite as unknown as {
+        isTinted: boolean; tintFill: boolean; tintTopLeft: number; tintTopRight: number; tintBottomLeft: number; tintBottomRight: number;
+      };
+      this.pilotVisual.setPosition(Math.round(this.sprite.x), Math.round(this.sprite.y))
+        .setDepth(this.sprite.depth)
+        .setAlpha(this.sprite.alpha)
+        .setVisible(this.sprite.active)
+        // Transient squash/rotation tweens remain on the hidden physics owner
+        // for OFF/ON gameplay parity. Pilot pixels only use authored alias
+        // rotation and therefore stay uniformly scaled and pixel crisp.
+        .setRotation(Phaser.Math.DegToRad(this.state.rotationDeg));
+      if (!tint.isTinted) this.pilotVisual.clearTint();
+      else if (tint.tintFill) this.pilotVisual.setTintFill(tint.tintTopLeft, tint.tintTopRight, tint.tintBottomLeft, tint.tintBottomRight);
+      else this.pilotVisual.setTint(tint.tintTopLeft, tint.tintTopRight, tint.tintBottomLeft, tint.tintBottomRight);
+    }
     const outline = this.outline;
     if (outline) {
+      const outlinePixels = this.motion?.outlinePixels ?? this.profile.outlinePixels;
+      const outlineAlpha = this.motion?.outlineAlpha ?? 0.52;
       const frameWidth = Math.max(1, outline.frame.realWidth);
       const frameHeight = Math.max(1, outline.frame.realHeight);
-      outline.setPosition(this.sprite.x, this.sprite.y)
-        .setOrigin(this.sprite.originX, this.sprite.originY)
+      outline.setPosition(primary.x, primary.y)
+        .setOrigin(primary.originX, primary.originY)
         .setScale(
-          Math.abs(this.sprite.scaleX) + this.profile.outlinePixels * 2 / frameWidth,
-          Math.abs(this.sprite.scaleY) + this.profile.outlinePixels * 2 / frameHeight,
+          Math.abs(primary.scaleX) + outlinePixels * 2 / frameWidth,
+          Math.abs(primary.scaleY) + outlinePixels * 2 / frameHeight,
         )
-        .setRotation(this.sprite.rotation)
-        .setFlipX(this.sprite.flipX)
-        .setAlpha(this.sprite.alpha * 0.52)
-        .setVisible(this.sprite.visible)
-        .setDepth(this.sprite.depth - 0.1);
+        .setRotation(primary.rotation)
+        .setFlipX(primary.flipX)
+        .setAlpha(primary.alpha * outlineAlpha)
+        .setVisible(primary.visible)
+        .setDepth(primary.depth - 0.1);
     }
     const overlay = this.overlay;
     if (!overlay) return;
-    overlay.setPosition(this.sprite.x, this.sprite.y)
-      .setOrigin(this.sprite.originX, this.sprite.originY)
-      .setScale(Math.abs(this.sprite.scaleX), Math.abs(this.sprite.scaleY))
-      .setRotation(this.sprite.rotation)
-      .setFlipX(this.sprite.flipX)
-      .setAlpha(this.sprite.alpha)
-      .setVisible(this.sprite.visible)
-      .setDepth(this.sprite.depth + 1);
+    overlay.setPosition(primary.x, primary.y)
+      .setOrigin(primary.originX, primary.originY)
+      .setScale(Math.abs(primary.scaleX), Math.abs(primary.scaleY))
+      .setRotation(primary.rotation)
+      .setFlipX(primary.flipX)
+      .setAlpha(primary.alpha)
+      .setVisible(primary.visible)
+      .setDepth(primary.depth + 1);
   }
 
   public hurtbox(groundPoint: Readonly<RuntimePoint>): Ellipse | null {
@@ -147,6 +200,11 @@ export class CreaturePresentation {
   public attackAnchor(groundPoint: Readonly<RuntimePoint>, anchorIndex = 0): RuntimePoint {
     const anchor = this.metadata.attackAnchors[anchorIndex % Math.max(1, this.metadata.attackAnchors.length)];
     return resolveWorldAttackAnchor(this.creatureId, groundPoint, this.effectiveFlipX, anchor?.id);
+  }
+
+  public visualAttackAnchor(groundPoint: Readonly<RuntimePoint>, anchorIndex = 0): RuntimePoint | undefined {
+    const anchor = this.metadata.attackAnchors[anchorIndex % Math.max(1, this.metadata.attackAnchors.length)];
+    return this.motion?.visualAnchor(groundPoint, this.presentationFlipX, anchor?.id);
   }
 
   public shadowAnchor(groundPoint: Readonly<RuntimePoint>): RuntimePoint {
@@ -159,6 +217,8 @@ export class CreaturePresentation {
   }
 
   public destroy(): void {
+    this.motion?.destroy();
+    this.pilotVisual?.destroy(); this.pilotVisual = undefined;
     this.outline?.destroy(); this.outline = undefined;
     this.overlay?.destroy(); this.overlay = undefined;
   }
@@ -180,10 +240,25 @@ export class CreaturePresentation {
     this.updateLayout();
   }
 
+  private applyMotionFrame(textureKey: string): void {
+    const profile = motionPilotPresentationProfile(this.creatureId as MotionPilotTarget);
+    if (!this.pilotVisual?.active) {
+      this.pilotVisual = this.sprite.scene.add.image(this.sprite.x, this.sprite.y, textureKey);
+      this.sprite.setVisible(false);
+    } else this.pilotVisual.setTexture(textureKey);
+    this.pilotVisual.setScale(profile.uniformScale);
+    this.outline?.setTexture(textureKey);
+    this.applyOriginAndFlip();
+  }
+
   private applyOriginAndFlip(): void {
     const origin = runtimeSpriteOrigin(this.creatureId, this.effectiveFlipX);
+    const presentationOrigin = runtimeSpriteOrigin(this.creatureId, this.presentationFlipX);
     const shaking = this.sprite.scene.time.now < this.shakeUntil;
     const shakeOffset = shaking ? Math.sin(this.sprite.scene.time.now * 0.55) * 0.018 : 0;
     this.sprite.setOrigin(origin.x + shakeOffset, origin.y).setFlipX(this.effectiveFlipX);
+    this.pilotVisual?.setOrigin(presentationOrigin.x + shakeOffset, presentationOrigin.y)
+      .setScale(this.motion?.uniformScale ?? motionPilotPresentationProfile(this.creatureId as MotionPilotTarget).uniformScale)
+      .setFlipX(this.presentationFlipX);
   }
 }

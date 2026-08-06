@@ -67,6 +67,7 @@ export const describeBackflowOpportunity = (frozenProjectiles: number, stoppedTa
 export interface HudState {
   health: number;
   maxHealth: number;
+  godMode?: boolean;
   sentence: number;
   sentenceMax: number;
   score: number;
@@ -305,7 +306,7 @@ export class OverlayUI {
     const hud = document.createElement('section');
     hud.className = 'hud';
     hud.innerHTML = `<div class="health-panel"><div class="hero-mini"><img src="./assets/hero-concept.png" alt="" /></div><div><div class="hud-label">생명 <span data-health-text>100 / 100</span></div><div class="health-track"><i data-health-ghost></i><em data-health-rewind></em><b data-health></b></div></div></div>
-      <div class="stage-panel"><span data-stage>서벽 절벽지대</span><small data-run-context>Act 1 · 서벽 절벽지대 · 보스 0</small><em data-modifiers></em><strong data-score>0</strong></div>
+      <div class="stage-panel"><span data-stage>서벽 절벽지대</span><small data-run-context>Act 1 · 서벽 절벽지대 · 보스 0</small><em data-modifiers></em><em class="hidden" data-god-mode>DEV GOD MODE</em><strong data-score>0</strong></div>
       <div class="boss-panel hidden" data-boss><div><span data-boss-name>반향각 산양</span><em data-boss-phase>영역 경고</em></div><small data-boss-guide></small><div class="boss-track"><b data-boss-health></b></div></div>
       <div class="word-hud">
         <div class="finisher-slot ready" data-cut><kbd>J</kbd><b data-cut-label>절단</b><small data-cut-status>준비 완료</small><span data-echo-status>잔향 칼날</span></div>
@@ -359,6 +360,7 @@ export class OverlayUI {
     const stage = this.hud.querySelector('[data-stage]'); if (stage) stage.textContent = state.stage;
     const runContext = this.hud.querySelector('[data-run-context]'); if (runContext) runContext.textContent = `Act ${state.actIndex} · ${state.actName} · 보스 ${state.bossesDefeated}`;
     const modifier = this.hud.querySelector('[data-modifiers]'); if (modifier) modifier.textContent = state.modifiers.length ? state.modifiers.map((item) => `${item.icon} ${item.name}`).join(' · ') : '';
+    const godMode = this.hud.querySelector<HTMLElement>('[data-god-mode]'); godMode?.classList.toggle('hidden', !state.godMode);
     const score = this.hud.querySelector('[data-score]'); if (score) score.textContent = state.score.toLocaleString();
     const fallbackSlots: HudState['wordSlots'] = [
       { slot: 'Q', wordId: 'stop', name: '멎는다', cooldown: state.stopCooldown, canUse: state.canStop },

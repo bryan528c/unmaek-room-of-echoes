@@ -1,4 +1,6 @@
 import Phaser from 'phaser';
+import { motionPilotAssetAudit, motionPilotImageEntries, motionPilotJsonEntries } from '../motion/MotionPilotAssets';
+import { motionPilotEnabled } from '../motion/MotionPilotConfig';
 import { runtimeAssetAudit, runtimeAssetEntries } from '../runtime/SubmissionRuntimeAssets';
 import { createCroppedTextures, createHeroFallback } from '../utils/assetCrop';
 
@@ -14,12 +16,26 @@ export class BootScene extends Phaser.Scene {
       throw new Error(`[BootScene] Submission runtime allowlist audit failed: ${JSON.stringify(audit)}`);
     }
     for (const asset of runtimeAssetEntries()) this.load.image(asset.key, asset.url);
+    if (motionPilotEnabled()) {
+      const motionAudit = motionPilotAssetAudit();
+      if (motionAudit.playerFrames !== 76 || motionAudit.creatureFrames !== 99 || motionAudit.directionLocks !== 8
+        || motionAudit.duplicateKeys.length || motionAudit.disallowed.length) {
+        throw new Error(`[BootScene] Motion pilot allowlist audit failed: ${JSON.stringify(motionAudit)}`);
+      }
+      for (const asset of motionPilotImageEntries(true)) this.load.image(asset.key, asset.url);
+      for (const asset of motionPilotJsonEntries(true)) this.load.json(asset.key, asset.url);
+    }
     this.load.once(Phaser.Loader.Events.FILE_LOAD_ERROR, () => { this.heroLoadFailed = true; });
   }
 
   public create(): void {
     const cropped = !this.heroLoadFailed && createCroppedTextures(this, 'hero-concept');
     if (!cropped) createHeroFallback(this);
+    if (motionPilotEnabled()) {
+      for (const asset of motionPilotImageEntries(true)) {
+        this.textures.get(asset.key).setFilter(Phaser.Textures.FilterMode.NEAREST);
+      }
+    }
     this.createEnemyTextures();
     this.scene.start('MenuScene');
   }
