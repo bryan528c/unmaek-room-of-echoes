@@ -42,6 +42,8 @@ import { adjustLinkedIncomingDamage, linkShareRatio } from '../systems/WordComba
 import { backflowBladeDamage, cutDamageMultiplier, cutHitsTarget, cutSentenceBonus, echoBladeProfile, echoBladeTargets, isolationChainProfile, quantizeEightDirection, returningScarProfile, selectEchoReplayTarget, WeaponCooldowns } from '../systems/WeaponCombatSystem';
 import { angleDelta, distanceSq, rankFor } from '../utils/math';
 import { createArchiveArena, createInkArchiveArena } from '../utils/arena';
+import { act1ShowcaseConfig } from '../showcase/Act1ShowcaseConfig';
+import { Act1ShowcaseVfx } from '../showcase/Act1ShowcaseVfx';
 import type { ResultStats } from '../../ui/OverlayUI';
 import { SubmissionMapRuntime } from '../runtime/SubmissionMapRuntime';
 import { nearestRuntimeSafeGroundPoint, runtimeGroundPointIsSafe } from '../runtime/RuntimeSafeSpawn';
@@ -114,7 +116,7 @@ interface WordCastContext {
 type CombatAction = 'attack' | 'parry' | 'dash' | WordId;
 type MotionReviewAction = 'idle' | 'move' | 'dash' | 'basic_attack' | 'parry_failure' | 'parry_success' | 'word_skill' | 'hit_recover' | 'advance';
 type MotionReviewDirection = 'N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW';
-type MotionR2ReviewAction = 'damage-projectile' | 'damage-melee' | 'goral-left' | 'goral-right' | 'phase-next' | 'qa-advance';
+type MotionR2ReviewAction = 'damage-projectile' | 'damage-melee' | 'goral-left' | 'goral-right' | 'phase-next' | 'qa-advance' | 'showcase-stop' | 'showcase-rewind' | 'showcase-link';
 type DebugWindow = Window & {
   __EONMAEK_DEBUG__?: () => unknown;
   __EONMAEK_MOTION_REVIEW__?: (direction: MotionReviewDirection, action: MotionReviewAction) => unknown;
@@ -185,6 +187,7 @@ export class GameScene extends Phaser.Scene {
   private submissionMap?: SubmissionMapRuntime;
   private backgroundCues = new Set<Phaser.GameObjects.Image>();
   private backgroundCueMotions = new Map<Phaser.GameObjects.Image, CreatureMotionPresentation>();
+  private showcaseVfx?: Act1ShowcaseVfx;
   private motionReviewMovement?: { x: number; y: number; until: number };
   private heroMapSafePoint = { x: 480, y: 300 };
   private atmosphere?: Phaser.GameObjects.Particles.ParticleEmitter;
@@ -250,6 +253,7 @@ export class GameScene extends Phaser.Scene {
   private parryCounterUntil = 0;
   private parryAimUntil = 0;
   private parryStartedAt = 0;
+  private parryShowcaseAttempt = 0;
   private sentencePulseUntil = 0;
   private sentenceFullAt = 0;
   private sentenceReminderShown = false;
@@ -356,6 +360,8 @@ export class GameScene extends Phaser.Scene {
       if (act.index > 1) this.runProgress.beginAct(this.runId, { actNumber: act.index, actId: act.id, actName: act.name, themeId: act.theme, enemySetId: act.enemySetId, bossId: act.bossId, modifiers: act.modifiers });
     }
     this.activateActArena('general', false);
+    this.showcaseVfx = new Act1ShowcaseVfx(this, act1ShowcaseConfig());
+    this.showcaseVfx.setAct(this.runAct.current.index);
     this.createAtmosphere();
     const playerSpawn = this.submissionMap?.playerSpawn ?? { x: 480, y: 300 };
     this.heroMapSafePoint = { ...playerSpawn };
@@ -379,6 +385,7 @@ export class GameScene extends Phaser.Scene {
       time: this.timeControl.snapshot(),
       input: this.inputRouter.snapshot(),
       development: { qa: this.qaMode, godMode: this.godMode, scenarioInvulnerable: this.debugInvulnerable },
+      act1Showcase: this.showcaseVfx?.snapshot(),
       hero: { x: this.hero.x, y: this.hero.y, active: this.hero.active, visible: this.hero.visible, alpha: this.hero.alpha, bodyEnabled: (this.hero.body as Phaser.Physics.Arcade.Body).enable, comboActive: this.hero.isComboActive, comboStep: this.hero.comboStep, direction: this.hero.attackDirection, health: this.hero.health, finisherCharges: this.finisherCharges.charges, flipX: this.hero.flipX, textureKey: this.hero.texture.key, geometry: this.hero.motionGeometrySnapshot, motion: this.hero.motionSnapshot, lastDamageAttempt: this.hero.lastDamageAttempt },
       heroDamageAttempt: this.lastHeroDamageAttempt,
       targetId: this.comboLock.targetId ?? this.heldAttackTarget?.id ?? this.currentTarget?.id,
@@ -446,12 +453,12 @@ export class GameScene extends Phaser.Scene {
     // cleared automatically even though display-list children are destroyed.
     this.boss = undefined;
     this.enemies = new Set(); this.projectiles = new Set(); this.inkZones = []; this.linkedTargets = new Set(); this.linkMarkers = new Map(); this.linkShareRatio = BALANCE.words.linkShare; this.linkGeneration = 0;
-    this.submissionMap = undefined; this.backgroundCues = new Set(); this.backgroundCueMotions = new Map(); this.motionReviewMovement = undefined; this.heroMapSafePoint = { x: 480, y: 300 };
+    this.submissionMap = undefined; this.backgroundCues = new Set(); this.backgroundCueMotions = new Map(); this.showcaseVfx = undefined; this.motionReviewMovement = undefined; this.heroMapSafePoint = { x: 480, y: 300 };
     this.upgrades = this.runProgress.upgrades; this.rewind = new RewindBuffer(BALANCE.words.rewindDuration); this.targeting = new TargetingSystem(BALANCE.targeting); this.wordChain = new WordChainSystem(BALANCE.chain.window); this.wordLoadout = new WordLoadoutState(DEFAULT_WORD_LOADOUT); this.wordStatuses = new WordStatusRuntime(); this.wordReadyAt = { stop: 0, rewind: 0, link: 0, pull: 0, mark: 0, push: 0 }; this.damageHistory = new DamageHistory(BALANCE.chain.damageHistoryRetention); this.combatStats = this.runProgress.combatStats; this.attackRegistry = new AttackHitRegistry(); this.attackInput = new RisingEdgeInput(); this.comboLock = new SoftTargetLock(); this.flow = new GameFlowController('RUN_START', import.meta.env.DEV ? (message) => console.warn(`[GameFlow] ${message}`) : undefined, performance.now()); this.inputRouter = new InputRouter(); this.parryResolver = new ParryResolver(); this.finisherCharges = new FinisherChargeSystem(BALANCE.hero.finisher.maximumCharges); this.weaponCooldowns = new WeaponCooldowns(); this.weaponCooldowns.reset(0); this.resonanceRuntime = new ResonanceRuntime(); this.waveDirector = new WaveDirector(BALANCE.pacing.roundClearStability, BALANCE.pacing.staleEnemyRecovery); this.threatBudget = new ThreatBudget(); this.runOutcome = new RunOutcomeController(); this.attacks = [];
     this.waveIndex = 0; this.waveSpawnGeneration = 0; this.enemySpawnTimes = new Map(); this.enemyFirstDamageAt = new Map(); this.currentComboDamage = 0; this.nextDefensiveSlashAt = 0; this.defensiveSlashEnabled = false; this.nextHeldComboAt = 0; this.firstWaveSpawnOrdinal = 0; this.defensiveSlashSequence = 100000; this.echoBladeSequence = 200000; this.lastDirectTargetId = undefined; this.echoFinisherUntil = 0; this.echoAmplifierUntil = 0; this.bossMechanicRewardUntil = 0; this.encounterStartedAt = 0; this.bossPhaseStartedAt = 0; this.currentWaveBatches = []; this.nextBatchIndex = 0; this.activeBatchPendingSpawns = 0; this.miniWaveReadyAt = 0; this.parryAnchorUntil = 0; this.lastWaveDiagnosticAt = 0; this.score = 0; this.activeActPatterns = new Set(); this.activeEndlessModifiers = []; this.actPatternGeneration = 0; this.echoProjectileSequence = 0; this.stitchedPairs = new Map(); this.arenaContainer = undefined; this.modifierEnvironment = undefined; this.modifierIntroductions = new ModifierIntroductionTracker(this.services.save.modifierTutorialsSeen);
     this.sentence = 0; this.empowered = false; this.stopReadyAt = 0; this.rewindReadyAt = 0; this.linkReadyAt = 0;
     this.damageTaken = 0; this.deathSequenceStarted = false; this.parries = 0; this.wordUses = { '멎는다': 0, '되돌린다': 0, '잇는다': 0, '당긴다': 0, '새긴다': 0, '밀어낸다': 0 };
-    this.tutorialIndex = 0; this.tutorialSteps = TUTORIAL.map((step) => ({ ...step })); this.tutorialHideAt = 0; this.firstHitAvailable = true; this.lastPursuitId = ''; this.pursuitCount = 0; this.regressionCharged = false; this.parryCounterUntil = 0; this.parryAimUntil = 0; this.parryStartedAt = 0; this.sentencePulseUntil = 0; this.sentenceFullAt = 0; this.sentenceReminderShown = false; this.perfectCounterUntil = 0; this.headwindGuardUntil = 0; this.cutPerfectCounterActive = false; this.lastDashAt = Number.NEGATIVE_INFINITY; this.echoHarvestWindowStartedAt = 0; this.echoHarvestWindowGain = 0; this.lastUpgradeToastAt = new Map(); this.lastActivatedUpgrade = undefined; this.lastActivatedUpgradeUntil = 0; this.lastActivatedResonance = undefined; this.lastActivatedResonanceUntil = 0; this.transientCombatObjects.clear(); this.bossTransitionUntil = 0; this.bossSignatureExecutions = new Set(); this.bossDeathEvents = 0; this.actTransitionStartedAt = 0; this.lastActTransitionDuration = 0; this.bufferedAction = undefined; this.currentTarget = undefined; this.comboTarget = undefined; this.heldAttackTarget = undefined; this.targetMarkerUntil = 0; this.targetDistance = 0; this.timeouts = []; this.rewindPreviewGhosts = [];
+    this.tutorialIndex = 0; this.tutorialSteps = TUTORIAL.map((step) => ({ ...step })); this.tutorialHideAt = 0; this.firstHitAvailable = true; this.lastPursuitId = ''; this.pursuitCount = 0; this.regressionCharged = false; this.parryCounterUntil = 0; this.parryAimUntil = 0; this.parryStartedAt = 0; this.parryShowcaseAttempt = 0; this.sentencePulseUntil = 0; this.sentenceFullAt = 0; this.sentenceReminderShown = false; this.perfectCounterUntil = 0; this.headwindGuardUntil = 0; this.cutPerfectCounterActive = false; this.lastDashAt = Number.NEGATIVE_INFINITY; this.echoHarvestWindowStartedAt = 0; this.echoHarvestWindowGain = 0; this.lastUpgradeToastAt = new Map(); this.lastActivatedUpgrade = undefined; this.lastActivatedUpgradeUntil = 0; this.lastActivatedResonance = undefined; this.lastActivatedResonanceUntil = 0; this.transientCombatObjects.clear(); this.bossTransitionUntil = 0; this.bossSignatureExecutions = new Set(); this.bossDeathEvents = 0; this.actTransitionStartedAt = 0; this.lastActTransitionDuration = 0; this.bufferedAction = undefined; this.currentTarget = undefined; this.comboTarget = undefined; this.heldAttackTarget = undefined; this.targetMarkerUntil = 0; this.targetDistance = 0; this.timeouts = []; this.rewindPreviewGhosts = [];
     this.activeDaggerDebug = undefined; this.debugHitboxes = false; this.debugStatsVisible = false; this.debugScenarioIndex = 0; this.debugInvulnerable = false; this.lastHeroDamageAttempt = undefined; this.summonSpawnDiagnostics = []; this.watchdogHandle = undefined; this.lastHeartbeatAt = performance.now(); this.lastWatchdogReportAt = 0; this.watchdogMessage = 'normal'; this.watchdogStalled = false; this.lastAttackAt = 0; this.lastHitAt = 0; this.lastDebugPublishAt = 0; this.frameDelta = 1000 / 60; this.combatHeartbeats = { scene: 0, physics: 0, damageQueue: 0, timeControl: 0, audio: 0, bossAi: 0 };
   }
 
@@ -641,15 +648,21 @@ export class GameScene extends Phaser.Scene {
       if (!groundFootprintInsideBounds(enemy.groundPoint, enemyGroundExtents(enemy.kind), COMBAT_BOUNDS)) this.combatStats.enemyOutsideBounds();
     }
     for (const projectile of [...this.projectiles]) {
-      if (!projectile.active) { this.projectiles.delete(projectile); continue; }
+      if (!projectile.active) { this.showcaseVfx?.releaseProjectile(projectile); this.projectiles.delete(projectile); continue; }
       projectile.update(time);
       if (this.submissionMap && (!this.submissionMap.isWalkable(projectile) || this.submissionMap.isHazard(projectile))) {
-        projectile.destroy(); this.projectiles.delete(projectile); continue;
+        this.showcaseVfx?.projectileImpact(projectile); projectile.destroy(); this.projectiles.delete(projectile); continue;
       }
       this.checkProjectileCollision(projectile); if (projectile.active) projectile.commitPosition();
     }
     this.checkMeleeCollisions(time);
     for (const enemy of this.enemies) if (enemy.active) enemy.commitGroundPosition();
+    this.showcaseVfx?.update(
+      time,
+      [...this.enemies],
+      [...this.projectiles],
+      [...this.backgroundCues].map((image) => ({ image, motion: this.backgroundCueMotions.get(image)?.snapshot() })),
+    );
     this.combatHeartbeats.physics = performance.now();
     this.updateInkZones(time);
     this.updateRewindPreview(time);
@@ -668,6 +681,7 @@ export class GameScene extends Phaser.Scene {
       flow: this.flow.state,
       run: this.runSession.snapshot(),
       development: { qa: this.qaMode, godMode: this.godMode, scenarioInvulnerable: this.debugInvulnerable },
+      act1Showcase: this.showcaseVfx?.snapshot(),
       hero: { x: this.hero.x, y: this.hero.y, active: this.hero.active, visible: this.hero.visible, alpha: this.hero.alpha, bodyEnabled: (this.hero.body as Phaser.Physics.Arcade.Body).enable, health: this.hero.health, parrying: this.hero.isParrying, finisherCharges: this.finisherCharges.charges, finisherMax: this.finisherCharges.maxCharges, comboActive: this.hero.isComboActive, comboStep: this.hero.comboStep, direction: this.hero.attackDirection, flipX: this.hero.flipX, textureKey: this.hero.texture.key, geometry: this.hero.motionGeometrySnapshot, motion: this.hero.motionSnapshot, lastDamageAttempt: this.hero.lastDamageAttempt },
       heroDamageAttempt: this.lastHeroDamageAttempt,
       targetId: this.comboLock.targetId ?? this.heldAttackTarget?.id ?? this.currentTarget?.id,
@@ -929,6 +943,7 @@ export class GameScene extends Phaser.Scene {
     projectile.setData('actId', this.runAct.current.id);
     projectile.setData('echoGeneration', echoGeneration);
     this.projectiles.add(projectile);
+    this.showcaseVfx?.attachProjectile(projectile, source);
     const echoEnabled = this.activeActPatterns.has('ink-echo-projectile') || this.activeEndlessModifiers.includes('projectile-echo');
     if (echoEnabled && echoGeneration === 0 && this.echoProjectileSequence++ % 3 === 0) {
       const marker = this.add.circle(x, y, 10, 0x6f4a82, .08).setStrokeStyle(2, 0xa578ae, .62).setDepth(DEPTH.telegraph);
@@ -942,6 +957,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private showCreatureMotionContactCue(source: Enemy): void {
+    if (this.showcaseVfx?.enabled) return;
     const anchor = source.visualAttackAnchor;
     if (!anchor) return;
     const cue = this.add.circle(anchor.x, anchor.y, 4, 0xe8fff7, 0.82).setStrokeStyle(1, 0x65cdb9, 0.9).setDepth(DEPTH.projectile);
@@ -949,6 +965,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private showPlayerMotionContactCue(): void {
+    if (this.showcaseVfx?.enabled) return;
     const anchor = this.hero.motionVisualAnchor('dagger_tip');
     if (!anchor) return;
     const cue = this.add.circle(anchor.x, anchor.y, 4, 0xffffff, 0.88).setStrokeStyle(1, 0xd8c89f, 0.94).setDepth(DEPTH.melee);
@@ -1099,11 +1116,15 @@ export class GameScene extends Phaser.Scene {
     const perfectCounter = perfectCounterProfile(this.upgrades.getStack('perfect-counter'));
     const counterActive = this.cutPerfectCounterActive;
     const profile = { ...BALANCE.hero.cut, range: BALANCE.hero.cut.range * (counterActive ? perfectCounter.rangeMultiplier : 1) };
-    const slash = this.add.graphics().setDepth(DEPTH.melee);
-    const motionReadability = this.hero.motionPilotActive;
-    slash.lineStyle(motionReadability ? 6 : 12, 0x143d37, motionReadability ? 0.34 : 0.68).beginPath().arc(attack.originX, attack.originY, profile.range, attack.angle - profile.halfAngle, attack.angle + profile.halfAngle).strokePath();
-    slash.lineStyle(motionReadability ? 3 : 6, 0xb5f6e8, motionReadability ? 0.64 : 0.96).beginPath().arc(attack.originX, attack.originY, profile.range, attack.angle - profile.halfAngle, attack.angle + profile.halfAngle).strokePath();
-    this.tweens.add({ targets: slash, alpha: 0, scaleX: 1.12, scaleY: 1.12, duration: motionReadability ? 105 : 175, onComplete: () => slash.destroy() });
+    if (this.showcaseVfx?.enabled) {
+      this.showcaseVfx.heroCut(this.hero.motionVisualAnchor('dagger_tip') ?? { x: attack.originX, y: attack.originY }, attack.angle);
+    } else {
+      const slash = this.add.graphics().setDepth(DEPTH.melee);
+      const motionReadability = this.hero.motionPilotActive;
+      slash.lineStyle(motionReadability ? 6 : 12, 0x143d37, motionReadability ? 0.34 : 0.68).beginPath().arc(attack.originX, attack.originY, profile.range, attack.angle - profile.halfAngle, attack.angle + profile.halfAngle).strokePath();
+      slash.lineStyle(motionReadability ? 3 : 6, 0xb5f6e8, motionReadability ? 0.64 : 0.96).beginPath().arc(attack.originX, attack.originY, profile.range, attack.angle - profile.halfAngle, attack.angle + profile.halfAngle).strokePath();
+      this.tweens.add({ targets: slash, alpha: 0, scaleX: 1.12, scaleY: 1.12, duration: motionReadability ? 105 : 175, onComplete: () => slash.destroy() });
+    }
     this.activeDaggerDebug = { x: attack.originX, y: attack.originY, angle: attack.angle, range: profile.range, until: this.time.now + 105 };
     const candidates = [...this.enemies].filter((enemy) => enemy.active && enemy.spawned && !enemy.removing
       && cutHitsTarget({ x: attack.originX, y: attack.originY }, attack.angle, profile, enemy.hurtbox))
@@ -1529,15 +1550,28 @@ export class GameScene extends Phaser.Scene {
     this.parryAnchorUntil = Math.max(this.parryAnchorUntil, this.time.now + Math.max(BALANCE.hero.parryWindow + extra, BALANCE.hero.parryPositionLock));
     this.markTutorial('parry');
     const hurtbox = this.hero.hurtbox;
-    const ring = this.add.ellipse(hurtbox.x, hurtbox.y, (hurtbox.radiusX + BALANCE.hero.parryEnvelopePadding) * 2, (hurtbox.radiusY + BALANCE.hero.parryEnvelopePadding) * 2, 0x72d7c5, 0.12).setStrokeStyle(3, 0x9affeb, 0.8).setDepth(DEPTH.melee);
-    this.tweens.add({ targets: ring, scaleX: 1.45, scaleY: 1.45, alpha: 0, duration: 190, onComplete: () => ring.destroy() });
+    if (this.showcaseVfx?.enabled) {
+      const attempt = this.parryShowcaseAttempt += 1;
+      const center = this.hero.motionVisualAnchor('parry_center') ?? hurtbox;
+      this.showcaseVfx.parryAttempt(center);
+      this.runDelayedCall(BALANCE.hero.parryWindow + extra + 1, () => {
+        if (attempt !== this.parryShowcaseAttempt) return;
+        this.showcaseVfx?.parryFailure(this.hero.motionVisualAnchor('parry_center') ?? this.hero.hurtbox);
+      });
+    } else {
+      const ring = this.add.ellipse(hurtbox.x, hurtbox.y, (hurtbox.radiusX + BALANCE.hero.parryEnvelopePadding) * 2, (hurtbox.radiusY + BALANCE.hero.parryEnvelopePadding) * 2, 0x72d7c5, 0.12).setStrokeStyle(3, 0x9affeb, 0.8).setDepth(DEPTH.melee);
+      this.tweens.add({ targets: ring, scaleX: 1.45, scaleY: 1.45, alpha: 0, duration: 190, onComplete: () => ring.destroy() });
+    }
     return true;
   }
 
   private parrySuccess(enemy?: Enemy, projectile?: Projectile): void {
     this.hero.resolveParryMotion(true);
     const visualParryCenter = this.hero.motionVisualAnchor('parry_center');
-    if (visualParryCenter) {
+    if (this.showcaseVfx?.enabled) {
+      this.parryShowcaseAttempt += 1;
+      this.showcaseVfx.parrySuccess(visualParryCenter ?? this.hero.hurtbox, this.hero.facing);
+    } else if (visualParryCenter) {
       const cue = this.add.circle(visualParryCenter.x, visualParryCenter.y, 5, 0xd889ff, 0.72).setDepth(DEPTH.word);
       this.tweens.add({ targets: cue, alpha: 0, scaleX: 2, scaleY: 2, duration: 120, onComplete: () => cue.destroy() });
     }
@@ -1557,9 +1591,11 @@ export class GameScene extends Phaser.Scene {
         this.showCombatLabel(this.hero.x, this.hero.y - 58, this.upgrades.hasResonance('counter-cut') ? '반격 절문 준비' : '다음 절단 강화', 0xb6f5df);
       }
     }
-    const flash = this.add.circle(this.hero.x, this.hero.y - 8, 24, 0xb4ffef, 0.2).setStrokeStyle(5, 0x8ff3df, 0.95).setDepth(DEPTH.word);
-    this.tweens.add({ targets: flash, radius: 72, alpha: 0, duration: this.services.save.settings.reducedMotion ? 95 : 170, onComplete: () => flash.destroy() });
-    this.runeBurst(this.hero.x, this.hero.y - 10, 8);
+    if (!this.showcaseVfx?.enabled) {
+      const flash = this.add.circle(this.hero.x, this.hero.y - 8, 24, 0xb4ffef, 0.2).setStrokeStyle(5, 0x8ff3df, 0.95).setDepth(DEPTH.word);
+      this.tweens.add({ targets: flash, radius: 72, alpha: 0, duration: this.services.save.settings.reducedMotion ? 95 : 170, onComplete: () => flash.destroy() });
+      this.runeBurst(this.hero.x, this.hero.y - 10, 8);
+    }
     if (enemy) {
       const inscription = counterInscriptionProfile(this.upgrades.getStack('counter-inscription'));
       if (inscription.duration > 0) { enemy.setData('counterInscriptionUntil', this.time.now + inscription.duration); this.recordUpgradeContribution('counter-inscription', { activationCount: 1, generated: 1, affectedTargets: 1 }, true); }
@@ -1576,6 +1612,7 @@ export class GameScene extends Phaser.Scene {
       const target = [...this.enemies].find((candidate) => candidate.id === projectile.sourceId && candidate.active) ?? this.nearestEnemy(projectile.x, projectile.y);
       const inscription = counterInscriptionProfile(this.upgrades.getStack('counter-inscription'));
       if (target && inscription.duration > 0) { target.setData('counterInscriptionUntil', this.time.now + inscription.duration); this.recordUpgradeContribution('counter-inscription', { activationCount: 1, generated: 1, affectedTargets: 1 }, true); }
+      this.showcaseVfx?.releaseProjectile(projectile);
       if (target) projectile.reflect(target.x, target.y); else projectile.destroy();
     }
     // parrySuccess never relocates the hero. Re-applying an unchanged position
@@ -1679,9 +1716,10 @@ export class GameScene extends Phaser.Scene {
     this.stopReadyAt = this.time.now + this.wordCooldown(BALANCE.words.stopCooldown);
     this.wordUses['멎는다'] = (this.wordUses['멎는다'] ?? 0) + 1; this.markTutorial('stop');
     this.hero.castPose(); this.services.audio.play('stop'); this.showWordTypography('멎는다', x, y);
-    const circle = this.add.circle(x, y, BALANCE.words.stopRadius, 0x55c4b1, 0.08).setStrokeStyle(3, 0x76d8c7, 0.74).setDepth(DEPTH.telegraph).setScale(0.2);
-    this.tweens.add({ targets: circle, scale: 1, duration: 180 });
+    const circle = this.showcaseVfx?.enabled ? undefined : this.add.circle(x, y, BALANCE.words.stopRadius, 0x55c4b1, 0.08).setStrokeStyle(3, 0x76d8c7, 0.74).setDepth(DEPTH.telegraph).setScale(0.2);
+    if (circle) this.tweens.add({ targets: circle, scale: 1, duration: 180 });
     this.runDelayedCall(180, () => {
+      this.showcaseVfx?.wordStop({ x, y });
       const until = this.time.now + BALANCE.words.stopDuration + overchargeDurationBonus;
       let damaged = 0;
       const stoppedEnemyIds: string[] = [];
@@ -1717,13 +1755,13 @@ export class GameScene extends Phaser.Scene {
       if (this.upgrades.getStack('stop-resonance') > 0 || this.upgrades.hasResonance('time-undertow')) this.runDelayedCall(until - this.time.now + 10, () => this.applyStopEndEffects(stoppedEnemyIds, until));
       if (chain === 'chain-stop') this.applyChainStop(activeLinked);
       else if (chain) this.applyWordReaction(chain, stoppedEnemyIds.map((id) => [...this.enemies].find((enemy) => enemy.id === id)).filter((enemy): enemy is Enemy => enemy !== undefined));
-      this.tweens.add({ targets: circle, alpha: 0, duration: 220, onComplete: () => circle.destroy() });
+      if (circle) this.tweens.add({ targets: circle, alpha: 0, duration: 220, onComplete: () => circle.destroy() });
     });
     return true;
   }
 
   private explodeStoppedProjectile(projectile: Projectile): void {
-    if (!projectile.active) return; const x = projectile.x; const y = projectile.y; projectile.destroy(); this.projectiles.delete(projectile);
+    if (!projectile.active) return; const x = projectile.x; const y = projectile.y; this.showcaseVfx?.projectileImpact(projectile); projectile.destroy(); this.projectiles.delete(projectile);
     this.runeBurst(x, y, 10); for (const enemy of [...this.enemies]) if (distanceSq(x, y, enemy.x, enemy.y) < 90 ** 2) this.damageEnemy(enemy, 22, Phaser.Math.Angle.Between(x, y, enemy.x, enemy.y), false, false, 'word', 'stop');
   }
 
@@ -1745,10 +1783,11 @@ export class GameScene extends Phaser.Scene {
     const targetState = records[0];
     this.hero.cancelAttackRecovery();
     this.services.audio.play('rewind'); this.showWordTypography('되돌린다', this.hero.x, this.hero.y - 48); this.hero.rewinding = true; this.hero.invulnerableUntil = this.time.now + 900;
-    if (targetState) {
+    if (targetState && !this.showcaseVfx?.enabled) {
       const marker = this.add.image(targetState.x, targetState.y, 'hero-idle').setOrigin(0.5, 1).setScale(SUBMISSION_HERO_PRESENTATION_SCALE).setFlipX(Math.cos(targetState.facing) < 0).setTint(0x68cbe5).setAlpha(0.42).setDepth(DEPTH.rewind);
       this.tweens.add({ targets: marker, alpha: 0, scaleX: 0.44, scaleY: 0.44, duration: 520, onComplete: () => marker.destroy() });
     }
+    this.showcaseVfx?.wordRewind(records.length > 0 ? records.map((record) => ({ x: record.x, y: record.y })) : [before]);
     const echoDamage = this.rewindEchoBurst(before.x, before.y, enhanced, overchargeMultiplier);
     if (echoDamage > 0) this.showCombatLabel(before.x, before.y - 58, `잔상 피해 ${Math.round(echoDamage)}`, 0x72cfe8);
     if (records.length === 0) {
@@ -1765,7 +1804,7 @@ export class GameScene extends Phaser.Scene {
     this.tweens.addCounter({ from: 0, to: reverse.length - 1, duration: 470, ease: 'Sine.InOut', onUpdate: (tween) => {
       const state = reverse[Math.floor(tween.getValue() ?? 0)]; if (!state) return;
       this.hero.setGroundPosition(state.x, state.y).setFlipX(Math.cos(state.facing) < 0).restoreHealth(state.health);
-      if (echoTrail.length < 8 && Math.random() < 0.28) {
+      if (!this.showcaseVfx?.enabled && echoTrail.length < 8 && Math.random() < 0.28) {
         const echo = this.add.image(state.x, state.y, 'hero-move').setOrigin(0.5, 1).setScale(Math.abs(this.hero.scaleX), Math.abs(this.hero.scaleY)).setFlipX(this.hero.flipX).setTint(0x43add0).setAlpha(0.24).setDepth(DEPTH.rewind);
         echoTrail.push(echo); this.tweens.add({ targets: echo, alpha: 0, duration: 320, onComplete: () => echo.destroy() });
       }
@@ -1806,11 +1845,13 @@ export class GameScene extends Phaser.Scene {
   private rewindEchoBurst(x: number, y: number, enhanced: boolean, overchargeMultiplier = 1): number {
     const radius = BALANCE.words.rewindDamageRadius * (enhanced ? 1.18 : 1);
     const angle = this.hero.facing;
-    const rangeRing = this.add.circle(x, y - 8, radius, 0x3c9ec2, 0.04).setStrokeStyle(2, 0x75dff0, 0.42).setDepth(DEPTH.word).setScale(0.55);
-    this.tweens.add({ targets: rangeRing, scale: 1.05, alpha: 0, duration: 280, onComplete: () => rangeRing.destroy() });
-    const slash = this.add.graphics().setDepth(DEPTH.word).lineStyle(7, 0x75dff0, 0.82);
-    slash.beginPath().arc(x, y - 10, radius, angle - 0.88, angle + 0.88).strokePath();
-    this.tweens.add({ targets: slash, alpha: 0, scaleX: 1.12, scaleY: 1.12, duration: 280, onComplete: () => slash.destroy() });
+    if (!this.showcaseVfx?.enabled) {
+      const rangeRing = this.add.circle(x, y - 8, radius, 0x3c9ec2, 0.04).setStrokeStyle(2, 0x75dff0, 0.42).setDepth(DEPTH.word).setScale(0.55);
+      this.tweens.add({ targets: rangeRing, scale: 1.05, alpha: 0, duration: 280, onComplete: () => rangeRing.destroy() });
+      const slash = this.add.graphics().setDepth(DEPTH.word).lineStyle(7, 0x75dff0, 0.82);
+      slash.beginPath().arc(x, y - 10, radius, angle - 0.88, angle + 0.88).strokePath();
+      this.tweens.add({ targets: slash, alpha: 0, scaleX: 1.12, scaleY: 1.12, duration: 280, onComplete: () => slash.destroy() });
+    }
     let damage = 0;
     for (const enemy of [...this.enemies]) if (enemy.active && distanceToEllipse({ x, y }, enemy.hurtbox) <= radius) damage += this.damageEnemy(enemy, BALANCE.words.rewindDamage * (enhanced ? 1.35 : 1) * overchargeMultiplier, Phaser.Math.Angle.Between(x, y, enemy.x, enemy.y), false, false, 'word', 'rewind', 'word');
     if (damage > 0) {
@@ -1899,7 +1940,10 @@ export class GameScene extends Phaser.Scene {
     const cast = this.beginWordCast(); const { enhanced, overchargeMultiplier, overchargeDurationBonus } = cast;
     this.linkReadyAt = this.time.now + this.wordCooldown(BALANCE.words.linkCooldown); this.wordUses['잇는다'] = (this.wordUses['잇는다'] ?? 0) + 1; this.markTutorial('link');
     this.services.audio.play('link'); this.hero.castPose(); this.showWordTypography('잇는다', x, y);
-    this.showLinkPreview(selected);
+    if (this.showcaseVfx?.enabled) {
+      const origin = this.hero.motionVisualAnchor('word_target') ?? { x: this.hero.x, y: this.hero.y - 18 };
+      this.showcaseVfx.wordLink(origin, selected.map((enemy) => enemy.groundPoint));
+    } else this.showLinkPreview(selected);
     this.clearLinks();
     let directDamage = 0;
     selected.forEach((enemy) => { directDamage += this.damageEnemy(enemy, BALANCE.words.linkDamage * (selected.length === 1 ? BALANCE.words.singleLinkDamageMultiplier : 1) * (enhanced ? 1.35 : 1) * overchargeMultiplier, Phaser.Math.Angle.Between(this.hero.x, this.hero.y, enemy.x, enemy.y), false, false, 'word', 'link', 'word'); });
@@ -1915,8 +1959,10 @@ export class GameScene extends Phaser.Scene {
       this.applyWordStatus(enemy, selected.length === 1 ? 'ISOLATED' : 'LINKED', 'link', expires - this.time.now);
       const marker = this.add.text(enemy.x, enemy.y - (enemy.kind === 'boss' ? 78 : 48), selected.length === 1 ? '孤' : '連', { fontFamily: 'Malgun Gothic, serif', fontSize: enemy.kind === 'boss' ? '19px' : '15px', color: '#a1f3df', stroke: '#09201d', strokeThickness: 4 }).setOrigin(0.5).setDepth(DEPTH.word);
       this.linkMarkers.set(enemy, marker);
-      const preview = this.add.circle(enemy.x, enemy.y - 8, enemy.kind === 'boss' ? 34 : 23, 0x58c9b6, 0.04).setStrokeStyle(2, 0xa3f5e4, 0.72).setDepth(DEPTH.word).setScale(0.72);
-      this.tweens.add({ targets: preview, scale: 1.18, alpha: 0, duration: 190, onComplete: () => preview.destroy() });
+      if (!this.showcaseVfx?.enabled) {
+        const preview = this.add.circle(enemy.x, enemy.y - 8, enemy.kind === 'boss' ? 34 : 23, 0x58c9b6, 0.04).setStrokeStyle(2, 0xa3f5e4, 0.72).setDepth(DEPTH.word).setScale(0.72);
+        this.tweens.add({ targets: preview, scale: 1.18, alpha: 0, duration: 190, onComplete: () => preview.destroy() });
+      }
     });
     this.showCombatLabel(selected[0]?.x ?? this.hero.x, (selected[0]?.y ?? this.hero.y) - 62, selected.length === 1 ? '고립 연결 1/3 · 피해 +18%' : `연결 ${selected.length}/${enhanced ? BALANCE.words.empoweredLinkTargets : BALANCE.words.baseLinkTargets}`, 0x9fe9dc);
     const linkReaction = this.registerWordUse('link', { successful: true, hasLinkedTargets: selected.length > 0, relevantTargetCount: selected.length });
@@ -2653,6 +2699,7 @@ export class GameScene extends Phaser.Scene {
       const hit = sweptCircleHitsEllipse(projectile.previousPosition, projectile, projectile.collisionCircle.radius, this.hero.hurtbox);
       const distance = Phaser.Math.Distance.Between(projectile.x, projectile.y, this.hero.hurtbox.x, this.hero.hurtbox.y);
       if (hit) {
+        this.showcaseVfx?.projectileImpact(projectile);
         const parry = this.parryResolver.resolve(this.hero.isParrying, { attackId: projectile.attackId, parryable: projectile.parryable, overlapsHurtbox: true });
         if (parry.cancelDamage) { if (parry.grantReward) this.parrySuccess(undefined, projectile); }
         else { const sourceEnemy = [...this.enemies].find((enemy) => enemy.id === projectile.sourceId); this.hitHero(projectile.damage, projectile.x, projectile.y, 'projectile', { attackerId: projectile.sourceId ?? 'unknown-projectile', attackerDisplayName: sourceEnemy ? enemyDisplayName(sourceEnemy.kind) : '기록 탄환', attackId: projectile.attackId, patternName: projectile.texture.key === 'projectile-ink' ? '먹물 탄환' : '기록 탄환', modifier: this.activeActPatterns.has('ink-echo-projectile') ? '먹물 잔향탄' : undefined, parryable: projectile.parryable }); projectile.destroy(); }
@@ -2689,6 +2736,7 @@ export class GameScene extends Phaser.Scene {
       // and creates a deep overlap that can pin movement on following frames.
       enemy.cancelAttackIntent(time + 120);
       enemy.playResolvedContactRecovery();
+      this.showcaseVfx?.meleeContact(enemy);
       if (parry.cancelDamage) { if (parry.grantReward) this.parrySuccess(enemy); }
       else this.hitHero(Number(enemy.getData('meleeDamage') ?? BALANCE.enemies[enemy.kind === 'minion' ? 'chaser' : enemy.kind].damage), enemy.x, enemy.y, enemy.kind === 'boss' ? 'boss' : 'melee', { attackerId: enemy.id, attackerDisplayName: enemy.kind === 'boss' ? this.boss?.definition.displayName ?? '보스' : enemyDisplayName(enemy.kind), attackId: enemy.meleeAttackId, patternName: enemy.kind === 'boss' ? `${this.boss?.definition.displayName ?? '보스'} 돌진` : `${enemyDisplayName(enemy.kind)} · 돌진`, parryable: enemy.meleeParryable });
     }
@@ -3588,6 +3636,7 @@ export class GameScene extends Phaser.Scene {
     this.actTransitionStartedAt = performance.now();
     this.timeControl.acquire('SCENE_TRANSITION', this.timeOwner);
     this.clearCombatInput(); this.hero.controlsLocked = true; this.wordChain.reset(); this.clearLinks(); this.clearTransientCombatObjects();
+    this.showcaseVfx?.clear();
     this.actPatternGeneration += 1; this.waveSpawnGeneration += 1; this.waveDirector.reset();
     for (const projectile of this.projectiles) projectile.destroy(); this.projectiles.clear();
     for (const enemy of [...this.enemies]) { enemy.destroy(); this.enemies.delete(enemy); }
@@ -3595,6 +3644,7 @@ export class GameScene extends Phaser.Scene {
     this.currentTarget = undefined; this.comboTarget = undefined; this.heldAttackTarget = undefined; this.targetMarkerUntil = 0; this.boss = undefined;
     this.runSession.clearBoss(this.runId, true);
     const next = this.runAct.advanceAct(this.time.now, this.damageTaken);
+    this.showcaseVfx?.setAct(next.index);
     this.runProgress.beginAct(this.runId, { actNumber: next.index, actId: next.id, actName: next.name, themeId: next.theme, enemySetId: next.enemySetId, bossId: next.bossId, modifiers: next.modifiers });
     this.waveIndex = 0; this.firstWaveSpawnOrdinal = 0; this.stopReadyAt = this.time.now; this.rewindReadyAt = this.time.now; this.linkReadyAt = this.time.now;
     this.hero.setVelocity(0); this.hero.health = Math.min(this.hero.health, this.hero.maxHealth);
@@ -3659,6 +3709,7 @@ export class GameScene extends Phaser.Scene {
     this.submissionMap?.destroy(); this.submissionMap = undefined;
     this.clearBackgroundCues();
     const act = this.runAct.current;
+    this.showcaseVfx?.setAct(act.index);
     const mapId = isSubmissionActIntegrated(act.index) ? submissionMapId(act.index, encounter) : undefined;
     if (mapId) {
       this.submissionMap = new SubmissionMapRuntime(this, mapId);
@@ -3822,6 +3873,18 @@ export class GameScene extends Phaser.Scene {
       this.runFoundationScenario(action === 'damage-projectile' ? 7 : 8);
       return { ok: true, action, health: this.hero.health };
     }
+    if (action === 'showcase-stop' || action === 'showcase-rewind' || action === 'showcase-link') {
+      if (!this.showcaseVfx?.enabled) return { ok: false, reason: 'SHOWCASE_REQUIRED' };
+      this.qaReadyWords();
+      const nearest = this.nearestEnemy(this.hero.x, this.hero.y);
+      const stopTarget = this.keyboardStopTarget(undefined);
+      const cast = action === 'showcase-stop'
+        ? this.castStop(stopTarget.x, stopTarget.y)
+        : action === 'showcase-rewind'
+          ? this.castRewind()
+          : this.castLink(nearest?.x ?? this.hero.x, nearest?.y ?? this.hero.y, nearest);
+      return { ok: cast, action, showcase: this.showcaseVfx.snapshot() };
+    }
     if (action === 'phase-next') {
       const phase = this.boss?.phase;
       if (!phase || phase >= 3) return { ok: false, reason: 'NO_NEXT_PHASE', phase };
@@ -3855,7 +3918,7 @@ export class GameScene extends Phaser.Scene {
     const r2Request = this.game.canvas.dataset.motionR2Review as MotionR2ReviewAction | undefined;
     if (!r2Request) return;
     delete this.game.canvas.dataset.motionR2Review;
-    const r2Actions: readonly string[] = ['damage-projectile', 'damage-melee', 'goral-left', 'goral-right', 'phase-next', 'qa-advance'];
+    const r2Actions: readonly string[] = ['damage-projectile', 'damage-melee', 'goral-left', 'goral-right', 'phase-next', 'qa-advance', 'showcase-stop', 'showcase-rewind', 'showcase-link'];
     const r2Result = r2Actions.includes(r2Request) ? this.runMotionR2Review(r2Request) : { ok: false, reason: 'INVALID_R2_REQUEST', request: r2Request };
     this.game.canvas.dataset.motionR2ReviewResult = JSON.stringify(r2Result);
   }
@@ -3879,7 +3942,7 @@ export class GameScene extends Phaser.Scene {
     const debug = document.createElement('button');
     debug.type = 'button'; debug.textContent = 'F2 DEBUG';
     debug.addEventListener('click', () => this.toggleHitboxDebug());
-    const r2Buttons = (['damage-projectile', 'damage-melee', 'goral-left', 'goral-right', 'phase-next', 'qa-advance'] as const).map((reviewAction) => {
+    const r2Buttons = (['damage-projectile', 'damage-melee', 'goral-left', 'goral-right', 'phase-next', 'qa-advance', 'showcase-stop', 'showcase-rewind', 'showcase-link'] as const).map((reviewAction) => {
       const button = document.createElement('button');
       button.type = 'button';
       button.dataset.motionR2Action = reviewAction;
@@ -3915,6 +3978,7 @@ export class GameScene extends Phaser.Scene {
 
   private cleanup(): void {
     this.clearTransientCombatObjects();
+    this.showcaseVfx?.destroy(); this.showcaseVfx = undefined;
     this.events.off(Phaser.Scenes.Events.POST_UPDATE, this.handlePostPhysicsUpdate, this);
     this.input.off(Phaser.Input.Events.POINTER_DOWN, this.pointerHandler);
     this.keys.j.off(Phaser.Input.Keyboard.Events.DOWN, this.attackKeyDownHandler);

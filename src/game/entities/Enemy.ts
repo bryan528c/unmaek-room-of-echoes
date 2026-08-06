@@ -445,6 +445,9 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   public get nonlethalRetreat(): boolean { return this.presentation?.hasNonlethalRetreat ?? false; }
   public get attackAnchor(): Readonly<{ x: number; y: number }> { return this.projectileOrigin(); }
   public get visualAttackAnchor(): Readonly<{ x: number; y: number }> | undefined { return this.presentation?.visualAttackAnchor(this.groundPoint); }
+  public createPresentationAfterimage(offsetX: number, offsetY: number, tint: number, alpha: number): Phaser.GameObjects.Image | undefined {
+    return this.presentation?.createAfterimage(offsetX, offsetY, tint, alpha);
+  }
   public get motionSnapshot() { return this.presentation?.motionSnapshot; }
   public get runtimeState(): string | undefined { return this.presentation?.currentState; }
   public get runtimeAssetFile(): string | undefined { return this.presentation?.currentAssetFile; }

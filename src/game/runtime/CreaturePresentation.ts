@@ -216,6 +216,19 @@ export class CreaturePresentation {
     this.applyOriginAndFlip();
   }
 
+  /** Creates a presentation-only echo without changing the gameplay owner. */
+  public createAfterimage(offsetX: number, offsetY: number, tint: number, alpha: number): Phaser.GameObjects.Image {
+    const source = this.pilotVisual?.active ? this.pilotVisual : this.sprite;
+    return this.sprite.scene.add.image(source.x + offsetX, source.y + offsetY, source.texture.key)
+      .setOrigin(source.originX, source.originY)
+      .setScale(Math.abs(source.scaleX), Math.abs(source.scaleY))
+      .setRotation(source.rotation)
+      .setFlipX(source.flipX)
+      .setTint(tint)
+      .setAlpha(alpha)
+      .setDepth(source.depth - 1);
+  }
+
   public destroy(): void {
     this.motion?.destroy();
     this.pilotVisual?.destroy(); this.pilotVisual = undefined;
