@@ -44,6 +44,8 @@ import { angleDelta, distanceSq, rankFor } from '../utils/math';
 import { createArchiveArena, createInkArchiveArena } from '../utils/arena';
 import { act1ShowcaseConfig } from '../showcase/Act1ShowcaseConfig';
 import { Act1ShowcaseVfx } from '../showcase/Act1ShowcaseVfx';
+import { Act1FinalVfx } from '../final/Act1FinalVfx';
+import { act1FinalEnabled } from '../final/Act1FinalConfig';
 import type { ResultStats } from '../../ui/OverlayUI';
 import { SubmissionMapRuntime } from '../runtime/SubmissionMapRuntime';
 import { nearestRuntimeSafeGroundPoint, runtimeGroundPointIsSafe } from '../runtime/RuntimeSafeSpawn';
@@ -187,7 +189,7 @@ export class GameScene extends Phaser.Scene {
   private submissionMap?: SubmissionMapRuntime;
   private backgroundCues = new Set<Phaser.GameObjects.Image>();
   private backgroundCueMotions = new Map<Phaser.GameObjects.Image, CreatureMotionPresentation>();
-  private showcaseVfx?: Act1ShowcaseVfx;
+  private showcaseVfx?: Act1ShowcaseVfx | Act1FinalVfx;
   private motionReviewMovement?: { x: number; y: number; until: number };
   private heroMapSafePoint = { x: 480, y: 300 };
   private atmosphere?: Phaser.GameObjects.Particles.ParticleEmitter;
@@ -360,13 +362,14 @@ export class GameScene extends Phaser.Scene {
       if (act.index > 1) this.runProgress.beginAct(this.runId, { actNumber: act.index, actId: act.id, actName: act.name, themeId: act.theme, enemySetId: act.enemySetId, bossId: act.bossId, modifiers: act.modifiers });
     }
     this.activateActArena('general', false);
-    this.showcaseVfx = new Act1ShowcaseVfx(this, act1ShowcaseConfig());
+    this.showcaseVfx = act1FinalEnabled() ? new Act1FinalVfx(this) : new Act1ShowcaseVfx(this, act1ShowcaseConfig());
     this.showcaseVfx.setAct(this.runAct.current.index);
     this.createAtmosphere();
     const playerSpawn = this.submissionMap?.playerSpawn ?? { x: 480, y: 300 };
     this.heroMapSafePoint = { ...playerSpawn };
     this.heroShadow = this.add.ellipse(playerSpawn.x, playerSpawn.y + 4, 38, 12, 0x020506, 0.3).setDepth(DEPTH.shadow);
     this.hero = new Hero(this, playerSpawn.x, playerSpawn.y);
+    this.hero.setPresentationAct(this.runAct.current.index);
     this.linkGraphics = this.add.graphics().setDepth(DEPTH.word);
     this.rewindGraphics = this.add.graphics().setDepth(DEPTH.rewind);
     this.rewindPreviewGhosts = Array.from({ length: 3 }, () => this.add.image(this.hero.x, this.hero.y, 'hero-move')
@@ -390,8 +393,9 @@ export class GameScene extends Phaser.Scene {
       heroDamageAttempt: this.lastHeroDamageAttempt,
       targetId: this.comboLock.targetId ?? this.heldAttackTarget?.id ?? this.currentTarget?.id,
       targetDistance: this.targetDistance,
-      enemies: [...this.enemies].filter((enemy) => enemy.active).map((enemy) => ({ id: enemy.id, kind: enemy.kind, creatureId: enemy.creatureId, phase: enemy instanceof Boss ? enemy.phase : undefined, x: enemy.x, y: enemy.y, health: enemy.health, flipX: enemy.flipX, visualFlipX: enemy.visualFlipX, motion: enemy.motionSnapshot, summonSpawn: enemy.getData('summonSpawn'), insideBounds: groundFootprintInsideBounds(enemy.groundPoint, enemyGroundExtents(enemy.kind), COMBAT_BOUNDS) })),
-      submissionRuntime: { mapId: this.submissionMap?.definition.id, mapName: this.submissionMap?.displayName, backgroundCueCount: this.backgroundCues.size, backgroundCueMotions: [...this.backgroundCueMotions.values()].map((motion) => motion.snapshot()), hazard: this.submissionMap?.hasHazardMask ?? false, summonSpawns: this.summonSpawnDiagnostics },
+      enemies: [...this.enemies].filter((enemy) => enemy.active).map((enemy) => ({ id: enemy.id, kind: enemy.kind, creatureId: enemy.creatureId, phase: enemy instanceof Boss ? enemy.phase : undefined, x: enemy.x, y: enemy.y, health: enemy.health, flipX: enemy.flipX, visualFlipX: enemy.visualFlipX, motion: enemy.motionSnapshot, stop: enemy.stopSnapshot, summonSpawn: enemy.getData('summonSpawn'), insideBounds: groundFootprintInsideBounds(enemy.groundPoint, enemyGroundExtents(enemy.kind), COMBAT_BOUNDS) })),
+      projectiles: [...this.projectiles].filter((projectile) => projectile.active).map((projectile) => ({ id: projectile.attackId, sourceId: projectile.sourceId, x: projectile.x, y: projectile.y, enemyOwned: projectile.enemyOwned })),
+      submissionRuntime: { mapId: this.submissionMap?.definition.id, mapName: this.submissionMap?.displayName, backgroundCueCount: this.backgroundCues.size, backgroundCueMotions: [...this.backgroundCueMotions.values()].map((motion) => motion.snapshot()), hazard: this.submissionMap?.hasHazardMask ?? false, activeGameplayZones: this.inkZones.map((zone) => ({ x: zone.circle.x, y: zone.circle.y, radius: zone.radius, expiresInMs: Math.max(0, zone.expiresAt - this.time.now), patternName: zone.patternName })), activeZoneVisualCount: this.inkZones.filter((zone) => zone.circle.active).length, expiredZoneVisualCount: this.inkZones.filter((zone) => zone.circle.active && zone.expiresAt <= this.time.now).length, summonSpawns: this.summonSpawnDiagnostics },
       wave: this.waveDirector.snapshot(),
       runActFlow: {
         currentBossDefinition: this.boss?.definition.bossId,
@@ -934,7 +938,7 @@ export class GameScene extends Phaser.Scene {
     enemy.setData('actId', this.runAct.current.id);
     enemy.setData('damageMultiplier', this.runAct.current.damageMultiplier);
     this.enemySpawnTimes.set(enemy.id, { kind, at: performance.now() });
-    this.enemies.add(enemy); enemy.spawn(); return enemy;
+    this.enemies.add(enemy); enemy.spawn(this.showcaseVfx instanceof Act1FinalVfx); return enemy;
   }
 
   private spawnProjectile(source: Enemy, x: number, y: number, angle: number, speed: number, damage: number, texture?: string, echoGeneration = 0): void {
@@ -1719,12 +1723,12 @@ export class GameScene extends Phaser.Scene {
     const circle = this.showcaseVfx?.enabled ? undefined : this.add.circle(x, y, BALANCE.words.stopRadius, 0x55c4b1, 0.08).setStrokeStyle(3, 0x76d8c7, 0.74).setDepth(DEPTH.telegraph).setScale(0.2);
     if (circle) this.tweens.add({ targets: circle, scale: 1, duration: 180 });
     this.runDelayedCall(180, () => {
-      this.showcaseVfx?.wordStop({ x, y });
       const until = this.time.now + BALANCE.words.stopDuration + overchargeDurationBonus;
       let damaged = 0;
       const stoppedEnemyIds: string[] = [];
       for (const enemy of [...this.enemies]) if (enemy.active && (enhanced || this.skillAreaHitsEnemy(x, y, BALANCE.words.stopRadius, enemy))) {
-        enemy.freeze(until + (enhanced ? 500 : 0), enemy.kind === 'boss');
+        const applied = enemy.freeze(until + (enhanced ? 500 : 0), enemy.kind === 'boss');
+        if (!applied) continue;
         this.applyWordStatus(enemy, 'STOPPED', 'stop', until - this.time.now + (enhanced ? 500 : 0));
         stoppedEnemyIds.push(enemy.id);
         damaged += this.damageEnemy(enemy, BALANCE.words.stopDamage * (enhanced ? 1.35 : 1) * overchargeMultiplier, Phaser.Math.Angle.Between(x, y, enemy.x, enemy.y), false, false, 'word', 'stop', 'word');
@@ -1743,6 +1747,7 @@ export class GameScene extends Phaser.Scene {
         }
       }
       const successful = empoweredWordEffectIsValid({ damage: damaged, statusApplications: stoppedEnemyIds.length + stoppedProjectiles });
+      if (successful) this.showcaseVfx?.wordStop({ x, y });
       const chain = successful ? this.registerWordUse('stop', { successful: true, hasLinkedTargets: activeLinked.length > 0 }) : undefined;
       if (!successful) {
         this.stopReadyAt = this.time.now;
@@ -1987,7 +1992,8 @@ export class GameScene extends Phaser.Scene {
     const projectiles = [...this.projectiles].filter((projectile) => projectile.active && projectile.enemyOwned && this.skillAreaHitsProjectile(center.x, center.y, radius, projectile));
     if (targets.length === 0 && projectiles.length === 0) { this.combatStats.invalidWord('pull'); this.setReadyAtForWord('pull', this.time.now); this.completeEmpoweredWord('pull', cast, false, {}, 'no-target'); return true; }
     this.setReadyAtForWord('pull', this.time.now + this.wordCooldown(definition.cooldown)); this.wordUses['당긴다'] = (this.wordUses['당긴다'] ?? 0) + 1; this.markTutorial('pull'); this.hero.castPose(); this.services.audio.play('link'); this.showWordTypography('당긴다', center.x, center.y);
-    const spiral = this.add.circle(center.x, center.y, radius, 0x4aa897, .05).setStrokeStyle(4, 0x8be5d4, .72).setDepth(DEPTH.word).setScale(1.15); this.tweens.add({ targets: spiral, scale: .2, alpha: 0, duration: 430, onComplete: () => spiral.destroy() });
+    if (this.showcaseVfx instanceof Act1FinalVfx) this.showcaseVfx.wordPull(center);
+    if (!(this.showcaseVfx instanceof Act1FinalVfx)) { const spiral = this.add.circle(center.x, center.y, radius, 0x4aa897, .05).setStrokeStyle(4, 0x8be5d4, .72).setDepth(DEPTH.word).setScale(1.15); this.tweens.add({ targets: spiral, scale: .2, alpha: 0, duration: 430, onComplete: () => spiral.destroy() }); }
     let damage = 0;
     for (const enemy of targets) { const angle = Phaser.Math.Angle.Between(enemy.x, enemy.y, center.x, center.y); const distance = Phaser.Math.Distance.Between(enemy.x, enemy.y, center.x, center.y); const moved = Math.min(cast.enhanced ? 70 : 46, Math.max(0, distance - 34)); enemy.setGroundPosition(enemy.x + Math.cos(angle) * moved, enemy.y + Math.sin(angle) * moved); enemy.constrainToCombatBounds(); damage += this.damageEnemy(enemy, definition.baseDamage * cast.overchargeMultiplier, angle, false, false, 'word', 'word', 'word', { handler: `word:pull:${enemy.id}`, baseSource: 'word', skillId: 'pull' }); this.applyWordStatus(enemy, 'PULLED', 'pull', 3000); if (distance < 105) this.applyWordStatus(enemy, 'COMPRESSED', 'pull', 3000); }
     const captureCount = Math.min(projectiles.length, cast.enhanced ? projectiles.length : this.upgrades.getStack('captured-projectile') > 0 ? 4 : 0);
@@ -2015,6 +2021,7 @@ export class GameScene extends Phaser.Scene {
     const targets = [...this.enemies].filter((enemy) => enemy.active && !enemy.removing).sort((a, b) => distanceSq(this.hero.x, this.hero.y, a.x, a.y) - distanceSq(this.hero.x, this.hero.y, b.x, b.y));
     if (targets.length === 0) { this.combatStats.invalidWord('mark'); this.noteEmpoweredWordFailure('mark', 'no-target'); return true; }
     const cast = this.beginWordCast(); const selected = targets.slice(0, cast.enhanced ? 3 : 1); this.setReadyAtForWord('mark', this.time.now + this.wordCooldown(definition.cooldown)); this.wordUses['새긴다'] = (this.wordUses['새긴다'] ?? 0) + 1; this.markTutorial('mark'); this.hero.castPose(); this.services.audio.play('stop');
+    if (this.showcaseVfx instanceof Act1FinalVfx) this.showcaseVfx.wordMark(this.hero.motionVisualAnchor('word_target') ?? this.hero.groundPoint);
     let damage = 0; for (const enemy of selected) { damage += this.damageEnemy(enemy, definition.baseDamage * cast.overchargeMultiplier, Phaser.Math.Angle.Between(this.hero.x, this.hero.y, enemy.x, enemy.y), false, false, 'word', 'word', 'word', { handler: `word:mark:${enemy.id}`, baseSource: 'word', skillId: 'mark' }); this.applyWordStatus(enemy, 'MARKED', 'mark', cast.enhanced ? 7500 : 6000); const seal = this.add.text(enemy.x, enemy.y - 56, '刻', { fontFamily: 'serif', fontSize: '22px', color: '#a8f4df', stroke: '#32152d', strokeThickness: 5 }).setOrigin(.5).setDepth(DEPTH.word); this.tweens.add({ targets: seal, scale: 1.35, alpha: .5, duration: 320, yoyo: true, onComplete: () => this.runDelayedCall(700, () => seal.destroy()) }); }
     this.showWordTypography('새긴다', selected[0]!.x, selected[0]!.y - 70); this.combatStats.agencyDamage('mark', damage); this.gainWordHitSentence(BALANCE.sentence.wordHitGain); const chain = this.registerWordUse('mark', { successful: true, relevantTargetCount: selected.length }); if (chain) this.applyWordReaction(chain, selected); this.completeEmpoweredWord('mark', cast, true, { damage, affectedTargets: selected.length }, 'no-target'); return true;
   }
@@ -2026,7 +2033,8 @@ export class GameScene extends Phaser.Scene {
     const projectiles = [...this.projectiles].filter((projectile) => projectile.active && projectile.enemyOwned && Phaser.Math.Distance.Between(this.hero.x, this.hero.y, projectile.x, projectile.y) <= range);
     if (targets.length === 0 && projectiles.length === 0) { this.combatStats.invalidWord('push'); this.completeEmpoweredWord('push', cast, false, {}, 'no-target'); return true; }
     this.setReadyAtForWord('push', this.time.now + this.wordCooldown(definition.cooldown)); this.wordUses['밀어낸다'] = (this.wordUses['밀어낸다'] ?? 0) + 1; this.markTutorial('push'); this.hero.castPose(); this.services.audio.play('parry'); this.showWordTypography('밀어낸다', this.hero.x + Math.cos(angle) * 54, this.hero.y + Math.sin(angle) * 54);
-    const fan = this.add.graphics().setDepth(DEPTH.word).lineStyle(8, 0x9ae8d4, .78).beginPath().arc(this.hero.x, this.hero.y, range, angle - halfAngle, angle + halfAngle).strokePath(); this.tweens.add({ targets: fan, alpha: 0, scaleX: 1.1, scaleY: 1.1, duration: 240, onComplete: () => fan.destroy() });
+    if (this.showcaseVfx instanceof Act1FinalVfx) this.showcaseVfx.wordPush(this.hero.motionVisualAnchor('word_target') ?? this.hero.groundPoint);
+    if (!(this.showcaseVfx instanceof Act1FinalVfx)) { const fan = this.add.graphics().setDepth(DEPTH.word).lineStyle(8, 0x9ae8d4, .78).beginPath().arc(this.hero.x, this.hero.y, range, angle - halfAngle, angle + halfAngle).strokePath(); this.tweens.add({ targets: fan, alpha: 0, scaleX: 1.1, scaleY: 1.1, duration: 240, onComplete: () => fan.destroy() }); }
     const ripple = recoilRippleProfile(this.upgrades.getStack('recoil-ripple'));
     let damage = 0; let rippleDamage = 0; let collisions = 0; for (const enemy of targets) { const away = Phaser.Math.Angle.Between(this.hero.x, this.hero.y, enemy.x, enemy.y); damage += this.damageEnemy(enemy, definition.baseDamage * cast.overchargeMultiplier, away, false, false, 'word', 'word', 'word', { handler: `word:push:${enemy.id}`, baseSource: 'word', skillId: 'push' }); if (enemy.kind !== 'boss') { const beforeX = enemy.x; const beforeY = enemy.y; const distance = cast.enhanced ? 64 : 42; enemy.setGroundPosition(enemy.x + Math.cos(away) * distance, enemy.y + Math.sin(away) * distance); enemy.constrainToCombatBounds(); const collided = Phaser.Math.Distance.Between(beforeX, beforeY, enemy.x, enemy.y) < distance * .8 || targets.some((other) => other !== enemy && other.active && distanceSq(enemy.x, enemy.y, other.x, other.y) <= 42 ** 2); if (collided && ripple.damage > 0) { collisions += 1; for (const other of [...this.enemies]) if (other.active && !other.removing && distanceSq(enemy.x, enemy.y, other.x, other.y) <= ripple.radius ** 2) rippleDamage += this.damageEnemy(other, ripple.damage, away, false, true, undefined, 'word', 'none', { handler: `recoil-ripple:${enemy.id}:${other.id}`, baseSource: 'word', skillId: 'recoil-ripple', cardId: 'recoil-ripple', damageKind: 'card-derived', flags: ['cardDerived', 'cannotTriggerCard', 'cannotTriggerShare', 'cannotTriggerResonance'] }); } } else enemy.vulnerableUntil = Math.max(enemy.vulnerableUntil, this.time.now + 800); this.applyWordStatus(enemy, 'DISPLACED', 'push', 2800); }
     if (ripple.damage > 0) this.recordUpgradeContribution('recoil-ripple', { activationCount: collisions, damage: rippleDamage, affectedTargets: collisions, hits: collisions, failedConditions: collisions > 0 ? 0 : 1 }, rippleDamage > 0);
@@ -2575,7 +2583,7 @@ export class GameScene extends Phaser.Scene {
       inkZone: (x, y, radius, duration, style = 'ink') => { this.runSession.invoke(bossRunId, () => { const safe = this.runtimeEncounterPoint({ x, y }, this.hero.groundPoint); this.createInkZone(safe.x, safe.y, radius, duration, style); }); },
     };
     const bossSpawn = this.submissionMap?.bossSpawn ?? { x: 480, y: 125 };
-    this.boss = new Boss(this, bossSpawn.x, bossSpawn.y, callbacks, this.runAct.current.bossId, this.runAct.current.healthMultiplier); this.boss.setData('runId', this.runId); this.boss.setData('actId', this.runAct.current.id); this.boss.setData('damageMultiplier', this.runAct.current.damageMultiplier); this.enemies.add(this.boss); this.boss.spawn();
+    this.boss = new Boss(this, bossSpawn.x, bossSpawn.y, callbacks, this.runAct.current.bossId, this.runAct.current.healthMultiplier); this.boss.setData('runId', this.runId); this.boss.setData('actId', this.runAct.current.id); this.boss.setData('damageMultiplier', this.runAct.current.damageMultiplier); this.enemies.add(this.boss); this.boss.spawn(this.showcaseVfx instanceof Act1FinalVfx);
     this.runSession.activateBoss(this.runId, this.boss.id, this.boss.phaseHealth, this.boss.phaseMaxHealth);
     this.bossTransitionUntil = this.time.now + 1000; this.hero.invulnerableUntil = Math.max(this.hero.invulnerableUntil, this.bossTransitionUntil + 100);
     this.boss.cancelAttackIntent(this.bossTransitionUntil); this.separateHeroFromBoss();
@@ -2600,6 +2608,7 @@ export class GameScene extends Phaser.Scene {
     this.sentence = Math.max(this.sentence, BALANCE.boss.phaseSentenceMinimum);
     if (phase === 2) this.rewindReadyAt = this.time.now;
     if (phase === 3) this.linkReadyAt = this.time.now;
+    if (this.showcaseVfx instanceof Act1FinalVfx) this.showcaseVfx.clearAttackPresentations();
     for (const projectile of this.projectiles) projectile.destroy(); this.projectiles.clear();
     this.inkZones.forEach((zone) => zone.circle.destroy()); this.inkZones = [];
     for (const enemy of this.enemies) enemy.cancelAttackIntent(this.bossTransitionUntil);
@@ -2815,6 +2824,7 @@ export class GameScene extends Phaser.Scene {
 
   private updateLinks(time: number): void {
     this.linkGraphics?.clear();
+    const finalReadability = this.showcaseVfx instanceof Act1FinalVfx;
     const active = [...this.linkedTargets].filter((enemy) => enemy.active && enemy.linked && enemy.linkedUntil > time);
     for (const enemy of active) if (!this.linkMarkers.has(enemy)) {
       const marker = this.add.text(enemy.x, enemy.y - (enemy.kind === 'boss' ? 78 : 48), '連', { fontFamily: 'Malgun Gothic, serif', fontSize: enemy.kind === 'boss' ? '19px' : '15px', color: '#a1f3df', stroke: '#09201d', strokeThickness: 4 }).setOrigin(0.5).setDepth(DEPTH.word);
@@ -2823,7 +2833,9 @@ export class GameScene extends Phaser.Scene {
     for (const [enemy, marker] of this.linkMarkers) {
       if (!active.includes(enemy)) { marker.destroy(); this.linkMarkers.delete(enemy); continue; }
       marker.setText(`${active.length === 1 ? '孤' : '連'}\n${Math.max(0, (enemy.linkedUntil - time) / 1000).toFixed(1)}`)
-        .setPosition(enemy.x, enemy.y - (enemy.kind === 'boss' ? 78 : 48)).setAlpha(0.72 + Math.sin(time / 120 + enemy.x) * 0.22).setScale(1 + Math.sin(time / 150 + enemy.y) * 0.08);
+        .setPosition(enemy.x, enemy.y - (enemy.kind === 'boss' ? 88 : 58))
+        .setAlpha((finalReadability ? 0.55 : 0.72) + Math.sin(time / 120 + enemy.x) * (finalReadability ? 0.12 : 0.22))
+        .setScale(1 + Math.sin(time / 150 + enemy.y) * (finalReadability ? 0.04 : 0.08));
     }
     const drawnStitches = new Set<string>();
     for (const [firstId, secondId] of this.stitchedPairs) {
@@ -2831,8 +2843,8 @@ export class GameScene extends Phaser.Scene {
       const first = [...this.enemies].find((enemy) => enemy.id === firstId && enemy.active && !enemy.removing);
       const second = [...this.enemies].find((enemy) => enemy.id === secondId && enemy.active && !enemy.removing);
       if (!first || !second) { this.stitchedPairs.delete(firstId); this.stitchedPairs.delete(secondId); continue; }
-      this.linkGraphics?.lineStyle(4, 0x301923, .88).beginPath().moveTo(first.x, first.y - 14).lineTo(second.x, second.y - 14).strokePath();
-      this.linkGraphics?.lineStyle(1, 0xc06f8d, .82).beginPath();
+      this.linkGraphics?.lineStyle(finalReadability ? 2 : 4, 0x301923, finalReadability ? .55 : .88).beginPath().moveTo(first.x, first.y - 14).lineTo(second.x, second.y - 14).strokePath();
+      this.linkGraphics?.lineStyle(1, 0xc06f8d, finalReadability ? .58 : .82).beginPath();
       for (let step = 0; step <= 10; step += 1) {
         const ratio = step / 10; const x = Phaser.Math.Linear(first.x, second.x, ratio); const y = Phaser.Math.Linear(first.y - 14, second.y - 14, ratio) + (step % 2 ? 4 : -4);
         if (step === 0) this.linkGraphics?.moveTo(x, y); else this.linkGraphics?.lineTo(x, y);
@@ -2857,12 +2869,12 @@ export class GameScene extends Phaser.Scene {
         }
         this.linkGraphics?.strokePath();
       };
-      drawWave(0, 5, 0x102f2d, 0.92);
-      drawWave(3.4, 1.5, 0x89ead7, 0.92);
-      drawWave(-3.4, 1, 0x4dbfac, 0.82);
+      drawWave(0, finalReadability ? 2.5 : 5, 0x102f2d, finalReadability ? 0.56 : 0.92);
+      drawWave(3.4, finalReadability ? 1 : 1.5, 0x89ead7, finalReadability ? 0.62 : 0.92);
+      drawWave(-3.4, 1, 0x4dbfac, finalReadability ? 0.5 : 0.82);
       const travel = (time / 720 + index * 0.31) % 1;
       const gx = Phaser.Math.Linear(ax, bx, travel); const gy = Phaser.Math.Linear(ay, by, travel);
-      this.linkGraphics?.fillStyle(0xc0ffef, 0.95).fillCircle(gx, gy, 4);
+      this.linkGraphics?.fillStyle(0xc0ffef, finalReadability ? 0.72 : 0.95).fillCircle(gx, gy, finalReadability ? 2 : 4);
       const echoTravel = (travel + 0.5) % 1;
       const echoX = Phaser.Math.Linear(ax, bx, echoTravel); const echoY = Phaser.Math.Linear(ay, by, echoTravel);
       this.linkGraphics?.fillStyle(0x5fd0bc, 0.8).fillTriangle(echoX, echoY - 4, echoX + 4, echoY, echoX, echoY + 4).fillTriangle(echoX, echoY - 4, echoX - 4, echoY, echoX, echoY + 4);
@@ -3165,8 +3177,15 @@ export class GameScene extends Phaser.Scene {
         .slice(0, 6)
         .map((enemy) => {
           const snapshot = enemy.motionSnapshot!;
-          return `${enemy.creatureId}=${snapshot.renderSource} ${snapshot.sequence} f${snapshot.frameIndex + 1} flip=${enemy.visualFlipX ? 'R' : 'L'} r${snapshot.blockedRestartCount}`;
+          const stop = enemy.stopSnapshot;
+          const speed = Math.hypot(stop.velocity.x, stop.velocity.y);
+          return `${enemy.creatureId}=${snapshot.renderSource} ${snapshot.sequence} f${snapshot.frameIndex + 1} s${snapshot.uniformScale.toFixed(2)} c${snapshot.sourceCanvas.width}x${snapshot.sourceCanvas.height} a${snapshot.alphaBounds.width}x${snapshot.alphaBounds.height} gp${snapshot.groundPointDelta.toFixed(1)} flip=${enemy.visualFlipX ? 'R' : 'L'} r${snapshot.blockedRestartCount} xy=${enemy.x.toFixed(1)},${enemy.y.toFixed(1)} stop=${stop.fullStopPaused ? 'PAUSED' : enemy.isStopped ? 'ACTIVE' : 'OFF'} v=${speed.toFixed(1)} cb=${stop.pendingAttackCallbacks}`;
         });
+      const hostileProjectileCount = [...this.projectiles].filter((projectile) => projectile.active && projectile.enemyOwned).length;
+      const finalVfx = this.showcaseVfx instanceof Act1FinalVfx ? this.showcaseVfx.snapshot() : undefined;
+      const finalSourceSummary = finalVfx
+        ? Object.entries(finalVfx.eventSources).slice(-4).map(([eventId, value]) => `${eventId}=${value.source}[${value.liveInstances}]`)
+        : [];
       this.debugMotionText.setText(motion ? [
         'PLAYER MOTION',
         `direction=${motion.direction}`,
@@ -3181,6 +3200,13 @@ export class GameScene extends Phaser.Scene {
         '',
         'MOTION SOURCE',
         ...creatureMotion,
+        `HOSTILE PROJECTILES=${hostileProjectileCount}`,
+        ...(finalVfx ? [
+          '',
+          `FINAL VFX live=${finalVfx.liveEffectCount} core=${finalVfx.collisionCoreCount} corridor=${finalVfx.telegraphCorridorCount}`,
+          `orphan=${finalVfx.orphanCount} oldest=${Math.round(finalVfx.oldestAgeMs)}ms`,
+          ...finalSourceSummary,
+        ] : []),
       ] : ['PLAYER MOTION', 'source=LEGACY_RUNTIME']);
     }
     if (this.debugStatsText && this.debugStatsVisible) {
@@ -3447,6 +3473,13 @@ export class GameScene extends Phaser.Scene {
         const strength = enemy.kind === 'boss' ? 0.82 : BALANCE.collision.heroSeparationStrength;
         const offset = separationOffset(this.hero.movementCircle, enemy.movementCircle, strength, correctionPerIteration, fallbackDirection);
         if (offset.x === 0 && offset.y === 0) continue;
+        if (enemy.isStopPositionLocked) {
+          if (!this.hero.isParrying && this.time.now >= this.parryAnchorUntil) {
+            this.hero.setGroundPosition(this.hero.x + offset.x, this.hero.y + offset.y);
+            this.hero.constrainToArena();
+          }
+          continue;
+        }
         const heroShare = this.hero.isParrying || this.time.now < this.parryAnchorUntil
           ? 0
           : enemy.kind === 'boss'
@@ -3461,8 +3494,10 @@ export class GameScene extends Phaser.Scene {
         const fallback = { x: a.id < b.id ? -1 : 1, y: 0 };
         const offset = separationOffset(a.movementCircle, b.movementCircle, BALANCE.collision.enemySeparationStrength, correctionPerIteration, fallback);
         if (offset.x === 0 && offset.y === 0) continue;
-        a.setGroundPosition(a.x + offset.x * 0.5, a.y + offset.y * 0.5);
-        b.setGroundPosition(b.x - offset.x * 0.5, b.y - offset.y * 0.5);
+        if (a.isStopPositionLocked && b.isStopPositionLocked) continue;
+        const aShare = a.isStopPositionLocked ? 0 : b.isStopPositionLocked ? 1 : 0.5;
+        a.setGroundPosition(a.x + offset.x * aShare, a.y + offset.y * aShare);
+        b.setGroundPosition(b.x - offset.x * (1 - aShare), b.y - offset.y * (1 - aShare));
         a.constrainToCombatBounds(); b.constrainToCombatBounds();
       }
     }
@@ -3473,6 +3508,7 @@ export class GameScene extends Phaser.Scene {
     this.resolveEntitySeparation(this.frameDelta);
     this.enforceSubmissionMapContract();
     this.syncEnemyPresentationCompanions();
+    this.hero.syncMotionPresentation();
     this.heroShadow?.setPosition(this.hero.x, this.hero.y + 9).setScale(this.hero.isDashing ? 1.5 : 1);
     this.heroRune?.setPosition(this.hero.x, this.hero.y - 7);
   }
@@ -3645,6 +3681,7 @@ export class GameScene extends Phaser.Scene {
     this.runSession.clearBoss(this.runId, true);
     const next = this.runAct.advanceAct(this.time.now, this.damageTaken);
     this.showcaseVfx?.setAct(next.index);
+    this.hero.setPresentationAct(next.index);
     this.runProgress.beginAct(this.runId, { actNumber: next.index, actId: next.id, actName: next.name, themeId: next.theme, enemySetId: next.enemySetId, bossId: next.bossId, modifiers: next.modifiers });
     this.waveIndex = 0; this.firstWaveSpawnOrdinal = 0; this.stopReadyAt = this.time.now; this.rewindReadyAt = this.time.now; this.linkReadyAt = this.time.now;
     this.hero.setVelocity(0); this.hero.health = Math.min(this.hero.health, this.hero.maxHealth);
@@ -3710,6 +3747,7 @@ export class GameScene extends Phaser.Scene {
     this.clearBackgroundCues();
     const act = this.runAct.current;
     this.showcaseVfx?.setAct(act.index);
+    this.hero?.setPresentationAct(act.index);
     const mapId = isSubmissionActIntegrated(act.index) ? submissionMapId(act.index, encounter) : undefined;
     if (mapId) {
       this.submissionMap = new SubmissionMapRuntime(this, mapId);

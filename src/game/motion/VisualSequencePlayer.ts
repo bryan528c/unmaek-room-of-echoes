@@ -58,6 +58,16 @@ export class VisualSequencePlayer {
     this.active = false;
   }
 
+  /** Preserve the current frame while an owning gameplay clock is paused. */
+  public shiftWindow(deltaMs: number): void {
+    if (!this.window || deltaMs <= 0) return;
+    this.window = {
+      ...this.window,
+      startAt: this.window.startAt + deltaMs,
+      contactAt: this.window.contactAt === undefined ? undefined : this.window.contactAt + deltaMs,
+    };
+  }
+
   public update(now: number): VisualFrame | undefined {
     const sequence = this.sequence;
     const window = this.window;

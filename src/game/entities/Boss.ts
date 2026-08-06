@@ -94,7 +94,7 @@ export class Boss extends Enemy {
     // is not immediately replaced by the base phase texture.
     this.bossCallbacks.phaseChanged(phase);
     this.presentation?.playMotionAction(['warning'], BALANCE.boss.phaseTransition);
-    if (phase === 3) this.scene.time.delayedCall(900, () => { if (this.active) this.bossCallbacks.summon(3); });
+    if (phase === 3) this.scheduleAttackCallback(900, () => { if (this.active) this.bossCallbacks.summon(3); });
   }
 
   private phaseOne(hero: Phaser.Physics.Arcade.Sprite): void {
@@ -110,7 +110,7 @@ export class Boss extends Enemy {
     this.presentation?.playMotionAction(['warning'], 720);
     this.showAim(angle, 720, 0xd95842, 650);
     const generation = this.attackIntentGeneration;
-    this.scene.time.delayedCall(680, () => {
+    this.scheduleAttackCallback(680, () => {
       if (!this.active || generation !== this.attackIntentGeneration || this.scene.time.now < this.phaseTransitionUntil) return;
       this.markSignaturePattern();
       for (let index = -2; index <= 2; index += 1) { const origin = this.projectileOrigin(-18, index + 2); this.callbacks.shoot(this, origin.x, origin.y, angle + index * 0.12, 245, 15, 'projectile-boss'); }
@@ -131,10 +131,10 @@ export class Boss extends Enemy {
       { x: Phaser.Math.Clamp(hero.x + Phaser.Math.Between(-150, 150), 100, 860), y: Phaser.Math.Clamp(hero.y + Phaser.Math.Between(-100, 100), 110, 475) },
     ];
     const generation = this.attackIntentGeneration;
-    spots.forEach((spot, index) => this.scene.time.delayedCall(index * 220, () => {
+    spots.forEach((spot, index) => this.scheduleAttackCallback(index * 220, () => {
       if (this.active && generation === this.attackIntentGeneration && this.scene.time.now >= this.phaseTransitionUntil) { this.markSignaturePattern(); this.bossCallbacks.inkZone(spot.x, spot.y, 62, 3500); }
     }));
-    this.scene.time.delayedCall(650, () => {
+    this.scheduleAttackCallback(650, () => {
       if (!this.active || generation !== this.attackIntentGeneration || this.scene.time.now < this.phaseTransitionUntil) return;
       for (let index = 0; index < 12; index += 1) { const origin = this.projectileOrigin(0, index); this.callbacks.shoot(this, origin.x, origin.y, index * Math.PI * 2 / 12 + this.patternIndex * 0.14, 155, 14, 'projectile-ink'); }
     });
@@ -146,7 +146,7 @@ export class Boss extends Enemy {
     if (this.patternIndex === 1 || this.patternIndex % 4 === 0) this.bossCallbacks.summon(this.patternIndex === 1 ? 3 : 2);
     if (this.patternIndex % 2 === 0) {
       this.telegraphDash(hero, 28, 520, 475);
-      this.scene.time.delayedCall(520, () => { if (this.active && this.phase === 3) this.markSignaturePattern(); });
+      this.scheduleAttackCallback(520, () => { if (this.active && this.phase === 3) this.markSignaturePattern(); });
       this.nextActionAt = this.scene.time.now + 1250;
       return;
     }
@@ -155,7 +155,7 @@ export class Boss extends Enemy {
     this.presentation?.playMotionAction(['warning'], 520);
     this.showAim(angle, 520, 0xe36f4b, 680);
     const generation = this.attackIntentGeneration;
-    this.scene.time.delayedCall(480, () => {
+    this.scheduleAttackCallback(480, () => {
       if (!this.active || generation !== this.attackIntentGeneration || this.scene.time.now < this.phaseTransitionUntil) return;
       this.markSignaturePattern();
       for (let index = -3; index <= 3; index += 1) { const origin = this.projectileOrigin(-14, index + 3); this.callbacks.shoot(this, origin.x, origin.y, angle + index * 0.17, 270 - Math.abs(index) * 12, 17, 'projectile-boss'); }
@@ -170,7 +170,7 @@ export class Boss extends Enemy {
     this.presentation?.playMotionAction(['warning'], 680);
     this.showAim(angle, 680, 0xb44861, 700);
     const generation = this.attackIntentGeneration;
-    this.scene.time.delayedCall(650, () => {
+    this.scheduleAttackCallback(650, () => {
       if (!this.active || generation !== this.attackIntentGeneration || this.scene.time.now < this.phaseTransitionUntil) return;
       this.markSignaturePattern();
       for (let index = -2; index <= 2; index += 1) { const origin = this.projectileOrigin(-18, index + 2); this.callbacks.shoot(this, origin.x, origin.y, angle + index * .18, 220, 14, 'projectile-boss'); }
@@ -187,7 +187,7 @@ export class Boss extends Enemy {
       { x: Phaser.Math.Clamp(hero.x + Phaser.Math.Between(-140, 140), 92, 868), y: Phaser.Math.Clamp(hero.y + Phaser.Math.Between(-105, 105), 105, 478) },
     ];
     const generation = this.attackIntentGeneration;
-    delayed.forEach((spot, index) => this.scene.time.delayedCall(index * 230, () => {
+    delayed.forEach((spot, index) => this.scheduleAttackCallback(index * 230, () => {
       if (this.active && generation === this.attackIntentGeneration && this.scene.time.now >= this.phaseTransitionUntil) { this.markSignaturePattern(); this.bossCallbacks.inkZone(spot.x, spot.y, 54, 2600, 'erasure'); }
     }));
     this.nextActionAt = this.scene.time.now + 2100;
@@ -201,7 +201,7 @@ export class Boss extends Enemy {
     this.presentation?.playMotionAction(['warning'], 620);
     this.showAim(angle, 620, 0xa53d68, 650);
     const generation = this.attackIntentGeneration;
-    this.scene.time.delayedCall(590, () => {
+    this.scheduleAttackCallback(590, () => {
       if (!this.active || generation !== this.attackIntentGeneration || this.scene.time.now < this.phaseTransitionUntil) return;
       this.markSignaturePattern();
       for (let index = -4; index <= 4; index += 1) { const origin = this.projectileOrigin(-16, index + 4); this.callbacks.shoot(this, origin.x, origin.y, angle + index * .14, 250 - Math.abs(index) * 10, 16, 'projectile-ink'); }
@@ -214,6 +214,12 @@ export class Boss extends Enemy {
     this.phaseIntegrity.markSignatureExecuted();
     const current = this.phaseIntegrity.snapshot().phaseHealth;
     this.takeDamage(current, 0, false, 'other');
+  }
+
+  protected override canAcceptFullStop(now: number): boolean {
+    // Phase transitions own the boss clock and cannot be interrupted. Callers
+    // must treat a stop cast during this window as an invalid application.
+    return now >= this.phaseTransitionUntil;
   }
 
   private markSignaturePattern(): void {

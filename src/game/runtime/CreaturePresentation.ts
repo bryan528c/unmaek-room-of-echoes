@@ -95,7 +95,8 @@ export class CreaturePresentation {
   public get stateScale(): number { return this.state.scale; }
   public get effectiveFlipX(): boolean { return this.requestedFlipX !== this.state.flipX; }
   public get presentationFlipX(): boolean {
-    return this.motion?.renderSource === 'PILOT_MIRRORED_STAGING_FALLBACK' ? this.pilotVisualFlipX : this.effectiveFlipX;
+    const policy = this.motion?.directionPolicy;
+    return policy === 'MIRRORED_STAGING' || policy === 'INVERTED_FLIP_X' ? this.pilotVisualFlipX : this.effectiveFlipX;
   }
   public get currentState(): string { return this.state.requestedState; }
   public get currentAssetFile(): string { return this.state.assetFile; }
@@ -133,14 +134,18 @@ export class CreaturePresentation {
 
   public setFacingFlipX(flipped: boolean, horizontalDelta = flipped ? -1 : 1): void {
     this.requestedFlipX = this.metadata.directionMode === 'fixed' ? false : flipped;
-    if (this.motion?.renderSource === 'PILOT_MIRRORED_STAGING_FALLBACK') {
+    if (this.motion?.directionPolicy === 'MIRRORED_STAGING') {
       // The approved goral pilot is canonically left-facing. Staging may
       // mirror only its non-physics presentation; six logical pixels of
       // hysteresis prevents target crossings from flickering at the center.
       this.pilotVisualFlipX = resolveMirroredStagingFlip(this.pilotVisualFlipX, horizontalDelta);
+    } else if (this.motion?.directionPolicy === 'INVERTED_FLIP_X') {
+      this.pilotVisualFlipX = !this.effectiveFlipX;
     } else this.pilotVisualFlipX = this.effectiveFlipX;
     this.applyOriginAndFlip();
   }
+
+  public pauseMotion(until: number): void { this.motion?.pause(this.sprite.scene.time.now, until); }
 
   public updateLayout(): void {
     this.motion?.update(this.sprite.scene.time.now);
@@ -254,19 +259,18 @@ export class CreaturePresentation {
   }
 
   private applyMotionFrame(textureKey: string): void {
-    const profile = motionPilotPresentationProfile(this.creatureId as MotionPilotTarget);
     if (!this.pilotVisual?.active) {
       this.pilotVisual = this.sprite.scene.add.image(this.sprite.x, this.sprite.y, textureKey);
       this.sprite.setVisible(false);
     } else this.pilotVisual.setTexture(textureKey);
-    this.pilotVisual.setScale(profile.uniformScale);
+    this.pilotVisual.setScale(this.motion?.uniformScale ?? motionPilotPresentationProfile(this.creatureId as MotionPilotTarget).uniformScale);
     this.outline?.setTexture(textureKey);
     this.applyOriginAndFlip();
   }
 
   private applyOriginAndFlip(): void {
     const origin = runtimeSpriteOrigin(this.creatureId, this.effectiveFlipX);
-    const presentationOrigin = runtimeSpriteOrigin(this.creatureId, this.presentationFlipX);
+    const presentationOrigin = this.motion?.origin ?? runtimeSpriteOrigin(this.creatureId, this.presentationFlipX);
     const shaking = this.sprite.scene.time.now < this.shakeUntil;
     const shakeOffset = shaking ? Math.sin(this.sprite.scene.time.now * 0.55) * 0.018 : 0;
     this.sprite.setOrigin(origin.x + shakeOffset, origin.y).setFlipX(this.effectiveFlipX);

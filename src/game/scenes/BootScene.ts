@@ -1,4 +1,6 @@
 import Phaser from 'phaser';
+import { act1FinalAssetAudit, act1FinalImageEntries, act1FinalJsonEntries } from '../final/Act1FinalAssets';
+import { act1FinalEnabled } from '../final/Act1FinalConfig';
 import { motionPilotAssetAudit, motionPilotImageEntries, motionPilotJsonEntries } from '../motion/MotionPilotAssets';
 import { motionPilotEnabled } from '../motion/MotionPilotConfig';
 import { runtimeAssetAudit, runtimeAssetEntries } from '../runtime/SubmissionRuntimeAssets';
@@ -16,7 +18,7 @@ export class BootScene extends Phaser.Scene {
       throw new Error(`[BootScene] Submission runtime allowlist audit failed: ${JSON.stringify(audit)}`);
     }
     for (const asset of runtimeAssetEntries()) this.load.image(asset.key, asset.url);
-    if (motionPilotEnabled()) {
+    if (motionPilotEnabled() && !act1FinalEnabled()) {
       const motionAudit = motionPilotAssetAudit();
       if (motionAudit.playerFrames !== 76 || motionAudit.creatureFrames !== 99 || motionAudit.directionLocks !== 8
         || motionAudit.duplicateKeys.length || motionAudit.disallowed.length) {
@@ -25,16 +27,29 @@ export class BootScene extends Phaser.Scene {
       for (const asset of motionPilotImageEntries(true)) this.load.image(asset.key, asset.url);
       for (const asset of motionPilotJsonEntries(true)) this.load.json(asset.key, asset.url);
     }
+    if (act1FinalEnabled()) {
+      const finalAudit = act1FinalAssetAudit();
+      if (finalAudit.playerFrames !== 256 || finalAudit.correctedFrames !== 27 || finalAudit.verifiedFrames !== 99
+        || finalAudit.vfxFrames !== 138 || finalAudit.jsonFiles !== 6
+        || finalAudit.duplicateKeys.length || finalAudit.disallowed.length) {
+        throw new Error(`[BootScene] ACT 1 final allowlist audit failed: ${JSON.stringify(finalAudit)}`);
+      }
+      for (const asset of act1FinalImageEntries(true)) this.load.image(asset.key, asset.url);
+      for (const asset of act1FinalJsonEntries(true)) this.load.json(asset.key, asset.url);
+    }
     this.load.once(Phaser.Loader.Events.FILE_LOAD_ERROR, () => { this.heroLoadFailed = true; });
   }
 
   public create(): void {
     const cropped = !this.heroLoadFailed && createCroppedTextures(this, 'hero-concept');
     if (!cropped) createHeroFallback(this);
-    if (motionPilotEnabled()) {
+    if (motionPilotEnabled() && !act1FinalEnabled()) {
       for (const asset of motionPilotImageEntries(true)) {
         this.textures.get(asset.key).setFilter(Phaser.Textures.FilterMode.NEAREST);
       }
+    }
+    if (act1FinalEnabled()) {
+      for (const asset of act1FinalImageEntries(true)) this.textures.get(asset.key).setFilter(Phaser.Textures.FilterMode.NEAREST);
     }
     this.createEnemyTextures();
     this.scene.start('MenuScene');

@@ -244,7 +244,8 @@ export class Hero extends Phaser.Physics.Arcade.Sprite {
   public get groundPoint(): Readonly<{ x: number; y: number }> { return { x: this.x, y: this.y }; }
   public get movementCircle(): Readonly<{ x: number; y: number; radius: number }> { return { x: this.x, y: this.y, radius: BALANCE.collision.heroMovementRadius }; }
   public get hurtbox(): Ellipse { return { x: this.x, y: this.y + BALANCE.collision.heroHurtOffsetY, radiusX: BALANCE.collision.heroHurtRadiusX, radiusY: BALANCE.collision.heroHurtRadiusY }; }
-  public get motionPilotActive(): boolean { return Boolean(this.motionPresentation); }
+  public get motionPilotActive(): boolean { return this.motionPresentation?.enabled ?? false; }
+  public get finalMotionPresentationActive(): boolean { return this.motionPresentation?.isFinalHandoff ?? false; }
   public get lastDamageAttempt(): HeroDamageAttemptSnapshot | undefined { return this.lastDamageAttemptValue ? { ...this.lastDamageAttemptValue } : undefined; }
   public get motionSnapshot(): PlayerMotionSnapshot | undefined { return this.motionPresentation?.snapshot(); }
   public get motionGeometrySnapshot(): Readonly<{
@@ -271,6 +272,9 @@ export class Hero extends Phaser.Physics.Arcade.Sprite {
   public motionVisualAnchor(anchorId: 'dagger_tip' | 'parry_center' | 'word_target' | 'collarbone_resonance'): Readonly<{ x: number; y: number }> | undefined {
     return this.motionPresentation?.anchorWorld(anchorId);
   }
+
+  public setPresentationAct(actIndex: number): void { this.motionPresentation?.setAct(actIndex); }
+  public syncMotionPresentation(): void { this.motionPresentation?.update(this.scene.time.now); }
 
   public resolveParryMotion(success: boolean): void { this.motionPresentation?.resolveParry(success, this.scene.time.now); }
 
@@ -348,7 +352,7 @@ export class Hero extends Phaser.Physics.Arcade.Sprite {
     this.scene.tweens.add({ targets: this, scaleX: HERO_SCALE * 1.035, scaleY: HERO_SCALE * 1.045, duration: 90, yoyo: true });
     if (this.motionPresentation) this.motionPresentation.setTint(0x9effec);
     else this.setTint(0x9effec);
-    this.scene.time.delayedCall(260, () => {
+    this.scene.time.delayedCall(this.finalMotionPresentationActive ? 60 : 260, () => {
       if (!this.active || this.comboActive) return;
       if (this.motionPresentation) this.motionPresentation.clearTint();
       else this.clearTint();

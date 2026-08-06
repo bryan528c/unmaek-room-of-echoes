@@ -95,7 +95,7 @@ describe('player motion contract', () => {
   it('uses centralized uniform pixel-density profiles without synthesizing unsupported facing', () => {
     expect(MOTION_PILOT_PRESENTATION_PROFILES.player).toMatchObject({ uniformScale: 1.5, directionPolicy: 'SEQUENCE_OR_LOCK' });
     expect(MOTION_PILOT_PRESENTATION_PROFILES.deflect_bat).toMatchObject({ uniformScale: 1.5, directionPolicy: 'FLIP_X' });
-    expect(MOTION_PILOT_PRESENTATION_PROFILES.rewind_lizard).toMatchObject({ uniformScale: 1, directionPolicy: 'FLIP_X' });
+    expect(MOTION_PILOT_PRESENTATION_PROFILES.rewind_lizard).toMatchObject({ uniformScale: 1, directionPolicy: 'INVERTED_FLIP_X' });
     expect(MOTION_PILOT_PRESENTATION_PROFILES.mineral_spider).toMatchObject({ uniformScale: 1, source: 'PILOT' });
     expect(MOTION_PILOT_PRESENTATION_PROFILES.resonance_goral).toMatchObject({
       uniformScale: 1,
@@ -224,7 +224,7 @@ describe('ACT 1 creature motion inventory', () => {
     expect(enemySource).toContain("playMotionAction(['prep', 'attack'], 610, 540)");
     expect(enemySource).toContain('this.scene.time.delayedCall(540');
     expect(enemySource).toContain("playMotionAction(['combat_prep', 'charge_attack'], warningMs + 300, warningMs)");
-    expect(enemySource).toContain('this.scene.time.delayedCall(310');
+    expect(enemySource).toContain('this.scheduleAttackCallback(310');
     expect(enemySource).toContain("playMotionAction(['hit_recover'], 220)");
     const sceneSource = readFileSync('src/game/scenes/GameScene.ts', 'utf8');
     expect(sceneSource).toContain('enemy.cancelAttackIntent(time + 120);\n      enemy.playResolvedContactRecovery();');

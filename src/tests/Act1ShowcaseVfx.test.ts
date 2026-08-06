@@ -81,7 +81,7 @@ describe('ACT 1 showcase procedural VFX staging', () => {
     const boss = readFileSync('src/game/entities/Boss.ts', 'utf8');
     expect(enemy).toContain("this.scene.time.delayedCall(540");
     expect(enemy).toContain("this.scene.time.delayedCall(650");
-    expect(enemy).toContain('this.scene.time.delayedCall(warningMs');
+    expect(enemy).toContain('this.scheduleAttackCallback(warningMs');
     expect(boss).toContain('for (let index = -2; index <= 2; index += 1)');
     expect(boss).toContain('for (let index = 0; index < 12; index += 1)');
     expect(boss).toContain('for (let index = -3; index <= 3; index += 1)');

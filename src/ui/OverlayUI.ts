@@ -64,6 +64,22 @@ export const describeBackflowOpportunity = (frozenProjectiles: number, stoppedTa
     : `E 되돌린다 · 최소 역류 파동 · 정지 적 ${stoppedTargets}명`
 );
 
+export type WordLoadoutEnterAction = 'IGNORE' | 'SHOW_VALIDATION' | 'CONFIRM';
+
+/**
+ * Enter belongs to the loadout form, not to the currently focused card.
+ * Keeping the decision pure makes key-repeat and incomplete-selection behavior
+ * testable without coupling gameplay startup to browser-native button clicks.
+ */
+export const resolveWordLoadoutEnterAction = (
+  code: string,
+  repeat: boolean,
+  selectionCount: number,
+): WordLoadoutEnterAction => {
+  if (code !== 'Enter' || repeat) return 'IGNORE';
+  return selectionCount === 3 ? 'CONFIRM' : 'SHOW_VALIDATION';
+};
+
 export interface HudState {
   health: number;
   maxHealth: number;
@@ -493,11 +509,24 @@ export class OverlayUI {
     this.clear();
     const initialLoadout: [WordId, WordId, WordId] = validWordLoadout(initial) ? [...initial] : [...DEFAULT_WORD_LOADOUT];
     let selected: WordId[] = [...initialLoadout];
+    let confirmed = false;
     const screen = document.createElement('div'); screen.className = 'screen loadout-screen';
+    const submit = (): void => {
+      if (confirmed) return;
+      if (selected.length !== 3) {
+        const validation = screen.querySelector<HTMLElement>('[data-loadout-validation]');
+        if (validation) validation.textContent = '언령 세 개를 장착해야 합니다.';
+        return;
+      }
+      confirmed = true;
+      if (this.keyHandler) window.removeEventListener('keydown', this.keyHandler);
+      this.keyHandler = undefined;
+      confirm([...selected] as [WordId, WordId, WordId]);
+    };
     const render = (): void => {
       const reactionCount = availableReactionCount(selected);
       const reactionNames = WORD_REACTIONS.filter((reaction) => selected.includes(reaction.firstWordId) && selected.includes(reaction.secondWordId)).map((reaction) => reaction.displayName);
-      screen.innerHTML = `<div class="loadout-panel"><p class="eyebrow">Run 시작 준비</p><h2>언령 장착</h2><p>선택 순서대로 Q / E / R에 장착됩니다.</p><div class="loadout-slots">${(['Q','E','R'] as const).map((slot, index) => `<span><kbd>${slot}</kbd><b>${selected[index] ? WORD_DEFINITIONS[selected[index]!].displayName : '비어 있음'}</b></span>`).join('')}</div><div class="loadout-presets"><button data-preset="1"><kbd>1</kbd> 시간 조작</button><button data-preset="2"><kbd>2</kbd> 군중 제어</button><button data-preset="3"><kbd>3</kbd> 반응 공격</button></div><div class="loadout-grid">${WORD_IDS.map((id) => { const definition = WORD_DEFINITIONS[id]; const order = selected.indexOf(id); return `<button class="word-loadout-card${order >= 0 ? ' selected' : ''}" data-word="${id}" aria-pressed="${order >= 0}"><i>${order >= 0 ? ['Q','E','R'][order] : '言'}</i><b>${definition.displayName}</b><small>${definition.roles.join(' · ')}</small><p>${definition.shortDescription}</p><em>${definition.empoweredEffect}</em></button>`; }).join('')}</div><div class="loadout-reactions"><b>가능한 반응 ${reactionCount}개</b><span>${reactionCount < 2 ? '사용 가능한 연계가 적습니다.' : reactionNames.join(' · ')}</span></div><button class="rune-button primary" data-confirm ${selected.length === 3 ? '' : 'disabled'}>이 구성으로 시작 <kbd>Enter</kbd></button></div>`;
+      screen.innerHTML = `<div class="loadout-panel"><p class="eyebrow">Run 시작 준비</p><h2>언령 장착</h2><p>선택 순서대로 Q / E / R에 장착됩니다.</p><div class="loadout-slots">${(['Q','E','R'] as const).map((slot, index) => `<span><kbd>${slot}</kbd><b>${selected[index] ? WORD_DEFINITIONS[selected[index]!].displayName : '비어 있음'}</b></span>`).join('')}</div><div class="loadout-presets"><button data-preset="1"><kbd>1</kbd> 시간 조작</button><button data-preset="2"><kbd>2</kbd> 군중 제어</button><button data-preset="3"><kbd>3</kbd> 반응 공격</button></div><div class="loadout-grid">${WORD_IDS.map((id) => { const definition = WORD_DEFINITIONS[id]; const order = selected.indexOf(id); return `<button class="word-loadout-card${order >= 0 ? ' selected' : ''}" data-word="${id}" aria-pressed="${order >= 0}"><i>${order >= 0 ? ['Q','E','R'][order] : '言'}</i><b>${definition.displayName}</b><small>${definition.roles.join(' · ')}</small><p>${definition.shortDescription}</p><em>${definition.empoweredEffect}</em></button>`; }).join('')}</div><div class="loadout-reactions"><b>가능한 반응 ${reactionCount}개</b><span>${reactionCount < 2 ? '사용 가능한 연계가 적습니다.' : reactionNames.join(' · ')}</span></div><p data-loadout-validation aria-live="polite"></p><button class="rune-button primary" data-confirm ${selected.length === 3 ? '' : 'disabled'}>이 구성으로 시작 <kbd>Enter</kbd></button></div>`;
       screen.querySelectorAll<HTMLButtonElement>('[data-preset]').forEach((button) => button.addEventListener('click', () => {
         selected = button.dataset.preset === '2' ? ['pull', 'link', 'push'] : button.dataset.preset === '3' ? ['mark', 'stop', 'rewind'] : [...DEFAULT_WORD_LOADOUT];
         render();
@@ -507,7 +536,7 @@ export class OverlayUI {
         if (index >= 0) selected.splice(index, 1); else if (selected.length < 3) selected.push(id);
         render();
       }));
-      screen.querySelector<HTMLButtonElement>('[data-confirm]')?.addEventListener('click', () => { if (selected.length === 3) confirm([...selected] as [WordId, WordId, WordId]); }, { once: true });
+      screen.querySelector<HTMLButtonElement>('[data-confirm]')?.addEventListener('click', submit, { once: true });
       this.bindKeyboardNavigation(screen, 'button:not([disabled])', () => confirm([...initialLoadout]), {
         KeyK: () => confirm([...initialLoadout]),
         Digit1: () => { selected = [...DEFAULT_WORD_LOADOUT]; render(); },
@@ -515,6 +544,15 @@ export class OverlayUI {
         Digit3: () => { selected = ['mark', 'stop', 'rewind']; render(); },
       });
     };
+    // Capture Enter before a focused native <button> can synthesize a click.
+    // Space remains a normal accessible card activation key.
+    screen.addEventListener('keydown', (event) => {
+      if (event.code !== 'Enter') return;
+      event.preventDefault();
+      event.stopPropagation();
+      const action = resolveWordLoadoutEnterAction(event.code, event.repeat, selected.length);
+      if (action !== 'IGNORE') submit();
+    }, true);
     this.root.append(screen); render();
   }
 

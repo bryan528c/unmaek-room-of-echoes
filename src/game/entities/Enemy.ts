@@ -9,6 +9,7 @@ import { shouldRecoverDistantPursuit } from '../systems/EnemyPursuit';
 import { angleDelta } from '../utils/math';
 import { CreaturePresentation } from '../runtime/CreaturePresentation';
 import { shouldRestoreHitPresentation } from '../runtime/SubmissionRuntime';
+import { act1FinalEnabled } from '../final/Act1FinalConfig';
 
 export interface EnemyCallbacks {
   shoot: (source: Enemy, x: number, y: number, angle: number, speed: number, damage: number, texture?: string) => void;
@@ -51,6 +52,14 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   private previousGroundY: number;
   private frozenStartedAt = 0;
   private runtimeShadow?: Phaser.GameObjects.Ellipse;
+  private readonly attackTimers = new Set<Phaser.Time.TimerEvent>();
+  private pausedAttackTweens = new Set<Phaser.Tweens.Tween>();
+  private stopResumeTimer?: Phaser.Time.TimerEvent;
+  private fullStopPausedAt?: number;
+  private pausedAttackGeneration = -1;
+  private pausedVelocity?: Readonly<{ x: number; y: number }>;
+  private pausedBodyMoves?: boolean;
+  private pausedBodyImmovable?: boolean;
   private static sequence = 0;
 
   public constructor(scene: Phaser.Scene, x: number, y: number, kind: EnemyKind, callbacks: EnemyCallbacks, healthMultiplier = 1, creatureId?: string) {
@@ -85,11 +94,21 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     }
   }
 
-  public spawn(): void {
+  public spawn(minimalPresentation = false): void {
     const marker = this.scene.add.graphics().setDepth(DEPTH.telegraph);
-    marker.lineStyle(2, 0xc4543c, 0.8).strokeEllipse(this.x, this.y + 8, 58, 26);
-    marker.lineStyle(1, 0xe5ad68, 0.55).strokeCircle(this.x, this.y + 8, 9);
-    this.scene.tweens.add({ targets: marker, alpha: 0.22, scaleX: 1.2, scaleY: 1.2, duration: 560, onComplete: () => marker.destroy() });
+    if (minimalPresentation) marker.lineStyle(1, 0xe5ad68, 0.42).strokeCircle(this.x, this.y + 3, 7);
+    else {
+      marker.lineStyle(2, 0xc4543c, 0.8).strokeEllipse(this.x, this.y + 8, 58, 26);
+      marker.lineStyle(1, 0xe5ad68, 0.55).strokeCircle(this.x, this.y + 8, 9);
+    }
+    this.scene.tweens.add({
+      targets: marker,
+      alpha: minimalPresentation ? 0 : 0.22,
+      scaleX: minimalPresentation ? 1.12 : 1.2,
+      scaleY: minimalPresentation ? 1.12 : 1.2,
+      duration: minimalPresentation ? 160 : 560,
+      onComplete: () => marker.destroy(),
+    });
     const groundX = this.x; const groundY = this.y;
     this.setScale(this.baseScale * 0.92, this.baseScale * 0.84);
     this.scene.time.delayedCall(560, () => {
@@ -238,7 +257,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     // so this tween cannot stretch or rotate its source pixels.
     this.scene.tweens.add({ targets: this, scaleX: this.baseScale * 1.08, scaleY: this.baseScale * 0.82, rotation: Math.cos(angle) < 0 ? -0.06 : 0.06, duration: warningMs * 0.72, yoyo: true });
     const generation = this.attackIntentGeneration;
-    this.scene.time.delayedCall(warningMs, () => {
+    this.scheduleAttackCallback(warningMs, () => {
       if (generation !== this.attackIntentGeneration || !this.active || this.health <= 0) return;
       this.setPresentationState('attack');
       this.callbacks.cue('parryWindow'); this.setScale(this.baseScale).setRotation(0);
@@ -247,8 +266,8 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
       this.attackActiveUntil = this.scene.time.now + 300;
       this.telegraphState = { angle, length: Math.max(40, speed * 0.28), halfWidth: this.meleeHitRadius * BALANCE.collision.meleeTelegraphPadding, until: this.attackActiveUntil };
       this.setVelocity(Math.cos(angle) * speed, Math.sin(angle) * speed);
-      this.scene.time.delayedCall(280, () => { if (this.active) { this.setVelocity(0); this.setPresentationState('idle'); this.attackActiveUntil = 0; this.telegraphState = undefined; } });
-      this.scene.time.delayedCall(310, () => {
+      this.scheduleAttackCallback(280, () => { if (this.active) { this.setVelocity(0); this.setPresentationState('idle'); this.attackActiveUntil = 0; this.telegraphState = undefined; } });
+      this.scheduleAttackCallback(310, () => {
         if (generation === this.attackIntentGeneration && this.active && this.health > 0) this.presentation?.playMotionAction(['hit_recover'], 220);
       });
     });
@@ -257,11 +276,14 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
   protected showAim(angle: number, duration: number, color: number, length = 540): void {
     this.clearTelegraph();
-    const telegraph = this.scene.add.graphics().setDepth(DEPTH.telegraph);
-    this.telegraph = telegraph;
     const halfWidth = Math.max(30, this.movementCircle.radius + 14) * BALANCE.collision.meleeTelegraphPadding;
     this.telegraphState = { angle, length, halfWidth, until: this.scene.time.now + duration };
     this.callbacks.cue('warning');
+    // Final bat presentation owns its short mouth cue. Preserve the gameplay
+    // telegraph state/timing while suppressing the legacy full-screen line.
+    if (act1FinalEnabled() && this.creatureId === 'deflect_bat') return;
+    const telegraph = this.scene.add.graphics().setDepth(DEPTH.telegraph);
+    this.telegraph = telegraph;
     const origin = this.projectileOrigin();
     telegraph.lineStyle(7, 0x5b1715, 0.22).lineBetween(origin.x, origin.y, origin.x + Math.cos(angle) * length, origin.y + Math.sin(angle) * length);
     telegraph.lineStyle(2, color, 0.88).lineBetween(origin.x, origin.y, origin.x + Math.cos(angle) * length, origin.y + Math.sin(angle) * length);
@@ -282,25 +304,39 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.scene.tweens.add({ targets: cue, alpha: 0, scaleX: 1.7, scaleY: 1.7, duration: 85, onComplete: () => cue.destroy() });
   }
 
-  public freeze(until: number, bossSlow = false): void {
+  public freeze(until: number, bossSlow = false): boolean {
     const now = this.scene.time.now;
-    if (bossSlow) {
+    const fullBossStop = bossSlow && this.kind === 'boss' && this.creatureId === 'resonance_goral';
+    if (fullBossStop && !this.canAcceptFullStop(now)) return false;
+    if (bossSlow && !fullBossStop) {
       const slowedUntil = now + Math.max(0, until - now) * 0.58;
       this.slowUntil = Math.max(this.slowUntil, slowedUntil);
       this.nextActionAt = Math.max(this.nextActionAt, now + Math.max(0, slowedUntil - now) * 0.72);
-      return;
+      return true;
     }
     if (until > this.frozenUntil) { this.frozenStartedAt = now; this.frozenUntil = until; }
+    if (fullBossStop) this.pauseFullStop(until);
+    return true;
   }
 
   public markEcho(until: number): void { this.echoUntil = Math.max(this.echoUntil, until); }
   public consumeStopped(now = this.scene.time.now): boolean {
     if (this.frozenUntil <= now && this.slowUntil <= now) return false;
-    this.frozenUntil = now; this.slowUntil = now; return true;
+    this.frozenUntil = now; this.slowUntil = now;
+    if (this.fullStopPausedAt !== undefined) {
+      this.stopResumeTimer?.remove(false);
+      this.resumeFullStop();
+    }
+    return true;
   }
 
   public cancelAttackIntent(until: number): void {
     this.attackIntentGeneration += 1;
+    for (const timer of this.attackTimers) timer.remove(false);
+    this.attackTimers.clear();
+    this.pausedVelocity = undefined;
+    this.pausedAttackGeneration = -1;
+    this.pausedAttackTweens.clear();
     this.clearTelegraph(); this.telegraphState = undefined; this.attackActiveUntil = 0;
     this.actionLockedUntil = Math.max(this.actionLockedUntil, until); this.nextActionAt = Math.max(this.nextActionAt, until);
     this.scene.tweens.killTweensOf(this);
@@ -436,6 +472,23 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     const now = this.scene?.time?.now;
     return typeof now === 'number' && (now < this.frozenUntil || now < this.slowUntil);
   }
+  public get isStopPositionLocked(): boolean { return this.fullStopPausedAt !== undefined; }
+  public get stopSnapshot(): Readonly<{
+    frozenUntil: number;
+    slowUntil: number;
+    fullStopPaused: boolean;
+    pendingAttackCallbacks: number;
+    velocity: Readonly<{ x: number; y: number }>;
+  }> {
+    const body = this.body as Phaser.Physics.Arcade.Body;
+    return {
+      frozenUntil: this.frozenUntil,
+      slowUntil: this.slowUntil,
+      fullStopPaused: this.fullStopPausedAt !== undefined,
+      pendingAttackCallbacks: this.attackTimers.size,
+      velocity: { x: body.velocity.x, y: body.velocity.y },
+    };
+  }
   public get isEchoMarked(): boolean {
     const now = this.scene?.time?.now;
     return typeof now === 'number' && now < this.echoUntil;
@@ -512,6 +565,9 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   }
 
   public override destroy(fromScene?: boolean): void {
+    this.stopResumeTimer?.remove(false); this.stopResumeTimer = undefined;
+    for (const timer of this.attackTimers) timer.remove(false);
+    this.attackTimers.clear(); this.pausedAttackTweens.clear();
     this.clearTelegraph();
     this.scene?.tweens?.killTweensOf(this);
     this.statusGraphics?.destroy();
@@ -523,6 +579,71 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
   protected setFacingFlipX(flipped: boolean, horizontalDelta?: number): void {
     if (this.presentation) this.presentation.setFacingFlipX(flipped, horizontalDelta);
     else this.setFlipX(flipped);
+  }
+
+  protected canAcceptFullStop(_now: number): boolean { return true; }
+
+  protected scheduleAttackCallback(delay: number, callback: () => void): Phaser.Time.TimerEvent {
+    let timer!: Phaser.Time.TimerEvent;
+    timer = this.scene.time.delayedCall(delay, () => {
+      this.attackTimers.delete(timer);
+      callback();
+    });
+    if (this.fullStopPausedAt !== undefined) timer.paused = true;
+    this.attackTimers.add(timer);
+    return timer;
+  }
+
+  private pauseFullStop(until: number): void {
+    const now = this.scene.time.now;
+    if (until <= now) return;
+    if (this.fullStopPausedAt === undefined) {
+      this.fullStopPausedAt = now;
+      this.pausedAttackGeneration = this.attackIntentGeneration;
+      const body = this.body as Phaser.Physics.Arcade.Body;
+      this.pausedVelocity = { x: body.velocity.x, y: body.velocity.y };
+      this.pausedBodyMoves = body.moves;
+      this.pausedBodyImmovable = body.immovable;
+      body.moves = false;
+      body.immovable = true;
+      this.setVelocity(0);
+      for (const timer of this.attackTimers) timer.paused = true;
+      const tweenTargets: object[] = [this];
+      if (this.telegraph?.active) tweenTargets.push(this.telegraph);
+      for (const tween of this.scene.tweens.getTweensOf(tweenTargets)) {
+        if (tween.isPaused()) continue;
+        tween.pause(); this.pausedAttackTweens.add(tween);
+      }
+    }
+    this.presentation?.pauseMotion(until);
+    this.stopResumeTimer?.remove(false);
+    this.stopResumeTimer = this.scene.time.delayedCall(Math.max(0, until - now), () => this.resumeFullStop());
+  }
+
+  private resumeFullStop(): void {
+    const pausedAt = this.fullStopPausedAt;
+    if (pausedAt === undefined || this.scene.time.now < this.frozenUntil) return;
+    const pausedDuration = Math.max(0, this.frozenUntil - pausedAt);
+    const sameAttack = this.pausedAttackGeneration === this.attackIntentGeneration;
+    const body = this.body as Phaser.Physics.Arcade.Body;
+    body.moves = this.pausedBodyMoves ?? body.moves;
+    body.immovable = this.pausedBodyImmovable ?? body.immovable;
+    if (sameAttack) {
+      if (this.actionLockedUntil > pausedAt) this.actionLockedUntil += pausedDuration;
+      if (this.nextActionAt > pausedAt) this.nextActionAt += pausedDuration;
+      if (this.attackActiveUntil > pausedAt) this.attackActiveUntil += pausedDuration;
+      if (this.telegraphState && this.telegraphState.until > pausedAt) this.telegraphState.until += pausedDuration;
+      for (const timer of this.attackTimers) timer.paused = false;
+      for (const tween of this.pausedAttackTweens) if (tween.isPaused()) tween.resume();
+      if (this.active && this.pausedVelocity) this.setVelocity(this.pausedVelocity.x, this.pausedVelocity.y);
+    }
+    this.fullStopPausedAt = undefined;
+    this.pausedAttackGeneration = -1;
+    this.pausedVelocity = undefined;
+    this.pausedBodyMoves = undefined;
+    this.pausedBodyImmovable = undefined;
+    this.pausedAttackTweens.clear();
+    this.stopResumeTimer = undefined;
   }
 
   public get visualFlipX(): boolean { return this.presentation?.presentationFlipX ?? this.flipX; }

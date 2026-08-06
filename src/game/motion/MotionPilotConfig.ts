@@ -11,14 +11,14 @@ export type MotionPilotTarget =
   | 'mineral_spider'
   | 'resonance_goral';
 
-export type MotionPilotRenderSource = 'PILOT' | 'PARTIAL_FALLBACK' | 'LEGACY_QUALITY_FALLBACK' | 'PILOT_MIRRORED_STAGING_FALLBACK';
+export type MotionPilotRenderSource = 'PILOT' | 'PARTIAL_FALLBACK' | 'LEGACY_QUALITY_FALLBACK' | 'PILOT_MIRRORED_STAGING_FALLBACK' | 'FINAL_HANDOFF' | 'FINAL_CORRECTED' | 'VERIFIED_MOTION';
 
 export interface MotionPilotPresentationProfile {
   source: MotionPilotRenderSource;
   uniformScale: number;
   outlinePixels: number;
   outlineAlpha: number;
-  directionPolicy: 'SEQUENCE_OR_LOCK' | 'FLIP_X' | 'FRONT_SIDE' | 'MIRRORED_STAGING';
+  directionPolicy: 'SEQUENCE_OR_LOCK' | 'FULL_8' | 'FLIP_X' | 'INVERTED_FLIP_X' | 'FRONT_SIDE' | 'MIRRORED_STAGING';
 }
 
 /**
@@ -34,7 +34,9 @@ export const MOTION_PILOT_PRESENTATION_PROFILES: Readonly<Record<MotionPilotTarg
   player: { source: 'PILOT', uniformScale: 1.5, outlinePixels: 1, outlineAlpha: 0.32, directionPolicy: 'SEQUENCE_OR_LOCK' },
   pressure_swift: { source: 'PILOT', uniformScale: 1.5, outlinePixels: 0, outlineAlpha: 0, directionPolicy: 'FLIP_X' },
   deflect_bat: { source: 'PILOT', uniformScale: 1.5, outlinePixels: 0, outlineAlpha: 0, directionPolicy: 'FLIP_X' },
-  rewind_lizard: { source: 'PILOT', uniformScale: 1, outlinePixels: 0, outlineAlpha: 0, directionPolicy: 'FLIP_X' },
+  // Both corrected and verified lizard frames are authored head-left. Keep the
+  // gameplay owner's metadata flip untouched and invert only the pilot image.
+  rewind_lizard: { source: 'PILOT', uniformScale: 1, outlinePixels: 0, outlineAlpha: 0, directionPolicy: 'INVERTED_FLIP_X' },
   mineral_spider: { source: 'PILOT', uniformScale: 1, outlinePixels: 0, outlineAlpha: 0, directionPolicy: 'FRONT_SIDE' },
   resonance_goral: { source: 'PILOT_MIRRORED_STAGING_FALLBACK', uniformScale: 1, outlinePixels: 1, outlineAlpha: 0.28, directionPolicy: 'MIRRORED_STAGING' },
 };
@@ -47,7 +49,8 @@ export const resolveMirroredStagingFlip = (current: boolean, horizontalDelta: nu
   Math.abs(horizontalDelta) > hysteresis ? horizontalDelta > 0 : current;
 
 export const resolveMotionPilotConfig = (search: string): MotionPilotConfig => {
-  const enabled = new URLSearchParams(search).get('motionPilot') === '1';
+  const params = new URLSearchParams(search);
+  const enabled = params.get('motionPilot') === '1' || params.get('act1Final') === '1';
   return { enabled, source: enabled ? 'URL_QUERY' : 'DEFAULT_OFF' };
 };
 
