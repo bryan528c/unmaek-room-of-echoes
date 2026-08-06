@@ -1,0 +1,337 @@
+{
+  "schemaVersion": "1.0",
+  "gameplayAdditions": 0,
+  "bindingPolicy": "Bind only to an already existing runtime event/sequence. Do not create an event to satisfy a visual candidate.",
+  "mappings": [
+    {
+      "effectId": "player_basic_attack_cut_n",
+      "existingGameplaySequence": "player.basic_attack.n",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "dagger_tip",
+      "visualStartRatio": 0.38,
+      "visualContactRatio": 0.6,
+      "visualEndRatio": 0.83
+    },
+    {
+      "effectId": "player_basic_attack_cut_ne",
+      "existingGameplaySequence": "player.basic_attack.ne",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "dagger_tip",
+      "visualStartRatio": 0.38,
+      "visualContactRatio": 0.6,
+      "visualEndRatio": 0.83
+    },
+    {
+      "effectId": "player_basic_attack_cut_e",
+      "existingGameplaySequence": "player.basic_attack.e",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "dagger_tip",
+      "visualStartRatio": 0.38,
+      "visualContactRatio": 0.6,
+      "visualEndRatio": 0.83
+    },
+    {
+      "effectId": "player_basic_attack_cut_se",
+      "existingGameplaySequence": "player.basic_attack.se",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "dagger_tip",
+      "visualStartRatio": 0.38,
+      "visualContactRatio": 0.6,
+      "visualEndRatio": 0.83
+    },
+    {
+      "effectId": "player_basic_attack_cut_s",
+      "existingGameplaySequence": "player.basic_attack.s",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "dagger_tip",
+      "visualStartRatio": 0.38,
+      "visualContactRatio": 0.6,
+      "visualEndRatio": 0.83
+    },
+    {
+      "effectId": "player_basic_attack_cut_sw",
+      "existingGameplaySequence": "player.basic_attack.sw",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "dagger_tip",
+      "visualStartRatio": 0.38,
+      "visualContactRatio": 0.6,
+      "visualEndRatio": 0.83
+    },
+    {
+      "effectId": "player_basic_attack_cut_w",
+      "existingGameplaySequence": "player.basic_attack.w",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "dagger_tip",
+      "visualStartRatio": 0.38,
+      "visualContactRatio": 0.6,
+      "visualEndRatio": 0.83
+    },
+    {
+      "effectId": "player_basic_attack_cut_nw",
+      "existingGameplaySequence": "player.basic_attack.nw",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "dagger_tip",
+      "visualStartRatio": 0.38,
+      "visualContactRatio": 0.6,
+      "visualEndRatio": 0.83
+    },
+    {
+      "effectId": "player_parry_attempt",
+      "existingGameplaySequence": "player.parry",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "parry_center",
+      "visualStartRatio": 0.0,
+      "visualContactRatio": 0.35,
+      "visualEndRatio": 0.58
+    },
+    {
+      "effectId": "player_parry_active",
+      "existingGameplaySequence": "player.parry",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "parry_center",
+      "visualStartRatio": 0.25,
+      "visualContactRatio": 0.5,
+      "visualEndRatio": 0.7
+    },
+    {
+      "effectId": "player_parry_success",
+      "existingGameplaySequence": "player.parry",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "parry_center",
+      "visualStartRatio": 0.48,
+      "visualContactRatio": 0.58,
+      "visualEndRatio": 0.82
+    },
+    {
+      "effectId": "player_parry_failure",
+      "existingGameplaySequence": "player.parry",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "parry_center",
+      "visualStartRatio": 0.52,
+      "visualContactRatio": 0.7,
+      "visualEndRatio": 0.95
+    },
+    {
+      "effectId": "player_word_collarbone_resonance",
+      "existingGameplaySequence": "player.word_skill",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "collarbone_resonance",
+      "visualStartRatio": 0.28,
+      "visualContactRatio": 0.42,
+      "visualEndRatio": 0.58
+    },
+    {
+      "effectId": "word_stop",
+      "existingGameplaySequence": "player.word_skill",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "word_target",
+      "visualStartRatio": 0.48,
+      "visualContactRatio": 0.68,
+      "visualEndRatio": 0.92
+    },
+    {
+      "effectId": "word_rewind",
+      "existingGameplaySequence": "player.word_skill",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "word_target",
+      "visualStartRatio": 0.48,
+      "visualContactRatio": 0.68,
+      "visualEndRatio": 0.92
+    },
+    {
+      "effectId": "word_connect",
+      "existingGameplaySequence": "player.word_skill",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "word_target",
+      "visualStartRatio": 0.48,
+      "visualContactRatio": 0.68,
+      "visualEndRatio": 0.92
+    },
+    {
+      "effectId": "word_push",
+      "existingGameplaySequence": "player.word_skill",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "word_target",
+      "visualStartRatio": 0.48,
+      "visualContactRatio": 0.68,
+      "visualEndRatio": 0.92
+    },
+    {
+      "effectId": "word_hold",
+      "existingGameplaySequence": "player.word_skill",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "word_target",
+      "visualStartRatio": 0.48,
+      "visualContactRatio": 0.68,
+      "visualEndRatio": 0.92
+    },
+    {
+      "effectId": "word_flow",
+      "existingGameplaySequence": "player.word_skill",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "word_target",
+      "visualStartRatio": 0.48,
+      "visualContactRatio": 0.68,
+      "visualEndRatio": 0.92
+    },
+    {
+      "effectId": "pressure_swift_evade_pressure",
+      "existingGameplaySequence": "pressure_swift.evade",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "body_center_VISUAL_ONLY",
+      "visualStartRatio": 0.15,
+      "visualContactRatio": 0.48,
+      "visualEndRatio": 0.78
+    },
+    {
+      "effectId": "deflect_bat_prep",
+      "existingGameplaySequence": "deflect_bat.attack",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "mouth_resonance_organ",
+      "visualStartRatio": 0.1,
+      "visualContactRatio": 0.5,
+      "visualEndRatio": 0.85
+    },
+    {
+      "effectId": "deflect_bat_projectile",
+      "existingGameplaySequence": "deflect_bat.attack",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "mouth_resonance_organ",
+      "visualStartRatio": 0.0,
+      "visualContactRatio": 0.42,
+      "visualEndRatio": 0.9
+    },
+    {
+      "effectId": "deflect_bat_impact",
+      "existingGameplaySequence": "deflect_bat.attack",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "projectile_contact",
+      "visualStartRatio": 0.0,
+      "visualContactRatio": 0.45,
+      "visualEndRatio": 0.9
+    },
+    {
+      "effectId": "rewind_lizard_prep",
+      "existingGameplaySequence": "rewind_lizard.attack",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "snout",
+      "visualStartRatio": 0.12,
+      "visualContactRatio": 0.5,
+      "visualEndRatio": 0.78
+    },
+    {
+      "effectId": "rewind_lizard_lunge",
+      "existingGameplaySequence": "rewind_lizard.attack",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "snout",
+      "visualStartRatio": 0.0,
+      "visualContactRatio": 0.56,
+      "visualEndRatio": 0.92
+    },
+    {
+      "effectId": "rewind_lizard_contact",
+      "existingGameplaySequence": "rewind_lizard.attack",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "snout",
+      "visualStartRatio": 0.0,
+      "visualContactRatio": 0.38,
+      "visualEndRatio": 0.82
+    },
+    {
+      "effectId": "mineral_spider_thread_spawn_marker_approved",
+      "existingGameplaySequence": "mineral_spider.deploy_to_attack",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "thread_spawn_a|b|c",
+      "visualStartRatio": 0.05,
+      "visualContactRatio": 0.3,
+      "visualEndRatio": 0.55
+    },
+    {
+      "effectId": "mineral_spider_prep",
+      "existingGameplaySequence": "mineral_spider.deploy_to_attack",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "thread_spawn_a|b|c",
+      "visualStartRatio": 0.1,
+      "visualContactRatio": 0.48,
+      "visualEndRatio": 0.75
+    },
+    {
+      "effectId": "mineral_spider_projectile",
+      "existingGameplaySequence": "mineral_spider.deploy_to_attack",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "thread_spawn_a|b|c",
+      "visualStartRatio": 0.0,
+      "visualContactRatio": 0.45,
+      "visualEndRatio": 0.92
+    },
+    {
+      "effectId": "mineral_spider_impact",
+      "existingGameplaySequence": "mineral_spider.deploy_to_attack",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "thread_spawn_a|b|c",
+      "visualStartRatio": 0.0,
+      "visualContactRatio": 0.44,
+      "visualEndRatio": 0.86
+    },
+    {
+      "effectId": "resonance_goral_projectile",
+      "existingGameplaySequence": "resonance_goral.projectile",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "forehoof_contact",
+      "visualStartRatio": 0.0,
+      "visualContactRatio": 0.46,
+      "visualEndRatio": 0.94
+    },
+    {
+      "effectId": "resonance_goral_charge",
+      "existingGameplaySequence": "resonance_goral.charge",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "forehoof_contact",
+      "visualStartRatio": 0.12,
+      "visualContactRatio": 0.52,
+      "visualEndRatio": 0.9
+    },
+    {
+      "effectId": "resonance_goral_phase3_overlay_approved",
+      "existingGameplaySequence": "resonance_goral.phase3",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "body_canvas_root",
+      "visualStartRatio": 0.0,
+      "visualContactRatio": 0.5,
+      "visualEndRatio": 1.0
+    }
+  ]
+}

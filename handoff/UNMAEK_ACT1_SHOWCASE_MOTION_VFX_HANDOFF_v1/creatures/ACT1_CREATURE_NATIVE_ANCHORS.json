@@ -1,0 +1,284 @@
+{
+  "schemaVersion": "1.0",
+  "coordinateSpace": "native candidate canvas pixels",
+  "frames": {
+    "creatures/pressure_swift/readability_corrected/pressure_swift_native_fly_f01.png": {
+      "body_center_visual_only": {
+        "x": 32,
+        "y": 36
+      }
+    },
+    "creatures/pressure_swift/readability_corrected/pressure_swift_native_fly_f02.png": {
+      "body_center_visual_only": {
+        "x": 32,
+        "y": 49
+      }
+    },
+    "creatures/pressure_swift/readability_corrected/pressure_swift_native_fly_f03.png": {
+      "body_center_visual_only": {
+        "x": 32,
+        "y": 38
+      }
+    },
+    "creatures/pressure_swift/readability_corrected/pressure_swift_native_evade_f01.png": {
+      "body_center_visual_only": {
+        "x": 32,
+        "y": 36
+      }
+    },
+    "creatures/deflect_bat/readability_corrected/deflect_bat_native_idle_f01.png": {
+      "mouth_resonance_organ": {
+        "x": 14,
+        "y": 41
+      }
+    },
+    "creatures/deflect_bat/readability_corrected/deflect_bat_native_move_f01.png": {
+      "mouth_resonance_organ": {
+        "x": 14,
+        "y": 39
+      }
+    },
+    "creatures/deflect_bat/readability_corrected/deflect_bat_native_prep_f01.png": {
+      "mouth_resonance_organ": {
+        "x": 14,
+        "y": 39
+      }
+    },
+    "creatures/deflect_bat/readability_corrected/deflect_bat_native_attack_f01.png": {
+      "mouth_resonance_organ": {
+        "x": 14,
+        "y": 44
+      }
+    },
+    "creatures/deflect_bat/readability_corrected/deflect_bat_native_attack_f02.png": {
+      "mouth_resonance_organ": {
+        "x": 14,
+        "y": 48
+      }
+    },
+    "creatures/deflect_bat/readability_corrected/deflect_bat_native_hit_recover_f01.png": {
+      "mouth_resonance_organ": {
+        "x": 14,
+        "y": 42
+      }
+    },
+    "creatures/rewind_lizard/readability_corrected/rewind_lizard_native_idle_f01.png": {
+      "snout": {
+        "x": 15,
+        "y": 41
+      }
+    },
+    "creatures/rewind_lizard/readability_corrected/rewind_lizard_native_move_f01.png": {
+      "snout": {
+        "x": 15,
+        "y": 41
+      }
+    },
+    "creatures/rewind_lizard/readability_corrected/rewind_lizard_native_prep_f01.png": {
+      "snout": {
+        "x": 15,
+        "y": 47
+      }
+    },
+    "creatures/rewind_lizard/readability_corrected/rewind_lizard_native_attack_f01.png": {
+      "snout": {
+        "x": 15,
+        "y": 45
+      }
+    },
+    "creatures/rewind_lizard/readability_corrected/rewind_lizard_native_attack_f02.png": {
+      "snout": {
+        "x": 15,
+        "y": 47
+      }
+    },
+    "creatures/rewind_lizard/readability_corrected/rewind_lizard_native_hit_recover_f01.png": {
+      "snout": {
+        "x": 15,
+        "y": 40
+      }
+    },
+    "creatures/resonance_goral/readability_corrected/resonance_goral_native_idle_f01.png": {
+      "horn_root": {
+        "x": 69,
+        "y": 55
+      },
+      "forehoof_left": {
+        "x": 85,
+        "y": 182
+      },
+      "forehoof_right": {
+        "x": 117,
+        "y": 182
+      }
+    },
+    "creatures/resonance_goral/readability_corrected/resonance_goral_native_warning_f01.png": {
+      "horn_root": {
+        "x": 68,
+        "y": 55
+      },
+      "forehoof_left": {
+        "x": 84,
+        "y": 182
+      },
+      "forehoof_right": {
+        "x": 117,
+        "y": 182
+      }
+    },
+    "creatures/resonance_goral/readability_corrected/resonance_goral_native_combat_prep_f01.png": {
+      "horn_root": {
+        "x": 63,
+        "y": 94
+      },
+      "forehoof_left": {
+        "x": 81,
+        "y": 182
+      },
+      "forehoof_right": {
+        "x": 116,
+        "y": 182
+      }
+    },
+    "creatures/resonance_goral/readability_corrected/resonance_goral_native_charge_attack_f01.png": {
+      "horn_root": {
+        "x": 63,
+        "y": 99
+      },
+      "forehoof_left": {
+        "x": 81,
+        "y": 182
+      },
+      "forehoof_right": {
+        "x": 116,
+        "y": 182
+      }
+    },
+    "creatures/resonance_goral/readability_corrected/resonance_goral_native_charge_attack_f02.png": {
+      "horn_root": {
+        "x": 63,
+        "y": 103
+      },
+      "forehoof_left": {
+        "x": 81,
+        "y": 182
+      },
+      "forehoof_right": {
+        "x": 116,
+        "y": 182
+      }
+    },
+    "creatures/resonance_goral/readability_corrected/resonance_goral_native_hit_recover_f01.png": {
+      "horn_root": {
+        "x": 63,
+        "y": 62
+      },
+      "forehoof_left": {
+        "x": 81,
+        "y": 182
+      },
+      "forehoof_right": {
+        "x": 116,
+        "y": 182
+      }
+    },
+    "creatures/mineral_spider/readability_corrected/act1_mineral_spider_alert_front_corrected_candidate_104x88.png": {
+      "thread_spawn_a": {
+        "x": 37,
+        "y": 35
+      },
+      "thread_spawn_b": {
+        "x": 52,
+        "y": 35
+      },
+      "thread_spawn_c": {
+        "x": 67,
+        "y": 35
+      }
+    },
+    "creatures/mineral_spider/readability_corrected/act1_mineral_spider_attack_side_corrected_candidate_104x88.png": {
+      "thread_spawn_a": {
+        "x": 37,
+        "y": 35
+      },
+      "thread_spawn_b": {
+        "x": 52,
+        "y": 35
+      },
+      "thread_spawn_c": {
+        "x": 67,
+        "y": 35
+      }
+    },
+    "creatures/mineral_spider/readability_corrected/act1_mineral_spider_deploy_side_corrected_candidate_104x88.png": {
+      "thread_spawn_a": {
+        "x": 37,
+        "y": 35
+      },
+      "thread_spawn_b": {
+        "x": 52,
+        "y": 35
+      },
+      "thread_spawn_c": {
+        "x": 67,
+        "y": 35
+      }
+    },
+    "creatures/mineral_spider/readability_corrected/act1_mineral_spider_idle_front_corrected_candidate_104x88.png": {
+      "thread_spawn_a": {
+        "x": 37,
+        "y": 35
+      },
+      "thread_spawn_b": {
+        "x": 52,
+        "y": 35
+      },
+      "thread_spawn_c": {
+        "x": 67,
+        "y": 35
+      }
+    },
+    "creatures/mineral_spider/readability_corrected/act1_mineral_spider_move_side_corrected_candidate_104x88.png": {
+      "thread_spawn_a": {
+        "x": 37,
+        "y": 35
+      },
+      "thread_spawn_b": {
+        "x": 52,
+        "y": 35
+      },
+      "thread_spawn_c": {
+        "x": 67,
+        "y": 35
+      }
+    },
+    "creatures/mineral_spider/readability_corrected/act1_mineral_spider_retreat_side_corrected_candidate_104x88.png": {
+      "thread_spawn_a": {
+        "x": 37,
+        "y": 35
+      },
+      "thread_spawn_b": {
+        "x": 52,
+        "y": 35
+      },
+      "thread_spawn_c": {
+        "x": 67,
+        "y": 35
+      }
+    },
+    "creatures/mineral_spider/readability_corrected/act1_mineral_spider_stunned_front_corrected_candidate_104x88.png": {
+      "thread_spawn_a": {
+        "x": 37,
+        "y": 35
+      },
+      "thread_spawn_b": {
+        "x": 52,
+        "y": 35
+      },
+      "thread_spawn_c": {
+        "x": 67,
+        "y": 35
+      }
+    }
+  }
+}

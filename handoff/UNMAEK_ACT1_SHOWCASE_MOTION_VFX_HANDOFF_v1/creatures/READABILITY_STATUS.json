@@ -1,0 +1,177 @@
+{
+  "schemaVersion": "1.0",
+  "policy": "Existing body frames and gameplay meaning are preserved. This handoff adds no AI, attack, damage, timing, range, cooldown, hurtbox, collision, or phase pattern.",
+  "counts": {
+    "pressure_swift": 10,
+    "deflect_bat": 20,
+    "rewind_lizard": 20,
+    "mineral_spider": 26,
+    "resonance_goral": 23
+  },
+  "species": {
+    "pressure_swift": {
+      "source": "UNMAEK_COMBAT_MOTION_FRAME_RECOVERY_PILOT_v1",
+      "status": "READABILITY_VERIFIED_1X",
+      "runtimeCandidateFrameCount": 10,
+      "redrawnInThisHandoff": true,
+      "gameplayChanged": false,
+      "nativeReadabilityCorrectedCandidateCount": 4,
+      "nativeCanvas": {
+        "width": 64,
+        "height": 64
+      },
+      "nativeGroundPoint": {
+        "x": 32,
+        "y": 54
+      },
+      "nativeDisplayScale": 1,
+      "visibleMaxDimensionRangePx": [
+        38,
+        38
+      ],
+      "readabilityVerdict": "PASS_NATIVE_CANDIDATE"
+    },
+    "deflect_bat": {
+      "source": "UNMAEK_COMBAT_MOTION_FRAME_RECOVERY_PILOT_v1",
+      "status": "READABILITY_VERIFIED_1X",
+      "runtimeCandidateFrameCount": 20,
+      "redrawnInThisHandoff": true,
+      "gameplayChanged": false,
+      "nativeReadabilityCorrectedCandidateCount": 6,
+      "nativeCanvas": {
+        "width": 80,
+        "height": 72
+      },
+      "nativeGroundPoint": {
+        "x": 40,
+        "y": 62
+      },
+      "nativeDisplayScale": 1,
+      "visibleMaxDimensionRangePx": [
+        56,
+        56
+      ],
+      "readabilityVerdict": "PASS_NATIVE_CANDIDATE"
+    },
+    "rewind_lizard": {
+      "source": "UNMAEK_COMBAT_MOTION_FRAME_RECOVERY_PILOT_v1",
+      "status": "READABILITY_VERIFIED_1X",
+      "runtimeCandidateFrameCount": 20,
+      "redrawnInThisHandoff": true,
+      "gameplayChanged": false,
+      "nativeReadabilityCorrectedCandidateCount": 6,
+      "nativeCanvas": {
+        "width": 88,
+        "height": 64
+      },
+      "nativeGroundPoint": {
+        "x": 44,
+        "y": 56
+      },
+      "nativeDisplayScale": 1,
+      "visibleMaxDimensionRangePx": [
+        60,
+        60
+      ],
+      "readabilityVerdict": "PASS_NATIVE_CANDIDATE"
+    },
+    "mineral_spider": {
+      "source": "UNMAEK_COMBAT_MOTION_FRAME_RECOVERY_PILOT_v1",
+      "status": "READABILITY_VERIFIED_1X",
+      "runtimeCandidateFrameCount": 26,
+      "redrawnInThisHandoff": false,
+      "gameplayChanged": false,
+      "readabilityCorrectedCandidateCount": 7,
+      "readabilityCorrectionSource": "UNMAEK_VISUAL_RECOVERY_RUNTIME_EXPORT_v1",
+      "note": "Seven previously approved 104x88 corrected candidates are included separately; the 26-frame motion pilot remains preserved under readability_verified.",
+      "nativeReadabilityCorrectedCandidateCount": 7,
+      "nativeCanvas": {
+        "width": 104,
+        "height": 88
+      },
+      "nativeGroundPoint": {
+        "x": 52,
+        "y": 72
+      },
+      "nativeDisplayScale": 1,
+      "visibleMaxDimensionRangePx": [
+        69,
+        80
+      ],
+      "readabilityVerdict": "PASS_EXISTING_APPROVED_CORRECTION",
+      "alphaAndEdgeCorrectedInThisHandoff": true
+    },
+    "resonance_goral": {
+      "source": "UNMAEK_COMBAT_MOTION_FRAME_RECOVERY_PILOT_v1",
+      "status": "READABILITY_VERIFIED_1X",
+      "runtimeCandidateFrameCount": 23,
+      "redrawnInThisHandoff": true,
+      "gameplayChanged": false,
+      "nativeReadabilityCorrectedCandidateCount": 6,
+      "nativeCanvas": {
+        "width": 240,
+        "height": 200
+      },
+      "nativeGroundPoint": {
+        "x": 120,
+        "y": 184
+      },
+      "nativeDisplayScale": 1,
+      "visibleMaxDimensionRangePx": [
+        178,
+        178
+      ],
+      "readabilityVerdict": "PASS_NATIVE_CANDIDATE"
+    }
+  },
+  "canonicalAnchorReference": {
+    "deflect_bat": {
+      "mouth_resonance_organ": {
+        "x": 26,
+        "y": 14
+      }
+    },
+    "rewind_lizard": {
+      "snout": {
+        "x": 9,
+        "y": 22
+      },
+      "snout_flip_candidate": {
+        "x": 63,
+        "y": 22
+      }
+    },
+    "mineral_spider": {
+      "thread_spawn_a": {
+        "x": 37,
+        "y": 35
+      },
+      "thread_spawn_b": {
+        "x": 52,
+        "y": 35
+      },
+      "thread_spawn_c": {
+        "x": 67,
+        "y": 35
+      }
+    },
+    "resonance_goral": {
+      "horn_root": {
+        "x": 110,
+        "y": 49
+      },
+      "forehoof_left": {
+        "x": 92,
+        "y": 138
+      },
+      "forehoof_right": {
+        "x": 128,
+        "y": 138
+      }
+    },
+    "pressure_swift": {
+      "note": "No attack anchor; fly/evade cue only."
+    }
+  },
+  "nativeCandidatePolicy": "Only frames that failed the new 1x target-size audit are included under readability_corrected. Existing pilot frames remain separately preserved under readability_verified and are not enlarged or overwritten."
+}

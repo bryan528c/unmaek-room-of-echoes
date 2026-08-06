@@ -1,0 +1,1682 @@
+{
+  "schemaVersion": "1.0",
+  "package": "UNMAEK_ACT1_SHOWCASE_MOTION_VFX_HANDOFF_v1",
+  "pixelPolicy": {
+    "sampling": "nearest-neighbor",
+    "softAntialiasing": false,
+    "motionBlur": false,
+    "nativeScale": 1
+  },
+  "eventPolicy": "No new gameplay event or timing is created. BINDING_REQUIRED means the supplied sources did not expose a verified engine event id.",
+  "effects": [
+    {
+      "effectId": "player_basic_attack_cut_n",
+      "existingGameplaySequence": "player.basic_attack.n",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "dagger_tip",
+      "visualStartRatio": 0.38,
+      "visualContactRatio": 0.6,
+      "visualEndRatio": 0.83,
+      "frameFiles": [
+        "vfx/player_attack/n/player_attack_n_f01.png",
+        "vfx/player_attack/n/player_attack_n_f02.png",
+        "vfx/player_attack/n/player_attack_n_f03.png",
+        "vfx/player_attack/n/player_attack_n_f04.png",
+        "vfx/player_attack/n/player_attack_n_f05.png"
+      ],
+      "frameDurationMsCandidates": [
+        55,
+        55,
+        55,
+        45,
+        45
+      ],
+      "canvas": {
+        "width": 128,
+        "height": 128,
+        "format": "RGBA 8-bit"
+      },
+      "nativeDisplayScale": 1,
+      "offset": {
+        "x": -64,
+        "y": -64
+      },
+      "rotationPolicy": "baked_per_direction",
+      "flipPolicy": "none",
+      "alphaPolicy": "hard pixel alpha; fade frames use stepped alpha only",
+      "blendMode": "additive_candidate",
+      "layerDepth": "player_vfx_above_body_below_ui",
+      "loop": false,
+      "cleanupCondition": "remove on existing sequence/event end or projectile/zone cleanup",
+      "gameplayValuesChanged": 0,
+      "unchangedGameplay": [
+        "damage",
+        "range",
+        "hit timing",
+        "speed",
+        "cooldown",
+        "hurtbox",
+        "collision"
+      ],
+      "notes": "Bind to the existing basic_attack contact timestamp; no range or hit timing change."
+    },
+    {
+      "effectId": "player_basic_attack_cut_ne",
+      "existingGameplaySequence": "player.basic_attack.ne",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "dagger_tip",
+      "visualStartRatio": 0.38,
+      "visualContactRatio": 0.6,
+      "visualEndRatio": 0.83,
+      "frameFiles": [
+        "vfx/player_attack/ne/player_attack_ne_f01.png",
+        "vfx/player_attack/ne/player_attack_ne_f02.png",
+        "vfx/player_attack/ne/player_attack_ne_f03.png",
+        "vfx/player_attack/ne/player_attack_ne_f04.png",
+        "vfx/player_attack/ne/player_attack_ne_f05.png"
+      ],
+      "frameDurationMsCandidates": [
+        55,
+        55,
+        55,
+        45,
+        45
+      ],
+      "canvas": {
+        "width": 128,
+        "height": 128,
+        "format": "RGBA 8-bit"
+      },
+      "nativeDisplayScale": 1,
+      "offset": {
+        "x": -64,
+        "y": -64
+      },
+      "rotationPolicy": "baked_per_direction",
+      "flipPolicy": "none",
+      "alphaPolicy": "hard pixel alpha; fade frames use stepped alpha only",
+      "blendMode": "additive_candidate",
+      "layerDepth": "player_vfx_above_body_below_ui",
+      "loop": false,
+      "cleanupCondition": "remove on existing sequence/event end or projectile/zone cleanup",
+      "gameplayValuesChanged": 0,
+      "unchangedGameplay": [
+        "damage",
+        "range",
+        "hit timing",
+        "speed",
+        "cooldown",
+        "hurtbox",
+        "collision"
+      ],
+      "notes": "Bind to the existing basic_attack contact timestamp; no range or hit timing change."
+    },
+    {
+      "effectId": "player_basic_attack_cut_e",
+      "existingGameplaySequence": "player.basic_attack.e",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "dagger_tip",
+      "visualStartRatio": 0.38,
+      "visualContactRatio": 0.6,
+      "visualEndRatio": 0.83,
+      "frameFiles": [
+        "vfx/player_attack/e/player_attack_e_f01.png",
+        "vfx/player_attack/e/player_attack_e_f02.png",
+        "vfx/player_attack/e/player_attack_e_f03.png",
+        "vfx/player_attack/e/player_attack_e_f04.png",
+        "vfx/player_attack/e/player_attack_e_f05.png"
+      ],
+      "frameDurationMsCandidates": [
+        55,
+        55,
+        55,
+        45,
+        45
+      ],
+      "canvas": {
+        "width": 128,
+        "height": 128,
+        "format": "RGBA 8-bit"
+      },
+      "nativeDisplayScale": 1,
+      "offset": {
+        "x": -64,
+        "y": -64
+      },
+      "rotationPolicy": "baked_per_direction",
+      "flipPolicy": "none",
+      "alphaPolicy": "hard pixel alpha; fade frames use stepped alpha only",
+      "blendMode": "additive_candidate",
+      "layerDepth": "player_vfx_above_body_below_ui",
+      "loop": false,
+      "cleanupCondition": "remove on existing sequence/event end or projectile/zone cleanup",
+      "gameplayValuesChanged": 0,
+      "unchangedGameplay": [
+        "damage",
+        "range",
+        "hit timing",
+        "speed",
+        "cooldown",
+        "hurtbox",
+        "collision"
+      ],
+      "notes": "Bind to the existing basic_attack contact timestamp; no range or hit timing change."
+    },
+    {
+      "effectId": "player_basic_attack_cut_se",
+      "existingGameplaySequence": "player.basic_attack.se",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "dagger_tip",
+      "visualStartRatio": 0.38,
+      "visualContactRatio": 0.6,
+      "visualEndRatio": 0.83,
+      "frameFiles": [
+        "vfx/player_attack/se/player_attack_se_f01.png",
+        "vfx/player_attack/se/player_attack_se_f02.png",
+        "vfx/player_attack/se/player_attack_se_f03.png",
+        "vfx/player_attack/se/player_attack_se_f04.png",
+        "vfx/player_attack/se/player_attack_se_f05.png"
+      ],
+      "frameDurationMsCandidates": [
+        55,
+        55,
+        55,
+        45,
+        45
+      ],
+      "canvas": {
+        "width": 128,
+        "height": 128,
+        "format": "RGBA 8-bit"
+      },
+      "nativeDisplayScale": 1,
+      "offset": {
+        "x": -64,
+        "y": -64
+      },
+      "rotationPolicy": "baked_per_direction",
+      "flipPolicy": "none",
+      "alphaPolicy": "hard pixel alpha; fade frames use stepped alpha only",
+      "blendMode": "additive_candidate",
+      "layerDepth": "player_vfx_above_body_below_ui",
+      "loop": false,
+      "cleanupCondition": "remove on existing sequence/event end or projectile/zone cleanup",
+      "gameplayValuesChanged": 0,
+      "unchangedGameplay": [
+        "damage",
+        "range",
+        "hit timing",
+        "speed",
+        "cooldown",
+        "hurtbox",
+        "collision"
+      ],
+      "notes": "Bind to the existing basic_attack contact timestamp; no range or hit timing change."
+    },
+    {
+      "effectId": "player_basic_attack_cut_s",
+      "existingGameplaySequence": "player.basic_attack.s",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "dagger_tip",
+      "visualStartRatio": 0.38,
+      "visualContactRatio": 0.6,
+      "visualEndRatio": 0.83,
+      "frameFiles": [
+        "vfx/player_attack/s/player_attack_s_f01.png",
+        "vfx/player_attack/s/player_attack_s_f02.png",
+        "vfx/player_attack/s/player_attack_s_f03.png",
+        "vfx/player_attack/s/player_attack_s_f04.png",
+        "vfx/player_attack/s/player_attack_s_f05.png"
+      ],
+      "frameDurationMsCandidates": [
+        55,
+        55,
+        55,
+        45,
+        45
+      ],
+      "canvas": {
+        "width": 128,
+        "height": 128,
+        "format": "RGBA 8-bit"
+      },
+      "nativeDisplayScale": 1,
+      "offset": {
+        "x": -64,
+        "y": -64
+      },
+      "rotationPolicy": "baked_per_direction",
+      "flipPolicy": "none",
+      "alphaPolicy": "hard pixel alpha; fade frames use stepped alpha only",
+      "blendMode": "additive_candidate",
+      "layerDepth": "player_vfx_above_body_below_ui",
+      "loop": false,
+      "cleanupCondition": "remove on existing sequence/event end or projectile/zone cleanup",
+      "gameplayValuesChanged": 0,
+      "unchangedGameplay": [
+        "damage",
+        "range",
+        "hit timing",
+        "speed",
+        "cooldown",
+        "hurtbox",
+        "collision"
+      ],
+      "notes": "Bind to the existing basic_attack contact timestamp; no range or hit timing change."
+    },
+    {
+      "effectId": "player_basic_attack_cut_sw",
+      "existingGameplaySequence": "player.basic_attack.sw",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "dagger_tip",
+      "visualStartRatio": 0.38,
+      "visualContactRatio": 0.6,
+      "visualEndRatio": 0.83,
+      "frameFiles": [
+        "vfx/player_attack/sw/player_attack_sw_f01.png",
+        "vfx/player_attack/sw/player_attack_sw_f02.png",
+        "vfx/player_attack/sw/player_attack_sw_f03.png",
+        "vfx/player_attack/sw/player_attack_sw_f04.png",
+        "vfx/player_attack/sw/player_attack_sw_f05.png"
+      ],
+      "frameDurationMsCandidates": [
+        55,
+        55,
+        55,
+        45,
+        45
+      ],
+      "canvas": {
+        "width": 128,
+        "height": 128,
+        "format": "RGBA 8-bit"
+      },
+      "nativeDisplayScale": 1,
+      "offset": {
+        "x": -64,
+        "y": -64
+      },
+      "rotationPolicy": "baked_per_direction",
+      "flipPolicy": "none",
+      "alphaPolicy": "hard pixel alpha; fade frames use stepped alpha only",
+      "blendMode": "additive_candidate",
+      "layerDepth": "player_vfx_above_body_below_ui",
+      "loop": false,
+      "cleanupCondition": "remove on existing sequence/event end or projectile/zone cleanup",
+      "gameplayValuesChanged": 0,
+      "unchangedGameplay": [
+        "damage",
+        "range",
+        "hit timing",
+        "speed",
+        "cooldown",
+        "hurtbox",
+        "collision"
+      ],
+      "notes": "Bind to the existing basic_attack contact timestamp; no range or hit timing change."
+    },
+    {
+      "effectId": "player_basic_attack_cut_w",
+      "existingGameplaySequence": "player.basic_attack.w",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "dagger_tip",
+      "visualStartRatio": 0.38,
+      "visualContactRatio": 0.6,
+      "visualEndRatio": 0.83,
+      "frameFiles": [
+        "vfx/player_attack/w/player_attack_w_f01.png",
+        "vfx/player_attack/w/player_attack_w_f02.png",
+        "vfx/player_attack/w/player_attack_w_f03.png",
+        "vfx/player_attack/w/player_attack_w_f04.png",
+        "vfx/player_attack/w/player_attack_w_f05.png"
+      ],
+      "frameDurationMsCandidates": [
+        55,
+        55,
+        55,
+        45,
+        45
+      ],
+      "canvas": {
+        "width": 128,
+        "height": 128,
+        "format": "RGBA 8-bit"
+      },
+      "nativeDisplayScale": 1,
+      "offset": {
+        "x": -64,
+        "y": -64
+      },
+      "rotationPolicy": "baked_per_direction",
+      "flipPolicy": "none",
+      "alphaPolicy": "hard pixel alpha; fade frames use stepped alpha only",
+      "blendMode": "additive_candidate",
+      "layerDepth": "player_vfx_above_body_below_ui",
+      "loop": false,
+      "cleanupCondition": "remove on existing sequence/event end or projectile/zone cleanup",
+      "gameplayValuesChanged": 0,
+      "unchangedGameplay": [
+        "damage",
+        "range",
+        "hit timing",
+        "speed",
+        "cooldown",
+        "hurtbox",
+        "collision"
+      ],
+      "notes": "Bind to the existing basic_attack contact timestamp; no range or hit timing change."
+    },
+    {
+      "effectId": "player_basic_attack_cut_nw",
+      "existingGameplaySequence": "player.basic_attack.nw",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "dagger_tip",
+      "visualStartRatio": 0.38,
+      "visualContactRatio": 0.6,
+      "visualEndRatio": 0.83,
+      "frameFiles": [
+        "vfx/player_attack/nw/player_attack_nw_f01.png",
+        "vfx/player_attack/nw/player_attack_nw_f02.png",
+        "vfx/player_attack/nw/player_attack_nw_f03.png",
+        "vfx/player_attack/nw/player_attack_nw_f04.png",
+        "vfx/player_attack/nw/player_attack_nw_f05.png"
+      ],
+      "frameDurationMsCandidates": [
+        55,
+        55,
+        55,
+        45,
+        45
+      ],
+      "canvas": {
+        "width": 128,
+        "height": 128,
+        "format": "RGBA 8-bit"
+      },
+      "nativeDisplayScale": 1,
+      "offset": {
+        "x": -64,
+        "y": -64
+      },
+      "rotationPolicy": "baked_per_direction",
+      "flipPolicy": "none",
+      "alphaPolicy": "hard pixel alpha; fade frames use stepped alpha only",
+      "blendMode": "additive_candidate",
+      "layerDepth": "player_vfx_above_body_below_ui",
+      "loop": false,
+      "cleanupCondition": "remove on existing sequence/event end or projectile/zone cleanup",
+      "gameplayValuesChanged": 0,
+      "unchangedGameplay": [
+        "damage",
+        "range",
+        "hit timing",
+        "speed",
+        "cooldown",
+        "hurtbox",
+        "collision"
+      ],
+      "notes": "Bind to the existing basic_attack contact timestamp; no range or hit timing change."
+    },
+    {
+      "effectId": "player_parry_attempt",
+      "existingGameplaySequence": "player.parry",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "parry_center",
+      "visualStartRatio": 0.0,
+      "visualContactRatio": 0.35,
+      "visualEndRatio": 0.58,
+      "frameFiles": [
+        "vfx/player_parry/attempt/player_parry_attempt_f01.png",
+        "vfx/player_parry/attempt/player_parry_attempt_f02.png",
+        "vfx/player_parry/attempt/player_parry_attempt_f03.png",
+        "vfx/player_parry/attempt/player_parry_attempt_f04.png"
+      ],
+      "frameDurationMsCandidates": [
+        55,
+        55,
+        55,
+        65
+      ],
+      "canvas": {
+        "width": 96,
+        "height": 96,
+        "format": "RGBA 8-bit"
+      },
+      "nativeDisplayScale": 1,
+      "offset": {
+        "x": -48,
+        "y": -48
+      },
+      "rotationPolicy": "0",
+      "flipPolicy": "none",
+      "alphaPolicy": "hard pixel alpha; fade frames use stepped alpha only",
+      "blendMode": "additive_candidate",
+      "layerDepth": "player_vfx_above_body_below_ui",
+      "loop": false,
+      "cleanupCondition": "remove on existing sequence/event end or projectile/zone cleanup",
+      "gameplayValuesChanged": 0,
+      "unchangedGameplay": [
+        "damage",
+        "range",
+        "hit timing",
+        "speed",
+        "cooldown",
+        "hurtbox",
+        "collision"
+      ],
+      "notes": "No verified attempt event id was present in supplied metadata; bind only if the existing runtime exposes it."
+    },
+    {
+      "effectId": "player_parry_active",
+      "existingGameplaySequence": "player.parry",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "parry_center",
+      "visualStartRatio": 0.25,
+      "visualContactRatio": 0.5,
+      "visualEndRatio": 0.7,
+      "frameFiles": [
+        "vfx/player_parry/active/player_parry_active_f01.png",
+        "vfx/player_parry/active/player_parry_active_f02.png",
+        "vfx/player_parry/active/player_parry_active_f03.png",
+        "vfx/player_parry/active/player_parry_active_f04.png"
+      ],
+      "frameDurationMsCandidates": [
+        55,
+        55,
+        55,
+        65
+      ],
+      "canvas": {
+        "width": 96,
+        "height": 96,
+        "format": "RGBA 8-bit"
+      },
+      "nativeDisplayScale": 1,
+      "offset": {
+        "x": -48,
+        "y": -48
+      },
+      "rotationPolicy": "0",
+      "flipPolicy": "none",
+      "alphaPolicy": "hard pixel alpha; fade frames use stepped alpha only",
+      "blendMode": "additive_candidate",
+      "layerDepth": "player_vfx_above_body_below_ui",
+      "loop": false,
+      "cleanupCondition": "remove on existing sequence/event end or projectile/zone cleanup",
+      "gameplayValuesChanged": 0,
+      "unchangedGameplay": [
+        "damage",
+        "range",
+        "hit timing",
+        "speed",
+        "cooldown",
+        "hurtbox",
+        "collision"
+      ],
+      "notes": "No verified active event id was present in supplied metadata; bind only if the existing runtime exposes it."
+    },
+    {
+      "effectId": "player_parry_success",
+      "existingGameplaySequence": "player.parry",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "parry_center",
+      "visualStartRatio": 0.48,
+      "visualContactRatio": 0.58,
+      "visualEndRatio": 0.82,
+      "frameFiles": [
+        "vfx/player_parry/success/player_parry_success_f01.png",
+        "vfx/player_parry/success/player_parry_success_f02.png",
+        "vfx/player_parry/success/player_parry_success_f03.png",
+        "vfx/player_parry/success/player_parry_success_f04.png"
+      ],
+      "frameDurationMsCandidates": [
+        55,
+        55,
+        55,
+        65
+      ],
+      "canvas": {
+        "width": 96,
+        "height": 96,
+        "format": "RGBA 8-bit"
+      },
+      "nativeDisplayScale": 1,
+      "offset": {
+        "x": -48,
+        "y": -48
+      },
+      "rotationPolicy": "0",
+      "flipPolicy": "none",
+      "alphaPolicy": "hard pixel alpha; fade frames use stepped alpha only",
+      "blendMode": "additive_candidate",
+      "layerDepth": "player_vfx_above_body_below_ui",
+      "loop": false,
+      "cleanupCondition": "remove on existing sequence/event end or projectile/zone cleanup",
+      "gameplayValuesChanged": 0,
+      "unchangedGameplay": [
+        "damage",
+        "range",
+        "hit timing",
+        "speed",
+        "cooldown",
+        "hurtbox",
+        "collision"
+      ],
+      "notes": "No verified success event id was present in supplied metadata; bind only if the existing runtime exposes it."
+    },
+    {
+      "effectId": "player_parry_failure",
+      "existingGameplaySequence": "player.parry",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "parry_center",
+      "visualStartRatio": 0.52,
+      "visualContactRatio": 0.7,
+      "visualEndRatio": 0.95,
+      "frameFiles": [
+        "vfx/player_parry/failure/player_parry_failure_f01.png",
+        "vfx/player_parry/failure/player_parry_failure_f02.png",
+        "vfx/player_parry/failure/player_parry_failure_f03.png",
+        "vfx/player_parry/failure/player_parry_failure_f04.png"
+      ],
+      "frameDurationMsCandidates": [
+        55,
+        55,
+        55,
+        65
+      ],
+      "canvas": {
+        "width": 96,
+        "height": 96,
+        "format": "RGBA 8-bit"
+      },
+      "nativeDisplayScale": 1,
+      "offset": {
+        "x": -48,
+        "y": -48
+      },
+      "rotationPolicy": "0",
+      "flipPolicy": "none",
+      "alphaPolicy": "hard pixel alpha; fade frames use stepped alpha only",
+      "blendMode": "additive_candidate",
+      "layerDepth": "player_vfx_above_body_below_ui",
+      "loop": false,
+      "cleanupCondition": "remove on existing sequence/event end or projectile/zone cleanup",
+      "gameplayValuesChanged": 0,
+      "unchangedGameplay": [
+        "damage",
+        "range",
+        "hit timing",
+        "speed",
+        "cooldown",
+        "hurtbox",
+        "collision"
+      ],
+      "notes": "No verified failure event id was present in supplied metadata; bind only if the existing runtime exposes it."
+    },
+    {
+      "effectId": "player_word_collarbone_resonance",
+      "existingGameplaySequence": "player.word_skill",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "collarbone_resonance",
+      "visualStartRatio": 0.28,
+      "visualContactRatio": 0.42,
+      "visualEndRatio": 0.58,
+      "frameFiles": [
+        "vfx/words/common_collarbone/collarbone_resonance_f01.png",
+        "vfx/words/common_collarbone/collarbone_resonance_f02.png",
+        "vfx/words/common_collarbone/collarbone_resonance_f03.png",
+        "vfx/words/common_collarbone/collarbone_resonance_f04.png"
+      ],
+      "frameDurationMsCandidates": [
+        60,
+        60,
+        70,
+        80
+      ],
+      "canvas": {
+        "width": 32,
+        "height": 32,
+        "format": "RGBA 8-bit"
+      },
+      "nativeDisplayScale": 1,
+      "offset": {
+        "x": -16,
+        "y": -16
+      },
+      "rotationPolicy": "0",
+      "flipPolicy": "none",
+      "alphaPolicy": "hard pixel alpha; fade frames use stepped alpha only",
+      "blendMode": "additive_candidate",
+      "layerDepth": "player_vfx_above_body_below_ui",
+      "loop": false,
+      "cleanupCondition": "remove on existing sequence/event end or projectile/zone cleanup",
+      "gameplayValuesChanged": 0,
+      "unchangedGameplay": [
+        "damage",
+        "range",
+        "hit timing",
+        "speed",
+        "cooldown",
+        "hurtbox",
+        "collision"
+      ],
+      "notes": "Shared restrained resonance pulse; the target-designation body pose must start first."
+    },
+    {
+      "effectId": "word_stop",
+      "existingGameplaySequence": "player.word_skill",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "word_target",
+      "visualStartRatio": 0.48,
+      "visualContactRatio": 0.68,
+      "visualEndRatio": 0.92,
+      "frameFiles": [
+        "vfx/words/stop/word_stop_f01.png",
+        "vfx/words/stop/word_stop_f02.png",
+        "vfx/words/stop/word_stop_f03.png",
+        "vfx/words/stop/word_stop_f04.png",
+        "vfx/words/stop/word_stop_f05.png"
+      ],
+      "frameDurationMsCandidates": [
+        70,
+        70,
+        80,
+        90,
+        90
+      ],
+      "canvas": {
+        "width": 128,
+        "height": 128,
+        "format": "RGBA 8-bit"
+      },
+      "nativeDisplayScale": 1,
+      "offset": {
+        "x": -64,
+        "y": -64
+      },
+      "rotationPolicy": "0",
+      "flipPolicy": "none",
+      "alphaPolicy": "hard pixel alpha; fade frames use stepped alpha only",
+      "blendMode": "normal",
+      "layerDepth": "target_vfx_above_world_below_ui",
+      "loop": false,
+      "cleanupCondition": "remove on existing sequence/event end or projectile/zone cleanup",
+      "gameplayValuesChanged": 0,
+      "unchangedGameplay": [
+        "damage",
+        "range",
+        "hit timing",
+        "speed",
+        "cooldown",
+        "hurtbox",
+        "collision"
+      ],
+      "notes": "motion compression and fixed lines; functionality and target conditions remain unchanged.",
+      "displayName": "멎는다"
+    },
+    {
+      "effectId": "word_rewind",
+      "existingGameplaySequence": "player.word_skill",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "word_target",
+      "visualStartRatio": 0.48,
+      "visualContactRatio": 0.68,
+      "visualEndRatio": 0.92,
+      "frameFiles": [
+        "vfx/words/rewind/word_rewind_f01.png",
+        "vfx/words/rewind/word_rewind_f02.png",
+        "vfx/words/rewind/word_rewind_f03.png",
+        "vfx/words/rewind/word_rewind_f04.png",
+        "vfx/words/rewind/word_rewind_f05.png"
+      ],
+      "frameDurationMsCandidates": [
+        70,
+        70,
+        80,
+        90,
+        90
+      ],
+      "canvas": {
+        "width": 128,
+        "height": 128,
+        "format": "RGBA 8-bit"
+      },
+      "nativeDisplayScale": 1,
+      "offset": {
+        "x": -64,
+        "y": -64
+      },
+      "rotationPolicy": "0",
+      "flipPolicy": "none",
+      "alphaPolicy": "hard pixel alpha; fade frames use stepped alpha only",
+      "blendMode": "normal",
+      "layerDepth": "target_vfx_above_world_below_ui",
+      "loop": false,
+      "cleanupCondition": "remove on existing sequence/event end or projectile/zone cleanup",
+      "gameplayValuesChanged": 0,
+      "unchangedGameplay": [
+        "damage",
+        "range",
+        "hit timing",
+        "speed",
+        "cooldown",
+        "hurtbox",
+        "collision"
+      ],
+      "notes": "reverse state echoes, no time portal; functionality and target conditions remain unchanged.",
+      "displayName": "되돌린다"
+    },
+    {
+      "effectId": "word_connect",
+      "existingGameplaySequence": "player.word_skill",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "word_target",
+      "visualStartRatio": 0.48,
+      "visualContactRatio": 0.68,
+      "visualEndRatio": 0.92,
+      "frameFiles": [
+        "vfx/words/connect/word_connect_f01.png",
+        "vfx/words/connect/word_connect_f02.png",
+        "vfx/words/connect/word_connect_f03.png",
+        "vfx/words/connect/word_connect_f04.png",
+        "vfx/words/connect/word_connect_f05.png"
+      ],
+      "frameDurationMsCandidates": [
+        70,
+        70,
+        80,
+        90,
+        90
+      ],
+      "canvas": {
+        "width": 128,
+        "height": 128,
+        "format": "RGBA 8-bit"
+      },
+      "nativeDisplayScale": 1,
+      "offset": {
+        "x": -64,
+        "y": -64
+      },
+      "rotationPolicy": "0",
+      "flipPolicy": "none",
+      "alphaPolicy": "hard pixel alpha; fade frames use stepped alpha only",
+      "blendMode": "normal",
+      "layerDepth": "target_vfx_above_world_below_ui",
+      "loop": false,
+      "cleanupCondition": "remove on existing sequence/event end or projectile/zone cleanup",
+      "gameplayValuesChanged": 0,
+      "unchangedGameplay": [
+        "damage",
+        "range",
+        "hit timing",
+        "speed",
+        "cooldown",
+        "hurtbox",
+        "collision"
+      ],
+      "notes": "thin line between two existing targets only; functionality and target conditions remain unchanged.",
+      "displayName": "잇는다"
+    },
+    {
+      "effectId": "word_push",
+      "existingGameplaySequence": "player.word_skill",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "word_target",
+      "visualStartRatio": 0.48,
+      "visualContactRatio": 0.68,
+      "visualEndRatio": 0.92,
+      "frameFiles": [
+        "vfx/words/push/word_push_f01.png",
+        "vfx/words/push/word_push_f02.png",
+        "vfx/words/push/word_push_f03.png",
+        "vfx/words/push/word_push_f04.png",
+        "vfx/words/push/word_push_f05.png"
+      ],
+      "frameDurationMsCandidates": [
+        70,
+        70,
+        80,
+        90,
+        90
+      ],
+      "canvas": {
+        "width": 128,
+        "height": 128,
+        "format": "RGBA 8-bit"
+      },
+      "nativeDisplayScale": 1,
+      "offset": {
+        "x": -64,
+        "y": -64
+      },
+      "rotationPolicy": "0",
+      "flipPolicy": "none",
+      "alphaPolicy": "hard pixel alpha; fade frames use stepped alpha only",
+      "blendMode": "normal",
+      "layerDepth": "target_vfx_above_world_below_ui",
+      "loop": false,
+      "cleanupCondition": "remove on existing sequence/event end or projectile/zone cleanup",
+      "gameplayValuesChanged": 0,
+      "unchangedGameplay": [
+        "damage",
+        "range",
+        "hit timing",
+        "speed",
+        "cooldown",
+        "hurtbox",
+        "collision"
+      ],
+      "notes": "short directional pressure fan; functionality and target conditions remain unchanged.",
+      "displayName": "밀어낸다"
+    },
+    {
+      "effectId": "word_hold",
+      "existingGameplaySequence": "player.word_skill",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "word_target",
+      "visualStartRatio": 0.48,
+      "visualContactRatio": 0.68,
+      "visualEndRatio": 0.92,
+      "frameFiles": [
+        "vfx/words/hold/word_hold_f01.png",
+        "vfx/words/hold/word_hold_f02.png",
+        "vfx/words/hold/word_hold_f03.png",
+        "vfx/words/hold/word_hold_f04.png",
+        "vfx/words/hold/word_hold_f05.png"
+      ],
+      "frameDurationMsCandidates": [
+        70,
+        70,
+        80,
+        90,
+        90
+      ],
+      "canvas": {
+        "width": 128,
+        "height": 128,
+        "format": "RGBA 8-bit"
+      },
+      "nativeDisplayScale": 1,
+      "offset": {
+        "x": -64,
+        "y": -64
+      },
+      "rotationPolicy": "0",
+      "flipPolicy": "none",
+      "alphaPolicy": "hard pixel alpha; fade frames use stepped alpha only",
+      "blendMode": "normal",
+      "layerDepth": "target_vfx_above_world_below_ui",
+      "loop": false,
+      "cleanupCondition": "remove on existing sequence/event end or projectile/zone cleanup",
+      "gameplayValuesChanged": 0,
+      "unchangedGameplay": [
+        "damage",
+        "range",
+        "hit timing",
+        "speed",
+        "cooldown",
+        "hurtbox",
+        "collision"
+      ],
+      "notes": "fixed points and relation lines, no chains; functionality and target conditions remain unchanged.",
+      "displayName": "붙든다"
+    },
+    {
+      "effectId": "word_flow",
+      "existingGameplaySequence": "player.word_skill",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "word_target",
+      "visualStartRatio": 0.48,
+      "visualContactRatio": 0.68,
+      "visualEndRatio": 0.92,
+      "frameFiles": [
+        "vfx/words/flow/word_flow_f01.png",
+        "vfx/words/flow/word_flow_f02.png",
+        "vfx/words/flow/word_flow_f03.png",
+        "vfx/words/flow/word_flow_f04.png",
+        "vfx/words/flow/word_flow_f05.png"
+      ],
+      "frameDurationMsCandidates": [
+        70,
+        70,
+        80,
+        90,
+        90
+      ],
+      "canvas": {
+        "width": 128,
+        "height": 128,
+        "format": "RGBA 8-bit"
+      },
+      "nativeDisplayScale": 1,
+      "offset": {
+        "x": -64,
+        "y": -64
+      },
+      "rotationPolicy": "0",
+      "flipPolicy": "none",
+      "alphaPolicy": "hard pixel alpha; fade frames use stepped alpha only",
+      "blendMode": "normal",
+      "layerDepth": "target_vfx_above_world_below_ui",
+      "loop": false,
+      "cleanupCondition": "remove on existing sequence/event end or projectile/zone cleanup",
+      "gameplayValuesChanged": 0,
+      "unchangedGameplay": [
+        "damage",
+        "range",
+        "hit timing",
+        "speed",
+        "cooldown",
+        "hurtbox",
+        "collision"
+      ],
+      "notes": "one-direction narrow released flow; functionality and target conditions remain unchanged.",
+      "displayName": "흐르게 한다"
+    },
+    {
+      "effectId": "pressure_swift_evade_pressure",
+      "existingGameplaySequence": "pressure_swift.evade",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "body_center_VISUAL_ONLY",
+      "visualStartRatio": 0.15,
+      "visualContactRatio": 0.48,
+      "visualEndRatio": 0.78,
+      "frameFiles": [
+        "vfx/pressure_swift/evade_pressure/pressure_swift_evade_pressure_f01.png",
+        "vfx/pressure_swift/evade_pressure/pressure_swift_evade_pressure_f02.png",
+        "vfx/pressure_swift/evade_pressure/pressure_swift_evade_pressure_f03.png",
+        "vfx/pressure_swift/evade_pressure/pressure_swift_evade_pressure_f04.png"
+      ],
+      "frameDurationMsCandidates": [
+        60,
+        60,
+        60,
+        60
+      ],
+      "canvas": {
+        "width": 64,
+        "height": 64,
+        "format": "RGBA 8-bit"
+      },
+      "nativeDisplayScale": 1,
+      "offset": {
+        "x": -32,
+        "y": -32
+      },
+      "rotationPolicy": "0",
+      "flipPolicy": "none",
+      "alphaPolicy": "hard pixel alpha; fade frames use stepped alpha only",
+      "blendMode": "normal",
+      "layerDepth": "creature_vfx_below_body",
+      "loop": false,
+      "cleanupCondition": "remove on existing sequence/event end or projectile/zone cleanup",
+      "gameplayValuesChanged": 0,
+      "unchangedGameplay": [
+        "damage",
+        "range",
+        "hit timing",
+        "speed",
+        "cooldown",
+        "hurtbox",
+        "collision"
+      ],
+      "notes": "Evade cue only; no attack or hit event added."
+    },
+    {
+      "effectId": "deflect_bat_prep",
+      "existingGameplaySequence": "deflect_bat.attack",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "mouth_resonance_organ",
+      "visualStartRatio": 0.1,
+      "visualContactRatio": 0.5,
+      "visualEndRatio": 0.85,
+      "frameFiles": [
+        "vfx/deflect_bat/prep/deflect_bat_prep_f01.png",
+        "vfx/deflect_bat/prep/deflect_bat_prep_f02.png",
+        "vfx/deflect_bat/prep/deflect_bat_prep_f03.png"
+      ],
+      "frameDurationMsCandidates": [
+        70,
+        70,
+        70
+      ],
+      "canvas": {
+        "width": 48,
+        "height": 48,
+        "format": "RGBA 8-bit"
+      },
+      "nativeDisplayScale": 1,
+      "offset": {
+        "x": -24,
+        "y": -24
+      },
+      "rotationPolicy": "0",
+      "flipPolicy": "none",
+      "alphaPolicy": "hard pixel alpha; fade frames use stepped alpha only",
+      "blendMode": "normal",
+      "layerDepth": "creature_vfx_above_body",
+      "loop": false,
+      "cleanupCondition": "remove on existing sequence/event end or projectile/zone cleanup",
+      "gameplayValuesChanged": 0,
+      "unchangedGameplay": [
+        "damage",
+        "range",
+        "hit timing",
+        "speed",
+        "cooldown",
+        "hurtbox",
+        "collision"
+      ],
+      "notes": "body direction must read before the sound wave"
+    },
+    {
+      "effectId": "deflect_bat_projectile",
+      "existingGameplaySequence": "deflect_bat.attack",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "mouth_resonance_organ",
+      "visualStartRatio": 0.0,
+      "visualContactRatio": 0.42,
+      "visualEndRatio": 0.9,
+      "frameFiles": [
+        "vfx/deflect_bat/projectile/deflect_bat_projectile_f01.png",
+        "vfx/deflect_bat/projectile/deflect_bat_projectile_f02.png",
+        "vfx/deflect_bat/projectile/deflect_bat_projectile_f03.png",
+        "vfx/deflect_bat/projectile/deflect_bat_projectile_f04.png",
+        "vfx/deflect_bat/projectile/deflect_bat_projectile_f05.png"
+      ],
+      "frameDurationMsCandidates": [
+        70,
+        70,
+        70,
+        70,
+        70
+      ],
+      "canvas": {
+        "width": 80,
+        "height": 64,
+        "format": "RGBA 8-bit"
+      },
+      "nativeDisplayScale": 1,
+      "offset": {
+        "x": -40,
+        "y": -32
+      },
+      "rotationPolicy": "0",
+      "flipPolicy": "none",
+      "alphaPolicy": "hard pixel alpha; fade frames use stepped alpha only",
+      "blendMode": "normal",
+      "layerDepth": "creature_vfx_above_body",
+      "loop": false,
+      "cleanupCondition": "remove on existing sequence/event end or projectile/zone cleanup",
+      "gameplayValuesChanged": 0,
+      "unchangedGameplay": [
+        "damage",
+        "range",
+        "hit timing",
+        "speed",
+        "cooldown",
+        "hurtbox",
+        "collision"
+      ],
+      "notes": "existing projectile speed/size/collision retained"
+    },
+    {
+      "effectId": "deflect_bat_impact",
+      "existingGameplaySequence": "deflect_bat.attack",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "projectile_contact",
+      "visualStartRatio": 0.0,
+      "visualContactRatio": 0.45,
+      "visualEndRatio": 0.9,
+      "frameFiles": [
+        "vfx/deflect_bat/impact/deflect_bat_impact_f01.png",
+        "vfx/deflect_bat/impact/deflect_bat_impact_f02.png",
+        "vfx/deflect_bat/impact/deflect_bat_impact_f03.png"
+      ],
+      "frameDurationMsCandidates": [
+        70,
+        70,
+        70
+      ],
+      "canvas": {
+        "width": 48,
+        "height": 48,
+        "format": "RGBA 8-bit"
+      },
+      "nativeDisplayScale": 1,
+      "offset": {
+        "x": -24,
+        "y": -24
+      },
+      "rotationPolicy": "0",
+      "flipPolicy": "none",
+      "alphaPolicy": "hard pixel alpha; fade frames use stepped alpha only",
+      "blendMode": "normal",
+      "layerDepth": "creature_vfx_above_body",
+      "loop": false,
+      "cleanupCondition": "remove on existing sequence/event end or projectile/zone cleanup",
+      "gameplayValuesChanged": 0,
+      "unchangedGameplay": [
+        "damage",
+        "range",
+        "hit timing",
+        "speed",
+        "cooldown",
+        "hurtbox",
+        "collision"
+      ],
+      "notes": "small pressure ripple; no explosion"
+    },
+    {
+      "effectId": "rewind_lizard_prep",
+      "existingGameplaySequence": "rewind_lizard.attack",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "snout",
+      "visualStartRatio": 0.12,
+      "visualContactRatio": 0.5,
+      "visualEndRatio": 0.78,
+      "frameFiles": [
+        "vfx/rewind_lizard/prep/rewind_lizard_prep_f01.png",
+        "vfx/rewind_lizard/prep/rewind_lizard_prep_f02.png",
+        "vfx/rewind_lizard/prep/rewind_lizard_prep_f03.png"
+      ],
+      "frameDurationMsCandidates": [
+        70,
+        70,
+        70
+      ],
+      "canvas": {
+        "width": 80,
+        "height": 48,
+        "format": "RGBA 8-bit"
+      },
+      "nativeDisplayScale": 1,
+      "offset": {
+        "x": -40,
+        "y": -24
+      },
+      "rotationPolicy": "0",
+      "flipPolicy": "none",
+      "alphaPolicy": "hard pixel alpha; fade frames use stepped alpha only",
+      "blendMode": "normal",
+      "layerDepth": "creature_vfx_below_or_above_body_by_stage",
+      "loop": false,
+      "cleanupCondition": "remove on existing sequence/event end or projectile/zone cleanup",
+      "gameplayValuesChanged": 0,
+      "unchangedGameplay": [
+        "damage",
+        "range",
+        "hit timing",
+        "speed",
+        "cooldown",
+        "hurtbox",
+        "collision"
+      ],
+      "notes": "short scale-state echoes only"
+    },
+    {
+      "effectId": "rewind_lizard_lunge",
+      "existingGameplaySequence": "rewind_lizard.attack",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "snout",
+      "visualStartRatio": 0.0,
+      "visualContactRatio": 0.56,
+      "visualEndRatio": 0.92,
+      "frameFiles": [
+        "vfx/rewind_lizard/lunge/rewind_lizard_lunge_f01.png",
+        "vfx/rewind_lizard/lunge/rewind_lizard_lunge_f02.png",
+        "vfx/rewind_lizard/lunge/rewind_lizard_lunge_f03.png",
+        "vfx/rewind_lizard/lunge/rewind_lizard_lunge_f04.png"
+      ],
+      "frameDurationMsCandidates": [
+        70,
+        70,
+        70,
+        70
+      ],
+      "canvas": {
+        "width": 80,
+        "height": 48,
+        "format": "RGBA 8-bit"
+      },
+      "nativeDisplayScale": 1,
+      "offset": {
+        "x": -40,
+        "y": -24
+      },
+      "rotationPolicy": "0",
+      "flipPolicy": "none",
+      "alphaPolicy": "hard pixel alpha; fade frames use stepped alpha only",
+      "blendMode": "normal",
+      "layerDepth": "creature_vfx_below_or_above_body_by_stage",
+      "loop": false,
+      "cleanupCondition": "remove on existing sequence/event end or projectile/zone cleanup",
+      "gameplayValuesChanged": 0,
+      "unchangedGameplay": [
+        "damage",
+        "range",
+        "hit timing",
+        "speed",
+        "cooldown",
+        "hurtbox",
+        "collision"
+      ],
+      "notes": "low dust supports existing lunge, no light dash"
+    },
+    {
+      "effectId": "rewind_lizard_contact",
+      "existingGameplaySequence": "rewind_lizard.attack",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "snout",
+      "visualStartRatio": 0.0,
+      "visualContactRatio": 0.38,
+      "visualEndRatio": 0.82,
+      "frameFiles": [
+        "vfx/rewind_lizard/contact/rewind_lizard_contact_f01.png",
+        "vfx/rewind_lizard/contact/rewind_lizard_contact_f02.png",
+        "vfx/rewind_lizard/contact/rewind_lizard_contact_f03.png"
+      ],
+      "frameDurationMsCandidates": [
+        70,
+        70,
+        70
+      ],
+      "canvas": {
+        "width": 48,
+        "height": 32,
+        "format": "RGBA 8-bit"
+      },
+      "nativeDisplayScale": 1,
+      "offset": {
+        "x": -24,
+        "y": -16
+      },
+      "rotationPolicy": "0",
+      "flipPolicy": "none",
+      "alphaPolicy": "hard pixel alpha; fade frames use stepped alpha only",
+      "blendMode": "normal",
+      "layerDepth": "creature_vfx_below_or_above_body_by_stage",
+      "loop": false,
+      "cleanupCondition": "remove on existing sequence/event end or projectile/zone cleanup",
+      "gameplayValuesChanged": 0,
+      "unchangedGameplay": [
+        "damage",
+        "range",
+        "hit timing",
+        "speed",
+        "cooldown",
+        "hurtbox",
+        "collision"
+      ],
+      "notes": "bind to existing melee contact timestamp"
+    },
+    {
+      "effectId": "mineral_spider_thread_spawn_marker_approved",
+      "existingGameplaySequence": "mineral_spider.deploy_to_attack",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "thread_spawn_a|b|c",
+      "visualStartRatio": 0.05,
+      "visualContactRatio": 0.3,
+      "visualEndRatio": 0.55,
+      "frameFiles": [
+        "vfx/mineral_spider/thread_spawn_marker_approved.png"
+      ],
+      "frameDurationMsCandidates": [
+        80
+      ],
+      "canvas": {
+        "width": 32,
+        "height": 32,
+        "format": "RGBA 8-bit"
+      },
+      "nativeDisplayScale": 1,
+      "offset": {
+        "x": -16,
+        "y": -16
+      },
+      "rotationPolicy": "0",
+      "flipPolicy": "none",
+      "alphaPolicy": "hard pixel alpha; fade frames use stepped alpha only",
+      "blendMode": "normal",
+      "layerDepth": "creature_vfx_above_body",
+      "loop": false,
+      "cleanupCondition": "remove on existing sequence/event end or projectile/zone cleanup",
+      "gameplayValuesChanged": 0,
+      "unchangedGameplay": [
+        "damage",
+        "range",
+        "hit timing",
+        "speed",
+        "cooldown",
+        "hurtbox",
+        "collision"
+      ],
+      "notes": "Byte-preserved approved marker from the prior recovery pilot."
+    },
+    {
+      "effectId": "mineral_spider_prep",
+      "existingGameplaySequence": "mineral_spider.deploy_to_attack",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "thread_spawn_a|b|c",
+      "visualStartRatio": 0.1,
+      "visualContactRatio": 0.48,
+      "visualEndRatio": 0.75,
+      "frameFiles": [
+        "vfx/mineral_spider/prep/mineral_spider_prep_f01.png",
+        "vfx/mineral_spider/prep/mineral_spider_prep_f02.png",
+        "vfx/mineral_spider/prep/mineral_spider_prep_f03.png"
+      ],
+      "frameDurationMsCandidates": [
+        70,
+        70,
+        70
+      ],
+      "canvas": {
+        "width": 48,
+        "height": 48,
+        "format": "RGBA 8-bit"
+      },
+      "nativeDisplayScale": 1,
+      "offset": {
+        "x": -24,
+        "y": -24
+      },
+      "rotationPolicy": "0",
+      "flipPolicy": "none",
+      "alphaPolicy": "hard pixel alpha; fade frames use stepped alpha only",
+      "blendMode": "normal",
+      "layerDepth": "creature_vfx_above_body",
+      "loop": false,
+      "cleanupCondition": "remove on existing sequence/event end or projectile/zone cleanup",
+      "gameplayValuesChanged": 0,
+      "unchangedGameplay": [
+        "damage",
+        "range",
+        "hit timing",
+        "speed",
+        "cooldown",
+        "hurtbox",
+        "collision"
+      ],
+      "notes": "thread visibly gathers at the spinneret first"
+    },
+    {
+      "effectId": "mineral_spider_projectile",
+      "existingGameplaySequence": "mineral_spider.deploy_to_attack",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "thread_spawn_a|b|c",
+      "visualStartRatio": 0.0,
+      "visualContactRatio": 0.45,
+      "visualEndRatio": 0.92,
+      "frameFiles": [
+        "vfx/mineral_spider/projectile/mineral_spider_projectile_f01.png",
+        "vfx/mineral_spider/projectile/mineral_spider_projectile_f02.png",
+        "vfx/mineral_spider/projectile/mineral_spider_projectile_f03.png",
+        "vfx/mineral_spider/projectile/mineral_spider_projectile_f04.png",
+        "vfx/mineral_spider/projectile/mineral_spider_projectile_f05.png"
+      ],
+      "frameDurationMsCandidates": [
+        70,
+        70,
+        70,
+        70,
+        70
+      ],
+      "canvas": {
+        "width": 80,
+        "height": 64,
+        "format": "RGBA 8-bit"
+      },
+      "nativeDisplayScale": 1,
+      "offset": {
+        "x": -40,
+        "y": -32
+      },
+      "rotationPolicy": "0",
+      "flipPolicy": "none",
+      "alphaPolicy": "hard pixel alpha; fade frames use stepped alpha only",
+      "blendMode": "normal",
+      "layerDepth": "creature_vfx_above_body",
+      "loop": false,
+      "cleanupCondition": "remove on existing sequence/event end or projectile/zone cleanup",
+      "gameplayValuesChanged": 0,
+      "unchangedGameplay": [
+        "damage",
+        "range",
+        "hit timing",
+        "speed",
+        "cooldown",
+        "hurtbox",
+        "collision"
+      ],
+      "notes": "mineral web bundle retains existing projectile behavior"
+    },
+    {
+      "effectId": "mineral_spider_impact",
+      "existingGameplaySequence": "mineral_spider.deploy_to_attack",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "thread_spawn_a|b|c",
+      "visualStartRatio": 0.0,
+      "visualContactRatio": 0.44,
+      "visualEndRatio": 0.86,
+      "frameFiles": [
+        "vfx/mineral_spider/impact/mineral_spider_impact_f01.png",
+        "vfx/mineral_spider/impact/mineral_spider_impact_f02.png",
+        "vfx/mineral_spider/impact/mineral_spider_impact_f03.png",
+        "vfx/mineral_spider/impact/mineral_spider_impact_f04.png"
+      ],
+      "frameDurationMsCandidates": [
+        70,
+        70,
+        70,
+        70
+      ],
+      "canvas": {
+        "width": 80,
+        "height": 80,
+        "format": "RGBA 8-bit"
+      },
+      "nativeDisplayScale": 1,
+      "offset": {
+        "x": -40,
+        "y": -40
+      },
+      "rotationPolicy": "0",
+      "flipPolicy": "none",
+      "alphaPolicy": "hard pixel alpha; fade frames use stepped alpha only",
+      "blendMode": "normal",
+      "layerDepth": "creature_vfx_above_body",
+      "loop": false,
+      "cleanupCondition": "remove on existing sequence/event end or projectile/zone cleanup",
+      "gameplayValuesChanged": 0,
+      "unchangedGameplay": [
+        "damage",
+        "range",
+        "hit timing",
+        "speed",
+        "cooldown",
+        "hurtbox",
+        "collision"
+      ],
+      "notes": "small radial web; no persistent obstacle or new bind"
+    },
+    {
+      "effectId": "resonance_goral_projectile",
+      "existingGameplaySequence": "resonance_goral.projectile",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "forehoof_contact",
+      "visualStartRatio": 0.0,
+      "visualContactRatio": 0.46,
+      "visualEndRatio": 0.94,
+      "frameFiles": [
+        "vfx/resonance_goral/projectile/resonance_goral_projectile_f01.png",
+        "vfx/resonance_goral/projectile/resonance_goral_projectile_f02.png",
+        "vfx/resonance_goral/projectile/resonance_goral_projectile_f03.png",
+        "vfx/resonance_goral/projectile/resonance_goral_projectile_f04.png",
+        "vfx/resonance_goral/projectile/resonance_goral_projectile_f05.png"
+      ],
+      "frameDurationMsCandidates": [
+        70,
+        70,
+        70,
+        70,
+        70
+      ],
+      "canvas": {
+        "width": 80,
+        "height": 48,
+        "format": "RGBA 8-bit"
+      },
+      "nativeDisplayScale": 1,
+      "offset": {
+        "x": -40,
+        "y": -24
+      },
+      "rotationPolicy": "0",
+      "flipPolicy": "none",
+      "alphaPolicy": "hard pixel alpha; fade frames use stepped alpha only",
+      "blendMode": "normal",
+      "layerDepth": "creature_vfx_below_body",
+      "loop": false,
+      "cleanupCondition": "remove on existing sequence/event end or projectile/zone cleanup",
+      "gameplayValuesChanged": 0,
+      "unchangedGameplay": [
+        "damage",
+        "range",
+        "hit timing",
+        "speed",
+        "cooldown",
+        "hurtbox",
+        "collision"
+      ],
+      "notes": "low skipping rock chips; existing projectile behavior retained"
+    },
+    {
+      "effectId": "resonance_goral_charge",
+      "existingGameplaySequence": "resonance_goral.charge",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "forehoof_contact",
+      "visualStartRatio": 0.12,
+      "visualContactRatio": 0.52,
+      "visualEndRatio": 0.9,
+      "frameFiles": [
+        "vfx/resonance_goral/charge/resonance_goral_charge_f01.png",
+        "vfx/resonance_goral/charge/resonance_goral_charge_f02.png",
+        "vfx/resonance_goral/charge/resonance_goral_charge_f03.png",
+        "vfx/resonance_goral/charge/resonance_goral_charge_f04.png"
+      ],
+      "frameDurationMsCandidates": [
+        70,
+        70,
+        70,
+        70
+      ],
+      "canvas": {
+        "width": 96,
+        "height": 64,
+        "format": "RGBA 8-bit"
+      },
+      "nativeDisplayScale": 1,
+      "offset": {
+        "x": -48,
+        "y": -32
+      },
+      "rotationPolicy": "0",
+      "flipPolicy": "none",
+      "alphaPolicy": "hard pixel alpha; fade frames use stepped alpha only",
+      "blendMode": "normal",
+      "layerDepth": "creature_vfx_below_body",
+      "loop": false,
+      "cleanupCondition": "remove on existing sequence/event end or projectile/zone cleanup",
+      "gameplayValuesChanged": 0,
+      "unchangedGameplay": [
+        "damage",
+        "range",
+        "hit timing",
+        "speed",
+        "cooldown",
+        "hurtbox",
+        "collision"
+      ],
+      "notes": "dust and gravel only; charge pattern unchanged"
+    },
+    {
+      "effectId": "resonance_goral_phase3_overlay_approved",
+      "existingGameplaySequence": "resonance_goral.phase3",
+      "gameplayEvent": "BINDING_REQUIRED",
+      "bindingStatus": "BINDING_REQUIRED",
+      "sourceAnchor": "body_canvas_root",
+      "visualStartRatio": 0.0,
+      "visualContactRatio": 0.5,
+      "visualEndRatio": 1.0,
+      "frameFiles": [
+        "vfx/resonance_goral/phase3_overlay_approved.png"
+      ],
+      "frameDurationMsCandidates": [
+        120
+      ],
+      "canvas": {
+        "width": 220,
+        "height": 175,
+        "format": "RGBA 8-bit"
+      },
+      "nativeDisplayScale": 1,
+      "offset": {
+        "x": -110,
+        "y": -87
+      },
+      "rotationPolicy": "0",
+      "flipPolicy": "none",
+      "alphaPolicy": "hard pixel alpha; fade frames use stepped alpha only",
+      "blendMode": "normal",
+      "layerDepth": "creature_phase_overlay_above_body",
+      "loop": true,
+      "cleanupCondition": "remove on existing sequence/event end or projectile/zone cleanup",
+      "gameplayValuesChanged": 0,
+      "unchangedGameplay": [
+        "damage",
+        "range",
+        "hit timing",
+        "speed",
+        "cooldown",
+        "hurtbox",
+        "collision"
+      ],
+      "notes": "Byte-preserved approved phase-3 overlay; no new phase pattern."
+    }
+  ],
+  "gameplayAdditions": 0
+}

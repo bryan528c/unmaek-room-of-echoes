@@ -1,0 +1,208 @@
+{
+  "status": "PASS",
+  "passCount": 2505,
+  "failCount": 0,
+  "player": {
+    "frameCount": 256,
+    "sequenceCounts": {
+      "n": {
+        "idle": 4,
+        "move": 6,
+        "dash": 4,
+        "basic_attack": 5,
+        "parry": 5,
+        "word_skill": 5,
+        "hit_recover": 3
+      },
+      "ne": {
+        "idle": 4,
+        "move": 6,
+        "dash": 4,
+        "basic_attack": 5,
+        "parry": 5,
+        "word_skill": 5,
+        "hit_recover": 3
+      },
+      "e": {
+        "idle": 4,
+        "move": 6,
+        "dash": 4,
+        "basic_attack": 5,
+        "parry": 5,
+        "word_skill": 5,
+        "hit_recover": 3
+      },
+      "se": {
+        "idle": 4,
+        "move": 6,
+        "dash": 4,
+        "basic_attack": 5,
+        "parry": 5,
+        "word_skill": 5,
+        "hit_recover": 3
+      },
+      "s": {
+        "idle": 4,
+        "move": 6,
+        "dash": 4,
+        "basic_attack": 5,
+        "parry": 5,
+        "word_skill": 5,
+        "hit_recover": 3
+      },
+      "sw": {
+        "idle": 4,
+        "move": 6,
+        "dash": 4,
+        "basic_attack": 5,
+        "parry": 5,
+        "word_skill": 5,
+        "hit_recover": 3
+      },
+      "w": {
+        "idle": 4,
+        "move": 6,
+        "dash": 4,
+        "basic_attack": 5,
+        "parry": 5,
+        "word_skill": 5,
+        "hit_recover": 3
+      },
+      "nw": {
+        "idle": 4,
+        "move": 6,
+        "dash": 4,
+        "basic_attack": 5,
+        "parry": 5,
+        "word_skill": 5,
+        "hit_recover": 3
+      }
+    },
+    "paletteColors": 48,
+    "standingHeightRange": [
+      92,
+      96
+    ],
+    "exactDuplicateGroups": 0,
+    "translationOnlyGroups": 0
+  },
+  "creatures": {
+    "verifiedReferenceFrames": 99,
+    "nativeCorrectedFrames": 29,
+    "targets": {
+      "pressure_swift": [
+        30,
+        42
+      ],
+      "deflect_bat": [
+        46,
+        60
+      ],
+      "rewind_lizard": [
+        48,
+        62
+      ],
+      "mineral_spider": [
+        64,
+        80
+      ],
+      "resonance_goral": [
+        155,
+        185
+      ]
+    },
+    "metrics": {
+      "pressure_swift": [
+        38,
+        38
+      ],
+      "deflect_bat": [
+        56,
+        56
+      ],
+      "rewind_lizard": [
+        60,
+        60
+      ],
+      "resonance_goral": [
+        178,
+        178
+      ],
+      "mineral_spider": [
+        69,
+        80
+      ]
+    }
+  },
+  "vfx": {
+    "effectCount": 33,
+    "bindingRequired": 33,
+    "gameplayAdditions": 0
+  },
+  "videos": [
+    {
+      "file": "previews/gameplay_960x540/player_full8_idle_move_960x540.mp4",
+      "duration": 10.0,
+      "width": 960,
+      "height": 540,
+      "fps": "24/1"
+    },
+    {
+      "file": "previews/gameplay_960x540/player_full8_all_actions_960x540.mp4",
+      "duration": 14.0,
+      "width": 960,
+      "height": 540,
+      "fps": "24/1"
+    },
+    {
+      "file": "previews/player_vfx/player_attack_parry_vfx_960x540.mp4",
+      "duration": 9.0,
+      "width": 960,
+      "height": 540,
+      "fps": "24/1"
+    },
+    {
+      "file": "previews/player_vfx/word_vfx_6types_960x540.mp4",
+      "duration": 12.0,
+      "width": 960,
+      "height": 540,
+      "fps": "24/1"
+    },
+    {
+      "file": "previews/creature_vfx/act1_creature_readability_960x540.mp4",
+      "duration": 10.0,
+      "width": 960,
+      "height": 540,
+      "fps": "24/1"
+    },
+    {
+      "file": "previews/creature_vfx/act1_creature_attack_identity_960x540.mp4",
+      "duration": 15.0,
+      "width": 960,
+      "height": 540,
+      "fps": "24/1"
+    },
+    {
+      "file": "previews/gameplay_960x540/act1_showcase_clean_30to60s.mp4",
+      "duration": 38.0,
+      "width": 960,
+      "height": 540,
+      "fps": "24/1"
+    },
+    {
+      "file": "previews/before_after/old64_vs_new_native_before_after.mp4",
+      "duration": 8.0,
+      "width": 960,
+      "height": 540,
+      "fps": "24/1"
+    }
+  ],
+  "ppt": {
+    "slideCount": 15,
+    "emptyPlaceholders": 0,
+    "structuralPlaceholders": 0,
+    "overflow": 0,
+    "templateFidelityIssues": 0
+  },
+  "failures": []
+}

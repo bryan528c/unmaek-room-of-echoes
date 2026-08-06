@@ -1,0 +1,2844 @@
+{
+  "schemaVersion": 1,
+  "package": "UNMAEK_ACT1_SHOWCASE_MOTION_VFX_HANDOFF_v1",
+  "canonicalCanvas": {
+    "width": 128,
+    "height": 128
+  },
+  "groundPoint": {
+    "x": 64,
+    "y": 112
+  },
+  "runtimeScale": 1,
+  "visibleStandingBodyHeightPx": "88-96",
+  "pixelFormat": "RGBA 8-bit",
+  "sampling": "nearest-neighbor",
+  "sharedPaletteColors": 48,
+  "gameplayValuesChanged": 0,
+  "directions": {
+    "n": {
+      "idle": {
+        "frameCount": 4,
+        "frames": [
+          {
+            "file": "player/n/idle/player_n_idle_f01.png",
+            "durationMsCandidate": 180,
+            "anchorsRef": "player/n/idle/player_n_idle_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/n/idle/player_n_idle_f02.png",
+            "durationMsCandidate": 180,
+            "anchorsRef": "player/n/idle/player_n_idle_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/n/idle/player_n_idle_f03.png",
+            "durationMsCandidate": 180,
+            "anchorsRef": "player/n/idle/player_n_idle_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/n/idle/player_n_idle_f04.png",
+            "durationMsCandidate": 180,
+            "anchorsRef": "player/n/idle/player_n_idle_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_n_idle_sheet.png",
+        "loop": true,
+        "groundPointLoopDeltaPx": 0,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "move": {
+        "frameCount": 6,
+        "frames": [
+          {
+            "file": "player/n/move/player_n_move_f01.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/n/move/player_n_move_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/n/move/player_n_move_f02.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/n/move/player_n_move_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/n/move/player_n_move_f03.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/n/move/player_n_move_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/n/move/player_n_move_f04.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/n/move/player_n_move_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/n/move/player_n_move_f05.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/n/move/player_n_move_f05.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/n/move/player_n_move_f06.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/n/move/player_n_move_f06.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_n_move_sheet.png",
+        "loop": true,
+        "groundPointLoopDeltaPx": 0,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "dash": {
+        "frameCount": 4,
+        "frames": [
+          {
+            "file": "player/n/dash/player_n_dash_f01.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/n/dash/player_n_dash_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/n/dash/player_n_dash_f02.png",
+            "durationMsCandidate": 70,
+            "anchorsRef": "player/n/dash/player_n_dash_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/n/dash/player_n_dash_f03.png",
+            "durationMsCandidate": 70,
+            "anchorsRef": "player/n/dash/player_n_dash_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/n/dash/player_n_dash_f04.png",
+            "durationMsCandidate": 120,
+            "anchorsRef": "player/n/dash/player_n_dash_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_n_dash_sheet.png",
+        "loop": false,
+        "groundPointLoopDeltaPx": null,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "basic_attack": {
+        "frameCount": 5,
+        "frames": [
+          {
+            "file": "player/n/basic_attack/player_n_basic_attack_f01.png",
+            "durationMsCandidate": 100,
+            "anchorsRef": "player/n/basic_attack/player_n_basic_attack_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/n/basic_attack/player_n_basic_attack_f02.png",
+            "durationMsCandidate": 80,
+            "anchorsRef": "player/n/basic_attack/player_n_basic_attack_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/n/basic_attack/player_n_basic_attack_f03.png",
+            "durationMsCandidate": 70,
+            "anchorsRef": "player/n/basic_attack/player_n_basic_attack_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/n/basic_attack/player_n_basic_attack_f04.png",
+            "durationMsCandidate": 80,
+            "anchorsRef": "player/n/basic_attack/player_n_basic_attack_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/n/basic_attack/player_n_basic_attack_f05.png",
+            "durationMsCandidate": 140,
+            "anchorsRef": "player/n/basic_attack/player_n_basic_attack_f05.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_n_basic_attack_sheet.png",
+        "loop": false,
+        "groundPointLoopDeltaPx": null,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "parry": {
+        "frameCount": 5,
+        "frames": [
+          {
+            "file": "player/n/parry/player_n_parry_f01.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/n/parry/player_n_parry_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/n/parry/player_n_parry_f02.png",
+            "durationMsCandidate": 80,
+            "anchorsRef": "player/n/parry/player_n_parry_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/n/parry/player_n_parry_f03.png",
+            "durationMsCandidate": 70,
+            "anchorsRef": "player/n/parry/player_n_parry_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/n/parry/player_n_parry_f04.png",
+            "durationMsCandidate": 100,
+            "anchorsRef": "player/n/parry/player_n_parry_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/n/parry/player_n_parry_f05.png",
+            "durationMsCandidate": 140,
+            "anchorsRef": "player/n/parry/player_n_parry_f05.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_n_parry_sheet.png",
+        "loop": false,
+        "groundPointLoopDeltaPx": null,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "word_skill": {
+        "frameCount": 5,
+        "frames": [
+          {
+            "file": "player/n/word_skill/player_n_word_skill_f01.png",
+            "durationMsCandidate": 130,
+            "anchorsRef": "player/n/word_skill/player_n_word_skill_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/n/word_skill/player_n_word_skill_f02.png",
+            "durationMsCandidate": 110,
+            "anchorsRef": "player/n/word_skill/player_n_word_skill_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/n/word_skill/player_n_word_skill_f03.png",
+            "durationMsCandidate": 150,
+            "anchorsRef": "player/n/word_skill/player_n_word_skill_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/n/word_skill/player_n_word_skill_f04.png",
+            "durationMsCandidate": 160,
+            "anchorsRef": "player/n/word_skill/player_n_word_skill_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/n/word_skill/player_n_word_skill_f05.png",
+            "durationMsCandidate": 180,
+            "anchorsRef": "player/n/word_skill/player_n_word_skill_f05.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_n_word_skill_sheet.png",
+        "loop": false,
+        "groundPointLoopDeltaPx": null,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "hit_recover": {
+        "frameCount": 3,
+        "frames": [
+          {
+            "file": "player/n/hit_recover/player_n_hit_recover_f01.png",
+            "durationMsCandidate": 80,
+            "anchorsRef": "player/n/hit_recover/player_n_hit_recover_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/n/hit_recover/player_n_hit_recover_f02.png",
+            "durationMsCandidate": 110,
+            "anchorsRef": "player/n/hit_recover/player_n_hit_recover_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/n/hit_recover/player_n_hit_recover_f03.png",
+            "durationMsCandidate": 160,
+            "anchorsRef": "player/n/hit_recover/player_n_hit_recover_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_n_hit_recover_sheet.png",
+        "loop": false,
+        "groundPointLoopDeltaPx": null,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      }
+    },
+    "ne": {
+      "idle": {
+        "frameCount": 4,
+        "frames": [
+          {
+            "file": "player/ne/idle/player_ne_idle_f01.png",
+            "durationMsCandidate": 180,
+            "anchorsRef": "player/ne/idle/player_ne_idle_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/ne/idle/player_ne_idle_f02.png",
+            "durationMsCandidate": 180,
+            "anchorsRef": "player/ne/idle/player_ne_idle_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/ne/idle/player_ne_idle_f03.png",
+            "durationMsCandidate": 180,
+            "anchorsRef": "player/ne/idle/player_ne_idle_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/ne/idle/player_ne_idle_f04.png",
+            "durationMsCandidate": 180,
+            "anchorsRef": "player/ne/idle/player_ne_idle_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_ne_idle_sheet.png",
+        "loop": true,
+        "groundPointLoopDeltaPx": 0,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "move": {
+        "frameCount": 6,
+        "frames": [
+          {
+            "file": "player/ne/move/player_ne_move_f01.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/ne/move/player_ne_move_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/ne/move/player_ne_move_f02.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/ne/move/player_ne_move_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/ne/move/player_ne_move_f03.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/ne/move/player_ne_move_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/ne/move/player_ne_move_f04.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/ne/move/player_ne_move_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/ne/move/player_ne_move_f05.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/ne/move/player_ne_move_f05.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/ne/move/player_ne_move_f06.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/ne/move/player_ne_move_f06.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_ne_move_sheet.png",
+        "loop": true,
+        "groundPointLoopDeltaPx": 0,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "dash": {
+        "frameCount": 4,
+        "frames": [
+          {
+            "file": "player/ne/dash/player_ne_dash_f01.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/ne/dash/player_ne_dash_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/ne/dash/player_ne_dash_f02.png",
+            "durationMsCandidate": 70,
+            "anchorsRef": "player/ne/dash/player_ne_dash_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/ne/dash/player_ne_dash_f03.png",
+            "durationMsCandidate": 70,
+            "anchorsRef": "player/ne/dash/player_ne_dash_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/ne/dash/player_ne_dash_f04.png",
+            "durationMsCandidate": 120,
+            "anchorsRef": "player/ne/dash/player_ne_dash_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_ne_dash_sheet.png",
+        "loop": false,
+        "groundPointLoopDeltaPx": null,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "basic_attack": {
+        "frameCount": 5,
+        "frames": [
+          {
+            "file": "player/ne/basic_attack/player_ne_basic_attack_f01.png",
+            "durationMsCandidate": 100,
+            "anchorsRef": "player/ne/basic_attack/player_ne_basic_attack_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/ne/basic_attack/player_ne_basic_attack_f02.png",
+            "durationMsCandidate": 80,
+            "anchorsRef": "player/ne/basic_attack/player_ne_basic_attack_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/ne/basic_attack/player_ne_basic_attack_f03.png",
+            "durationMsCandidate": 70,
+            "anchorsRef": "player/ne/basic_attack/player_ne_basic_attack_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/ne/basic_attack/player_ne_basic_attack_f04.png",
+            "durationMsCandidate": 80,
+            "anchorsRef": "player/ne/basic_attack/player_ne_basic_attack_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/ne/basic_attack/player_ne_basic_attack_f05.png",
+            "durationMsCandidate": 140,
+            "anchorsRef": "player/ne/basic_attack/player_ne_basic_attack_f05.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_ne_basic_attack_sheet.png",
+        "loop": false,
+        "groundPointLoopDeltaPx": null,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "parry": {
+        "frameCount": 5,
+        "frames": [
+          {
+            "file": "player/ne/parry/player_ne_parry_f01.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/ne/parry/player_ne_parry_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/ne/parry/player_ne_parry_f02.png",
+            "durationMsCandidate": 80,
+            "anchorsRef": "player/ne/parry/player_ne_parry_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/ne/parry/player_ne_parry_f03.png",
+            "durationMsCandidate": 70,
+            "anchorsRef": "player/ne/parry/player_ne_parry_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/ne/parry/player_ne_parry_f04.png",
+            "durationMsCandidate": 100,
+            "anchorsRef": "player/ne/parry/player_ne_parry_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/ne/parry/player_ne_parry_f05.png",
+            "durationMsCandidate": 140,
+            "anchorsRef": "player/ne/parry/player_ne_parry_f05.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_ne_parry_sheet.png",
+        "loop": false,
+        "groundPointLoopDeltaPx": null,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "word_skill": {
+        "frameCount": 5,
+        "frames": [
+          {
+            "file": "player/ne/word_skill/player_ne_word_skill_f01.png",
+            "durationMsCandidate": 130,
+            "anchorsRef": "player/ne/word_skill/player_ne_word_skill_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/ne/word_skill/player_ne_word_skill_f02.png",
+            "durationMsCandidate": 110,
+            "anchorsRef": "player/ne/word_skill/player_ne_word_skill_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/ne/word_skill/player_ne_word_skill_f03.png",
+            "durationMsCandidate": 150,
+            "anchorsRef": "player/ne/word_skill/player_ne_word_skill_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/ne/word_skill/player_ne_word_skill_f04.png",
+            "durationMsCandidate": 160,
+            "anchorsRef": "player/ne/word_skill/player_ne_word_skill_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/ne/word_skill/player_ne_word_skill_f05.png",
+            "durationMsCandidate": 180,
+            "anchorsRef": "player/ne/word_skill/player_ne_word_skill_f05.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_ne_word_skill_sheet.png",
+        "loop": false,
+        "groundPointLoopDeltaPx": null,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "hit_recover": {
+        "frameCount": 3,
+        "frames": [
+          {
+            "file": "player/ne/hit_recover/player_ne_hit_recover_f01.png",
+            "durationMsCandidate": 80,
+            "anchorsRef": "player/ne/hit_recover/player_ne_hit_recover_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/ne/hit_recover/player_ne_hit_recover_f02.png",
+            "durationMsCandidate": 110,
+            "anchorsRef": "player/ne/hit_recover/player_ne_hit_recover_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/ne/hit_recover/player_ne_hit_recover_f03.png",
+            "durationMsCandidate": 160,
+            "anchorsRef": "player/ne/hit_recover/player_ne_hit_recover_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_ne_hit_recover_sheet.png",
+        "loop": false,
+        "groundPointLoopDeltaPx": null,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      }
+    },
+    "e": {
+      "idle": {
+        "frameCount": 4,
+        "frames": [
+          {
+            "file": "player/e/idle/player_e_idle_f01.png",
+            "durationMsCandidate": 180,
+            "anchorsRef": "player/e/idle/player_e_idle_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/e/idle/player_e_idle_f02.png",
+            "durationMsCandidate": 180,
+            "anchorsRef": "player/e/idle/player_e_idle_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/e/idle/player_e_idle_f03.png",
+            "durationMsCandidate": 180,
+            "anchorsRef": "player/e/idle/player_e_idle_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/e/idle/player_e_idle_f04.png",
+            "durationMsCandidate": 180,
+            "anchorsRef": "player/e/idle/player_e_idle_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_e_idle_sheet.png",
+        "loop": true,
+        "groundPointLoopDeltaPx": 0,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "move": {
+        "frameCount": 6,
+        "frames": [
+          {
+            "file": "player/e/move/player_e_move_f01.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/e/move/player_e_move_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/e/move/player_e_move_f02.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/e/move/player_e_move_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/e/move/player_e_move_f03.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/e/move/player_e_move_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/e/move/player_e_move_f04.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/e/move/player_e_move_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/e/move/player_e_move_f05.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/e/move/player_e_move_f05.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/e/move/player_e_move_f06.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/e/move/player_e_move_f06.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_e_move_sheet.png",
+        "loop": true,
+        "groundPointLoopDeltaPx": 0,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "dash": {
+        "frameCount": 4,
+        "frames": [
+          {
+            "file": "player/e/dash/player_e_dash_f01.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/e/dash/player_e_dash_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/e/dash/player_e_dash_f02.png",
+            "durationMsCandidate": 70,
+            "anchorsRef": "player/e/dash/player_e_dash_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/e/dash/player_e_dash_f03.png",
+            "durationMsCandidate": 70,
+            "anchorsRef": "player/e/dash/player_e_dash_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/e/dash/player_e_dash_f04.png",
+            "durationMsCandidate": 120,
+            "anchorsRef": "player/e/dash/player_e_dash_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_e_dash_sheet.png",
+        "loop": false,
+        "groundPointLoopDeltaPx": null,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "basic_attack": {
+        "frameCount": 5,
+        "frames": [
+          {
+            "file": "player/e/basic_attack/player_e_basic_attack_f01.png",
+            "durationMsCandidate": 100,
+            "anchorsRef": "player/e/basic_attack/player_e_basic_attack_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/e/basic_attack/player_e_basic_attack_f02.png",
+            "durationMsCandidate": 80,
+            "anchorsRef": "player/e/basic_attack/player_e_basic_attack_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/e/basic_attack/player_e_basic_attack_f03.png",
+            "durationMsCandidate": 70,
+            "anchorsRef": "player/e/basic_attack/player_e_basic_attack_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/e/basic_attack/player_e_basic_attack_f04.png",
+            "durationMsCandidate": 80,
+            "anchorsRef": "player/e/basic_attack/player_e_basic_attack_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/e/basic_attack/player_e_basic_attack_f05.png",
+            "durationMsCandidate": 140,
+            "anchorsRef": "player/e/basic_attack/player_e_basic_attack_f05.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_e_basic_attack_sheet.png",
+        "loop": false,
+        "groundPointLoopDeltaPx": null,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "parry": {
+        "frameCount": 5,
+        "frames": [
+          {
+            "file": "player/e/parry/player_e_parry_f01.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/e/parry/player_e_parry_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/e/parry/player_e_parry_f02.png",
+            "durationMsCandidate": 80,
+            "anchorsRef": "player/e/parry/player_e_parry_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/e/parry/player_e_parry_f03.png",
+            "durationMsCandidate": 70,
+            "anchorsRef": "player/e/parry/player_e_parry_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/e/parry/player_e_parry_f04.png",
+            "durationMsCandidate": 100,
+            "anchorsRef": "player/e/parry/player_e_parry_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/e/parry/player_e_parry_f05.png",
+            "durationMsCandidate": 140,
+            "anchorsRef": "player/e/parry/player_e_parry_f05.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_e_parry_sheet.png",
+        "loop": false,
+        "groundPointLoopDeltaPx": null,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "word_skill": {
+        "frameCount": 5,
+        "frames": [
+          {
+            "file": "player/e/word_skill/player_e_word_skill_f01.png",
+            "durationMsCandidate": 130,
+            "anchorsRef": "player/e/word_skill/player_e_word_skill_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/e/word_skill/player_e_word_skill_f02.png",
+            "durationMsCandidate": 110,
+            "anchorsRef": "player/e/word_skill/player_e_word_skill_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/e/word_skill/player_e_word_skill_f03.png",
+            "durationMsCandidate": 150,
+            "anchorsRef": "player/e/word_skill/player_e_word_skill_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/e/word_skill/player_e_word_skill_f04.png",
+            "durationMsCandidate": 160,
+            "anchorsRef": "player/e/word_skill/player_e_word_skill_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/e/word_skill/player_e_word_skill_f05.png",
+            "durationMsCandidate": 180,
+            "anchorsRef": "player/e/word_skill/player_e_word_skill_f05.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_e_word_skill_sheet.png",
+        "loop": false,
+        "groundPointLoopDeltaPx": null,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "hit_recover": {
+        "frameCount": 3,
+        "frames": [
+          {
+            "file": "player/e/hit_recover/player_e_hit_recover_f01.png",
+            "durationMsCandidate": 80,
+            "anchorsRef": "player/e/hit_recover/player_e_hit_recover_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/e/hit_recover/player_e_hit_recover_f02.png",
+            "durationMsCandidate": 110,
+            "anchorsRef": "player/e/hit_recover/player_e_hit_recover_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/e/hit_recover/player_e_hit_recover_f03.png",
+            "durationMsCandidate": 160,
+            "anchorsRef": "player/e/hit_recover/player_e_hit_recover_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_e_hit_recover_sheet.png",
+        "loop": false,
+        "groundPointLoopDeltaPx": null,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      }
+    },
+    "se": {
+      "idle": {
+        "frameCount": 4,
+        "frames": [
+          {
+            "file": "player/se/idle/player_se_idle_f01.png",
+            "durationMsCandidate": 180,
+            "anchorsRef": "player/se/idle/player_se_idle_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/se/idle/player_se_idle_f02.png",
+            "durationMsCandidate": 180,
+            "anchorsRef": "player/se/idle/player_se_idle_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/se/idle/player_se_idle_f03.png",
+            "durationMsCandidate": 180,
+            "anchorsRef": "player/se/idle/player_se_idle_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/se/idle/player_se_idle_f04.png",
+            "durationMsCandidate": 180,
+            "anchorsRef": "player/se/idle/player_se_idle_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_se_idle_sheet.png",
+        "loop": true,
+        "groundPointLoopDeltaPx": 0,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "move": {
+        "frameCount": 6,
+        "frames": [
+          {
+            "file": "player/se/move/player_se_move_f01.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/se/move/player_se_move_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/se/move/player_se_move_f02.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/se/move/player_se_move_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/se/move/player_se_move_f03.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/se/move/player_se_move_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/se/move/player_se_move_f04.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/se/move/player_se_move_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/se/move/player_se_move_f05.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/se/move/player_se_move_f05.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/se/move/player_se_move_f06.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/se/move/player_se_move_f06.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_se_move_sheet.png",
+        "loop": true,
+        "groundPointLoopDeltaPx": 0,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "dash": {
+        "frameCount": 4,
+        "frames": [
+          {
+            "file": "player/se/dash/player_se_dash_f01.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/se/dash/player_se_dash_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/se/dash/player_se_dash_f02.png",
+            "durationMsCandidate": 70,
+            "anchorsRef": "player/se/dash/player_se_dash_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/se/dash/player_se_dash_f03.png",
+            "durationMsCandidate": 70,
+            "anchorsRef": "player/se/dash/player_se_dash_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/se/dash/player_se_dash_f04.png",
+            "durationMsCandidate": 120,
+            "anchorsRef": "player/se/dash/player_se_dash_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_se_dash_sheet.png",
+        "loop": false,
+        "groundPointLoopDeltaPx": null,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "basic_attack": {
+        "frameCount": 5,
+        "frames": [
+          {
+            "file": "player/se/basic_attack/player_se_basic_attack_f01.png",
+            "durationMsCandidate": 100,
+            "anchorsRef": "player/se/basic_attack/player_se_basic_attack_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/se/basic_attack/player_se_basic_attack_f02.png",
+            "durationMsCandidate": 80,
+            "anchorsRef": "player/se/basic_attack/player_se_basic_attack_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/se/basic_attack/player_se_basic_attack_f03.png",
+            "durationMsCandidate": 70,
+            "anchorsRef": "player/se/basic_attack/player_se_basic_attack_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/se/basic_attack/player_se_basic_attack_f04.png",
+            "durationMsCandidate": 80,
+            "anchorsRef": "player/se/basic_attack/player_se_basic_attack_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/se/basic_attack/player_se_basic_attack_f05.png",
+            "durationMsCandidate": 140,
+            "anchorsRef": "player/se/basic_attack/player_se_basic_attack_f05.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_se_basic_attack_sheet.png",
+        "loop": false,
+        "groundPointLoopDeltaPx": null,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "parry": {
+        "frameCount": 5,
+        "frames": [
+          {
+            "file": "player/se/parry/player_se_parry_f01.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/se/parry/player_se_parry_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/se/parry/player_se_parry_f02.png",
+            "durationMsCandidate": 80,
+            "anchorsRef": "player/se/parry/player_se_parry_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/se/parry/player_se_parry_f03.png",
+            "durationMsCandidate": 70,
+            "anchorsRef": "player/se/parry/player_se_parry_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/se/parry/player_se_parry_f04.png",
+            "durationMsCandidate": 100,
+            "anchorsRef": "player/se/parry/player_se_parry_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/se/parry/player_se_parry_f05.png",
+            "durationMsCandidate": 140,
+            "anchorsRef": "player/se/parry/player_se_parry_f05.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_se_parry_sheet.png",
+        "loop": false,
+        "groundPointLoopDeltaPx": null,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "word_skill": {
+        "frameCount": 5,
+        "frames": [
+          {
+            "file": "player/se/word_skill/player_se_word_skill_f01.png",
+            "durationMsCandidate": 130,
+            "anchorsRef": "player/se/word_skill/player_se_word_skill_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/se/word_skill/player_se_word_skill_f02.png",
+            "durationMsCandidate": 110,
+            "anchorsRef": "player/se/word_skill/player_se_word_skill_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/se/word_skill/player_se_word_skill_f03.png",
+            "durationMsCandidate": 150,
+            "anchorsRef": "player/se/word_skill/player_se_word_skill_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/se/word_skill/player_se_word_skill_f04.png",
+            "durationMsCandidate": 160,
+            "anchorsRef": "player/se/word_skill/player_se_word_skill_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/se/word_skill/player_se_word_skill_f05.png",
+            "durationMsCandidate": 180,
+            "anchorsRef": "player/se/word_skill/player_se_word_skill_f05.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_se_word_skill_sheet.png",
+        "loop": false,
+        "groundPointLoopDeltaPx": null,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "hit_recover": {
+        "frameCount": 3,
+        "frames": [
+          {
+            "file": "player/se/hit_recover/player_se_hit_recover_f01.png",
+            "durationMsCandidate": 80,
+            "anchorsRef": "player/se/hit_recover/player_se_hit_recover_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/se/hit_recover/player_se_hit_recover_f02.png",
+            "durationMsCandidate": 110,
+            "anchorsRef": "player/se/hit_recover/player_se_hit_recover_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/se/hit_recover/player_se_hit_recover_f03.png",
+            "durationMsCandidate": 160,
+            "anchorsRef": "player/se/hit_recover/player_se_hit_recover_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_se_hit_recover_sheet.png",
+        "loop": false,
+        "groundPointLoopDeltaPx": null,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      }
+    },
+    "s": {
+      "idle": {
+        "frameCount": 4,
+        "frames": [
+          {
+            "file": "player/s/idle/player_s_idle_f01.png",
+            "durationMsCandidate": 180,
+            "anchorsRef": "player/s/idle/player_s_idle_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/s/idle/player_s_idle_f02.png",
+            "durationMsCandidate": 180,
+            "anchorsRef": "player/s/idle/player_s_idle_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/s/idle/player_s_idle_f03.png",
+            "durationMsCandidate": 180,
+            "anchorsRef": "player/s/idle/player_s_idle_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/s/idle/player_s_idle_f04.png",
+            "durationMsCandidate": 180,
+            "anchorsRef": "player/s/idle/player_s_idle_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_s_idle_sheet.png",
+        "loop": true,
+        "groundPointLoopDeltaPx": 0,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "move": {
+        "frameCount": 6,
+        "frames": [
+          {
+            "file": "player/s/move/player_s_move_f01.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/s/move/player_s_move_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/s/move/player_s_move_f02.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/s/move/player_s_move_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/s/move/player_s_move_f03.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/s/move/player_s_move_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/s/move/player_s_move_f04.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/s/move/player_s_move_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/s/move/player_s_move_f05.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/s/move/player_s_move_f05.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/s/move/player_s_move_f06.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/s/move/player_s_move_f06.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_s_move_sheet.png",
+        "loop": true,
+        "groundPointLoopDeltaPx": 0,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "dash": {
+        "frameCount": 4,
+        "frames": [
+          {
+            "file": "player/s/dash/player_s_dash_f01.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/s/dash/player_s_dash_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/s/dash/player_s_dash_f02.png",
+            "durationMsCandidate": 70,
+            "anchorsRef": "player/s/dash/player_s_dash_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/s/dash/player_s_dash_f03.png",
+            "durationMsCandidate": 70,
+            "anchorsRef": "player/s/dash/player_s_dash_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/s/dash/player_s_dash_f04.png",
+            "durationMsCandidate": 120,
+            "anchorsRef": "player/s/dash/player_s_dash_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_s_dash_sheet.png",
+        "loop": false,
+        "groundPointLoopDeltaPx": null,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "basic_attack": {
+        "frameCount": 5,
+        "frames": [
+          {
+            "file": "player/s/basic_attack/player_s_basic_attack_f01.png",
+            "durationMsCandidate": 100,
+            "anchorsRef": "player/s/basic_attack/player_s_basic_attack_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/s/basic_attack/player_s_basic_attack_f02.png",
+            "durationMsCandidate": 80,
+            "anchorsRef": "player/s/basic_attack/player_s_basic_attack_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/s/basic_attack/player_s_basic_attack_f03.png",
+            "durationMsCandidate": 70,
+            "anchorsRef": "player/s/basic_attack/player_s_basic_attack_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/s/basic_attack/player_s_basic_attack_f04.png",
+            "durationMsCandidate": 80,
+            "anchorsRef": "player/s/basic_attack/player_s_basic_attack_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/s/basic_attack/player_s_basic_attack_f05.png",
+            "durationMsCandidate": 140,
+            "anchorsRef": "player/s/basic_attack/player_s_basic_attack_f05.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_s_basic_attack_sheet.png",
+        "loop": false,
+        "groundPointLoopDeltaPx": null,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "parry": {
+        "frameCount": 5,
+        "frames": [
+          {
+            "file": "player/s/parry/player_s_parry_f01.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/s/parry/player_s_parry_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/s/parry/player_s_parry_f02.png",
+            "durationMsCandidate": 80,
+            "anchorsRef": "player/s/parry/player_s_parry_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/s/parry/player_s_parry_f03.png",
+            "durationMsCandidate": 70,
+            "anchorsRef": "player/s/parry/player_s_parry_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/s/parry/player_s_parry_f04.png",
+            "durationMsCandidate": 100,
+            "anchorsRef": "player/s/parry/player_s_parry_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/s/parry/player_s_parry_f05.png",
+            "durationMsCandidate": 140,
+            "anchorsRef": "player/s/parry/player_s_parry_f05.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_s_parry_sheet.png",
+        "loop": false,
+        "groundPointLoopDeltaPx": null,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "word_skill": {
+        "frameCount": 5,
+        "frames": [
+          {
+            "file": "player/s/word_skill/player_s_word_skill_f01.png",
+            "durationMsCandidate": 130,
+            "anchorsRef": "player/s/word_skill/player_s_word_skill_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/s/word_skill/player_s_word_skill_f02.png",
+            "durationMsCandidate": 110,
+            "anchorsRef": "player/s/word_skill/player_s_word_skill_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/s/word_skill/player_s_word_skill_f03.png",
+            "durationMsCandidate": 150,
+            "anchorsRef": "player/s/word_skill/player_s_word_skill_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/s/word_skill/player_s_word_skill_f04.png",
+            "durationMsCandidate": 160,
+            "anchorsRef": "player/s/word_skill/player_s_word_skill_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/s/word_skill/player_s_word_skill_f05.png",
+            "durationMsCandidate": 180,
+            "anchorsRef": "player/s/word_skill/player_s_word_skill_f05.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_s_word_skill_sheet.png",
+        "loop": false,
+        "groundPointLoopDeltaPx": null,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "hit_recover": {
+        "frameCount": 3,
+        "frames": [
+          {
+            "file": "player/s/hit_recover/player_s_hit_recover_f01.png",
+            "durationMsCandidate": 80,
+            "anchorsRef": "player/s/hit_recover/player_s_hit_recover_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/s/hit_recover/player_s_hit_recover_f02.png",
+            "durationMsCandidate": 110,
+            "anchorsRef": "player/s/hit_recover/player_s_hit_recover_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/s/hit_recover/player_s_hit_recover_f03.png",
+            "durationMsCandidate": 160,
+            "anchorsRef": "player/s/hit_recover/player_s_hit_recover_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_s_hit_recover_sheet.png",
+        "loop": false,
+        "groundPointLoopDeltaPx": null,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      }
+    },
+    "sw": {
+      "idle": {
+        "frameCount": 4,
+        "frames": [
+          {
+            "file": "player/sw/idle/player_sw_idle_f01.png",
+            "durationMsCandidate": 180,
+            "anchorsRef": "player/sw/idle/player_sw_idle_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/sw/idle/player_sw_idle_f02.png",
+            "durationMsCandidate": 180,
+            "anchorsRef": "player/sw/idle/player_sw_idle_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/sw/idle/player_sw_idle_f03.png",
+            "durationMsCandidate": 180,
+            "anchorsRef": "player/sw/idle/player_sw_idle_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/sw/idle/player_sw_idle_f04.png",
+            "durationMsCandidate": 180,
+            "anchorsRef": "player/sw/idle/player_sw_idle_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_sw_idle_sheet.png",
+        "loop": true,
+        "groundPointLoopDeltaPx": 0,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "move": {
+        "frameCount": 6,
+        "frames": [
+          {
+            "file": "player/sw/move/player_sw_move_f01.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/sw/move/player_sw_move_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/sw/move/player_sw_move_f02.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/sw/move/player_sw_move_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/sw/move/player_sw_move_f03.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/sw/move/player_sw_move_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/sw/move/player_sw_move_f04.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/sw/move/player_sw_move_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/sw/move/player_sw_move_f05.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/sw/move/player_sw_move_f05.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/sw/move/player_sw_move_f06.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/sw/move/player_sw_move_f06.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_sw_move_sheet.png",
+        "loop": true,
+        "groundPointLoopDeltaPx": 0,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "dash": {
+        "frameCount": 4,
+        "frames": [
+          {
+            "file": "player/sw/dash/player_sw_dash_f01.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/sw/dash/player_sw_dash_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/sw/dash/player_sw_dash_f02.png",
+            "durationMsCandidate": 70,
+            "anchorsRef": "player/sw/dash/player_sw_dash_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/sw/dash/player_sw_dash_f03.png",
+            "durationMsCandidate": 70,
+            "anchorsRef": "player/sw/dash/player_sw_dash_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/sw/dash/player_sw_dash_f04.png",
+            "durationMsCandidate": 120,
+            "anchorsRef": "player/sw/dash/player_sw_dash_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_sw_dash_sheet.png",
+        "loop": false,
+        "groundPointLoopDeltaPx": null,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "basic_attack": {
+        "frameCount": 5,
+        "frames": [
+          {
+            "file": "player/sw/basic_attack/player_sw_basic_attack_f01.png",
+            "durationMsCandidate": 100,
+            "anchorsRef": "player/sw/basic_attack/player_sw_basic_attack_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/sw/basic_attack/player_sw_basic_attack_f02.png",
+            "durationMsCandidate": 80,
+            "anchorsRef": "player/sw/basic_attack/player_sw_basic_attack_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/sw/basic_attack/player_sw_basic_attack_f03.png",
+            "durationMsCandidate": 70,
+            "anchorsRef": "player/sw/basic_attack/player_sw_basic_attack_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/sw/basic_attack/player_sw_basic_attack_f04.png",
+            "durationMsCandidate": 80,
+            "anchorsRef": "player/sw/basic_attack/player_sw_basic_attack_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/sw/basic_attack/player_sw_basic_attack_f05.png",
+            "durationMsCandidate": 140,
+            "anchorsRef": "player/sw/basic_attack/player_sw_basic_attack_f05.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_sw_basic_attack_sheet.png",
+        "loop": false,
+        "groundPointLoopDeltaPx": null,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "parry": {
+        "frameCount": 5,
+        "frames": [
+          {
+            "file": "player/sw/parry/player_sw_parry_f01.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/sw/parry/player_sw_parry_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/sw/parry/player_sw_parry_f02.png",
+            "durationMsCandidate": 80,
+            "anchorsRef": "player/sw/parry/player_sw_parry_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/sw/parry/player_sw_parry_f03.png",
+            "durationMsCandidate": 70,
+            "anchorsRef": "player/sw/parry/player_sw_parry_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/sw/parry/player_sw_parry_f04.png",
+            "durationMsCandidate": 100,
+            "anchorsRef": "player/sw/parry/player_sw_parry_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/sw/parry/player_sw_parry_f05.png",
+            "durationMsCandidate": 140,
+            "anchorsRef": "player/sw/parry/player_sw_parry_f05.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_sw_parry_sheet.png",
+        "loop": false,
+        "groundPointLoopDeltaPx": null,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "word_skill": {
+        "frameCount": 5,
+        "frames": [
+          {
+            "file": "player/sw/word_skill/player_sw_word_skill_f01.png",
+            "durationMsCandidate": 130,
+            "anchorsRef": "player/sw/word_skill/player_sw_word_skill_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/sw/word_skill/player_sw_word_skill_f02.png",
+            "durationMsCandidate": 110,
+            "anchorsRef": "player/sw/word_skill/player_sw_word_skill_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/sw/word_skill/player_sw_word_skill_f03.png",
+            "durationMsCandidate": 150,
+            "anchorsRef": "player/sw/word_skill/player_sw_word_skill_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/sw/word_skill/player_sw_word_skill_f04.png",
+            "durationMsCandidate": 160,
+            "anchorsRef": "player/sw/word_skill/player_sw_word_skill_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/sw/word_skill/player_sw_word_skill_f05.png",
+            "durationMsCandidate": 180,
+            "anchorsRef": "player/sw/word_skill/player_sw_word_skill_f05.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_sw_word_skill_sheet.png",
+        "loop": false,
+        "groundPointLoopDeltaPx": null,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "hit_recover": {
+        "frameCount": 3,
+        "frames": [
+          {
+            "file": "player/sw/hit_recover/player_sw_hit_recover_f01.png",
+            "durationMsCandidate": 80,
+            "anchorsRef": "player/sw/hit_recover/player_sw_hit_recover_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/sw/hit_recover/player_sw_hit_recover_f02.png",
+            "durationMsCandidate": 110,
+            "anchorsRef": "player/sw/hit_recover/player_sw_hit_recover_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/sw/hit_recover/player_sw_hit_recover_f03.png",
+            "durationMsCandidate": 160,
+            "anchorsRef": "player/sw/hit_recover/player_sw_hit_recover_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_sw_hit_recover_sheet.png",
+        "loop": false,
+        "groundPointLoopDeltaPx": null,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      }
+    },
+    "w": {
+      "idle": {
+        "frameCount": 4,
+        "frames": [
+          {
+            "file": "player/w/idle/player_w_idle_f01.png",
+            "durationMsCandidate": 180,
+            "anchorsRef": "player/w/idle/player_w_idle_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/w/idle/player_w_idle_f02.png",
+            "durationMsCandidate": 180,
+            "anchorsRef": "player/w/idle/player_w_idle_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/w/idle/player_w_idle_f03.png",
+            "durationMsCandidate": 180,
+            "anchorsRef": "player/w/idle/player_w_idle_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/w/idle/player_w_idle_f04.png",
+            "durationMsCandidate": 180,
+            "anchorsRef": "player/w/idle/player_w_idle_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_w_idle_sheet.png",
+        "loop": true,
+        "groundPointLoopDeltaPx": 0,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "move": {
+        "frameCount": 6,
+        "frames": [
+          {
+            "file": "player/w/move/player_w_move_f01.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/w/move/player_w_move_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/w/move/player_w_move_f02.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/w/move/player_w_move_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/w/move/player_w_move_f03.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/w/move/player_w_move_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/w/move/player_w_move_f04.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/w/move/player_w_move_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/w/move/player_w_move_f05.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/w/move/player_w_move_f05.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/w/move/player_w_move_f06.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/w/move/player_w_move_f06.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_w_move_sheet.png",
+        "loop": true,
+        "groundPointLoopDeltaPx": 0,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "dash": {
+        "frameCount": 4,
+        "frames": [
+          {
+            "file": "player/w/dash/player_w_dash_f01.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/w/dash/player_w_dash_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/w/dash/player_w_dash_f02.png",
+            "durationMsCandidate": 70,
+            "anchorsRef": "player/w/dash/player_w_dash_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/w/dash/player_w_dash_f03.png",
+            "durationMsCandidate": 70,
+            "anchorsRef": "player/w/dash/player_w_dash_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/w/dash/player_w_dash_f04.png",
+            "durationMsCandidate": 120,
+            "anchorsRef": "player/w/dash/player_w_dash_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_w_dash_sheet.png",
+        "loop": false,
+        "groundPointLoopDeltaPx": null,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "basic_attack": {
+        "frameCount": 5,
+        "frames": [
+          {
+            "file": "player/w/basic_attack/player_w_basic_attack_f01.png",
+            "durationMsCandidate": 100,
+            "anchorsRef": "player/w/basic_attack/player_w_basic_attack_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/w/basic_attack/player_w_basic_attack_f02.png",
+            "durationMsCandidate": 80,
+            "anchorsRef": "player/w/basic_attack/player_w_basic_attack_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/w/basic_attack/player_w_basic_attack_f03.png",
+            "durationMsCandidate": 70,
+            "anchorsRef": "player/w/basic_attack/player_w_basic_attack_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/w/basic_attack/player_w_basic_attack_f04.png",
+            "durationMsCandidate": 80,
+            "anchorsRef": "player/w/basic_attack/player_w_basic_attack_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/w/basic_attack/player_w_basic_attack_f05.png",
+            "durationMsCandidate": 140,
+            "anchorsRef": "player/w/basic_attack/player_w_basic_attack_f05.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_w_basic_attack_sheet.png",
+        "loop": false,
+        "groundPointLoopDeltaPx": null,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "parry": {
+        "frameCount": 5,
+        "frames": [
+          {
+            "file": "player/w/parry/player_w_parry_f01.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/w/parry/player_w_parry_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/w/parry/player_w_parry_f02.png",
+            "durationMsCandidate": 80,
+            "anchorsRef": "player/w/parry/player_w_parry_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/w/parry/player_w_parry_f03.png",
+            "durationMsCandidate": 70,
+            "anchorsRef": "player/w/parry/player_w_parry_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/w/parry/player_w_parry_f04.png",
+            "durationMsCandidate": 100,
+            "anchorsRef": "player/w/parry/player_w_parry_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/w/parry/player_w_parry_f05.png",
+            "durationMsCandidate": 140,
+            "anchorsRef": "player/w/parry/player_w_parry_f05.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_w_parry_sheet.png",
+        "loop": false,
+        "groundPointLoopDeltaPx": null,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "word_skill": {
+        "frameCount": 5,
+        "frames": [
+          {
+            "file": "player/w/word_skill/player_w_word_skill_f01.png",
+            "durationMsCandidate": 130,
+            "anchorsRef": "player/w/word_skill/player_w_word_skill_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/w/word_skill/player_w_word_skill_f02.png",
+            "durationMsCandidate": 110,
+            "anchorsRef": "player/w/word_skill/player_w_word_skill_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/w/word_skill/player_w_word_skill_f03.png",
+            "durationMsCandidate": 150,
+            "anchorsRef": "player/w/word_skill/player_w_word_skill_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/w/word_skill/player_w_word_skill_f04.png",
+            "durationMsCandidate": 160,
+            "anchorsRef": "player/w/word_skill/player_w_word_skill_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/w/word_skill/player_w_word_skill_f05.png",
+            "durationMsCandidate": 180,
+            "anchorsRef": "player/w/word_skill/player_w_word_skill_f05.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_w_word_skill_sheet.png",
+        "loop": false,
+        "groundPointLoopDeltaPx": null,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "hit_recover": {
+        "frameCount": 3,
+        "frames": [
+          {
+            "file": "player/w/hit_recover/player_w_hit_recover_f01.png",
+            "durationMsCandidate": 80,
+            "anchorsRef": "player/w/hit_recover/player_w_hit_recover_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/w/hit_recover/player_w_hit_recover_f02.png",
+            "durationMsCandidate": 110,
+            "anchorsRef": "player/w/hit_recover/player_w_hit_recover_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/w/hit_recover/player_w_hit_recover_f03.png",
+            "durationMsCandidate": 160,
+            "anchorsRef": "player/w/hit_recover/player_w_hit_recover_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_w_hit_recover_sheet.png",
+        "loop": false,
+        "groundPointLoopDeltaPx": null,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      }
+    },
+    "nw": {
+      "idle": {
+        "frameCount": 4,
+        "frames": [
+          {
+            "file": "player/nw/idle/player_nw_idle_f01.png",
+            "durationMsCandidate": 180,
+            "anchorsRef": "player/nw/idle/player_nw_idle_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/nw/idle/player_nw_idle_f02.png",
+            "durationMsCandidate": 180,
+            "anchorsRef": "player/nw/idle/player_nw_idle_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/nw/idle/player_nw_idle_f03.png",
+            "durationMsCandidate": 180,
+            "anchorsRef": "player/nw/idle/player_nw_idle_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/nw/idle/player_nw_idle_f04.png",
+            "durationMsCandidate": 180,
+            "anchorsRef": "player/nw/idle/player_nw_idle_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_nw_idle_sheet.png",
+        "loop": true,
+        "groundPointLoopDeltaPx": 0,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "move": {
+        "frameCount": 6,
+        "frames": [
+          {
+            "file": "player/nw/move/player_nw_move_f01.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/nw/move/player_nw_move_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/nw/move/player_nw_move_f02.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/nw/move/player_nw_move_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/nw/move/player_nw_move_f03.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/nw/move/player_nw_move_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/nw/move/player_nw_move_f04.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/nw/move/player_nw_move_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/nw/move/player_nw_move_f05.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/nw/move/player_nw_move_f05.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/nw/move/player_nw_move_f06.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/nw/move/player_nw_move_f06.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_nw_move_sheet.png",
+        "loop": true,
+        "groundPointLoopDeltaPx": 0,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "dash": {
+        "frameCount": 4,
+        "frames": [
+          {
+            "file": "player/nw/dash/player_nw_dash_f01.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/nw/dash/player_nw_dash_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/nw/dash/player_nw_dash_f02.png",
+            "durationMsCandidate": 70,
+            "anchorsRef": "player/nw/dash/player_nw_dash_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/nw/dash/player_nw_dash_f03.png",
+            "durationMsCandidate": 70,
+            "anchorsRef": "player/nw/dash/player_nw_dash_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/nw/dash/player_nw_dash_f04.png",
+            "durationMsCandidate": 120,
+            "anchorsRef": "player/nw/dash/player_nw_dash_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_nw_dash_sheet.png",
+        "loop": false,
+        "groundPointLoopDeltaPx": null,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "basic_attack": {
+        "frameCount": 5,
+        "frames": [
+          {
+            "file": "player/nw/basic_attack/player_nw_basic_attack_f01.png",
+            "durationMsCandidate": 100,
+            "anchorsRef": "player/nw/basic_attack/player_nw_basic_attack_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/nw/basic_attack/player_nw_basic_attack_f02.png",
+            "durationMsCandidate": 80,
+            "anchorsRef": "player/nw/basic_attack/player_nw_basic_attack_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/nw/basic_attack/player_nw_basic_attack_f03.png",
+            "durationMsCandidate": 70,
+            "anchorsRef": "player/nw/basic_attack/player_nw_basic_attack_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/nw/basic_attack/player_nw_basic_attack_f04.png",
+            "durationMsCandidate": 80,
+            "anchorsRef": "player/nw/basic_attack/player_nw_basic_attack_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/nw/basic_attack/player_nw_basic_attack_f05.png",
+            "durationMsCandidate": 140,
+            "anchorsRef": "player/nw/basic_attack/player_nw_basic_attack_f05.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_nw_basic_attack_sheet.png",
+        "loop": false,
+        "groundPointLoopDeltaPx": null,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "parry": {
+        "frameCount": 5,
+        "frames": [
+          {
+            "file": "player/nw/parry/player_nw_parry_f01.png",
+            "durationMsCandidate": 90,
+            "anchorsRef": "player/nw/parry/player_nw_parry_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/nw/parry/player_nw_parry_f02.png",
+            "durationMsCandidate": 80,
+            "anchorsRef": "player/nw/parry/player_nw_parry_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/nw/parry/player_nw_parry_f03.png",
+            "durationMsCandidate": 70,
+            "anchorsRef": "player/nw/parry/player_nw_parry_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/nw/parry/player_nw_parry_f04.png",
+            "durationMsCandidate": 100,
+            "anchorsRef": "player/nw/parry/player_nw_parry_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/nw/parry/player_nw_parry_f05.png",
+            "durationMsCandidate": 140,
+            "anchorsRef": "player/nw/parry/player_nw_parry_f05.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_nw_parry_sheet.png",
+        "loop": false,
+        "groundPointLoopDeltaPx": null,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "word_skill": {
+        "frameCount": 5,
+        "frames": [
+          {
+            "file": "player/nw/word_skill/player_nw_word_skill_f01.png",
+            "durationMsCandidate": 130,
+            "anchorsRef": "player/nw/word_skill/player_nw_word_skill_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/nw/word_skill/player_nw_word_skill_f02.png",
+            "durationMsCandidate": 110,
+            "anchorsRef": "player/nw/word_skill/player_nw_word_skill_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/nw/word_skill/player_nw_word_skill_f03.png",
+            "durationMsCandidate": 150,
+            "anchorsRef": "player/nw/word_skill/player_nw_word_skill_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/nw/word_skill/player_nw_word_skill_f04.png",
+            "durationMsCandidate": 160,
+            "anchorsRef": "player/nw/word_skill/player_nw_word_skill_f04.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/nw/word_skill/player_nw_word_skill_f05.png",
+            "durationMsCandidate": 180,
+            "anchorsRef": "player/nw/word_skill/player_nw_word_skill_f05.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_nw_word_skill_sheet.png",
+        "loop": false,
+        "groundPointLoopDeltaPx": null,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      },
+      "hit_recover": {
+        "frameCount": 3,
+        "frames": [
+          {
+            "file": "player/nw/hit_recover/player_nw_hit_recover_f01.png",
+            "durationMsCandidate": 80,
+            "anchorsRef": "player/nw/hit_recover/player_nw_hit_recover_f01.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/nw/hit_recover/player_nw_hit_recover_f02.png",
+            "durationMsCandidate": 110,
+            "anchorsRef": "player/nw/hit_recover/player_nw_hit_recover_f02.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          },
+          {
+            "file": "player/nw/hit_recover/player_nw_hit_recover_f03.png",
+            "durationMsCandidate": 160,
+            "anchorsRef": "player/nw/hit_recover/player_nw_hit_recover_f03.png",
+            "groundPoint": {
+              "x": 64,
+              "y": 112
+            }
+          }
+        ],
+        "sheet": "player/sprite_sheets/player_nw_hit_recover_sheet.png",
+        "loop": false,
+        "groundPointLoopDeltaPx": null,
+        "timingPolicy": "candidate only; bind to existing gameplay state/timestamp"
+      }
+    }
+  }
+}
