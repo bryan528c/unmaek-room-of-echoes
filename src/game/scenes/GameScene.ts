@@ -45,7 +45,7 @@ import { createArchiveArena, createInkArchiveArena } from '../utils/arena';
 import { act1ShowcaseConfig } from '../showcase/Act1ShowcaseConfig';
 import { Act1ShowcaseVfx } from '../showcase/Act1ShowcaseVfx';
 import { Act1FinalVfx } from '../final/Act1FinalVfx';
-import { act1FinalEnabled } from '../final/Act1FinalConfig';
+import { act1FinalCombatTypographyEnabled, act1FinalEnabled } from '../final/Act1FinalConfig';
 import type { ResultStats } from '../../ui/OverlayUI';
 import { SubmissionMapRuntime } from '../runtime/SubmissionMapRuntime';
 import { nearestRuntimeSafeGroundPoint, runtimeGroundPointIsSafe } from '../runtime/RuntimeSafeSpawn';
@@ -999,13 +999,15 @@ export class GameScene extends Phaser.Scene {
         const sourceX = record?.x ?? this.hero.x; const sourceY = record?.y ?? this.hero.y;
         const safe = clampPointToBounds(sourceX, sourceY, COMBAT_BOUNDS, 56); const x = safe.x; const y = safe.y;
         const telegraph = this.add.circle(x, y - 6, 52, 0x76284f, .16).setStrokeStyle(4, 0xf08a75, .92).setDepth(DEPTH.telegraph);
-        const glyph = this.add.text(x, y - 8, '削\n0.9', { align: 'center', fontFamily: 'serif', fontSize: '18px', color: '#f2b0c5', stroke: '#32111e', strokeThickness: 5 }).setOrigin(.5).setDepth(DEPTH.telegraph);
-        this.transientCombatObjects.add(telegraph); this.transientCombatObjects.add(glyph);
-        this.tweens.add({ targets: [telegraph, glyph], scaleX: 1.18, scaleY: 1.18, duration: 850 });
-        this.runDelayedCall(300, () => { if (glyph.active) glyph.setText('削\n0.6'); });
-        this.runDelayedCall(600, () => { if (glyph.active) glyph.setText('削\n0.3'); telegraph.setAlpha(.28); });
+        const glyph = this.combatWorldTextEnabled()
+          ? this.add.text(x, y - 8, '削\n0.9', { align: 'center', fontFamily: 'serif', fontSize: '18px', color: '#f2b0c5', stroke: '#32111e', strokeThickness: 5 }).setOrigin(.5).setDepth(DEPTH.telegraph)
+          : undefined;
+        this.transientCombatObjects.add(telegraph); if (glyph) this.transientCombatObjects.add(glyph);
+        this.tweens.add({ targets: glyph ? [telegraph, glyph] : telegraph, scaleX: 1.18, scaleY: 1.18, duration: 850 });
+        this.runDelayedCall(300, () => { if (glyph?.active) glyph.setText('削\n0.6'); });
+        this.runDelayedCall(600, () => { if (glyph?.active) glyph.setText('削\n0.3'); telegraph.setAlpha(.28); });
         this.runDelayedCall(900, () => {
-          telegraph.destroy(); glyph.destroy(); this.transientCombatObjects.delete(telegraph); this.transientCombatObjects.delete(glyph);
+          telegraph.destroy(); glyph?.destroy(); this.transientCombatObjects.delete(telegraph); if (glyph) this.transientCombatObjects.delete(glyph);
           this.createInkZone(x, y, 52, 1500, 'erasure', 10 * mixedProfile.damageMultiplier, '과거 교정', '과거 교정');
           this.runDelayedCall(3600 / mixedProfile.frequencyMultiplier, schedulePastStrike);
         });
@@ -1121,7 +1123,9 @@ export class GameScene extends Phaser.Scene {
     const counterActive = this.cutPerfectCounterActive;
     const profile = { ...BALANCE.hero.cut, range: BALANCE.hero.cut.range * (counterActive ? perfectCounter.rangeMultiplier : 1) };
     if (this.showcaseVfx?.enabled) {
-      this.showcaseVfx.heroCut(this.hero.motionVisualAnchor('dagger_tip') ?? { x: attack.originX, y: attack.originY }, attack.angle);
+      const anchor = this.hero.motionVisualAnchor('dagger_tip') ?? { x: attack.originX, y: attack.originY };
+      if (this.showcaseVfx instanceof Act1FinalVfx) this.showcaseVfx.heroCut(anchor, attack.angle, this.hero);
+      else this.showcaseVfx.heroCut(anchor, attack.angle);
     } else {
       const slash = this.add.graphics().setDepth(DEPTH.melee);
       const motionReadability = this.hero.motionPilotActive;
@@ -1342,7 +1346,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private resolveStoppedFinisher(target: Enemy, angle: number): void {
-    target.consumeStopped(this.time.now); this.showWordTypography('정지 파열', target.x, target.y - 56); this.runeBurst(target.x, target.y - 8, 16);
+    target.consumeStopped(this.time.now); this.showCombatWordTypography('정지 파열', target.x, target.y - 56); this.runeBurst(target.x, target.y - 8, 16);
     for (const enemy of [...this.enemies]) {
       if (enemy === target || !enemy.active || enemy.removing || distanceSq(target.x, target.y, enemy.x, enemy.y) > BALANCE.hero.finisher.stoppedBurstRadius ** 2) continue;
       this.damageEnemy(enemy, BALANCE.hero.finisher.stoppedBurstDamage, angle, false, true, undefined, 'stop');
@@ -1354,7 +1358,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private resolveLinkedFinisher(target: Enemy, angle: number): void {
-    this.showWordTypography('연결 폭발', target.x, target.y - 56);
+    this.showCombatWordTypography('연결 폭발', target.x, target.y - 56);
     const counterStacks = this.time.now <= Number(target.getData('counterMarkedUntil') ?? 0) ? this.upgrades.getStack('linked-counter') : 0;
     const amount = BALANCE.hero.finisher.damage * (BALANCE.hero.finisher.linkedReactionRatio + counterStacks * 0.18);
     for (const linked of [...this.linkedTargets]) {
@@ -1364,7 +1368,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private resolveEchoFinisher(target: Enemy, angle: number, dealt: number): void {
-    this.echoFinisherUntil = 0; target.echoUntil = 0; this.showWordTypography('잔향 재현', target.x, target.y - 56);
+    this.echoFinisherUntil = 0; target.echoUntil = 0; this.showCombatWordTypography('잔향 재현', target.x, target.y - 56);
     this.runDelayedCall(150, () => {
       if (!target.active || target.removing) return;
       const echo = this.add.image(target.x - Math.cos(angle) * 34, target.y, 'hero-attack').setOrigin(0.5, 1).setScale(SUBMISSION_HERO_PRESENTATION_SCALE).setFlipX(Math.cos(angle) < 0).setTint(0x55c7e6).setAlpha(0.52).setDepth(DEPTH.rewind);
@@ -1419,6 +1423,7 @@ export class GameScene extends Phaser.Scene {
     const lockedTarget = this.comboTarget;
     if (strikes === 3) this.currentComboDamage = 0;
     const started = this.hero.startCombo(directionX, directionY, strikes, (attack) => style === 'finisher' ? this.resolveFinisher(attack) : style === 'cut' ? this.resolveCut(attack) : this.resolveAttack(attack), (cancelled) => {
+      if (style === 'cut' && this.showcaseVfx instanceof Act1FinalVfx) this.showcaseVfx.endHeroCut(cancelled ? 'ACTION_CANCEL' : 'ACTION_END');
       if (!cancelled && strikes === 3) { this.combatStats.comboFinish(); this.combatStats.comboDamage(this.currentComboDamage); }
       if (this.comboTarget && this.comboLock.targetId && this.comboTarget.id !== this.comboLock.targetId) this.combatStats.comboTargetChanged();
       this.comboTarget = undefined;
@@ -1431,6 +1436,9 @@ export class GameScene extends Phaser.Scene {
       } else { this.currentTarget = undefined; this.targetMarkerUntil = 0; }
     }, lungeDistance, style);
     if (started) {
+      if (style === 'cut' && this.showcaseVfx instanceof Act1FinalVfx) {
+        this.showcaseVfx.beginHeroCut(this.hero, Math.atan2(directionY, directionX), BALANCE.hero.cut.hitDelay, BALANCE.hero.cut.recovery);
+      }
       this.comboLock.begin(lockedTarget?.id, { x: directionX, y: directionY });
       if (strikes === 3) this.combatStats.comboStarted();
       this.markTutorial(style === 'finisher' ? 'finisher' : 'attack');
@@ -1719,7 +1727,7 @@ export class GameScene extends Phaser.Scene {
     const { enhanced, overchargeMultiplier, overchargeDurationBonus } = cast;
     this.stopReadyAt = this.time.now + this.wordCooldown(BALANCE.words.stopCooldown);
     this.wordUses['멎는다'] = (this.wordUses['멎는다'] ?? 0) + 1; this.markTutorial('stop');
-    this.hero.castPose(); this.services.audio.play('stop'); this.showWordTypography('멎는다', x, y);
+    this.hero.castPose(); this.services.audio.play('stop'); this.showCombatWordTypography('멎는다', x, y);
     const circle = this.showcaseVfx?.enabled ? undefined : this.add.circle(x, y, BALANCE.words.stopRadius, 0x55c4b1, 0.08).setStrokeStyle(3, 0x76d8c7, 0.74).setDepth(DEPTH.telegraph).setScale(0.2);
     if (circle) this.tweens.add({ targets: circle, scale: 1, duration: 180 });
     this.runDelayedCall(180, () => {
@@ -1787,7 +1795,7 @@ export class GameScene extends Phaser.Scene {
     const before = { x: this.hero.x, y: this.hero.y, health: this.hero.health };
     const targetState = records[0];
     this.hero.cancelAttackRecovery();
-    this.services.audio.play('rewind'); this.showWordTypography('되돌린다', this.hero.x, this.hero.y - 48); this.hero.rewinding = true; this.hero.invulnerableUntil = this.time.now + 900;
+    this.services.audio.play('rewind'); this.showCombatWordTypography('되돌린다', this.hero.x, this.hero.y - 48); this.hero.rewinding = true; this.hero.invulnerableUntil = this.time.now + 900;
     if (targetState && !this.showcaseVfx?.enabled) {
       const marker = this.add.image(targetState.x, targetState.y, 'hero-idle').setOrigin(0.5, 1).setScale(SUBMISSION_HERO_PRESENTATION_SCALE).setFlipX(Math.cos(targetState.facing) < 0).setTint(0x68cbe5).setAlpha(0.42).setDepth(DEPTH.rewind);
       this.tweens.add({ targets: marker, alpha: 0, scaleX: 0.44, scaleY: 0.44, duration: 520, onComplete: () => marker.destroy() });
@@ -1944,7 +1952,7 @@ export class GameScene extends Phaser.Scene {
     if (!this.canCast(this.linkReadyAt)) return false;
     const cast = this.beginWordCast(); const { enhanced, overchargeMultiplier, overchargeDurationBonus } = cast;
     this.linkReadyAt = this.time.now + this.wordCooldown(BALANCE.words.linkCooldown); this.wordUses['잇는다'] = (this.wordUses['잇는다'] ?? 0) + 1; this.markTutorial('link');
-    this.services.audio.play('link'); this.hero.castPose(); this.showWordTypography('잇는다', x, y);
+    this.services.audio.play('link'); this.hero.castPose(); this.showCombatWordTypography('잇는다', x, y);
     if (this.showcaseVfx?.enabled) {
       const origin = this.hero.motionVisualAnchor('word_target') ?? { x: this.hero.x, y: this.hero.y - 18 };
       this.showcaseVfx.wordLink(origin, selected.map((enemy) => enemy.groundPoint));
@@ -1962,8 +1970,10 @@ export class GameScene extends Phaser.Scene {
     selected.forEach((enemy) => {
       enemy.linked = true; enemy.linkedUntil = expires; enemy.setData('linkContagionGeneration', 0); this.linkedTargets.add(enemy);
       this.applyWordStatus(enemy, selected.length === 1 ? 'ISOLATED' : 'LINKED', 'link', expires - this.time.now);
-      const marker = this.add.text(enemy.x, enemy.y - (enemy.kind === 'boss' ? 78 : 48), selected.length === 1 ? '孤' : '連', { fontFamily: 'Malgun Gothic, serif', fontSize: enemy.kind === 'boss' ? '19px' : '15px', color: '#a1f3df', stroke: '#09201d', strokeThickness: 4 }).setOrigin(0.5).setDepth(DEPTH.word);
-      this.linkMarkers.set(enemy, marker);
+      if (this.combatWorldTextEnabled()) {
+        const marker = this.add.text(enemy.x, enemy.y - (enemy.kind === 'boss' ? 78 : 48), selected.length === 1 ? '孤' : '連', { fontFamily: 'Malgun Gothic, serif', fontSize: enemy.kind === 'boss' ? '19px' : '15px', color: '#a1f3df', stroke: '#09201d', strokeThickness: 4 }).setOrigin(0.5).setDepth(DEPTH.word);
+        this.linkMarkers.set(enemy, marker);
+      }
       if (!this.showcaseVfx?.enabled) {
         const preview = this.add.circle(enemy.x, enemy.y - 8, enemy.kind === 'boss' ? 34 : 23, 0x58c9b6, 0.04).setStrokeStyle(2, 0xa3f5e4, 0.72).setDepth(DEPTH.word).setScale(0.72);
         this.tweens.add({ targets: preview, scale: 1.18, alpha: 0, duration: 190, onComplete: () => preview.destroy() });
@@ -1991,7 +2001,7 @@ export class GameScene extends Phaser.Scene {
     const targets = [...this.enemies].filter((enemy) => enemy.active && !enemy.removing && this.skillAreaHitsEnemy(center.x, center.y, radius, enemy));
     const projectiles = [...this.projectiles].filter((projectile) => projectile.active && projectile.enemyOwned && this.skillAreaHitsProjectile(center.x, center.y, radius, projectile));
     if (targets.length === 0 && projectiles.length === 0) { this.combatStats.invalidWord('pull'); this.setReadyAtForWord('pull', this.time.now); this.completeEmpoweredWord('pull', cast, false, {}, 'no-target'); return true; }
-    this.setReadyAtForWord('pull', this.time.now + this.wordCooldown(definition.cooldown)); this.wordUses['당긴다'] = (this.wordUses['당긴다'] ?? 0) + 1; this.markTutorial('pull'); this.hero.castPose(); this.services.audio.play('link'); this.showWordTypography('당긴다', center.x, center.y);
+    this.setReadyAtForWord('pull', this.time.now + this.wordCooldown(definition.cooldown)); this.wordUses['당긴다'] = (this.wordUses['당긴다'] ?? 0) + 1; this.markTutorial('pull'); this.hero.castPose(); this.services.audio.play('link'); this.showCombatWordTypography('당긴다', center.x, center.y);
     if (this.showcaseVfx instanceof Act1FinalVfx) this.showcaseVfx.wordPull(center);
     if (!(this.showcaseVfx instanceof Act1FinalVfx)) { const spiral = this.add.circle(center.x, center.y, radius, 0x4aa897, .05).setStrokeStyle(4, 0x8be5d4, .72).setDepth(DEPTH.word).setScale(1.15); this.tweens.add({ targets: spiral, scale: .2, alpha: 0, duration: 430, onComplete: () => spiral.destroy() }); }
     let damage = 0;
@@ -2022,8 +2032,15 @@ export class GameScene extends Phaser.Scene {
     if (targets.length === 0) { this.combatStats.invalidWord('mark'); this.noteEmpoweredWordFailure('mark', 'no-target'); return true; }
     const cast = this.beginWordCast(); const selected = targets.slice(0, cast.enhanced ? 3 : 1); this.setReadyAtForWord('mark', this.time.now + this.wordCooldown(definition.cooldown)); this.wordUses['새긴다'] = (this.wordUses['새긴다'] ?? 0) + 1; this.markTutorial('mark'); this.hero.castPose(); this.services.audio.play('stop');
     if (this.showcaseVfx instanceof Act1FinalVfx) this.showcaseVfx.wordMark(this.hero.motionVisualAnchor('word_target') ?? this.hero.groundPoint);
-    let damage = 0; for (const enemy of selected) { damage += this.damageEnemy(enemy, definition.baseDamage * cast.overchargeMultiplier, Phaser.Math.Angle.Between(this.hero.x, this.hero.y, enemy.x, enemy.y), false, false, 'word', 'word', 'word', { handler: `word:mark:${enemy.id}`, baseSource: 'word', skillId: 'mark' }); this.applyWordStatus(enemy, 'MARKED', 'mark', cast.enhanced ? 7500 : 6000); const seal = this.add.text(enemy.x, enemy.y - 56, '刻', { fontFamily: 'serif', fontSize: '22px', color: '#a8f4df', stroke: '#32152d', strokeThickness: 5 }).setOrigin(.5).setDepth(DEPTH.word); this.tweens.add({ targets: seal, scale: 1.35, alpha: .5, duration: 320, yoyo: true, onComplete: () => this.runDelayedCall(700, () => seal.destroy()) }); }
-    this.showWordTypography('새긴다', selected[0]!.x, selected[0]!.y - 70); this.combatStats.agencyDamage('mark', damage); this.gainWordHitSentence(BALANCE.sentence.wordHitGain); const chain = this.registerWordUse('mark', { successful: true, relevantTargetCount: selected.length }); if (chain) this.applyWordReaction(chain, selected); this.completeEmpoweredWord('mark', cast, true, { damage, affectedTargets: selected.length }, 'no-target'); return true;
+    let damage = 0; for (const enemy of selected) {
+      damage += this.damageEnemy(enemy, definition.baseDamage * cast.overchargeMultiplier, Phaser.Math.Angle.Between(this.hero.x, this.hero.y, enemy.x, enemy.y), false, false, 'word', 'word', 'word', { handler: `word:mark:${enemy.id}`, baseSource: 'word', skillId: 'mark' });
+      this.applyWordStatus(enemy, 'MARKED', 'mark', cast.enhanced ? 7500 : 6000);
+      if (this.combatWorldTextEnabled()) {
+        const seal = this.add.text(enemy.x, enemy.y - 56, '刻', { fontFamily: 'serif', fontSize: '22px', color: '#a8f4df', stroke: '#32152d', strokeThickness: 5 }).setOrigin(.5).setDepth(DEPTH.word);
+        this.tweens.add({ targets: seal, scale: 1.35, alpha: .5, duration: 320, yoyo: true, onComplete: () => this.runDelayedCall(700, () => seal.destroy()) });
+      }
+    }
+    this.showCombatWordTypography('새긴다', selected[0]!.x, selected[0]!.y - 70); this.combatStats.agencyDamage('mark', damage); this.gainWordHitSentence(BALANCE.sentence.wordHitGain); const chain = this.registerWordUse('mark', { successful: true, relevantTargetCount: selected.length }); if (chain) this.applyWordReaction(chain, selected); this.completeEmpoweredWord('mark', cast, true, { damage, affectedTargets: selected.length }, 'no-target'); return true;
   }
 
   private castPush(directionX: number, directionY: number): boolean {
@@ -2032,7 +2049,7 @@ export class GameScene extends Phaser.Scene {
     const targets = [...this.enemies].filter((enemy) => enemy.active && !enemy.removing && sectorHitsEllipse({ x: this.hero.x, y: this.hero.y, angle, range, halfAngle }, enemy.hurtbox));
     const projectiles = [...this.projectiles].filter((projectile) => projectile.active && projectile.enemyOwned && Phaser.Math.Distance.Between(this.hero.x, this.hero.y, projectile.x, projectile.y) <= range);
     if (targets.length === 0 && projectiles.length === 0) { this.combatStats.invalidWord('push'); this.completeEmpoweredWord('push', cast, false, {}, 'no-target'); return true; }
-    this.setReadyAtForWord('push', this.time.now + this.wordCooldown(definition.cooldown)); this.wordUses['밀어낸다'] = (this.wordUses['밀어낸다'] ?? 0) + 1; this.markTutorial('push'); this.hero.castPose(); this.services.audio.play('parry'); this.showWordTypography('밀어낸다', this.hero.x + Math.cos(angle) * 54, this.hero.y + Math.sin(angle) * 54);
+    this.setReadyAtForWord('push', this.time.now + this.wordCooldown(definition.cooldown)); this.wordUses['밀어낸다'] = (this.wordUses['밀어낸다'] ?? 0) + 1; this.markTutorial('push'); this.hero.castPose(); this.services.audio.play('parry'); this.showCombatWordTypography('밀어낸다', this.hero.x + Math.cos(angle) * 54, this.hero.y + Math.sin(angle) * 54);
     if (this.showcaseVfx instanceof Act1FinalVfx) this.showcaseVfx.wordPush(this.hero.motionVisualAnchor('word_target') ?? this.hero.groundPoint);
     if (!(this.showcaseVfx instanceof Act1FinalVfx)) { const fan = this.add.graphics().setDepth(DEPTH.word).lineStyle(8, 0x9ae8d4, .78).beginPath().arc(this.hero.x, this.hero.y, range, angle - halfAngle, angle + halfAngle).strokePath(); this.tweens.add({ targets: fan, alpha: 0, scaleX: 1.1, scaleY: 1.1, duration: 240, onComplete: () => fan.destroy() }); }
     const ripple = recoilRippleProfile(this.upgrades.getStack('recoil-ripple'));
@@ -2070,7 +2087,7 @@ export class GameScene extends Phaser.Scene {
     if (reaction === 'stopped-shatter') for (const projectile of [...this.projectiles]) { if (!projectile.active || !projectile.enemyOwned || projectile.frozenUntil <= this.time.now) continue; const target = this.nearestEnemy(projectile.x, projectile.y); if (target) projectile.reflect(target.x, target.y, projectile.originalDamage * .72, true); }
     if (damage > 0) { this.combatStats.addChainDamage(reaction, damage); this.combatStats.reactionDamage(reaction, damage); }
     const reactionName = definition?.displayName ?? reaction;
-    this.showWordTypography(reactionName, this.hero.x, this.hero.y - 70, true);
+    this.showCombatWordTypography(reactionName, this.hero.x, this.hero.y - 70, true);
   }
 
   private applyStopEndEffects(stoppedEnemyIds: readonly string[], token: number): void {
@@ -2081,10 +2098,12 @@ export class GameScene extends Phaser.Scene {
       pulses += 1;
       const outer = this.add.circle(source.x, source.y - 8, 12, 0x6dcab8, .03).setStrokeStyle(3, 0x9cebdc, .72).setDepth(DEPTH.word);
       const inner = this.add.circle(source.x, source.y - 8, 8, 0x0, 0).setStrokeStyle(1, 0x9cebdc, .92).setDepth(DEPTH.word);
-      const glyph = this.add.text(source.x, source.y - 10, '止', { fontFamily: 'serif', fontSize: '15px', color: '#b7f5e8', stroke: '#0a2823', strokeThickness: 3 }).setOrigin(.5).setDepth(DEPTH.word);
+      const glyph = this.combatWorldTextEnabled()
+        ? this.add.text(source.x, source.y - 10, '止', { fontFamily: 'serif', fontSize: '15px', color: '#b7f5e8', stroke: '#0a2823', strokeThickness: 3 }).setOrigin(.5).setDepth(DEPTH.word)
+        : undefined;
       this.tweens.add({ targets: outer, radius: profile.radius, alpha: 0, duration: 250, onComplete: () => outer.destroy() });
       this.tweens.add({ targets: inner, radius: profile.radius * .72, alpha: 0, duration: 190, delay: 35, onComplete: () => inner.destroy() });
-      this.tweens.add({ targets: glyph, y: glyph.y - 12, alpha: 0, duration: 280, onComplete: () => glyph.destroy() });
+      if (glyph) this.tweens.add({ targets: glyph, y: glyph.y - 12, alpha: 0, duration: 280, onComplete: () => glyph.destroy() });
       for (const target of [...this.enemies]) {
         if (!target.active || target.removing || target === source || distanceSq(source.x, source.y, target.x, target.y) > profile.radius ** 2) continue;
         const dealt = this.damageEnemy(target, profile.damage, Phaser.Math.Angle.Between(source.x, source.y, target.x, target.y), false, true, undefined, 'stop');
@@ -2425,8 +2444,11 @@ export class GameScene extends Phaser.Scene {
       .filter((enemy) => distanceSq(source.x, source.y, enemy.x, enemy.y) <= 190 ** 2).slice(0, profile.targets);
     for (const target of targets) {
       target.linked = true; target.linkedUntil = this.time.now + profile.duration; target.setData('linkContagionGeneration', generation + 1); this.linkedTargets.add(target);
-      const marker = this.add.text(target.x, target.y - (target.kind === 'boss' ? 78 : 48), '傳', { fontFamily: 'Malgun Gothic, serif', fontSize: '15px', color: '#8ee9d3', stroke: '#09201d', strokeThickness: 4 }).setOrigin(.5).setDepth(DEPTH.word);
-      this.linkMarkers.set(target, marker); this.linkPulse(source, target, 0x72d7bd);
+      if (this.combatWorldTextEnabled()) {
+        const marker = this.add.text(target.x, target.y - (target.kind === 'boss' ? 78 : 48), '傳', { fontFamily: 'Malgun Gothic, serif', fontSize: '15px', color: '#8ee9d3', stroke: '#09201d', strokeThickness: 4 }).setOrigin(.5).setDepth(DEPTH.word);
+        this.linkMarkers.set(target, marker);
+      }
+      this.linkPulse(source, target, 0x72d7bd);
     }
     if (targets.length > 0) { this.recordUpgradeContribution('link-contagion', { activationCount: 1, generated: targets.length, affectedTargets: targets.length }, true); this.showCombatLabel(source.x, source.y - 54, `연결 전염 ${targets.length}`, 0x80e3c8); }
   }
@@ -2825,8 +2847,13 @@ export class GameScene extends Phaser.Scene {
   private updateLinks(time: number): void {
     this.linkGraphics?.clear();
     const finalReadability = this.showcaseVfx instanceof Act1FinalVfx;
+    const worldTextEnabled = this.combatWorldTextEnabled();
+    if (!worldTextEnabled) {
+      for (const marker of this.linkMarkers.values()) marker.destroy();
+      this.linkMarkers.clear();
+    }
     const active = [...this.linkedTargets].filter((enemy) => enemy.active && enemy.linked && enemy.linkedUntil > time);
-    for (const enemy of active) if (!this.linkMarkers.has(enemy)) {
+    for (const enemy of active) if (worldTextEnabled && !this.linkMarkers.has(enemy)) {
       const marker = this.add.text(enemy.x, enemy.y - (enemy.kind === 'boss' ? 78 : 48), '連', { fontFamily: 'Malgun Gothic, serif', fontSize: enemy.kind === 'boss' ? '19px' : '15px', color: '#a1f3df', stroke: '#09201d', strokeThickness: 4 }).setOrigin(0.5).setDepth(DEPTH.word);
       this.linkMarkers.set(enemy, marker);
     }
@@ -2945,6 +2972,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private damageNumber(x: number, y: number, amount: number, color: number, shared = false, prefix = ''): void {
+    if (!this.combatWorldTextEnabled()) return;
     const text = this.add.text(x, y, `${prefix}${Math.round(amount)}`, { fontFamily: 'Malgun Gothic, sans-serif', fontSize: amount >= 40 ? '18px' : shared ? '12px' : '14px', fontStyle: shared ? 'italic' : 'normal', color: `#${color.toString(16).padStart(6, '0')}`, stroke: shared ? '#123631' : '#071012', strokeThickness: 4 }).setOrigin(0.5).setDepth(DEPTH.combatText);
     this.transientCombatObjects.add(text);
     this.tweens.add({ targets: text, y: y - 28, alpha: 0, duration: this.services.save.settings.reducedMotion ? 280 : 520, onComplete: () => { this.transientCombatObjects.delete(text); text.destroy(); } });
@@ -2967,6 +2995,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private showWordTypography(word: string, x: number, y: number, boss = false): void {
+    if (!this.combatWorldTextEnabled()) return;
     const text = this.add.text(x, y, word, { fontFamily: 'Malgun Gothic, serif', fontSize: boss ? '34px' : '25px', color: boss ? '#e6c79d' : '#a9f5e6', stroke: '#071012', strokeThickness: 7 }).setOrigin(0.5).setDepth(DEPTH.combatText).setAlpha(0).setScale(0.75);
     this.transientCombatObjects.add(text);
     this.tweens.add({ targets: text, alpha: 1, scale: 1, y: y - 14, duration: 190, hold: boss ? 720 : 350, yoyo: true, onComplete: () => { this.transientCombatObjects.delete(text); text.destroy(); } });
@@ -2977,7 +3006,12 @@ export class GameScene extends Phaser.Scene {
     this.cameras.main.shake(duration, intensity * strength);
   }
 
+  private showCombatWordTypography(word: string, x: number, y: number, boss = false): void {
+    this.showWordTypography(word, x, y, boss);
+  }
+
   private showCombatLabel(x: number, y: number, label: string, color = 0x9fe9dc): void {
+    if (!this.combatWorldTextEnabled()) return;
     const text = this.add.text(x, y, label, { fontFamily: 'Malgun Gothic, sans-serif', fontSize: '12px', fontStyle: 'bold', color: `#${color.toString(16).padStart(6, '0')}`, stroke: '#061012', strokeThickness: 4 }).setOrigin(0.5).setDepth(DEPTH.combatText);
     this.transientCombatObjects.add(text);
     this.tweens.add({ targets: text, y: y - 18, alpha: 0, duration: this.services.save.settings.reducedMotion ? 260 : 460, onComplete: () => { this.transientCombatObjects.delete(text); text.destroy(); } });
@@ -2989,6 +3023,10 @@ export class GameScene extends Phaser.Scene {
       if (object.active) object.destroy();
     }
     this.transientCombatObjects.clear();
+  }
+
+  private combatWorldTextEnabled(): boolean {
+    return act1FinalCombatTypographyEnabled(this.runAct.current.index);
   }
 
   private recordUpgradeContribution(id: UpgradeId, values: Partial<{
@@ -3186,6 +3224,9 @@ export class GameScene extends Phaser.Scene {
       const finalSourceSummary = finalVfx
         ? Object.entries(finalVfx.eventSources).slice(-4).map(([eventId, value]) => `${eventId}=${value.source}[${value.liveInstances}]`)
         : [];
+      const artPatchSummary = finalVfx
+        ? Object.entries(finalVfx.artPatch.sources).map(([category, source]) => `${category}=${source}`)
+        : [];
       this.debugMotionText.setText(motion ? [
         'PLAYER MOTION',
         `direction=${motion.direction}`,
@@ -3205,6 +3246,8 @@ export class GameScene extends Phaser.Scene {
           '',
           `FINAL VFX live=${finalVfx.liveEffectCount} core=${finalVfx.collisionCoreCount} corridor=${finalVfx.telegraphCorridorCount}`,
           `orphan=${finalVfx.orphanCount} oldest=${Math.round(finalVfx.oldestAgeMs)}ms`,
+          `ART PATCH live=${finalVfx.artPatch.liveEffectCount} projectile=${finalVfx.artPatch.projectileCompanionCount} orphan=${finalVfx.artPatch.orphanCount}`,
+          ...artPatchSummary,
           ...finalSourceSummary,
         ] : []),
       ] : ['PLAYER MOTION', 'source=LEGACY_RUNTIME']);

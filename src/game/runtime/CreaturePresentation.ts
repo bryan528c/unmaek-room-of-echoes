@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { act1FinalBossPhaseOverlayEnabled } from '../final/Act1FinalConfig';
 import { CreatureMotionPresentation, type CreatureMotionSnapshot } from '../motion/MotionPilotRuntime';
 import { motionPilotPresentationProfile, resolveMirroredStagingFlip, type MotionPilotTarget } from '../motion/MotionPilotConfig';
 import type { Ellipse } from '../systems/CombatGeometry';
@@ -121,7 +122,10 @@ export class CreaturePresentation {
   }
 
   public applyBossPhase(phase: 1 | 2 | 3 | 'preFight' | 'defeated/nonlethal'): void {
-    this.applyResolvedState(resolveBossPhaseState(this.creatureId, phase));
+    const resolved = resolveBossPhaseState(this.creatureId, phase);
+    this.applyResolvedState(act1FinalBossPhaseOverlayEnabled(this.creatureId, phase)
+      ? resolved
+      : { ...resolved, overlayFiles: [] });
     this.motion?.setState(phase === 'defeated/nonlethal' ? 'retreat' : 'idle', this.sprite.scene.time.now);
     this.motion?.update(this.sprite.scene.time.now);
   }

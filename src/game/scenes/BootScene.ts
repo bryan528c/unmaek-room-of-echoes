@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import { act1FinalAssetAudit, act1FinalImageEntries, act1FinalJsonEntries } from '../final/Act1FinalAssets';
 import { act1FinalEnabled } from '../final/Act1FinalConfig';
+import { act1VfxPatchAssetAudit, act1VfxPatchImageEntries } from '../final/Act1VfxArtPatchAssets';
+import { act1VfxArtPatchEnabled } from '../final/Act1VfxArtPatchConfig';
 import { motionPilotAssetAudit, motionPilotImageEntries, motionPilotJsonEntries } from '../motion/MotionPilotAssets';
 import { motionPilotEnabled } from '../motion/MotionPilotConfig';
 import { runtimeAssetAudit, runtimeAssetEntries } from '../runtime/SubmissionRuntimeAssets';
@@ -37,6 +39,13 @@ export class BootScene extends Phaser.Scene {
       for (const asset of act1FinalImageEntries(true)) this.load.image(asset.key, asset.url);
       for (const asset of act1FinalJsonEntries(true)) this.load.json(asset.key, asset.url);
     }
+    if (act1VfxArtPatchEnabled()) {
+      const patchAudit = act1VfxPatchAssetAudit();
+      if (patchAudit.duplicateKeys.length || patchAudit.disallowed.length || patchAudit.unexpected.length) {
+        throw new Error(`[BootScene] ACT 1 VFX art patch allowlist audit failed: ${JSON.stringify(patchAudit)}`);
+      }
+      for (const asset of act1VfxPatchImageEntries(true)) this.load.image(asset.key, asset.url);
+    }
     this.load.once(Phaser.Loader.Events.FILE_LOAD_ERROR, () => { this.heroLoadFailed = true; });
   }
 
@@ -50,6 +59,9 @@ export class BootScene extends Phaser.Scene {
     }
     if (act1FinalEnabled()) {
       for (const asset of act1FinalImageEntries(true)) this.textures.get(asset.key).setFilter(Phaser.Textures.FilterMode.NEAREST);
+    }
+    if (act1VfxArtPatchEnabled()) {
+      for (const asset of act1VfxPatchImageEntries(true)) this.textures.get(asset.key).setFilter(Phaser.Textures.FilterMode.NEAREST);
     }
     this.createEnemyTextures();
     this.scene.start('MenuScene');

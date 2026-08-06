@@ -2,9 +2,11 @@ import Phaser from 'phaser';
 import { BALANCE } from '../balance';
 import { DEPTH } from '../config';
 import type { Enemy } from '../entities/Enemy';
+import type { Hero } from '../entities/Hero';
 import type { Projectile } from '../entities/Projectile';
 import { Act1ShowcaseVfx, type ShowcaseBackgroundCue } from '../showcase/Act1ShowcaseVfx';
 import { ACT1_FINAL_CACHE_KEYS, act1FinalTextureKey } from './Act1FinalAssets';
+import { Act1VfxArtPatchRuntime, type Act1VfxArtPatchSnapshot } from './Act1VfxArtPatchRuntime';
 import {
   ACT1_FINAL_IMPACT_TTL_MS,
   ACT1_FINAL_PROJECTILE_READABILITY,
@@ -97,6 +99,7 @@ export interface Act1FinalVfxSnapshot {
   emitted: Readonly<Record<string, number>>;
   eventSources: Readonly<Record<string, Readonly<{ source: Act1FinalVfxSource; liveInstances: number }>>>;
   recentCleanup: readonly CleanupRecord[];
+  artPatch: Act1VfxArtPatchSnapshot;
 }
 
 const angleDirection = (angle: number): string => {
@@ -118,6 +121,7 @@ export class Act1FinalVfx {
   private readonly eventSources = new Map<string, EventSourceRecord>();
   private readonly cleanupHistory: CleanupRecord[] = [];
   private readonly fallback: Act1ShowcaseVfx;
+  private readonly artPatch: Act1VfxArtPatchRuntime;
   private instanceSequence = 0;
 
   public constructor(private readonly scene: Phaser.Scene) {
@@ -125,6 +129,7 @@ export class Act1FinalVfx {
     if (!manifest) throw new Error('[Act1FinalVfx] final VFX manifest was not preloaded');
     for (const effect of manifest.effects) this.effects.set(effect.effectId, effect);
     this.fallback = new Act1ShowcaseVfx(scene, { enabled: true, source: 'URL_QUERY' });
+    this.artPatch = new Act1VfxArtPatchRuntime(scene);
   }
 
   public setAct(actIndex: number): void {
@@ -132,11 +137,19 @@ export class Act1FinalVfx {
     if (this.actActive && !next) this.clear();
     this.actActive = next;
     this.fallback.setAct(next ? 1 : 2);
+    this.artPatch.setAct(actIndex);
   }
 
   public get enabled(): boolean { return this.actActive; }
 
-  public heroCut(start: Readonly<{ x: number; y: number }>, angle: number): void {
+  public beginHeroCut(hero: Hero, angle: number, hitDelayMs: number, totalDurationMs: number): void {
+    this.artPatch.beginHeroSlash(hero, angle, hitDelayMs, totalDurationMs);
+  }
+
+  public endHeroCut(reason = 'ACTION_END'): void { this.artPatch.endHeroSlash(reason); }
+
+  public heroCut(start: Readonly<{ x: number; y: number }>, angle: number, hero?: Hero): void {
+    if (hero && this.artPatch.heroSlashContact(hero, angle)) return;
     const effectId = `player_basic_attack_cut_${angleDirection(angle)}`;
     if (this.selectSource('player:cut', [effectId]) === 'FINAL_PNG') this.play(effectId, start);
     else this.fallback.heroCut(start, angle);
@@ -178,6 +191,7 @@ export class Act1FinalVfx {
 
   public attachProjectile(projectile: Projectile, source: Enemy): void {
     if (!this.actActive || this.projectiles.has(projectile)) return;
+    if (this.artPatch.attachProjectile(projectile, source)) return;
     const effectId = source.creatureId === 'deflect_bat' ? 'deflect_bat_projectile'
       : source.creatureId === 'mineral_spider' ? 'mineral_spider_projectile'
         : source.creatureId === 'resonance_goral' ? 'resonance_goral_projectile' : undefined;
@@ -201,6 +215,7 @@ export class Act1FinalVfx {
   }
 
   public projectileImpact(projectile: Projectile): void {
+    if (this.artPatch.projectileImpact(projectile)) return;
     const companion = this.projectiles.get(projectile);
     if (!companion) { this.fallback.projectileImpact(projectile); return; }
     const impact = companion.effectId === 'deflect_bat_projectile' ? 'deflect_bat_impact'
@@ -210,6 +225,7 @@ export class Act1FinalVfx {
   }
 
   public releaseProjectile(projectile: Projectile, reason = 'PROJECTILE_DESTROY'): void {
+    if (this.artPatch.releaseProjectile(projectile, reason)) return;
     const companion = this.projectiles.get(projectile);
     if (!companion) { this.fallback.releaseProjectile(projectile); return; }
     companion.image.destroy(); companion.collisionCore.destroy(); this.projectiles.delete(projectile);
@@ -224,6 +240,7 @@ export class Act1FinalVfx {
 
   public update(time: number, enemies: readonly Enemy[], projectiles: readonly Projectile[], cues: readonly ShowcaseBackgroundCue[]): void {
     if (!this.actActive) return;
+    this.artPatch.update(time, projectiles);
     const activeProjectiles = new Set(projectiles);
     for (const [projectile, companion] of [...this.projectiles]) {
       if (!projectile.active || !activeProjectiles.has(projectile) || !projectile.enemyOwned) { this.releaseProjectile(projectile, 'PROJECTILE_INACTIVE'); continue; }
@@ -261,6 +278,7 @@ export class Act1FinalVfx {
   }
 
   public clearAttackPresentations(): void {
+    this.artPatch.clear('ACT_OR_PHASE_CLEANUP');
     for (const projectile of [...this.projectiles.keys()]) this.releaseProjectile(projectile, 'ACT_OR_PHASE_CLEANUP');
     for (const cue of this.telegraphCorridors.values()) { cue.timer.remove(false); cue.graphics.destroy(); }
     this.telegraphCorridors.clear();
@@ -268,7 +286,11 @@ export class Act1FinalVfx {
     this.live.clear(); this.sequenceByOwner.clear(); this.phaseByOwner.clear(); this.fallback.clear();
   }
 
-  public destroy(): void { this.clear(); this.fallback.destroy(); }
+  public destroy(): void {
+    this.clear();
+    this.artPatch.destroy();
+    this.fallback.destroy();
+  }
 
   public snapshot(): Act1FinalVfxSnapshot {
     const now = this.scene.time.now;
@@ -325,6 +347,7 @@ export class Act1FinalVfx {
           : 0,
       }])),
       recentCleanup: [...this.cleanupHistory],
+      artPatch: this.artPatch.snapshot(),
     };
   }
 
@@ -337,14 +360,16 @@ export class Act1FinalVfx {
       this.removeTelegraphCorridor(enemy, 'SEQUENCE_CHANGE');
       const anchor = enemy.visualAttackAnchor ?? enemy.attackAnchor;
       if (enemy.creatureId === 'deflect_bat' && sequence.includes('prep')) {
-        this.play('deflect_bat_prep', anchor, enemy, { expectedCleanup: 'PROJECTILE_SPAWN' });
+        if (!this.artPatch.playEnemyForm(enemy)) this.play('deflect_bat_prep', anchor, enemy, { expectedCleanup: 'PROJECTILE_SPAWN' });
         this.ensureProjectileCorridor(enemy);
       }
       if (enemy.creatureId === 'rewind_lizard' && sequence.includes('prep')) this.play('rewind_lizard_prep', anchor, enemy);
       if (enemy.creatureId === 'rewind_lizard' && sequence.includes('attack')) this.play('rewind_lizard_lunge', anchor, enemy);
       if (enemy.creatureId === 'mineral_spider' && sequence.includes('deploy_to_attack')) {
-        this.play('mineral_spider_thread_spawn_marker_approved', anchor, enemy, { expectedCleanup: 'PROJECTILE_SPAWN' });
-        this.play('mineral_spider_prep', anchor, enemy, { expectedCleanup: 'PROJECTILE_SPAWN' });
+        if (!this.artPatch.playEnemyForm(enemy)) {
+          this.play('mineral_spider_thread_spawn_marker_approved', anchor, enemy, { expectedCleanup: 'PROJECTILE_SPAWN' });
+          this.play('mineral_spider_prep', anchor, enemy, { expectedCleanup: 'PROJECTILE_SPAWN' });
+        }
       }
       if (enemy.creatureId === 'resonance_goral' && sequence.includes('charge_attack')) this.play('resonance_goral_charge', anchor, enemy);
       this.sequenceByOwner.set(enemy.id, sequence);
@@ -353,10 +378,9 @@ export class Act1FinalVfx {
     if (this.phaseByOwner.has(enemy.id) && this.phaseByOwner.get(enemy.id) !== phase) this.removeOwnerEffects(enemy);
     this.phaseByOwner.set(enemy.id, phase);
     if (enemy.creatureId === 'resonance_goral' && phase === 3 && !this.sequenceByOwner.has(`${enemy.id}:phase3`)) {
-      // The final overlay is byte-identical to the approved runtime overlay
-      // already owned and cleaned by CreaturePresentation. Bind the existing
-      // phase-3 event without creating a second presentation companion.
-      this.note('resonance_goral_phase3_overlay_approved');
+      // CreaturePresentation keeps the phase state but suppresses the
+      // decorative overhead resonance arcs in final ACT 1 presentation.
+      this.note('resonance_goral_phase3_overlay_suppressed');
       this.sequenceByOwner.set(`${enemy.id}:phase3`, 'active');
     }
   }
@@ -409,6 +433,7 @@ export class Act1FinalVfx {
   }
 
   private removeOwnerEffects(owner: Phaser.GameObjects.GameObject, expectedCleanup?: LiveEffect['expectedCleanup'], reason = expectedCleanup ?? 'SEQUENCE_CHANGE'): void {
+    this.artPatch.removeOwnerEffects(owner, reason);
     for (const item of [...this.live]) if (item.owner === owner && (!expectedCleanup || item.expectedCleanup === expectedCleanup)) this.remove(item, reason);
   }
 

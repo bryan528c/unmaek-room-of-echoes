@@ -9,7 +9,7 @@ import { shouldRecoverDistantPursuit } from '../systems/EnemyPursuit';
 import { angleDelta } from '../utils/math';
 import { CreaturePresentation } from '../runtime/CreaturePresentation';
 import { shouldRestoreHitPresentation } from '../runtime/SubmissionRuntime';
-import { act1FinalEnabled } from '../final/Act1FinalConfig';
+import { act1FinalBossRetreatPresentation, act1FinalEnabled } from '../final/Act1FinalConfig';
 
 export interface EnemyCallbacks {
   shoot: (source: Enemy, x: number, y: number, angle: number, speed: number, damage: number, texture?: string) => void;
@@ -408,8 +408,21 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     if (this.kind === 'boss' && this.presentation?.hasNonlethalRetreat) {
       this.presentation.applyBossPhase('defeated/nonlethal');
       this.presentation.playMotionAction(['retreat'], 1100);
-      const exitX = this.x < 480 ? -140 : 1100;
       scene.tweens.add({ targets: this.runtimeShadow, alpha: 0, duration: 900 });
+      if (act1FinalBossRetreatPresentation(this.creatureId ?? '') === 'IN_PLACE_DISSOLVE') {
+        const restingX = this.x;
+        scene.tweens.add({ targets: this, x: restingX + 2, duration: 65, ease: 'Sine.InOut', yoyo: true, repeat: 4 });
+        scene.tweens.add({
+          targets: this,
+          y: this.y + 12,
+          alpha: 0,
+          duration: 1100,
+          ease: 'Sine.In',
+          onComplete: () => { this.callbacks.died(this, source); if (this.active) this.destroy(); },
+        });
+        return;
+      }
+      const exitX = this.x < 480 ? -140 : 1100;
       scene.tweens.add({ targets: this, x: exitX, alpha: 0.78, duration: 1100, ease: 'Sine.In', onComplete: () => { this.callbacks.died(this, source); if (this.active) this.destroy(); } });
       return;
     }

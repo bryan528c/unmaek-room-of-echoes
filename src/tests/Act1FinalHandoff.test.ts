@@ -60,7 +60,7 @@ describe('native player contract', () => {
     expect(player.canonicalCanvas).toEqual({ width: 128, height: 128 });
     expect(player.groundPoint).toEqual({ x: 64, y: 112 });
     expect(player.runtimeScale).toBe(1);
-    expect(ACT1_FINAL_PLAYER_VISUAL_SCALE).toBe(0.875);
+    expect(ACT1_FINAL_PLAYER_VISUAL_SCALE).toBe(0.8125);
     expect(Object.keys(player.directions)).toEqual(['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw']);
     const frames = Object.values(player.directions).flatMap((direction) => Object.values(direction).flatMap((sequence) => sequence.frames));
     expect(frames).toHaveLength(256);
@@ -102,6 +102,7 @@ describe('creature selection and VFX bindings', () => {
     expect(act1FinalCorrectedFrameIsStable('deflect_bat', 'attack', 0)).toBe(false);
     for (const profile of Object.values(ACT1_FINAL_CREATURE_PRESENTATION_PROFILES)) expect(profile.uniformScale).toBeGreaterThan(0);
     expect(ACT1_FINAL_CREATURE_PRESENTATION_PROFILES.resonance_goral?.uniformScale).toBe(1.16);
+    expect(ACT1_FINAL_CREATURE_PRESENTATION_PROFILES.deflect_bat?.uniformScale).toBe(1.8);
     for (const [correctedLongSide, verifiedLongSide] of [[60, 58], [72, 72], [178, 176]] satisfies Array<[number, number]>) {
       expect(Math.abs(correctedLongSide - verifiedLongSide) / verifiedLongSide).toBeLessThanOrEqual(0.08);
     }

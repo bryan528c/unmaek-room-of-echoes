@@ -34,7 +34,7 @@ export const ACT1_FINAL_CREATURE_PRESENTATION_PROFILES: Readonly<Record<string, 
     correctedCanvas: { width: 64, height: 64 }, correctedGroundPoint: { x: 32, y: 54 },
   },
   deflect_bat: {
-    uniformScale: 1.93,
+    uniformScale: 1.8,
     verifiedCanvas: { width: 52, height: 36 }, verifiedGroundPoint: { x: 26, y: 29 },
     correctedCanvas: { width: 80, height: 72 }, correctedGroundPoint: { x: 40, y: 62 },
   },
@@ -63,10 +63,10 @@ export const ACT1_FINAL_STABLE_CORRECTED_FRAME_KEYS: Readonly<Record<string, Rea
   resonance_goral: new Set(['charge_attack:1']),
 };
 
-// 7/8 keeps the 128 px source on a stable binary fraction while reducing the
-// prior 0.95 presentation by 7.9%. Physics and gameplay anchors remain owned
+// 13/16 keeps the 128 px source on a stable binary fraction while reducing the
+// prior final presentation. Physics and gameplay anchors remain owned
 // by the unchanged Hero sprite.
-export const ACT1_FINAL_PLAYER_VISUAL_SCALE = 0.875;
+export const ACT1_FINAL_PLAYER_VISUAL_SCALE = 0.8125;
 export const ACT1_FINAL_IMPACT_TTL_MS = 400;
 export const ACT1_FINAL_PROJECTILE_READABILITY = {
   outerColor: 0x170f13,
@@ -150,3 +150,31 @@ export const act1FinalConfig = (): Act1FinalConfig => resolveAct1FinalConfig(
 export const act1FinalEnabled = (): boolean => act1FinalConfig().enabled;
 
 export const act1FinalEnabledForAct = (actIndex: number): boolean => act1FinalEnabled() && actIndex === 1;
+
+/** Final ACT 1 keeps gameplay word feedback but omits large world-space type. */
+export const act1FinalCombatTypographyEnabled = (
+  actIndex: number,
+  finalEnabled = act1FinalEnabled(),
+): boolean => act1FinalCombatWorldTextEnabled(actIndex, finalEnabled);
+
+/** Final ACT 1 keeps HUD/debug text, but renders no world-space combat labels. */
+export const act1FinalCombatWorldTextEnabled = (
+  actIndex: number,
+  finalEnabled = act1FinalEnabled(),
+): boolean => !(finalEnabled && actIndex === 1);
+
+/** The approved phase state remains authoritative; only its decorative arc is suppressed. */
+export const act1FinalBossPhaseOverlayEnabled = (
+  creatureId: string,
+  phase: 1 | 2 | 3 | 'preFight' | 'defeated/nonlethal',
+  finalEnabled = act1FinalEnabled(),
+): boolean => !(finalEnabled && creatureId === 'resonance_goral' && phase === 3);
+
+export type Act1FinalBossRetreatPresentation = 'IN_PLACE_DISSOLVE' | 'LEGACY_SLIDE';
+
+export const act1FinalBossRetreatPresentation = (
+  creatureId: string,
+  finalEnabled = act1FinalEnabled(),
+): Act1FinalBossRetreatPresentation => finalEnabled && creatureId === 'resonance_goral'
+  ? 'IN_PLACE_DISSOLVE'
+  : 'LEGACY_SLIDE';
