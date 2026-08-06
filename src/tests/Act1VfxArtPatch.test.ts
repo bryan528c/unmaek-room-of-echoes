@@ -27,11 +27,15 @@ import {
 } from '../game/final/Act1FinalConfig';
 
 describe('ACT 1 final VFX art patch mode and strict loader', () => {
-  it('is opt-in, ACT 1 final-only, and preserves legacy/comparison rollback', () => {
-    expect(resolveAct1VfxArtPatchConfig('').enabled).toBe(false);
+  it('is the FINAL-mode default, with explicit rollback and legacy/comparison precedence', () => {
+    expect(resolveAct1VfxArtPatchConfig('').enabled).toBe(true);
     expect(resolveAct1VfxArtPatchConfig('?act1VfxPatch=1')).toMatchObject({ enabled: true });
     expect(resolveAct1VfxArtPatchConfig('?act1Final=1&act1VfxPatch=1')).toMatchObject({ enabled: true });
+    expect(resolveAct1VfxArtPatchConfig('?act1VfxPatch=0')).toMatchObject({ enabled: false, sources: {
+      playerSlash: 'CURRENT_FINAL_PNG', batSonic: 'CURRENT_FINAL_PNG', spiderWeb: 'CURRENT_FINAL_PNG', goralStone: 'CURRENT_FINAL_PNG',
+    } });
     expect(resolveAct1VfxArtPatchConfig('?legacyRuntime=1&act1VfxPatch=1')).toMatchObject({ enabled: false });
+    expect(resolveAct1VfxArtPatchConfig('?legacyRuntime=1&act1VfxPatch=0')).toMatchObject({ enabled: false });
     expect(resolveAct1VfxArtPatchConfig('?motionPilot=1&act1Showcase=1&act1VfxPatch=1')).toMatchObject({ enabled: false });
   });
 
@@ -146,12 +150,15 @@ describe('patch timing, attachment, and lifecycle contract', () => {
 
   it('cleans presentation without synthesizing cleanup impacts', () => {
     const runtime = readFileSync('src/game/final/Act1VfxArtPatchRuntime.ts', 'utf8');
+    const finalVfx = readFileSync('src/game/final/Act1FinalVfx.ts', 'utf8');
     expect(runtime).toContain("this.clear('ACT_TRANSITION')");
+    expect(runtime).toContain('const next = act1VfxArtPatchEnabledForAct(actIndex);');
     expect(runtime).toContain("this.clear('SCENE_SHUTDOWN')");
     expect(runtime).toContain("this.releaseProjectile(projectile, 'PROJECTILE_INACTIVE')");
     expect(runtime).toContain('private readonly impactedProjectiles = new WeakSet<Projectile>()');
     expect(runtime).toContain('wordCore3TextureCount: 0');
     expect(runtime).toContain('collisionCoreCount:');
+    expect(finalVfx).toContain('this.artPatch.setAct(actIndex);');
   });
 
   it('suppresses only final ACT 1 world typography and the decorative goral phase overlay', () => {

@@ -52,8 +52,12 @@ export const ACT1_VFX_PATCH_SLASH_CONTACT_FRAME: Readonly<Record<Act1VfxPatchDir
 };
 
 export const resolveAct1VfxArtPatchConfig = (search: string): Act1VfxArtPatchConfig => {
+  const params = new URLSearchParams(search);
+  // The approved patch is the FINAL-mode default.  `act1VfxPatch=0` is the
+  // explicit, per-session rollback to the preceding final VFX source; legacy
+  // and comparison modes remain outside the patch regardless of this query.
   const enabled = resolveAct1RuntimeMode(search) === 'FINAL'
-    && new URLSearchParams(search).get('act1VfxPatch') === '1';
+    && params.get('act1VfxPatch') !== '0';
   const source: Act1VfxArtPatchSource = enabled ? 'PATCH_PNG' : 'CURRENT_FINAL_PNG';
   return {
     enabled,
@@ -62,7 +66,7 @@ export const resolveAct1VfxArtPatchConfig = (search: string): Act1VfxArtPatchCon
 };
 
 export const act1VfxArtPatchConfig = (): Act1VfxArtPatchConfig => resolveAct1VfxArtPatchConfig(
-  typeof window === 'undefined' ? '' : window.location.search,
+  typeof window === 'undefined' ? '?legacyRuntime=1' : window.location.search,
 );
 
 export const act1VfxArtPatchEnabled = (): boolean => act1VfxArtPatchConfig().enabled;
