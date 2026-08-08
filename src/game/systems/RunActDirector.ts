@@ -109,15 +109,15 @@ const endlessModifiers = (actIndex: number): readonly EndlessModifierId[] => {
 export const actDefinition = (actIndex: number): ActDefinition => {
   if (actIndex <= 1) return {
     index: 1, id: 'act-1-west-cliffs', name: actDisplayName(1), theme: 'echo-room', enemySetId: 'submission-act1',
-    bossId: 'resonance_goral', bossName: bossDisplayName('resonance_goral'), summary: '서벽의 반향과 끊어진 길을 지나 반향단으로 향한다.', waves: actOneWaves, modifiers: [], healthMultiplier: 1, damageMultiplier: 1,
+    bossId: 'resonance_goral', bossName: bossDisplayName('resonance_goral'), summary: '서벽 절벽지대에서 구조대의 길이 끊겼다. 누나의 표식과 낯선 생물의 반응을 따라 첫 하강로를 확보하라.', waves: actOneWaves, modifiers: [], healthMultiplier: 1, damageMultiplier: 1,
   };
   if (actIndex === 2) return {
     index: 2, id: 'act-2-sinkhole-lowland', name: actDisplayName(2), theme: 'ink-archive', enemySetId: 'submission-act2',
-    bossId: 'diffraction_pangolin', bossName: bossDisplayName('diffraction_pangolin'), summary: '천갱의 저지림을 지나 뿌리 고리 분지로 향한다.', waves: actTwoWaves, modifiers: [], healthMultiplier: 1.08, damageMultiplier: 1.05,
+    bossId: 'diffraction_pangolin', bossName: bossDisplayName('diffraction_pangolin'), summary: '절벽 아래 저지림에서는 생물들의 이동 경로가 한곳으로 뒤엉켜 있다. 누나가 남긴 조사 표식을 찾고, 영역을 지키는 큰 개체를 물러나게 해 안전한 길을 확보하라.', waves: actTwoWaves, modifiers: [], healthMultiplier: 1.08, damageMultiplier: 1.05,
   };
   if (actIndex === 3) return {
     index: 3, id: 'act-3-central-waterway', name: actDisplayName(3), theme: 'echo-room', enemySetId: 'submission-act3',
-    bossId: 'channel_otter_mother', bossName: bossDisplayName('channel_otter_mother'), summary: '중앙 습지와 지하 수로를 지나 우각호의 자갈섬으로 향한다.', waves: actThreeWaves, modifiers: endlessModifiers(3), healthMultiplier: 1.08 * 1.1, damageMultiplier: 1.05 * 1.06,
+    bossId: 'channel_otter_mother', bossName: bossDisplayName('channel_otter_mother'), summary: '중앙 습지의 물길마다 같은 진동이 번지고 있다. 생존자와 누나의 흔적을 따라 수맥이 모이는 곳까지 전진하라.', waves: actThreeWaves, modifiers: endlessModifiers(3), healthMultiplier: 1.08 * 1.1, damageMultiplier: 1.05 * 1.06,
   };
   const scaleIndex = actIndex - 2;
   const useInk = actIndex % 2 === 0;

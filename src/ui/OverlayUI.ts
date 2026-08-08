@@ -219,11 +219,11 @@ export class OverlayUI {
       <div class="title-mist"></div>
       <div class="title-content">
         <div class="portrait-crop" aria-label="주인공 초상화"><img src="./assets/hero-concept.png" alt="검은 망토를 입은 소년의 얼굴" /></div>
-        <p class="eyebrow">잊힌 언어를 잇는 자</p>
-        <h1><small>言脈</small> 언맥 <span>잔향의 방</span></h1>
-        <p class="title-copy">멎고, 되돌리고, 이어라.<br />서벽에서 지하 수로까지 끊긴 언맥을 다시 이으라.</p>
+        <p class="eyebrow">천갱 조사구역</p>
+        <h1><small>言脈</small> 언맥 <span>천갱 조사구역</span></h1>
+        <p class="title-copy">용의 마지막 말이 생명 속에 남은 땅,<br />누나의 흔적을 따라 천갱으로 내려간다.</p>
         <div class="menu-actions">
-          <button class="rune-button primary" data-action="start"><span>새 기록 시작</span><kbd>Enter</kbd></button>
+          <button class="rune-button primary" data-action="start"><span>탐사 시작</span><kbd>Enter</kbd></button>
           <button class="rune-button" data-action="controls">조작법</button>
           <button class="rune-button" data-action="settings">설정</button>
         </div>
@@ -264,7 +264,7 @@ export class OverlayUI {
     const diagnostics = this.audio.diagnostics();
     const screen = document.createElement('section');
     screen.className = 'screen parchment-panel';
-    screen.innerHTML = `<div class="panel-content"><p class="eyebrow">기록실 환경</p><h2>설정</h2>
+    screen.innerHTML = `<div class="panel-content"><p class="eyebrow">탐사 환경</p><h2>설정</h2>
       <div class="control-setting"><span>조작 방식</span><div class="control-mode-options">
         <button data-control="keyboard" aria-pressed="${current.controlMode === 'keyboard'}"><b>키보드 전용</b><small>8방향 절단 + 언령</small></button>
         <button data-control="mouse" aria-pressed="${current.controlMode === 'mouse'}"><b>기존 마우스 조준</b><small>클릭 절단 + 포인터 방향</small></button>
@@ -562,7 +562,7 @@ export class OverlayUI {
   ): void {
     this.clear();
     const screen = document.createElement('section'); screen.className = 'screen act-clear-screen';
-    screen.innerHTML = `<div class="panel-content act-clear-card"><p class="eyebrow">기록의 매듭이 풀렸다</p><h2>Act ${summary.index} · ${summary.name} 완료</h2><div class="act-clear-recovery"><span>생명 회복</span><b>+${Math.round(summary.recovery)}</b></div><div class="act-clear-details"><span>처치한 보스 <b>${summary.bossesDefeated}</b></span><span>유지 강화 <b>${summary.upgrades.length}</b></span><span>활성 공명 <b>${summary.resonances.length ? summary.resonances.join(' · ') : '없음'}</b></span></div><small>보스의 기록을 계승합니다</small></div>`;
+    screen.innerHTML = `<div class="panel-content act-clear-card"><p class="eyebrow">전진로가 확보됐다</p><h2>Act ${summary.index} · ${summary.name} 완료</h2><div class="act-clear-recovery"><span>생명 회복</span><b>+${Math.round(summary.recovery)}</b></div><div class="act-clear-details"><span>영역 개체 후퇴 <b>${summary.bossesDefeated}</b></span><span>유지 강화 <b>${summary.upgrades.length}</b></span><span>활성 공명 <b>${summary.resonances.length ? summary.resonances.join(' · ') : '없음'}</b></span></div><small>다음 조사 구역으로 전진합니다</small></div>`;
     this.root.append(screen);
     this.rewardTimer = window.setTimeout(continueRun, 1450);
   }
@@ -581,7 +581,7 @@ export class OverlayUI {
   ): void {
     this.clear();
     const screen = document.createElement('section'); screen.className = 'screen act-transition-screen';
-    screen.innerHTML = `<div class="act-transition-ink"></div><div class="panel-content act-transition-card"><p class="eyebrow">기록이 다음 층으로 이어진다</p><h2>Act ${act.index} · ${act.name}</h2><p class="act-summary">${act.summary}</p><div class="act-transition-details"><span>활성 Modifier<b>${act.modifiers.length ? act.modifiers.join(' · ') : '없음'}</b></span><span>유지 강화<b>${act.upgrades.length ? act.upgrades.join(' · ') : '없음'}</b></span><span>활성 공명<b>${act.resonances.length ? act.resonances.join(' · ') : '없음'}</b></span></div><button class="rune-button primary" data-continue>기록고 진입 <kbd>Enter / J</kbd></button><small>3초 후 자동 진입</small></div>`;
+    screen.innerHTML = `<div class="act-transition-ink"></div><div class="panel-content act-transition-card"><p class="eyebrow">탐사가 다음 구역으로 이어진다</p><h2>Act ${act.index} · ${act.name}</h2><p class="act-summary">${act.summary}</p><div class="act-transition-details"><span>활성 Modifier<b>${act.modifiers.length ? act.modifiers.join(' · ') : '없음'}</b></span><span>유지 강화<b>${act.upgrades.length ? act.upgrades.join(' · ') : '없음'}</b></span><span>활성 공명<b>${act.resonances.length ? act.resonances.join(' · ') : '없음'}</b></span></div><button class="rune-button primary" data-continue>다음 구역 진입 <kbd>Enter / J</kbd></button><small>3초 후 자동 진입</small></div>`;
     this.root.append(screen);
     let ready = false; let done = false;
     const finish = (): void => {
@@ -672,8 +672,8 @@ export class OverlayUI {
     const deathCause = !stats.victory && lastDamage
       ? `<div class="result-death-cause"><span>마지막 피해</span><b>${lastDamage.patternName} · ${Math.round(lastDamage.amount)} 피해</b><small>${lastDamage.attackerDisplayName ?? '알 수 없는 공격자'} · Act ${lastDamage.act} ${lastDamage.wave}${lastDamage.modifier ? ` · ${lastDamage.modifier}` : ''} · ${lastDamage.parryable ? '패링 가능' : '패링 불가'}</small><ol>${recentDamage.slice().reverse().map((hit) => `<li>${hit.patternName} · ${Math.round(hit.amount)}</li>`).join('')}</ol></div>`
       : '';
-    screen.innerHTML = `<div class="result-sigil">${stats.rank}</div><div class="result-content"><p class="eyebrow">${stats.victory ? '마지막 문장이 이어졌다' : '기록이 먹빛에 잠겼다'}</p><h2>${stats.victory ? '기록 회수 완료' : '계승 실패'}</h2><div class="score-big">${stats.score.toLocaleString()}${stats.newBest ? '<em>NEW BEST</em>' : ''}</div><div class="result-progress"><b>${stats.progressLabel}</b><span>${comparison}</span></div>
-      <div class="result-stats"><span>플레이 시간<b>${minutes}:${seconds}</b></span><span>도달 Act<b>${stats.reachedAct ?? 1}</b></span><span>완료 Act<b>${stats.completedActs ?? 0}</b></span><span>처치 보스<b>${stats.bossesDefeated ?? 0}</b></span><span>받은 피해<b>${Math.round(stats.damageTaken)}</b></span><span>패링 성공<b>${stats.parries}</b></span><span>전체 언령<b>${Object.values(stats.wordUses).reduce((sum, value) => sum + value, 0)}</b></span><span>언령 연쇄<b>${stats.chainSuccesses ?? 0}</b></span><span>강화 용언 F<b>${stats.empowerUses ?? 0}</b></span></div>
+    screen.innerHTML = `<div class="result-sigil">${stats.rank}</div><div class="result-content"><p class="eyebrow">${stats.victory ? '천갱의 진동이 잠잠해졌다' : '탐사가 중단됐다'}</p><h2>${stats.victory ? '탐사 완료' : '탐사 중단'}</h2><div class="score-big">${stats.score.toLocaleString()}${stats.newBest ? '<em>NEW BEST</em>' : ''}</div><div class="result-progress"><b>${stats.progressLabel}</b><span>${comparison}</span></div>
+      <div class="result-stats"><span>플레이 시간<b>${minutes}:${seconds}</b></span><span>도달 Act<b>${stats.reachedAct ?? 1}</b></span><span>완료 Act<b>${stats.completedActs ?? 0}</b></span><span>영역 개체<b>${stats.bossesDefeated ?? 0}</b></span><span>받은 피해<b>${Math.round(stats.damageTaken)}</b></span><span>패링 성공<b>${stats.parries}</b></span><span>전체 언령<b>${Object.values(stats.wordUses).reduce((sum, value) => sum + value, 0)}</b></span><span>언령 연쇄<b>${stats.chainSuccesses ?? 0}</b></span><span>강화 용언 F<b>${stats.empowerUses ?? 0}</b></span></div>
       ${deathCause}
       ${stats.milestones.length ? `<div class="milestones">${stats.milestones.map((item) => `<span>${item}</span>`).join('')}</div>` : ''}
       <div class="result-build-summary"><div><span>활성 공명</span><b>${activeResonanceIds.length ? activeResonanceIds.map((id) => resonanceById(id)?.name ?? id).join(' · ') : '없음'}</b></div><div><span>기본 피해 원천</span><b>잔향 ${ratio(attribution.echo)} · J 절단 ${ratio(attribution.cut)} · 패링 ${ratio(attribution.parry)} · 언령 ${ratio(attribution.word)} · 기타 ${ratio(attribution.other)}</b></div><div><span>카드·공명 추가 기여</span><b>${Math.round(cardResonanceDamage)} 피해 · 전체의 ${contributionRatio}</b></div><div><span>언령 연계</span><b>${chainSummary}</b></div><div><span>F 강화 언령</span><b>${empowerSummary}</b></div></div>
