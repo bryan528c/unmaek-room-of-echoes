@@ -219,9 +219,9 @@ export class OverlayUI {
       <div class="title-mist"></div>
       <div class="title-content">
         <div class="portrait-crop" aria-label="주인공 초상화"><img src="./assets/hero-concept.png" alt="검은 망토를 입은 소년의 얼굴" /></div>
-        <p class="eyebrow">천갱 조사구역</p>
-        <h1><small>言脈</small> 언맥 <span>천갱 조사구역</span></h1>
-        <p class="title-copy">용의 마지막 말이 생명 속에 남은 땅,<br />누나의 흔적을 따라 천갱으로 내려간다.</p>
+        <p class="eyebrow">잊힌 언어를 잇는 자</p>
+        <h1><small>言脈</small> 언맥 <span>용흔 구역</span></h1>
+        <p class="title-copy">용의 마지막 말이 생명 속에 남은 땅,<br />누나의 흔적을 따라 미지의 함몰지로 내려간다.</p>
         <div class="menu-actions">
           <button class="rune-button primary" data-action="start"><span>탐사 시작</span><kbd>Enter</kbd></button>
           <button class="rune-button" data-action="controls">조작법</button>
@@ -241,7 +241,7 @@ export class OverlayUI {
   private showControls(back: () => void): void {
     this.clear();
     const screen = document.createElement('section');
-    screen.className = 'screen parchment-panel';
+    screen.className = 'screen parchment-panel controls-screen';
     screen.innerHTML = `<div class="panel-content wide"><p class="eyebrow">살아남기 위한 문법</p><h2>조작법</h2>
       <div class="control-grid">
         <div><kbd>WASD</kbd><kbd>방향키</kbd><span>이동 · 메뉴 선택</span></div><div><kbd>J</kbd><span>마지막 이동 방향으로 한 번 절단</span></div>
