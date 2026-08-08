@@ -1,0 +1,87 @@
+{
+  "schemaVersion": "1.0",
+  "package": "UNMAEK_SUBMISSION_FINAL_UI_WORD_POLISH_v1",
+  "effects": [
+    {
+      "effectId": "player_word_collarbone_resonance",
+      "frameFiles": [],
+      "canvas": "reuse current runtime cue",
+      "anchor": { "semantic": "collarboneCenter" },
+      "offset": { "x": 0, "y": -18 },
+      "displayScale": 1.0,
+      "frameDurationCandidate": null,
+      "loop": false,
+      "blendMode": "normal",
+      "depthHint": "above player body, below skill-specific VFX",
+      "cleanup": "reuse current runtime cue cleanup; do not add a new event or timer",
+      "existingGameplayUnchanged": true,
+      "assetDecision": "reuse current runtime cue; no new frame"
+    },
+    {
+      "effectId": "word_stop",
+      "frameFiles": [
+        "vfx/word_stop/WORD_STOP_F01.png",
+        "vfx/word_stop/WORD_STOP_F02.png",
+        "vfx/word_stop/WORD_STOP_F03.png",
+        "vfx/word_stop/WORD_STOP_F04.png",
+        "vfx/word_stop/WORD_STOP_F05.png"
+      ],
+      "canvas": { "width": 128, "height": 128, "format": "RGBA 8-bit PNG" },
+      "anchor": { "x": 64, "y": 64, "semantic": "targetCenter" },
+      "offset": { "x": 0, "y": 0 },
+      "displayScale": 1.25,
+      "frameDurationCandidate": [60, 55, 55, 70, 90],
+      "loop": false,
+      "blendMode": "normal",
+      "depthHint": "above target sprite and telegraph interior; below damage numbers",
+      "cleanup": "remove on the existing word_stop completion, cancel or target-destroy path; never prolong stop state",
+      "existingGameplayUnchanged": true,
+      "assetDecision": "reuse source silhouette with visual-only contrast normalization"
+    },
+    {
+      "effectId": "word_rewind",
+      "frameFiles": [
+        "vfx/word_rewind/WORD_REWIND_F01.png",
+        "vfx/word_rewind/WORD_REWIND_F02.png",
+        "vfx/word_rewind/WORD_REWIND_F03.png",
+        "vfx/word_rewind/WORD_REWIND_F04.png",
+        "vfx/word_rewind/WORD_REWIND_F05.png"
+      ],
+      "canvas": { "width": 128, "height": 128, "format": "RGBA 8-bit PNG" },
+      "anchor": { "x": 96, "y": 64, "semantic": "currentStateConvergencePoint" },
+      "offset": { "x": 0, "y": 0 },
+      "displayScale": 1.0,
+      "frameDurationCandidate": [70, 65, 65, 70, 90],
+      "loop": false,
+      "blendMode": "normal",
+      "depthHint": "above restored target sprite; below hit flash and damage numbers",
+      "cleanup": "remove every contour on the existing word_rewind completion, cancel or target-destroy path",
+      "existingGameplayUnchanged": true,
+      "assetDecision": "replace failed UI-icon sequence with inward-converging broken afterimage contours"
+    },
+    {
+      "effectId": "word_connect",
+      "frameFiles": [
+        "vfx/word_connect/WORD_LINK_F01.png",
+        "vfx/word_connect/WORD_LINK_F02.png",
+        "vfx/word_connect/WORD_LINK_F03.png",
+        "vfx/word_connect/WORD_LINK_F04.png",
+        "vfx/word_connect/WORD_LINK_F05.png",
+        "vfx/word_connect/WORD_LINK_F06.png"
+      ],
+      "canvas": { "width": 192, "height": 64, "format": "RGBA 8-bit PNG" },
+      "anchor": { "x": 8, "y": 32, "semantic": "startNodeCenter" },
+      "offset": { "x": 0, "y": 0 },
+      "displayScale": 1.0,
+      "frameDurationCandidate": [65, 75, 75, 75, 65, 80],
+      "loop": { "cast": ["F01"], "active": ["F02", "F03", "F04"], "release": ["F05", "F06"], "mode": "active ping-pong" },
+      "blendMode": "normal",
+      "depthHint": "above ground and below character silhouettes; endpoint nodes above both targets",
+      "cleanup": "remove start node, end node and repeated segment together on existing link release, target destroy or event cancel",
+      "existingGameplayUnchanged": true,
+      "assetDecision": "reuse existing sequence",
+      "renderMode": "rotate full link to target direction; keep endpoint caps fixed and repeat the center segment instead of scaling Y",
+      "repeatSlice": { "sourceFrame": "WORD_LINK_F03.png", "x": 24, "y": 28, "width": 144, "height": 8, "tileAxis": "x", "fixedCap": 16 }
+    }
+  ]
+}

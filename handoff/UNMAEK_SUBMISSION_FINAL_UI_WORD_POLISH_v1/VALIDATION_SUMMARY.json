@@ -1,0 +1,55 @@
+{
+  "sourcesFound": [
+    "플레이 영상 0808.mp4",
+    "UNMAEK_FINAL_WORLD_STORY_v1.md",
+    "UNMAEK_VISUAL_RECOVERY_HANDOFF_v1(1).pptx",
+    "UNMAEK_ACT1_VFX_FINAL_ART_PATCH_v1/word_core3/",
+    "UNMAEK_ACT1_VFX_FINAL_ART_PATCH_v1/ACT1_VFX_FINAL_REVIEW_BOARD.png",
+    "UNMAEK_RUNTIME_PACK_VISUAL_REVIEW_v1(4).pptx"
+  ],
+  "sourcesMissing": [],
+  "uiScreensCreated": [
+    "title_960x540.png",
+    "word_select_960x540.png",
+    "combat_hud_960x540.png",
+    "act_entry_960x540.png",
+    "act_complete_960x540.png",
+    "result_960x540.png"
+  ],
+  "vfxFramesCreated": [
+    "word_stop/WORD_STOP_F01.png (contrast-normalized)",
+    "word_stop/WORD_STOP_F02.png (contrast-normalized)",
+    "word_stop/WORD_STOP_F03.png (contrast-normalized)",
+    "word_stop/WORD_STOP_F04.png (contrast-normalized)",
+    "word_stop/WORD_STOP_F05.png (contrast-normalized)",
+    "word_rewind/WORD_REWIND_F01.png (replacement)",
+    "word_rewind/WORD_REWIND_F02.png (replacement)",
+    "word_rewind/WORD_REWIND_F03.png (replacement)",
+    "word_rewind/WORD_REWIND_F04.png (replacement)",
+    "word_rewind/WORD_REWIND_F05.png (replacement)"
+  ],
+  "vfxFramesReused": [
+    "word_connect/WORD_LINK_F01.png",
+    "word_connect/WORD_LINK_F02.png",
+    "word_connect/WORD_LINK_F03.png",
+    "word_connect/WORD_LINK_F04.png",
+    "word_connect/WORD_LINK_F05.png",
+    "word_connect/WORD_LINK_F06.png",
+    "player_word_collarbone_resonance (current runtime cue; no copied frame)"
+  ],
+  "duplicateFiles": [],
+  "transparentCornerFailures": [],
+  "cropFailures": [],
+  "finalStatus": {
+    "Title UI": "NEEDS_USER_REVIEW",
+    "Word Select UI": "NEEDS_USER_REVIEW",
+    "Combat HUD": "NEEDS_USER_REVIEW",
+    "ACT Entry": "NEEDS_USER_REVIEW",
+    "ACT Complete": "NEEDS_USER_REVIEW",
+    "Result UI": "NEEDS_USER_REVIEW",
+    "Stop VFX": "NEEDS_USER_REVIEW",
+    "Rewind VFX": "NEEDS_USER_REVIEW",
+    "Connect VFX": "NEEDS_USER_REVIEW",
+    "Full Handoff": "NEEDS_USER_REVIEW"
+  }
+}

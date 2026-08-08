@@ -1,0 +1,186 @@
+{
+  "schemaVersion": "1.0",
+  "package": "UNMAEK_SUBMISSION_FINAL_UI_WORD_POLISH_v1",
+  "logicalResolution": { "width": 960, "height": 540 },
+  "safeArea": { "top": 32, "right": 32, "bottom": 32, "left": 32 },
+  "sourceFiles": [
+    { "name": "플레이 영상 0808.mp4", "usage": "00:00–00:30, 00:30–01:55, 01:55–02:05, 02:05–02:56 current UI and flow" },
+    { "name": "UNMAEK_FINAL_WORLD_STORY_v1.md", "usage": "official world, dragon-word constraints, characters, regions, theme, prohibitions" },
+    { "name": "UNMAEK_VISUAL_RECOVERY_HANDOFF_v1(1).pptx", "usage": "slides 22–28 and 38 only" },
+    { "name": "UNMAEK_ACT1_VFX_FINAL_ART_PATCH_v1/word_core3/", "usage": "existing STOP, REWIND and LINK source frames" },
+    { "name": "hero_runtime_keyposes.png", "usage": "hero silhouette and current resonance-position reference" },
+    { "name": "주인공 컨셉 원본.png", "usage": "hero identity reference" }
+  ],
+  "colorTokens": {
+    "ink950": "#06100F",
+    "ink900": "#091715",
+    "ink850": "#0C1D1A",
+    "ink800": "#102521",
+    "hanji100": "#E6DFCA",
+    "hanji200": "#CCC4AE",
+    "slate300": "#9AA9A5",
+    "slate500": "#62736F",
+    "jade300": "#78B49F",
+    "jade400": "#5F9F8B",
+    "jade600": "#355F54",
+    "rust500": "#8C4C43",
+    "ochre400": "#AA8F55",
+    "line": "#39514C",
+    "lineSoft": "#253A36",
+    "panelOpacity": 0.94,
+    "titleBackgroundOverlay": 0.37,
+    "actBackgroundOverlay": 0.60,
+    "resultBackgroundOverlay": 0.60
+  },
+  "typography": {
+    "fontFamily": ["Pretendard", "Noto Sans KR", "system-ui", "sans-serif"],
+    "externalFontFileBundled": false,
+    "weights": { "regular": 400, "semibold": 600, "bold": 700 },
+    "sizes": {
+      "titleLogo": 56,
+      "titleIntro": 18,
+      "screenTitle": 28,
+      "resultTitle": 32,
+      "body": 16,
+      "bodyLarge": 18,
+      "support": 12,
+      "hud": 11,
+      "keycap": 12
+    },
+    "lineHeights": { "tight": 1.2, "body": 1.55, "story": 1.65 }
+  },
+  "spacing": {
+    "base": 4,
+    "values": [4, 8, 12, 16, 20, 24, 28, 32, 40, 48],
+    "cardGap": 12,
+    "hudGap": 8
+  },
+  "borders": {
+    "default": { "width": 1, "colorToken": "line", "style": "solid" },
+    "selected": { "width": 2, "colorToken": "jade400", "style": "solid" },
+    "keyboardFocus": { "width": 2, "colorToken": "hanji200", "style": "solid", "offset": 3, "cornerNotch": true },
+    "disabled": { "width": 1, "colorToken": "slate500", "style": "dashed" },
+    "radius": { "panel": 4, "card": 3, "button": 3, "keycap": 3 },
+    "shadow": "0 12px 28px rgba(0,0,0,0.38)"
+  },
+  "screenLayouts": {
+    "title": {
+      "background": "reuse current environment background",
+      "informationBlock": { "x": 32, "y": 58, "w": 390, "h": 424 },
+      "primaryButton": { "x": 71, "y": 333, "w": 280, "h": 56 },
+      "secondaryButton": { "x": 71, "y": 399, "w": 280, "h": 48 }
+    },
+    "wordSelect": {
+      "header": { "x": 32, "y": 28, "w": 516, "h": 68 },
+      "cardGrid": { "x": 32, "y": 112, "columns": 3, "rows": 2, "cardW": 164, "cardH": 106, "gap": 12 },
+      "equipPanel": { "x": 568, "y": 112, "w": 360, "h": 336 },
+      "equipSlot": { "w": 324, "h": 52, "gap": 8 },
+      "confirmButton": { "x": 586, "y": 397, "w": 324, "h": 48 },
+      "keyboardHelp": { "x": 32, "y": 446, "w": 516, "h": 66 }
+    },
+    "combatHud": {
+      "player": { "x": 32, "y": 32, "w": 260, "h": 52 },
+      "boss": { "x": 300, "y": 32, "w": 360, "h": 38 },
+      "actGoal": { "x": 708, "y": 32, "w": 220, "h": 64 },
+      "cardResonanceDock": { "x": 32, "y": 444, "w": 252, "h": 64 },
+      "wordSlots": { "x": 310, "y": 444, "slotW": 108, "slotH": 64, "gap": 8 },
+      "supportInfo": { "x": 708, "y": 444, "w": 220, "h": 64 },
+      "combatSafeCenter": { "x": 32, "y": 70, "w": 896, "h": 340 },
+      "cardExpansionRule": "Keep a 252x64 dock. Collapse overflow to current count/summary and open only the existing card view; never extend into x=284–676 or y=70–410."
+    },
+    "actEntry": {
+      "sharedComponent": "ActOverlay",
+      "panel": { "x": 200, "y": 144, "w": 560, "h": 252 },
+      "backgroundTreatment": "freeze current scene and apply 60% ink overlay",
+      "existingAction": "current enter/continue action only"
+    },
+    "actComplete": {
+      "sharedComponent": "ActOverlay",
+      "panel": { "x": 200, "y": 128, "w": 560, "h": 284 },
+      "backgroundTreatment": "freeze current scene and apply 60% ink overlay",
+      "existingAction": "current automatic reward/next-step flow; no new button"
+    },
+    "result": {
+      "panel": { "x": 32, "y": 32, "w": 896, "h": 476 },
+      "mainCopy": { "x": 62, "y": 60, "w": 520, "h": 240 },
+      "stats": { "x": 628, "y": 60, "w": 270, "h": 212 },
+      "primaryButton": { "x": 62, "y": 432, "w": 240, "h": 48 },
+      "secondaryActions": { "x": 314, "y": 432, "w": 584, "h": 48 }
+    }
+  },
+  "componentStates": {
+    "wordCard": {
+      "default": { "border": "default", "background": "ink900", "marker": "none" },
+      "keyboardFocus": { "border": "keyboardFocus", "marker": "top-right corner notch" },
+      "selected": { "border": "selected", "background": "ink800", "marker": "jade top cut line" },
+      "assigned": { "border": "selected", "marker": "matching Q/E/R equip slot and selected border" },
+      "disabled": { "border": "disabled", "opacity": 0.38, "marker": "short diagonal cut; never color-only" }
+    },
+    "button": {
+      "default": { "borderWidth": 1, "background": "ink900" },
+      "primary": { "borderWidth": 1, "background": "jade600", "cornerNotch": true },
+      "keyboardFocus": { "borderWidth": 2, "outlineToken": "hanji200", "outlineOffset": 3 },
+      "pressed": { "translateY": 1, "background": "ink800" },
+      "disabled": { "opacity": 0.38, "borderStyle": "dashed" }
+    },
+    "wordSlot": {
+      "ready": { "supportText": "사용 가능", "supportColor": "jade300" },
+      "cooldown": { "supportText": "existing cooldown value", "progressDirection": "left-to-right" },
+      "unavailable": { "opacity": 0.45, "marker": "diagonal cut" }
+    }
+  },
+  "storyMicrocopy": {
+    "title": "용의 마지막 말이 생명 속에 남은 땅, 누나의 흔적을 따라 천갱으로 내려간다.",
+    "wordSelectTitle": "언령 선택",
+    "wordSelectGuide": "탐사 전 사용할 세 언령을 장착한다.",
+    "actEntry": {
+      "ACT1": { "region": "서벽 절벽지대", "copy": "서벽 절벽지대에서 구조대의 길이 끊겼다. 누나의 표식과 낯선 생물의 반응을 따라 첫 하강로를 확보하라." },
+      "ACT2": { "region": "천갱 저지림", "copy": "절벽 아래 저지림에서는 생물들의 이동 경로가 한곳으로 뒤엉켜 있다. 누나가 남긴 조사 표식을 찾고, 영역을 지키는 큰 개체를 물러나게 해 안전한 길을 확보하라." },
+      "ACT3": { "region": "중앙 습지", "copy": "중앙 습지의 물길마다 같은 진동이 번지고 있다. 생존자와 누나의 흔적을 따라 수맥이 모이는 곳까지 전진하라." }
+    },
+    "goals": {
+      "general": "누나의 표식을 따라 다음 조사 구역으로 이동하라.",
+      "boss": "영역 개체를 물러나게 하고 전진로를 확보하라."
+    },
+    "actComplete": {
+      "ACT1": "영역 개체가 물러나 첫 하강로가 열렸다. 누나의 표식은 절벽 아래 저지림으로 이어진다.",
+      "ACT2": "뒤엉킨 이동 경로가 가라앉고 안전한 길이 확보됐다. 누나의 조사 표식은 중앙 습지의 수맥을 가리킨다.",
+      "ACT3": "습지의 진동이 잠잠해졌다. 누나가 남긴 표식은 더 깊은 수로를 가리킨다."
+    },
+    "result": {
+      "title": "탐사 결과",
+      "worldChange": "습지의 진동이 잠잠해졌다. 누나가 남긴 표식은 더 깊은 수로를 가리킨다.",
+      "primary": "조사 계속하기",
+      "secondary": ["같은 구역 다시 탐사", "언령 장착 바꾸기", "탐사 종료"]
+    }
+  },
+  "responsiveFallback": {
+    "strategy": "uniform logical-canvas scale",
+    "formula": "scale = min(viewportWidth / 960, viewportHeight / 540)",
+    "alignment": "center",
+    "letterboxColor": "#06100F",
+    "reflow": false,
+    "nonUniformScale": false,
+    "minimumReviewResolution": "960x540 at 100%"
+  },
+  "existingActionOnly": {
+    "title": ["start", "settings"],
+    "wordSelect": ["move focus", "select", "assign Q/E/R in current order", "confirm"],
+    "actEntry": ["current enter/continue action"],
+    "actComplete": ["current automatic next-step flow"],
+    "result": ["continue", "retry current area", "change word loadout", "end run"]
+  },
+  "doNotImplement": [
+    "new button behavior",
+    "new stats or CTA",
+    "new card, word or combat system",
+    "settings redesign",
+    "codex, inventory or pause menu",
+    "runtime UI flatten PNG",
+    "external font file bundle",
+    "gameplay timing, damage, range or cooldown change",
+    "world-space Korean word labels",
+    "generic magic circles, runes, mana or neon glow",
+    "legacy story terms: 잔향의 방, 기록고, 기록 포식자, 기록 편집자, 유산의 방"
+  ]
+}
