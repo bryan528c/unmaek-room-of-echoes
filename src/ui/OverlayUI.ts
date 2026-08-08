@@ -219,14 +219,16 @@ export class OverlayUI {
       <div class="title-mist"></div>
       <div class="title-content">
         <div class="portrait-crop" aria-label="주인공 초상화"><img src="./assets/hero-concept.png" alt="검은 망토를 입은 소년의 얼굴" /></div>
+        <img class="title-lockup" src="/assets/title-ui-lockup.png" alt="" aria-hidden="true" />
         <p class="eyebrow">잊힌 언어를 잇는 자</p>
         <h1><small>言脈</small> 언맥 <span>용흔 구역</span></h1>
         <p class="title-copy">용의 마지막 말이 생명 속에 남은 땅,<br />누나의 흔적을 따라 미지의 함몰지로 내려간다.</p>
         <div class="menu-actions">
-          <button class="rune-button primary" data-action="start"><span>탐사 시작</span><kbd>Enter</kbd></button>
-          <button class="rune-button" data-action="controls">조작법</button>
-          <button class="rune-button" data-action="settings">설정</button>
+          <button class="rune-button primary" data-action="start"><span class="menu-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v18M3 12h18M6 6l12 12M18 6 6 18"/><circle cx="12" cy="12" r="4"/></svg></span><span class="menu-label">탐사 시작</span><kbd>Enter</kbd></button>
+          <button class="rune-button" data-action="controls"><span class="menu-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5.5c3.1-.8 5.7-.2 8 1.7v12c-2.3-1.9-4.9-2.5-8-1.7zM20 5.5c-3.1-.8-5.7-.2-8 1.7v12c2.3-1.9 4.9-2.5 8-1.7z"/></svg></span><span class="menu-label">조작법</span></button>
+          <button class="rune-button" data-action="settings"><span class="menu-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="2"/></svg></span><span class="menu-label">설정</span></button>
         </div>
+        <div class="title-record-row"><span class="menu-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 19V12h3v7zM10.5 19V5h3v14zM16 19V9h3v10z"/></svg></span><span class="menu-label">최고 기록</span></div>
         <div class="best-record"><span>최고 기록</span><strong>${this.save.bestScore.toLocaleString()} · ${this.save.bestRank} 랭크</strong><small>Act ${this.save.highestAct} · 보스 ${this.save.mostBossesDefeated} · 최장 ${Math.floor(this.save.longestSurvivalSeconds / 60)}:${Math.floor(this.save.longestSurvivalSeconds % 60).toString().padStart(2, '0')}</small></div>
       </div>
       <p class="footer-note">한 판 4–6분 · 헤드폰 권장</p>`;
