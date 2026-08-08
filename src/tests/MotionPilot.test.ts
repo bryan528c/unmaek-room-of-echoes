@@ -229,7 +229,7 @@ describe('ACT 1 creature motion inventory', () => {
     expect(enemySource).toContain("playMotionAction(['combat_prep', 'charge_attack'], warningMs + 300, warningMs)");
     expect(enemySource).toContain('this.scheduleAttackCallback(310');
     expect(enemySource).toContain("playMotionAction(['hit_recover'], 220)");
-    const sceneSource = readFileSync('src/game/scenes/GameScene.ts', 'utf8');
+    const sceneSource = readFileSync('src/game/scenes/GameScene.ts', 'utf8').replace(/\r\n/g, '\n');
     expect(sceneSource).toContain('enemy.cancelAttackIntent(time + 120);\n      enemy.playResolvedContactRecovery();');
   });
 
