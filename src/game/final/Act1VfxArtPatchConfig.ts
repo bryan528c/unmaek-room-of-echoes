@@ -12,24 +12,24 @@ export const ACT1_VFX_PATCH_DIRECTIONS = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 
 export type Act1VfxPatchDirection = typeof ACT1_VFX_PATCH_DIRECTIONS[number];
 
 export const ACT1_VFX_PATCH_PRESENTATION = {
-  // 5/8 preserves a crisp binary-fraction scale while reducing the native
+  // 17/32 preserves a crisp binary-fraction scale while reducing the native
   // slash's apparent stroke weight. Directional offsets move the canvas away
   // from the hand without changing the gameplay cut origin or range.
-  playerSlash: { displayScale: 0.625, alpha: 0.88, tint: 0xc7c1b3, frameCount: 5, totalDurationMs: 245 },
-  batSonic: { displayScale: 1, formFrames: 3, launchFrames: 2, travelFrames: 3, impactFrames: 5, frameDurationMs: 70, showCollisionCore: false },
-  spiderWeb: { displayScale: 1, saturation: -1, formFrames: 3, launchFrames: 2, travelFrames: 3, impactFrames: 5, frameDurationMs: 70, showCollisionCore: false },
+  playerSlash: { displayScale: 0.53125, alpha: 0.54, edgeAlpha: 0.38, tint: 0x9eaaa1, frameCount: 5, totalDurationMs: 245 },
+  batSonic: { displayScale: 1, formForwardOffset: 11, formFrames: 3, launchFrames: 2, travelFrames: 3, impactFrames: 5, frameDurationMs: 70, showCollisionCore: false },
+  spiderWeb: { displayScale: 1, formForwardOffset: 10, saturation: -1, formFrames: 3, launchFrames: 2, travelFrames: 3, impactFrames: 5, frameDurationMs: 70, showCollisionCore: false },
   goralStone: { displayScale: 1, saturation: -1, travelFrames: 4, impactFrames: 5, frameDurationMs: 70, showCollisionCore: false },
 } as const;
 
 export const ACT1_VFX_PATCH_SLASH_OFFSET: Readonly<Record<Act1VfxPatchDirection, Readonly<{ x: number; y: number }>>> = {
-  n: { x: 0, y: -16 },
-  ne: { x: 13, y: -13 },
-  e: { x: 18, y: 0 },
-  se: { x: 13, y: 13 },
-  s: { x: 0, y: 16 },
-  sw: { x: -13, y: 13 },
-  w: { x: -18, y: 0 },
-  nw: { x: -13, y: -13 },
+  n: { x: 0, y: -26 },
+  ne: { x: 21, y: -21 },
+  e: { x: 29, y: 0 },
+  se: { x: 21, y: 21 },
+  s: { x: 0, y: 26 },
+  sw: { x: -21, y: 21 },
+  w: { x: -29, y: 0 },
+  nw: { x: -21, y: -21 },
 };
 
 export const offsetAct1VfxPatchSlashAnchor = (
@@ -38,6 +38,15 @@ export const offsetAct1VfxPatchSlashAnchor = (
 ): Readonly<{ x: number; y: number }> => ({
   x: anchor.x + ACT1_VFX_PATCH_SLASH_OFFSET[direction].x,
   y: anchor.y + ACT1_VFX_PATCH_SLASH_OFFSET[direction].y,
+});
+
+export const offsetAct1VfxPatchEnemyAnchor = (
+  anchor: Readonly<{ x: number; y: number }>,
+  aimAngle: number,
+  forwardOffset: number,
+): Readonly<{ x: number; y: number }> => ({
+  x: anchor.x + Math.cos(aimAngle) * forwardOffset,
+  y: anchor.y + Math.sin(aimAngle) * forwardOffset,
 });
 
 export const ACT1_VFX_PATCH_SLASH_CONTACT_FRAME: Readonly<Record<Act1VfxPatchDirection, number>> = {

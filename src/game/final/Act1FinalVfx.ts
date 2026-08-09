@@ -182,7 +182,13 @@ export class Act1FinalVfx {
   }
 
   public wordLink(origin: Readonly<{ x: number; y: number }>, targets: ReadonlyArray<Readonly<{ x: number; y: number }>>): void {
-    this.playWord('word_connect', origin, () => this.fallback.wordLink(origin, targets));
+    const effects = ['player_word_collarbone_resonance', 'word_connect'] as const;
+    if (this.selectSource('player:word:word_connect', effects, true) === 'FINAL_PNG') {
+      // Keep the approved collarbone cue, but use the existing thin procedural
+      // connector instead of the oversized endpoint rings/laser raster.
+      this.play('player_word_collarbone_resonance', origin);
+      this.fallback.wordLink(origin, targets);
+    } else this.fallback.wordLink(origin, targets);
   }
 
   public wordPush(center: Readonly<{ x: number; y: number }>): void { this.playWord('word_push', center); }

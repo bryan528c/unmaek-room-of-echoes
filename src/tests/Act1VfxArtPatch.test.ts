@@ -13,6 +13,7 @@ import {
   ACT1_VFX_PATCH_SLASH_OFFSET,
   act1VfxPatchImpactAllowed,
   normalizedSlashFrameDurations,
+  offsetAct1VfxPatchEnemyAnchor,
   offsetAct1VfxPatchSlashAnchor,
   resolveAct1VfxArtPatchConfig,
   resolveAct1VfxArtPatchSource,
@@ -20,6 +21,7 @@ import {
 import {
   ACT1_FINAL_CREATURE_PRESENTATION_PROFILES,
   ACT1_FINAL_PLAYER_VISUAL_SCALE,
+  act1FinalCorrectedFrameIsStable,
   act1FinalBossPhaseOverlayEnabled,
   act1FinalBossRetreatPresentation,
   act1FinalCombatTypographyEnabled,
@@ -91,7 +93,7 @@ describe('patch timing, attachment, and lifecycle contract', () => {
       expect(durations.slice(0, contactFrame).reduce((sum, value) => sum + value, 0)).toBeCloseTo(BALANCE.hero.cut.hitDelay, 5);
       expect(durations.reduce((sum, value) => sum + value, 0)).toBeCloseTo(BALANCE.hero.cut.recovery, 5);
     }
-    expect(ACT1_VFX_PATCH_PRESENTATION.playerSlash).toMatchObject({ displayScale: 0.625, alpha: 0.88, tint: 0xc7c1b3 });
+    expect(ACT1_VFX_PATCH_PRESENTATION.playerSlash).toMatchObject({ displayScale: 0.53125, alpha: 0.54, edgeAlpha: 0.38, tint: 0x9eaaa1 });
   });
 
   it('keeps every slash attached in front of the dagger with one crisp uniform scale', () => {
@@ -102,10 +104,28 @@ describe('patch timing, attachment, and lifecycle contract', () => {
     for (const direction of ACT1_VFX_PATCH_DIRECTIONS) {
       const offset = ACT1_VFX_PATCH_SLASH_OFFSET[direction];
       const vector = directionVectors[direction];
-      expect(offset.x * vector.x + offset.y * vector.y).toBeGreaterThanOrEqual(16);
+      expect(offset.x * vector.x + offset.y * vector.y).toBeGreaterThanOrEqual(25);
       expect(offsetAct1VfxPatchSlashAnchor({ x: 100, y: 200 }, direction)).toEqual({ x: 100 + offset.x, y: 200 + offset.y });
     }
     expect(ACT1_VFX_PATCH_PRESENTATION.playerSlash.displayScale).toBeLessThan(0.75);
+  });
+
+  it('locks bat and spider FORM/LAUNCH to the attack angle in front of the visual anchor', () => {
+    const anchor = { x: 100, y: 100 };
+    expect(offsetAct1VfxPatchEnemyAnchor(anchor, 0, 10)).toEqual({ x: 110, y: 100 });
+    expect(offsetAct1VfxPatchEnemyAnchor(anchor, Math.PI / 2, 10)).toMatchObject({ x: 100, y: 110 });
+    expect(offsetAct1VfxPatchEnemyAnchor(anchor, Math.PI, 10)).toMatchObject({ x: 90, y: 100 });
+    expect(offsetAct1VfxPatchEnemyAnchor(anchor, -Math.PI / 2, 10)).toMatchObject({ x: 100, y: 90 });
+    const runtime = readFileSync('src/game/final/Act1VfxArtPatchRuntime.ts', 'utf8');
+    expect(runtime).toContain('const lockedAimAngle = enemy.facingAngle');
+    expect(runtime).toContain('const lockedAimAngle = projectile.rotation');
+    expect(runtime).toContain('.setRotation(rotation)');
+  });
+
+  it('uses verified charge keys instead of corrected frames with baked magenta edges', () => {
+    expect(act1FinalCorrectedFrameIsStable('rewind_lizard', 'attack', 1)).toBe(false);
+    expect(act1FinalCorrectedFrameIsStable('resonance_goral', 'charge_attack', 1)).toBe(false);
+    expect(act1FinalCorrectedFrameIsStable('mineral_spider', 'move', 0)).toBe(true);
   });
 
   it('hides patch collision-core helpers while preserving fallback presentation paths', () => {
@@ -146,6 +166,23 @@ describe('patch timing, attachment, and lifecycle contract', () => {
     expect(patchRuntime).not.toContain('.damage =');
     expect(BALANCE.collision.projectileRadius).toBe(5);
     expect(BALANCE.hero.cut).toMatchObject({ damage: 14, range: 108, cooldown: 1050, hitDelay: 115, recovery: 245 });
+  });
+
+  it('uses one thin final link pulse without the raster endpoint rings', () => {
+    const finalVfx = readFileSync('src/game/final/Act1FinalVfx.ts', 'utf8');
+    const scene = readFileSync('src/game/scenes/GameScene.ts', 'utf8');
+    expect(finalVfx).toContain('this.fallback.wordLink(origin, targets)');
+    expect(finalVfx).not.toContain("this.playWord('word_connect'");
+    expect(scene).toContain('drawWave(0, 1, 0x6f9c91, 0.48)');
+  });
+
+  it('keeps the bottom combat cards and dynamic J text inside their panels', () => {
+    const overlay = readFileSync('src/ui/OverlayUI.ts', 'utf8');
+    const css = readFileSync('src/styles.css', 'utf8');
+    expect(overlay).toContain('잔향 ${state.echoBladeOrbitCount} · 범위 ${Math.round(state.echoBladeRange)} · ${state.echoBladeInterval.toFixed(1)}s');
+    expect(css).toContain('.finisher-slot { position: relative; height: 56px;');
+    expect(css).toContain('overflow: hidden; border: 1px solid #56635f88');
+    expect(css).toContain('.chain-status small { display: none; }');
   });
 
   it('cleans presentation without synthesizing cleanup impacts', () => {

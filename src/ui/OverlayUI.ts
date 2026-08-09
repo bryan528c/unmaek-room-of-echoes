@@ -373,7 +373,7 @@ export class OverlayUI {
       const status = cut.querySelector<HTMLElement>('[data-cut-status]');
       if (status) status.textContent = state.cutCooldown > 0 ? `${state.cutCooldown.toFixed(1)}s` : '준비 완료';
       const echo = cut.querySelector<HTMLElement>('[data-echo-status]');
-      if (echo) echo.textContent = `잔향 ${state.echoBladeOrbitCount}날 · ${Math.round(state.echoBladeRange)}범위 · ${state.echoBladeInterval.toFixed(1)}s`;
+      if (echo) echo.textContent = `잔향 ${state.echoBladeOrbitCount} · 범위 ${Math.round(state.echoBladeRange)} · ${state.echoBladeInterval.toFixed(1)}s`;
     }
     const stage = this.hud.querySelector('[data-stage]'); if (stage) stage.textContent = state.stage;
     const runContext = this.hud.querySelector('[data-run-context]'); if (runContext) runContext.textContent = `Act ${state.actIndex} · ${state.actName} · 보스 ${state.bossesDefeated}`;

@@ -2870,8 +2870,8 @@ export class GameScene extends Phaser.Scene {
       const first = [...this.enemies].find((enemy) => enemy.id === firstId && enemy.active && !enemy.removing);
       const second = [...this.enemies].find((enemy) => enemy.id === secondId && enemy.active && !enemy.removing);
       if (!first || !second) { this.stitchedPairs.delete(firstId); this.stitchedPairs.delete(secondId); continue; }
-      this.linkGraphics?.lineStyle(finalReadability ? 2 : 4, 0x301923, finalReadability ? .55 : .88).beginPath().moveTo(first.x, first.y - 14).lineTo(second.x, second.y - 14).strokePath();
-      this.linkGraphics?.lineStyle(1, 0xc06f8d, finalReadability ? .58 : .82).beginPath();
+      this.linkGraphics?.lineStyle(finalReadability ? 1 : 4, finalReadability ? 0x607f77 : 0x301923, finalReadability ? .42 : .88).beginPath().moveTo(first.x, first.y - 14).lineTo(second.x, second.y - 14).strokePath();
+      this.linkGraphics?.lineStyle(1, finalReadability ? 0x789e94 : 0xc06f8d, finalReadability ? .36 : .82).beginPath();
       for (let step = 0; step <= 10; step += 1) {
         const ratio = step / 10; const x = Phaser.Math.Linear(first.x, second.x, ratio); const y = Phaser.Math.Linear(first.y - 14, second.y - 14, ratio) + (step % 2 ? 4 : -4);
         if (step === 0) this.linkGraphics?.moveTo(x, y); else this.linkGraphics?.lineTo(x, y);
@@ -2896,15 +2896,18 @@ export class GameScene extends Phaser.Scene {
         }
         this.linkGraphics?.strokePath();
       };
-      drawWave(0, finalReadability ? 2.5 : 5, 0x102f2d, finalReadability ? 0.56 : 0.92);
-      drawWave(3.4, finalReadability ? 1 : 1.5, 0x89ead7, finalReadability ? 0.62 : 0.92);
-      drawWave(-3.4, 1, 0x4dbfac, finalReadability ? 0.5 : 0.82);
+      if (finalReadability) drawWave(0, 1, 0x6f9c91, 0.48);
+      else {
+        drawWave(0, 5, 0x102f2d, 0.92);
+        drawWave(3.4, 1.5, 0x89ead7, 0.92);
+        drawWave(-3.4, 1, 0x4dbfac, 0.82);
+      }
       const travel = (time / 720 + index * 0.31) % 1;
       const gx = Phaser.Math.Linear(ax, bx, travel); const gy = Phaser.Math.Linear(ay, by, travel);
-      this.linkGraphics?.fillStyle(0xc0ffef, finalReadability ? 0.72 : 0.95).fillCircle(gx, gy, finalReadability ? 2 : 4);
+      this.linkGraphics?.fillStyle(finalReadability ? 0x91b9af : 0xc0ffef, finalReadability ? 0.52 : 0.95).fillCircle(gx, gy, finalReadability ? 1.5 : 4);
       const echoTravel = (travel + 0.5) % 1;
       const echoX = Phaser.Math.Linear(ax, bx, echoTravel); const echoY = Phaser.Math.Linear(ay, by, echoTravel);
-      this.linkGraphics?.fillStyle(0x5fd0bc, 0.8).fillTriangle(echoX, echoY - 4, echoX + 4, echoY, echoX, echoY + 4).fillTriangle(echoX, echoY - 4, echoX - 4, echoY, echoX, echoY + 4);
+      if (!finalReadability) this.linkGraphics?.fillStyle(0x5fd0bc, 0.8).fillTriangle(echoX, echoY - 4, echoX + 4, echoY, echoX, echoY + 4).fillTriangle(echoX, echoY - 4, echoX - 4, echoY, echoX, echoY + 4);
     }
   }
 

@@ -84,7 +84,7 @@ describe('native player contract', () => {
 });
 
 describe('creature selection and VFX bindings', () => {
-  it('keeps a single species scale and admits only corrected key frames inside the 8% envelope gate', () => {
+  it('keeps a single species scale and admits only corrected keys that pass the visual stability gate', () => {
     const corrected = act1FinalImagePaths('corrected');
     expect(corrected).toHaveLength(27);
     expect(act1FinalImagePaths('verified')).toHaveLength(99);
@@ -95,10 +95,10 @@ describe('creature selection and VFX bindings', () => {
     expect(runtime).toContain('act1FinalCorrectedFrameIsStable');
     expect(runtime).toContain("source: 'FINAL_CORRECTED'");
     expect(runtime).toContain("return this.frameFile.includes('/readability_corrected/') ? 'FINAL_CORRECTED' : 'VERIFIED_MOTION'");
-    expect(Object.values(ACT1_FINAL_STABLE_CORRECTED_FRAME_KEYS).reduce((sum, keys) => sum + keys.size, 0)).toBe(3);
-    expect(act1FinalCorrectedFrameIsStable('rewind_lizard', 'attack', 1)).toBe(true);
+    expect(Object.values(ACT1_FINAL_STABLE_CORRECTED_FRAME_KEYS).reduce((sum, keys) => sum + keys.size, 0)).toBe(1);
+    expect(act1FinalCorrectedFrameIsStable('rewind_lizard', 'attack', 1)).toBe(false);
     expect(act1FinalCorrectedFrameIsStable('mineral_spider', 'move', 0)).toBe(true);
-    expect(act1FinalCorrectedFrameIsStable('resonance_goral', 'charge_attack', 1)).toBe(true);
+    expect(act1FinalCorrectedFrameIsStable('resonance_goral', 'charge_attack', 1)).toBe(false);
     expect(act1FinalCorrectedFrameIsStable('deflect_bat', 'attack', 0)).toBe(false);
     for (const profile of Object.values(ACT1_FINAL_CREATURE_PRESENTATION_PROFILES)) expect(profile.uniformScale).toBeGreaterThan(0);
     expect(ACT1_FINAL_CREATURE_PRESENTATION_PROFILES.resonance_goral?.uniformScale).toBe(1.16);

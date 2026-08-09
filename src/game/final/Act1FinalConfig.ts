@@ -58,9 +58,12 @@ export const ACT1_FINAL_CREATURE_PRESENTATION_PROFILES: Readonly<Record<string, 
 export const ACT1_FINAL_STABLE_CORRECTED_FRAME_KEYS: Readonly<Record<string, ReadonlySet<string>>> = {
   pressure_swift: new Set(),
   deflect_bat: new Set(),
-  rewind_lizard: new Set(['attack:1']),
+  // The corrected charge key includes a magenta edge that reads as a transient
+  // gameplay outline. Keep the approved verified frame for this pose instead.
+  rewind_lizard: new Set(),
   mineral_spider: new Set(['move:0']),
-  resonance_goral: new Set(['charge_attack:1']),
+  // As above, the corrected charge key carries baked magenta edge pixels.
+  resonance_goral: new Set(),
 };
 
 // 13/16 keeps the 128 px source on a stable binary fraction while reducing the

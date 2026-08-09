@@ -11,6 +11,7 @@ import {
   ACT1_VFX_PATCH_SLASH_CONTACT_FRAME,
   act1VfxArtPatchEnabledForAct,
   normalizedSlashFrameDurations,
+  offsetAct1VfxPatchEnemyAnchor,
   offsetAct1VfxPatchSlashAnchor,
   resolveAct1VfxArtPatchSource,
   type Act1VfxArtPatchCategory,
@@ -97,6 +98,12 @@ const applySequencePresentation = (image: Phaser.GameObjects.Image, sequenceId: 
   return image;
 };
 
+const applySequenceFrameAlpha = (image: Phaser.GameObjects.Image, sequenceId: string, frame: number): void => {
+  if (!sequenceId.startsWith('player_slash:')) return;
+  const presentation = ACT1_VFX_PATCH_PRESENTATION.playerSlash;
+  image.setAlpha(frame === 0 || frame === presentation.frameCount - 1 ? presentation.edgeAlpha : presentation.alpha);
+};
+
 export interface Act1VfxArtPatchSnapshot {
   enabled: boolean;
   sources: Readonly<Record<Act1VfxArtPatchCategory, Act1VfxArtPatchSource>>;
@@ -171,7 +178,15 @@ export class Act1VfxArtPatchRuntime {
     const sequenceId = enemy.creatureId === 'deflect_bat' ? 'bat_sonic:form'
       : enemy.creatureId === 'mineral_spider' ? 'spider_web:form' : undefined;
     if (!sequenceId || this.sourceForSequence(sequenceId) !== 'PATCH_PNG') return false;
-    return Boolean(this.play(sequenceId, () => enemy.visualAttackAnchor ?? enemy.attackAnchor, enemy, undefined, 'PROJECTILE_SPAWN'));
+    const lockedAimAngle = enemy.facingAngle;
+    const forwardOffset = enemy.creatureId === 'deflect_bat'
+      ? ACT1_VFX_PATCH_PRESENTATION.batSonic.formForwardOffset
+      : ACT1_VFX_PATCH_PRESENTATION.spiderWeb.formForwardOffset;
+    return Boolean(this.play(sequenceId, () => offsetAct1VfxPatchEnemyAnchor(
+      enemy.visualAttackAnchor ?? enemy.attackAnchor,
+      lockedAimAngle,
+      forwardOffset,
+    ), enemy, undefined, 'PROJECTILE_SPAWN', 0, lockedAimAngle));
   }
 
   public attachProjectile(projectile: Projectile, source: Enemy): boolean {
@@ -180,7 +195,17 @@ export class Act1VfxArtPatchRuntime {
     const sequences = projectileSequences(source);
     if (!sequences || this.sourceForCategory(sequences.category) !== 'PATCH_PNG') return false;
     this.removeOwnerEffects(source, 'PROJECTILE_SPAWN');
-    if (sequences.launch) this.play(sequences.launch, () => source.visualAttackAnchor ?? source.attackAnchor, source, undefined, 'FRAME_COMPLETE');
+    if (sequences.launch) {
+      const lockedAimAngle = projectile.rotation;
+      const forwardOffset = sequences.category === 'batSonic'
+        ? ACT1_VFX_PATCH_PRESENTATION.batSonic.formForwardOffset
+        : ACT1_VFX_PATCH_PRESENTATION.spiderWeb.formForwardOffset;
+      this.play(sequences.launch, () => offsetAct1VfxPatchEnemyAnchor(
+        source.visualAttackAnchor ?? source.attackAnchor,
+        lockedAimAngle,
+        forwardOffset,
+      ), source, undefined, 'FRAME_COMPLETE', 0, lockedAimAngle);
+    }
     const frames = act1VfxPatchSequencePaths(sequences.travel);
     const first = frames[0];
     if (!first) return false;
@@ -314,6 +339,7 @@ export class Act1VfxArtPatchRuntime {
     durations?: readonly number[],
     expectedCleanup = owner ? 'SEQUENCE_CHANGE' : 'FRAME_COMPLETE',
     initialFrame = 0,
+    rotation = 0,
   ): PatchLiveEffect | undefined {
     if (!this.actActive || this.sourceForSequence(sequenceId) !== 'PATCH_PNG') return undefined;
     const frames = act1VfxPatchSequencePaths(sequenceId);
@@ -324,7 +350,9 @@ export class Act1VfxArtPatchRuntime {
     const image = applySequencePresentation(this.scene.add.image(Math.round(position.x), Math.round(position.y), act1VfxPatchTextureKey(first))
       .setOrigin(0.5)
       .setScale(sequenceScale(sequenceId))
+      .setRotation(rotation)
       .setDepth(sequenceId.startsWith('player_slash:') ? DEPTH.melee : DEPTH.projectile), sequenceId);
+    applySequenceFrameAlpha(image, sequenceId, frameIndex);
     const frameDurations = durations ?? frames.map(() => sequenceFrameDuration(sequenceId));
     const live: PatchLiveEffect = {
       instanceId: this.instanceSequence += 1,
@@ -353,6 +381,7 @@ export class Act1VfxArtPatchRuntime {
       item.frame = next;
       const path = item.frames[next];
       if (path) item.image.setTexture(act1VfxPatchTextureKey(path));
+      applySequenceFrameAlpha(item.image, item.sequenceId, item.frame);
       this.scheduleAdvance(item);
     });
   }
@@ -361,6 +390,7 @@ export class Act1VfxArtPatchRuntime {
     item.frame = Math.max(item.frame, Math.min(item.frames.length - 1, frame));
     const path = item.frames[item.frame];
     if (path) item.image.setTexture(act1VfxPatchTextureKey(path));
+    applySequenceFrameAlpha(item.image, item.sequenceId, item.frame);
     this.scheduleAdvance(item);
   }
 
