@@ -219,7 +219,7 @@ export class OverlayUI {
       <div class="title-mist"></div>
       <div class="title-content">
         <div class="portrait-crop" aria-label="주인공 초상화"><img src="./assets/hero-concept.png" alt="검은 망토를 입은 소년의 얼굴" /></div>
-        <img class="title-lockup" src="/assets/title-ui-lockup.png" alt="" aria-hidden="true" />
+        <img class="title-lockup" src="./assets/title-ui-lockup.png" alt="" aria-hidden="true" />
         <p class="eyebrow">잊힌 언어를 잇는 자</p>
         <h1><small>言脈</small> 언맥 <span>용흔 구역</span></h1>
         <p class="title-copy">용의 마지막 말이 생명 속에 남은 땅,<br />누나의 흔적을 따라 미지의 함몰지로 내려간다.</p>
